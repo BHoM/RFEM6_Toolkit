@@ -1,18 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>SoftwareName_Adapter</AssemblyName>
-    <RootNamespace>BH.Adapter.SoftwareName</RootNamespace>
+    <AssemblyName>RFEM6_Adapter</AssemblyName>
+    <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.2.30" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SoftwareName_Engine\SoftwareName_Engine.csproj" />
-    <ProjectReference Include="..\SoftwareName_oM\SoftwareName_oM.csproj" />
+    <ProjectReference Include="..\RFEM6_Engine\RFEM6_Engine.csproj" />
+    <ProjectReference Include="..\RFEM6_oM\RFEM6_oM.csproj" />
   </ItemGroup>
 
   <ItemGroup>

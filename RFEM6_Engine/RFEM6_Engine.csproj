@@ -5,7 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SoftwareName_oM\SoftwareName_oM.csproj" />
+    <PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.2.30" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RFEM6_oM\RFEM6_oM.csproj" />
   </ItemGroup>
 
   <ItemGroup>

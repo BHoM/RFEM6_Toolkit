@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2022, the respective contributors. All rights reserved.
  *
@@ -22,31 +22,26 @@
 
 using BH.oM.Base;
 using BH.oM.Base.Attributes;
-using BH.oM.Adapters.SoftwareName;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace BH.Engine.Adapters.SoftwareName
+namespace BH.oM.Adapters.RFEM6
 {
-    public static partial class Modify
+    [Description("Object description in here. Will appear in the UI tooltip.")]
+    public class ExampleObject : BHoMObject
     {
-        /***************************************************/
-        /**** Public Methods                            ****/
-        /***************************************************/
+        // // See examples in the BHoM repo and the wiki to see how we define types.
+        // // Generally, all properties should be public and have public getter and setter.
+        // // BHoM Objects should have orthogonal properties and no behaviour (no methods), as in C# Records (or Python Dataclasses).
+        // // No constructor should be specified. If a specific instantiaton method is needed, we make it as an "Engine/Create" method.
+        // // Objects created with this convention will automatically appear as UI components (e.g. Grasshopper component).
 
-        [Description("Description of the method. Will appear in the UI tooltip.")]
-        [Input("objectToModify", "Description of the input. Will appear in the UI tooltip.")]
-        [Output("outputName", "Description of the output. Will appear in the UI tooltip.")]
-        public static ExampleObject ExampleCreateMethod(ExampleObject objectToModify)
-        {
-            // This method will appear in every UI (e.g. Grasshopper) as a component.
-            // Find it using the CTRL+Shift+B search bar, or by navigating the `Create` component (Engine tab) right click menu.
-            throw new NotImplementedException();
-        }
+        [Description("Property description in here.")]
+        public string SomeStringProperty { get; set; }
 
-        /***************************************************/
-
+        [Description("Property description in here.")]
+        public int SomeNumberProperty { get; set; }
     }
 }
