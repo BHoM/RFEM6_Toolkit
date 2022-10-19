@@ -27,6 +27,9 @@
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
     </Reference>
+    <Reference Include="Analytical_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Analytical_oM.dll</HintPath>
+    </Reference>
     <Reference Include="BHoM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
       <Private>false</Private>
@@ -41,6 +44,30 @@
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="Data_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Data_oM.dll</HintPath>
+    </Reference>
+    <Reference Include="Geometry_Engine">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Geometry_Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="Geometry_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Geometry_oM.dll</HintPath>
+    </Reference>
+    <Reference Include="Spatial_Engine">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Spatial_Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="Spatial_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Spatial_oM.dll</HintPath>
+    </Reference>
+    <Reference Include="Structure_AdapterModules">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Structure_AdapterModules.dll</HintPath>
+    </Reference>
+    <Reference Include="Structure_Engine">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Structure_Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="Structure_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Structure_oM.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -22,12 +22,25 @@
 
 using BH.Adapter;
 using BH.oM.Base.Attributes;
+
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using Dlubal.WS.Rfem6.Application;
+using Dlubal.WS.Rfem6.Model;
+using BH.oM.Structure.Elements;
+using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.Constraints;
+using BH.Engine.Base.Objects;
+using BH.oM.Structure.SurfaceProperties;
+using BH.oM.Structure.Loads;
+using System.ServiceModel;
 
 namespace BH.Adapter.RFEM6
 {
@@ -39,17 +52,51 @@ namespace BH.Adapter.RFEM6
 
         [Description("Adapter for RFEM6.")]
         [Output("The created RFEM6 adapter.")]
-        public RFEM6Adapter()
+        public RFEM6Adapter(bool active = false)
         {
             // The Adapter constructor can be used to configure the Adapter behaviour.
             // For example:
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly; // Adapter `Push` Action simply calls "Create" method.
-            
-            // See the wiki, the AdapterSettings object and other Adapters to see how it can be configured.
 
-            // If your toolkit needs to define this.AdapterComparers and or this.DependencyTypes,
-            // this constructor has to populate those properties.
-            // See the wiki for more information.
+            // See the wiki, the AdapterSettings object and other Adapters to see how it can be configured.
+            //AdapterIdFragmentType = typeof(RFEMId);
+            BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
+
+            AdapterComparers = new Dictionary<Type, object>
+            {
+                {typeof(Bar), new BH.Engine.Structure.BarEndNodesDistanceComparer(3) },
+                {typeof(Node), new BH.Engine.Structure.NodeDistanceComparer(3) },
+                {typeof(ISectionProperty), new BHoMObjectNameOrToStringComparer() },
+                {typeof(IMaterialFragment), new BHoMObjectNameComparer() },
+                {typeof(LinkConstraint), new BHoMObjectNameComparer() },
+            };
+
+            DependencyTypes = new Dictionary<Type, List<Type>>
+            {
+                {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(Node) } },
+                {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },
+                {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
+                {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
+                {typeof(ISurfaceProperty), new List<Type> { typeof(IMaterialFragment) } },
+                {typeof(Panel), new List<Type> { typeof(ISurfaceProperty) } },
+                {typeof(ILoad), new List<Type> { typeof(Loadcase) } },
+                {typeof(LoadCombination), new List<Type> { typeof(Loadcase) } }
+            };
+
+
+
+            if (active)
+            {
+                // creates new model
+                string modelName = "MyTestModel";
+                string modelUrl = application.new_model(modelName);
+
+                // connects to RFEM6/RSTAB9 model
+                RfemModelClient model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
+                model.reset();
+
+
+            }
         }
 
         // You can add any other constructors that take more inputs here. 
@@ -63,6 +110,20 @@ namespace BH.Adapter.RFEM6
         // if a method does not need any external call (API call, connection call, etc.)
         // we place them in the Engine project, and then reference them from the Adapter.
         // See the wiki for more information.
+
+
+        //RFEM stuff ----------------------------
+        public static EndpointAddress Address { get; set; } = new EndpointAddress("http://localhost:8081");
+
+        private static BasicHttpBinding Binding
+        {
+            get
+            {
+                BasicHttpBinding binding = new BasicHttpBinding { SendTimeout = new TimeSpan(0, 0, 180), UseDefaultWebProxy = true, };
+                return binding;
+            }
+        }
+        private static RfemApplicationClient application = null;
 
         /***************************************************/
     }
