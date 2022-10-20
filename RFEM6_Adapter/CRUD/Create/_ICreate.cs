@@ -48,9 +48,23 @@ namespace BH.Adapter.RFEM6
             // In other words:
             foreach (T obj in objects)
             {
-                success &= Create(obj as dynamic);
-            }
+                //success &= Create(obj as dynamic);
+                if (objects.Count() > 0)
+                {
+                    //AppLock();
+                    try
+                    {
+                        model.begin_modification("Geometry");
+                        success = CreateCollection(objects as dynamic); //Calls the correct CreateCollection method based on dynamic casting
+                    }
+                    finally
+                    {
+                        //AppUnlock();
+                        model.finish_modification();
+                    }
 
+                }
+            }
             // Then place the specific Create methods below this method or, better, in separate file for each object type.
             return success;
         }
@@ -70,7 +84,7 @@ namespace BH.Adapter.RFEM6
         // Fallback case. If no specific Create is found, here we should handle what happens then.
         protected bool Create(IBHoMObject obj)
         {
-            BH.Engine.Base.Compute.RecordError("No specific Create method found for {obj.GetType().Name}.");
+            BH.Engine.Base.Compute.RecordError("No specific Create method found for" + obj.GetType().Name);
             return false;
         }
     }

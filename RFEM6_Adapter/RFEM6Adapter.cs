@@ -92,7 +92,7 @@ namespace BH.Adapter.RFEM6
                 string modelUrl = application.new_model(modelName);
 
                 // connects to RFEM6/RSTAB9 model
-                RfemModelClient model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
+                model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
                 model.reset();
 
 
@@ -113,6 +113,7 @@ namespace BH.Adapter.RFEM6
 
 
         //RFEM stuff ----------------------------
+        RfemModelClient model;
         public static EndpointAddress Address { get; set; } = new EndpointAddress("http://localhost:8081");
 
         private static BasicHttpBinding Binding
