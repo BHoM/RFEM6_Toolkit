@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.2.34" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="BHoM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
       <Private>false</Private>

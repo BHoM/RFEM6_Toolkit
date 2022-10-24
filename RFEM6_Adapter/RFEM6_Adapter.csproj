@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.2.34" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.10.0" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +57,9 @@
     </Reference>
     <Reference Include="Geometry_oM">
       <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Geometry_oM.dll</HintPath>
+    </Reference>
+    <Reference Include="RFEMWebServiceLibrary">
+      <HintPath>..\packages\BHoM.Interop.RFEM6\RFEMWebServiceLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Spatial_Engine">
       <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Spatial_Engine.dll</HintPath>
