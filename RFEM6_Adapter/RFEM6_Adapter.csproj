@@ -4,6 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>RFEM6_Adapter</AssemblyName>
     <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<BaseOutputPath>..\Build\</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
