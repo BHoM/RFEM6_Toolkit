@@ -87,7 +87,7 @@ namespace BH.Adapter.RFEM6
 
             if (active)
             {
-                System.Security.Permissions.ReflectionPermission permission = new System.Security.Permissions.ReflectionPermission(System.Security.Permissions.ReflectionPermissionFlag.ReflectionEmit);
+                //System.Security.Permissions.ReflectionPermission permission = new System.Security.Permissions.ReflectionPermission(System.Security.Permissions.ReflectionPermissionFlag.ReflectionEmit);
                 // creates new model
                 string modelName = "MyTestModel";
                 string modelUrl = application.new_model(modelName);//throws error: This operation is not supported on .NET Standard as Reflection.Emit is not available.'
