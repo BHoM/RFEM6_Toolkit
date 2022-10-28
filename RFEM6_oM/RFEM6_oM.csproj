@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>v4.7.2</TargetFramework>
+    <TargetFrameworks>net472</TargetFrameworks>
     <BaseOutputPath>..\Build</BaseOutputPath>
   </PropertyGroup>
 

@@ -41,6 +41,7 @@ using BH.Engine.Base.Objects;
 using BH.oM.Structure.SurfaceProperties;
 using BH.oM.Structure.Loads;
 using System.ServiceModel;
+using System.ServiceModel.Primitives;
 
 namespace BH.Adapter.RFEM6
 {
