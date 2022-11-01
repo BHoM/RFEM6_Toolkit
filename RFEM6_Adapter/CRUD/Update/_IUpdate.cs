@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2022, the respective contributors. All rights reserved.
  *
@@ -27,9 +27,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BH.Adapter.SoftwareName
+namespace BH.Adapter.RFEM6
 {
-    public partial class SoftwareNameAdapter : BHoMAdapter
+    public partial class RFEM6Adapter : BHoMAdapter
     {
         // This method gets called when appropriate by the Push method contained in the base Adapter class.
         // Unlike the Create, Delete and Read, this method already exposes a simple implementation: it calls Delete and then Create.

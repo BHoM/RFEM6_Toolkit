@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net48</TargetFrameworks>
+    <AssemblyName>RFEM6_Adapter</AssemblyName>
+    <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<BaseOutputPath>..\Build\</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.2.34" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Private.ServiceModel" Version="4.10.0" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RFEM6_Engine\RFEM6_Engine.csproj" />
+    <ProjectReference Include="..\RFEM6_oM\RFEM6_oM.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Adapter_Engine">
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Adapter_oM">
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
+      <Private>false</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="Analytical_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Analytical_oM.dll</HintPath>
+    </Reference>
+    <Reference Include="BHoM">
+      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
+      <Private>false</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="BHoM_Adapter">
+      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
+      <Private>false</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="BHoM_Engine">
+      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
+      <Private>false</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="Data_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Data_oM.dll</HintPath>
+    </Reference>
+    <Reference Include="Dimensional_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Dimensional_oM.dll</HintPath>
+    </Reference>
+    <Reference Include="Geometry_Engine">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Geometry_Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="Geometry_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Geometry_oM.dll</HintPath>
+    </Reference>
+    <Reference Include="RFEMWebServiceLibrary">
+      <HintPath>..\packages\BHoM.Interop.RFEM6\RFEMWebServiceLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Spatial_Engine">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Spatial_Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="Spatial_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Spatial_oM.dll</HintPath>
+    </Reference>
+    <Reference Include="Structure_AdapterModules">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Structure_AdapterModules.dll</HintPath>
+    </Reference>
+    <Reference Include="Structure_Engine">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Structure_Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="Structure_oM">
+      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Structure_oM.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
+  </Target>
+
+</Project>

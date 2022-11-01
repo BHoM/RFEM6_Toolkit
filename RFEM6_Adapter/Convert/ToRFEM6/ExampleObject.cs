@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2022, the respective contributors. All rights reserved.
  *
@@ -20,7 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.oM.Adapters.SoftwareName;
+using BH.oM.Adapters.RFEM6;
 using BH.oM.Base;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BH.Adapter.SoftwareName
+namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
@@ -36,9 +36,9 @@ namespace BH.Adapter.SoftwareName
         /**** Public Methods                            ****/
         /***************************************************/
 
-        // Add methods for converting to BHoM from the specific software types. 
+        // Add methods for converting from BHoM to the specific software types
         // Example:
-        public static BHoMObject FromSoftwareName(this ExampleObject node)
+        public static ExampleObject ToRFEM6(this BHoMObject node)
         {
             //Insert code for convertion
             throw new NotImplementedException();

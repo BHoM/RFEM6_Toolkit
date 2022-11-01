@@ -1,12 +1,12 @@
 using namespace System.IO
 using namespace System.Collections.Generic
 
-$softwareName = Read-Host "Please enter the software name."
+$RFEM6 = Read-Host "Please enter the software name."
 
-# Replace occurrences of "SoftwareName" in all files
+# Replace occurrences of "RFEM6" in all files
 Get-ChildItem -File -Recurse | ForEach-Object {
     try {
-        (Get-Content $_.FullName) -replace 'SoftwareName', $softwareName | Set-Content $_.FullName
+        (Get-Content $_.FullName) -replace 'RFEM6', $RFEM6 | Set-Content $_.FullName
     } 
     catch {}
 }
@@ -16,11 +16,11 @@ $stack = [Stack[string]]::new()
 $allPaths = [List[string]]::new()
 
 
-# Get all files and directories containing "SoftwareName" recursively
+# Get all files and directories containing "RFEM6" recursively
 Get-ChildItem -Recurse -Directory | ForEach-Object {
     $dirpath = $_.FullName
     $dirname = Split-Path  $dirpath -Leaf
-    if ($dirname.Contains("SoftwareName"))
+    if ($dirname.Contains("RFEM6"))
     {
         Write-Host "dirpath: " $dirpath
         $stack.Push($dirpath)
@@ -32,7 +32,7 @@ Get-ChildItem -Recurse -Directory | ForEach-Object {
     foreach ($file in [Directory]::EnumerateFiles($dirpath)) 
     {
         $filename = [Path]::GetFileName($file)
-        if ($filename.Contains('SoftwareName') -and -not $allPaths.Contains($file))
+        if ($filename.Contains('RFEM6') -and -not $allPaths.Contains($file))
         {
             Write-Host "filepath: " $file
             $stack.Push($file)
@@ -43,7 +43,7 @@ Get-ChildItem -Recurse -Directory | ForEach-Object {
 
 # Add root files
 Get-ChildItem -File | ForEach-Object {
-    if ($_.FullName.Contains("SoftwareName")) {
+    if ($_.FullName.Contains("RFEM6")) {
         Write-Host "filepath: " $_.FullName
         $stack.Push($_.FullName)
     }
@@ -56,9 +56,9 @@ while ($stack.Count) {
 
     $filename = [Path]::GetFileName($poppedFullName)
 
-    if($filename.Contains('SoftwareName') -and $pathExists)
+    if($filename.Contains('RFEM6') -and $pathExists)
     {
-        $newName = $filename.Replace('SoftwareName', $softwareName)
+        $newName = $filename.Replace('RFEM6', $RFEM6)
 
         Write-Host "Renaming: " $poppedFullName " to: " $newName
 
