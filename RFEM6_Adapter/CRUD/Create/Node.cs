@@ -47,8 +47,12 @@ namespace BH.Adapter.RFEM6
             for (int i = 0; i < bhNodes.Count(); i++)
             {
                 Node bhNode = bhNodes.ToList()[i];
-             
+
+                //bool nodeDoesExisitInModel = modelDoesContainNode(bhNode);
+
+                
                 if (modelDoesContainNode(bhNode)==null) {
+
 
                     rfModel.node rfNode = new rfModel.node()
                     {
