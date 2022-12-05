@@ -22,6 +22,12 @@
 
 using BH.oM.Adapter;
 using BH.oM.Base;
+using BH.oM.Structure.Elements;
+using BH.oM.Structure.Constraints;
+using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.SurfaceProperties;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.Loads;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,7 +57,39 @@ namespace BH.Adapter.RFEM6
             // else if (type == typeof(SomeType3))
             //     return ReadSomeType3(ids as dynamic);
 
-            return new List<IBHoMObject>();
+           // AppLock();
+
+            try
+            {
+                if (type == typeof(Node))
+                    return ReadNodes(ids as dynamic);
+                //if (type == typeof(Constraint6DOF))
+                //    return ReadConstraints(ids as dynamic);
+                //else if (type == typeof(Bar))
+                //    return ReadBars(ids as dynamic);
+                //else if (type == typeof(ISectionProperty) || type.GetInterfaces().Contains(typeof(ISectionProperty)))
+                //    return ReadSectionProperties(ids as dynamic);
+                //else if (type == typeof(IMaterialFragment))
+                //    return ReadMaterials(ids as dynamic);
+                //else if (type == typeof(Panel))
+                //    return ReadPanels(ids as dynamic);
+                //else if (type == typeof(ISurfaceProperty))
+                //    return ReadSurfaceProperties(ids as dynamic);
+                //else if (type == typeof(RigidLink))
+                //    return ReadLinks(ids as dynamic);
+                //else if (type == typeof(ILoad))
+                //    return ReadLoads(ids as dynamic);
+                //else if (type == typeof(Loadcase))
+                //    return ReadLoadcases(ids as dynamic);
+                //else if (type == typeof(LoadCombination))
+                //    return ReadLoadCombinations(ids as dynamic);
+            }
+            finally
+            {
+               // AppUnlock();
+            }
+
+            return new List<IBHoMObject>(); ;
         }
 
         /***************************************************/
