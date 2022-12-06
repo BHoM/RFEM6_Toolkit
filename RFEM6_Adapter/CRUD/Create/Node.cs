@@ -27,7 +27,6 @@ namespace BH.Adapter.RFEM6
 
                 rfModel.node rfNd= modelDoesContainNode(bhNode);
                
-                //check if node does exist
                 if (rfNd == null) {
 
 
@@ -43,7 +42,6 @@ namespace BH.Adapter.RFEM6
 
                 }
 
-                //does node have a support?
                 if (bhNode.Support!=null)
                 {
 
@@ -51,26 +49,20 @@ namespace BH.Adapter.RFEM6
 
                     rfModel.node constraintLocationNode = modelDoesContainNode(bhNode);
 
-                    //check if support already exist
-                    var existinConstraint = checkForExistenceOfConstraint(bhNode.Support);
+                    rfModel.nodal_support existinConstraint = checkForExistenceOfConstraint(bhNode.Support);
                     if (existinConstraint == null)
                     {
-                        rfModel.nodal_support rfNodalSuuuport = new rfModel.nodal_support()
-                        {
-                            no = nodalSupportId,
-                            nodes = new int[] { constraintLocationNode.no },
-                            spring = new rfModel.vector_3d() { x = stiffnessTranslationBHToRF("" + bhNode.Support.TranslationX), y = stiffnessTranslationBHToRF("" + bhNode.Support.TranslationY), z = stiffnessTranslationBHToRF("" + bhNode.Support.TranslationZ) },
-                            rotational_restraint = new rfModel.vector_3d() { x = stiffnessTranslationBHToRF("" + bhNode.Support.RotationX), y = stiffnessTranslationBHToRF("" + bhNode.Support.RotationY), z = stiffnessTranslationBHToRF("" + bhNode.Support.RotationZ) },
-                        };
 
-                        model.set_nodal_support(rfNodalSuuuport);
+                        rfModel.nodal_support rfNodelSuport = Convert.ToRFEM6(bhNode, constraintLocationNode.no, nodalSupportId);
+                        model.set_nodal_support(rfNodelSuport);
+
                     }
                     else
                     {
-                        var a = modelDoesContainNode(bhNode);
-                        var b = existinConstraint.nodes.ToList();
-                        b.Add(a.no);
-                        existinConstraint.nodes=b.ToArray();
+                        rfModel.node rfNode = modelDoesContainNode(bhNode);
+                        List<int> constrrainNodesNo = existinConstraint.nodes.ToList();
+                        constrrainNodesNo.Add(rfNode.no);
+                        existinConstraint.nodes=constrrainNodesNo.ToArray();
                         model.delete_object(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT, existinConstraint.no, 0);
                         model.set_nodal_support(existinConstraint);
                     }
@@ -83,10 +75,10 @@ namespace BH.Adapter.RFEM6
         private rfModel.node modelDoesContainNode(Node bhNode)
         {
 
-            var numbers=model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);
-            var foundNode=numbers.ToList().Select(n => model.get_node(n.no));
+            rfModel.object_with_children[] numbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);
+            IEnumerable<rfModel.node> foundNode=numbers.ToList().Select(n => model.get_node(n.no));
 
-            var collectedNode = foundNode.Where(n => (n.coordinate_1.Equals(bhNode.Position.X) && n.coordinate_2.Equals(bhNode.Position.Y) && n.coordinate_3.Equals(bhNode.Position.Z)));
+            IEnumerable<rfModel.node> collectedNode = foundNode.Where(n => (n.coordinate_1.Equals(bhNode.Position.X) && n.coordinate_2.Equals(bhNode.Position.Y) && n.coordinate_3.Equals(bhNode.Position.Z)));
 
             if (collectedNode.ToList().Count>0)
             {
@@ -96,30 +88,20 @@ namespace BH.Adapter.RFEM6
             return null;
         }
 
-        private Double stiffnessTranslationBHToRF(String stiffness)
-        {
-
-            Double result = stiffness=="Free"?0.0:Double.PositiveInfinity;
-
-            return result;
-        }
-
         private rfModel.nodal_support checkForExistenceOfConstraint(BH.oM.Structure.Constraints.Constraint6DOF constraint)
         {
 
-            //gettin all nodalsupport from model
-            var numbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
-            var allSupports = numbers.ToList().Select(n => model.get_nodal_support(n.no));
+            rfModel.object_with_children[] supporNo = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
+            IEnumerable<rfModel.nodal_support> supports = supporNo.ToList().Select(n => model.get_nodal_support(n.no));
 
-            //check if there is one support in model that does fullfill all criterial for equality
-            foreach (var s in allSupports)
+            foreach (rfModel.nodal_support s in supports)
             {
-               bool x = s.spring.x.Equals(stiffnessTranslationBHToRF("" + constraint.TranslationX));
-               bool y = s.spring.y.Equals(stiffnessTranslationBHToRF("" + constraint.TranslationY));
-               bool z = s.spring.z.Equals(stiffnessTranslationBHToRF("" + constraint.TranslationZ));
-               bool xx = s.rotational_restraint.x.Equals(stiffnessTranslationBHToRF("" + constraint.RotationX));
-               bool yy = s.rotational_restraint.y.Equals(stiffnessTranslationBHToRF("" + constraint.RotationY));
-               bool zz = s.rotational_restraint.z.Equals(stiffnessTranslationBHToRF("" + constraint.RotationZ));
+               bool x = s.spring.x.Equals(Convert.stiffnessTranslationBHToRF("" + constraint.TranslationX));
+               bool y = s.spring.y.Equals(Convert.stiffnessTranslationBHToRF("" + constraint.TranslationY));
+               bool z = s.spring.z.Equals(Convert.stiffnessTranslationBHToRF("" + constraint.TranslationZ));
+               bool xx = s.rotational_restraint.x.Equals(Convert.stiffnessTranslationBHToRF("" + constraint.RotationX));
+               bool yy = s.rotational_restraint.y.Equals(Convert.stiffnessTranslationBHToRF("" + constraint.RotationY));
+               bool zz = s.rotational_restraint.z.Equals(Convert.stiffnessTranslationBHToRF("" + constraint.RotationZ));
 
                 if (x&&y&&z&&xx&&yy&&zz)
                 {
