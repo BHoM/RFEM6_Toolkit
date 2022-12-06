@@ -18,9 +18,27 @@ namespace BH.Adapter.RFEM6
 
             List<Node> constraintList = new List<Node>();
 
+            rfModel.object_with_children[] numbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
+            IEnumerable<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => model.get_nodal_support(n.no));
+
+            foreach (rfModel.nodal_support s in foundSupports)
+            {
+                List<int> nodeNo = s.nodes.ToList();
+                BH.oM.Structure.Constraints.Constraint6DOF rfConstraint = Convert.FromRFEM(s);
+
+                foreach (int i in nodeNo)
+                {
+
+                    model.get_node(i);
+                    Node n=Convert.FromRFEM(model.get_node(i));
+                    n.Support=rfConstraint;
+                    constraintList.Add(n);
+                }
 
 
-     
+            }
+
+
 
             return constraintList;
         }
