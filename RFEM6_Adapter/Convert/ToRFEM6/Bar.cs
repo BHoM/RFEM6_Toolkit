@@ -5,23 +5,23 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
+using BH.Engine.Adapter;
+using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class Convert
     {
 
-        private List<Node> ReadMaterial(List<string> ids = null)
+        public static rfModel.member ToRFEM6(this Bar bar)
         {
-
-            List<Node> MaterialList = new List<Node>();
-
             
 
 
-            return MaterialList;
+            return null;
+
         }
 
     }

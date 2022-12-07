@@ -13,14 +13,18 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private List<Node> ReadLines(List<string> ids = null)
+        private bool CreateCollection(IEnumerable<Bar> bhBar)
         {
 
-            List<Node> nodeList = new List<Node>();
+            //Create Lines
 
-     
 
-            return nodeList;
+            //Create Material
+            //Create Sections
+            //Create Bar
+
+
+            return true;
         }
 
     }
