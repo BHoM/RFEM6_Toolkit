@@ -15,10 +15,21 @@ namespace BH.Adapter.RFEM6
     public partial class Convert
     {
 
-        public static rfModel.node ToRFEM6(this rfModel.node node)
+        public static rfModel.node ToRFEM6(this Node node, int nodeId)
         {
 
-            return null;
+
+
+            rfModel.node rfNode = new rfModel.node()
+            {
+                no = nodeId,
+                coordinates = new rfModel.vector_3d() { x = node.Position.X, y = node.Position.Y, z = node.Position.Z },
+                coordinate_system_type = rfModel.node_coordinate_system_type.COORDINATE_SYSTEM_CARTESIAN,
+                coordinate_system_typeSpecified = true,
+                comment = "concrete part"
+            };
+
+            return rfNode;
 
         }
 
