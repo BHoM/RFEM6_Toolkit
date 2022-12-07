@@ -35,10 +35,7 @@ namespace BH.Adapter.RFEM6
                     constraintList.Add(n);
                 }
 
-
             }
-
-
 
             return constraintList;
         }
