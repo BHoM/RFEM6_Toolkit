@@ -69,8 +69,8 @@ namespace BH.Adapter.RFEM6
                 //    return ReadBars(ids as dynamic);
                 //else if (type == typeof(ISectionProperty) || type.GetInterfaces().Contains(typeof(ISectionProperty)))
                 //    return ReadSectionProperties(ids as dynamic);
-                //else if (type == typeof(IMaterialFragment))
-                //    return ReadMaterials(ids as dynamic);
+                else if (type.Namespace == typeof(IMaterialFragment).Namespace)
+                    return ReadMaterial(ids as dynamic);
                 //else if (type == typeof(Panel))
                 //    return ReadPanels(ids as dynamic);
                 //else if (type == typeof(ISurfaceProperty))
