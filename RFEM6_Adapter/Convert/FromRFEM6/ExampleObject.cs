@@ -35,7 +35,7 @@ namespace BH.Adapter.RFEM6
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
-
+         
         // Add methods for converting to BHoM from the specific software types. 
         // Example:
         public static BHoMObject FromRFEM6(this ExampleObject node)
