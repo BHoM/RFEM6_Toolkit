@@ -36,7 +36,8 @@ namespace BH.Adapter.RFEM6
 
                 rfModel.material rfMaterial = Convert.ToRFEM6(m,materialNo);
 
-                bool materialExistAlready = materialList.Any(k=>k.name.Split(' ')[0].Equals(rfMaterial.name));
+                //bool materialExistAlready = materialList.Any(k=>k.name.Split(' ')[0].Equals(rfMaterial.name));
+                bool materialExistAlready = materialDoesAlreadyExist(m);
 
                 if (!materialExistAlready) {
                     model.set_material(rfMaterial);
@@ -45,6 +46,31 @@ namespace BH.Adapter.RFEM6
             }
 
             return true;
+        }
+
+        private bool materialDoesAlreadyExist(IMaterialFragment materialFragments)
+        {
+
+
+            rfModel.object_with_children[] mat = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
+            var matNum = mat.ToList().Select(m => m.no).ToList();
+
+            foreach (int n in matNum)
+            {
+
+                var rfMat = model.get_material(n);
+                string rfSecName = rfMat.name.Split('|')[0].Trim(new Char[] { ' ' });
+
+
+                if (rfSecName.Equals(materialFragments.Name))
+                {
+                    return true;
+                }
+
+            }
+
+
+            return false;
         }
 
     }
