@@ -47,7 +47,7 @@ namespace BH.Adapter.RFEM6
             {
                 Node bhNode = bhNodes.ToList()[i];
 
-                rfModel.node rfNd= modelDoesContainNode(bhNode);
+                rfModel.node rfNd= getNodeFromRFModel(bhNode);
                
                 if (rfNd == null) {
 
@@ -69,7 +69,7 @@ namespace BH.Adapter.RFEM6
 
                     int nodalSupportId = model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT, 0);
 
-                    rfModel.node constraintLocationNode = modelDoesContainNode(bhNode);
+                    rfModel.node constraintLocationNode = getNodeFromRFModel(bhNode);
 
                     rfModel.nodal_support existinConstraint = checkForExistenceOfConstraint(bhNode.Support);
                     if (existinConstraint == null)
@@ -81,7 +81,7 @@ namespace BH.Adapter.RFEM6
                     }
                     else
                     {
-                        rfModel.node rfNode = modelDoesContainNode(bhNode);
+                        rfModel.node rfNode = getNodeFromRFModel(bhNode);
                         List<int> constrrainNodesNo = existinConstraint.nodes.ToList();
                         constrrainNodesNo.Add(rfNode.no);
                         existinConstraint.nodes=constrrainNodesNo.ToArray();
@@ -94,7 +94,7 @@ namespace BH.Adapter.RFEM6
             return true;
         }
 
-        private rfModel.node modelDoesContainNode(Node bhNode)
+        public rfModel.node getNodeFromRFModel(Node bhNode)
         {
 
             rfModel.object_with_children[] numbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);

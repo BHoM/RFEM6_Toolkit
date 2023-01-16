@@ -40,23 +40,6 @@ namespace BH.Adapter.RFEM6
                     }
                 }
 
-                bool csDoesExist=csDoesAlreadyExist(section);
-
-                // create section
-                //rfModel.section sectionSteelCSBeam = new rfModel.section
-                //{
-                //    no = model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_SECTION, 0),
-                //    material = matNo,
-                //    materialSpecified = true,
-                //    name = section.Name,
-                //    typeSpecified = true,
-                //    type = rfModel.section_type.TYPE_STANDARDIZED_STEEL,
-                //    manufacturing_type = rfModel.section_manufacturing_type.MANUFACTURING_TYPE_HOT_ROLLED,
-                //    manufacturing_typeSpecified = true,
-                //    thin_walled_model = true,
-                //    thin_walled_modelSpecified = true,
-                //};
-
                 rfModel.section sectionSteelCSBeam = section.ToRFEM6(model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_SECTION, 0),matNo);
 
                 model.set_section(sectionSteelCSBeam);
