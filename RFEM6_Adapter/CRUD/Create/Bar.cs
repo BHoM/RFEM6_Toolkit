@@ -34,10 +34,6 @@ namespace BH.Adapter.RFEM6
                 
                     //rfModel.line rfLine = new rfModel.line();
 
-                   
-                   
-
-
                     if (!lineDoesExist(start,end)) {
 
                         rfModel.line rfLine = new rfModel.line()
@@ -58,31 +54,19 @@ namespace BH.Adapter.RFEM6
                             section_startSpecified = true,
                             //section_end = sectionSquare.no,
                             section_endSpecified = true,
-                            comment = "Arnes First Beam",
+                            comment = "",
                         };
 
                         model.set_member(rfMember);
 
                     }
 
-                    
-
-
                 }
 
             }
 
-            //Create Lines
-            
-
-            //Create Material
-            //Create Sections
-            //Create Bar
-
-
             return true;
         }
-
 
         private bool lineDoesExist(rfModel.node n0, rfModel.node n1) {
 
