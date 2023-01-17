@@ -23,6 +23,7 @@ namespace BH.Adapter.RFEM6
             IProfile bhSection = null;
 
             //Chekc for material
+            
             bhSection = GetSectionProfile(section);
 
             //generate section for steel
