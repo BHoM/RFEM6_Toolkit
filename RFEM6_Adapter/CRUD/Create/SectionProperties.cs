@@ -26,7 +26,7 @@ namespace BH.Adapter.RFEM6
 
                 rfModel.object_with_children[] materials = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
                 var materialNumbers = materials.ToList().Select(m => m.no);
-                int matNo = 1;
+                int matNo = model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MATERIAL, 0);
 
                 foreach (int n in materialNumbers) {
 
@@ -40,9 +40,9 @@ namespace BH.Adapter.RFEM6
                     }
                 }
 
-                rfModel.section sectionSteelCSBeam = section.ToRFEM6(model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_SECTION, 0),matNo);
+                rfModel.section rfSection = section.ToRFEM6(model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_SECTION, 0), matNo, section.Material.GetType().Name); ;
 
-                model.set_section(sectionSteelCSBeam);
+                model.set_section(rfSection);
 
             }
 

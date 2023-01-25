@@ -16,20 +16,14 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private List<IProfile> ReadSectionProperties(List<string> ids = null)
+        private List<ISectionProperty> ReadSectionProperties(List<string> ids = null)
         {
 
-            List<IProfile> sectionList = new List<IProfile>();
+            List<ISectionProperty> sectionList = new List<ISectionProperty>();
 
             var sectionNumbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
             var allSections = sectionNumbers.ToList().Select(n => model.get_section(n.no));
 
-            string name = "";
-
-            // get library sections
-            //Get all sections
-            var cs1 = BH.Engine.Library.Query.Library("Structure\\SectionProperties");
-            var cs2 = BH.Engine.Library.Query.Match("Structure\\SectionProperties", name, true, true);
 
 
             foreach (var section in allSections) {
