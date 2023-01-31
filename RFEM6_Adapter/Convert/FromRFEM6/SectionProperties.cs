@@ -40,6 +40,40 @@ namespace BH.Adapter.RFEM6
         {
             string rfSecName_simplified = section.name.Split('|')[0].Replace(" ", "").ToUpper();
 
+            if (section.name.Split(' ')[0].Equals("L")) {
+                rfSecName_simplified += ".0";
+            } else if (section.name.Split(' ')[0].Equals("RHSU")) {
+
+                string[] signature = section.name.Split(' ')[1].Split('/');
+
+                int height = (int)(Double.Parse(signature[0]) * 1000);
+                int width = (int)(Double.Parse(signature[1]) * 1000);
+                double thickness = (Double.Parse(signature[2]) * 1000);
+
+                if (height.Equals(width)) {
+
+                    rfSecName_simplified = "SHS" + height + "X" + width + "X" + thickness;
+                }
+                else {
+
+                    rfSecName_simplified = "RHS" + height + "X" + width + "X" + thickness;
+                }
+
+            } else if (section.name.Split(' ')[0].Equals("1/2")) {
+
+                string[] signature = section.name.Split(' ')[2].Split('x');
+
+                int height = (int)(Double.Parse(signature[0]));
+                int width = (int)(Double.Parse(signature[1]));
+                double thickness = (Double.Parse(signature[2]));
+
+
+                rfSecName_simplified = section.name.Split(' ')[1].Equals("UB")?"TUB":"TUC";
+
+                rfSecName_simplified+=height + "X" + width + "X" + thickness;
+
+            }
+
             var cs1 = BH.Engine.Library.Query.Library("StructureSectionProperties");
             var bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty) BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true);
 
