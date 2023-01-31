@@ -7,6 +7,7 @@ using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
+using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
@@ -93,6 +94,32 @@ namespace BH.Adapter.RFEM6
         }
 
         private rfModel.section getRFSection(ISectionProperty bhSection) {
+
+
+             //String name=Convert.alterSectionName(bhSection, bhSection.Material.GetType().Name.ToString());
+
+            //convert name into right form
+            
+            //List<String> modNameArr=new List<String> {};
+            //foreach (String s in bhSection.Name.Split('/').ToArray())
+            //{
+
+            //    if (s.Equals("H")||s.Equals(bhSection.Name.Split('/').ToArray().First())) { 
+
+            //        modNameArr.Add(s);
+            //        continue;
+            //    }
+            //    else
+            //    {
+            //        double valDouble=Double.Parse(s)*1000;
+            //        int valInt =(int)valDouble;
+            //        modNameArr.Add(valInt.ToString());
+            //    }
+
+
+            //}
+            ////String modName = String.Join("/", modNameArr);
+            //String modName = "";
 
 
             rfModel.object_with_children[] rfSectionsByType = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
