@@ -121,6 +121,7 @@ namespace BH.Adapter.RFEM6
                         bhSection.Name = bhSection.Name.Remove(0, 1);
                         bhSection.Name = bhSection.Name.Insert(0, "1/2 ");
 
+                        return bhSection.Name;
                     }
 
                     //return bhSection.Name;
@@ -474,7 +475,7 @@ namespace BH.Adapter.RFEM6
         private static bool isStandardSteelSection(ISectionProperty bhSection) {
 
             String bhSecNameAbrev = bhSection.Name.Split(' ')[0].Length>3 ? bhSection.Name.TrimStart().Substring(3).ToUpper(): bhSection.Name.Split(' ')[0];
-            HashSet<String> crossSectionNameSet = new HashSet<String>() {"HE", "CHS", "IPE", "L", "RHS", "SHS", "UPE" , "PFC", "TUB", "TUC", "UB", "UBP", "UC"};
+            HashSet<String> crossSectionNameSet = new HashSet<String>() {"HE", "CHS", "IPE", "L", "RHS", "SHS", "UPE" , "PFC", "TUB", "TUC", "UB", "UBP", "UC", "1/2"};
             return crossSectionNameSet.Contains(bhSecNameAbrev);
         
         }
