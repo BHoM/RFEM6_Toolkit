@@ -93,7 +93,7 @@ namespace BH.Adapter.RFEM6
             return false;
         }
 
-        private rfModel.section getRFSection(ISectionProperty bhSection) {
+        public  rfModel.section getRFSection(ISectionProperty bhSection) {
 
 
              //String name=Convert.alterSectionName(bhSection, bhSection.Material.GetType().Name.ToString());

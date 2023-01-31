@@ -23,7 +23,7 @@ namespace BH.Adapter.RFEM6
             foreach (ISectionProperty section in sectionProperties) {
 
                 if (csDoesAlreadyExist(section)) { continue; }
-
+                
                 rfModel.object_with_children[] materials = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
                 var materialNumbers = materials.ToList().Select(m => m.no);
                 int matNo = model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MATERIAL, 0);
@@ -58,10 +58,13 @@ namespace BH.Adapter.RFEM6
 
             foreach (int n in secNum)
             {
+
+                var x=bhSec.ToRFEM6(n, matNo, bhSec.Material.GetType().Name.ToString());
+
                 var rfSec = model.get_section(n);
                 string rfSecName = rfSec.name.Split('|')[0].Trim(new Char[] { ' ' });
 
-                if (rfSecName.Equals(bhSec.Name))
+                if (rfSecName.Equals(bhSec.Name)|| rfSecName.Equals(x.name))
                 {
                     return true;
                 }
