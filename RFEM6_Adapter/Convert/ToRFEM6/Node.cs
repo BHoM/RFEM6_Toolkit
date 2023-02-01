@@ -18,8 +18,6 @@ namespace BH.Adapter.RFEM6
         public static rfModel.node ToRFEM6(this Node node, int nodeId)
         {
 
-
-
             rfModel.node rfNode = new rfModel.node()
             {
                 no = nodeId,

@@ -16,16 +16,18 @@ namespace BH.Adapter.RFEM6
     public partial class Convert
     {
 
-        public static rfModel.section ToRFEM6(this ISectionProperty bhSection, int secNo, int matNo, string materialType )
+        public static rfModel.section ToRFEM6(this ISectionProperty bhSection, int secNo, int matNo, string materialType)
         {
 
             rfModel.section rfSection = null;
 
-            alterSectionName( bhSection,  materialType);
+            alterSectionName(bhSection, materialType);
 
-            if (materialType.Equals("Steel")) {
+            if (materialType.Equals("Steel"))
+            {
 
-                if (isStandardSteelSection(bhSection)) {
+                if (isStandardSteelSection(bhSection))
+                {
 
                     // create section
                     rfSection = new rfModel.section
@@ -42,7 +44,9 @@ namespace BH.Adapter.RFEM6
                         thin_walled_modelSpecified = true,
                     };
 
-                } else {
+                }
+                else
+                {
 
                     rfSection = new rfModel.section
                     {
@@ -70,7 +74,9 @@ namespace BH.Adapter.RFEM6
 
                 }
 
-            } else if (materialType.Equals("Concrete")) {
+            }
+            else if (materialType.Equals("Concrete"))
+            {
 
                 rfSection = new rfModel.section
                 {
@@ -79,7 +85,7 @@ namespace BH.Adapter.RFEM6
                     materialSpecified = true,
                     type = rfModel.section_type.TYPE_PARAMETRIC_MASSIVE_I,
                     typeSpecified = true,
-                    parametrization_type = getParametrizationType(bhSection,materialType),
+                    parametrization_type = getParametrizationType(bhSection, materialType),
                     parametrization_typeSpecified = true,
                     name = bhSection.Name, // width/height as in RFEM, SI units
                 };
@@ -90,12 +96,14 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        public static String alterSectionName(ISectionProperty bhSection, string materialType) {
+        public static String alterSectionName(ISectionProperty bhSection, string materialType)
+        {
 
             //Parametrs for dimensioning Cross Sections
             double v0, v1, v2, v3, v4, v5;
 
-            if (materialType.Equals("Steel")) {
+            if (materialType.Equals("Steel"))
+            {
 
                 if (isStandardSteelSection(bhSection))
                 {
@@ -127,13 +135,15 @@ namespace BH.Adapter.RFEM6
                     //return bhSection.Name;
 
                 }
-                else {
+                else
+                {
 
-                   
+
                     String bhSectionTypeName = (bhSection as SteelSection).SectionProfile.Shape.ToString();
                     String rfSectionTypeName = "";
 
-                    switch ((bhSection as SteelSection).SectionProfile.Shape.ToString()) {
+                    switch ((bhSection as SteelSection).SectionProfile.Shape.ToString())
+                    {
 
                         case "Box":
 
@@ -144,7 +154,8 @@ namespace BH.Adapter.RFEM6
                                 v2 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.BoxProfile).Thickness;
                                 rfSectionTypeName = ("RHSU " + v0 + "/" + v1 + "/" + v2 + "/" + v2 + "/" + v2 + "/" + v2);
                             }
-                            else {
+                            else
+                            {
                                 v0 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.FabricatedBoxProfile).Height;
                                 v1 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.FabricatedBoxProfile).Width;
                                 v2 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.FabricatedBoxProfile).BotFlangeThickness;
@@ -178,7 +189,8 @@ namespace BH.Adapter.RFEM6
                                 rfSectionTypeName = "I " + v0 + "/" + v1 + "/" + v2 + "/" + v3 + "/" + v4 + "/" + v5 + "/H";
 
                             }
-                            else {
+                            else
+                            {
 
                                 v0 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.FabricatedISectionProfile).Height;
                                 v1 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.FabricatedISectionProfile).TopFlangeWidth;
@@ -188,7 +200,7 @@ namespace BH.Adapter.RFEM6
                                 v5 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.FabricatedISectionProfile).BotFlangeThickness;
 
 
-                                rfSectionTypeName = "IS "  + v0 + "/" + v1 + "/" + v2 + "/" + v3 + "/" + v4 + "/" + v5 + "/0/0/H";
+                                rfSectionTypeName = "IS " + v0 + "/" + v1 + "/" + v2 + "/" + v3 + "/" + v4 + "/" + v5 + "/0/0/H";
 
                                 Engine.Base.Compute.RecordWarning("Weld size for " + bhSection.Name + " has been set to 0!");
 
@@ -196,7 +208,7 @@ namespace BH.Adapter.RFEM6
 
 
                             break;
-                
+
                         case "Tee":
 
                             v0 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TSectionProfile).Height;
@@ -206,7 +218,7 @@ namespace BH.Adapter.RFEM6
                             v4 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TSectionProfile).RootRadius;
                             v5 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TSectionProfile).ToeRadius;
 
-                            rfSectionTypeName = "T "  + v0 + "/" + v1 + "/" + v2 + "/" + v3 + "/" + v4 + "/" + v5 + "/H";
+                            rfSectionTypeName = "T " + v0 + "/" + v1 + "/" + v2 + "/" + v3 + "/" + v4 + "/" + v5 + "/H";
 
                             break;
                         case "Tube":
@@ -228,13 +240,13 @@ namespace BH.Adapter.RFEM6
                             if (CornerRadius > 0)
                             {
 
-                                rfSectionTypeName = isSqrt  ? "SQUARER " + width + "/" + CornerRadius+"/H" : "FLAT " + width + "/" + height + "/H";
+                                rfSectionTypeName = isSqrt ? "SQUARER " + width + "/" + CornerRadius + "/H" : "FLAT " + width + "/" + height + "/H";
 
                             }
                             else
                             {
 
-                                rfSectionTypeName = isSqrt ? "SQUARES " + width+"/H" : "FLAT " + width + "/" + height+"/H";
+                                rfSectionTypeName = isSqrt ? "SQUARES " + width + "/H" : "FLAT " + width + "/" + height + "/H";
 
                             }
 
@@ -255,18 +267,20 @@ namespace BH.Adapter.RFEM6
                 }
 
 
-            } else if (materialType.Equals("Concrete")) {
+            }
+            else if (materialType.Equals("Concrete"))
+            {
 
                 String bhSectionTypeName = (bhSection as ConcreteSection).SectionProfile.Shape.ToString();
                 String rfSectionTypeName = "";
 
                 //double v0, v1, v2, v3, v4, v5;
 
-                switch(bhSectionTypeName)
+                switch (bhSectionTypeName)
                 {
 
                     case "Circle":
-                        rfSectionTypeName = "CIRCLE_M1 " + ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.CircleProfile).Diameter; 
+                        rfSectionTypeName = "CIRCLE_M1 " + ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.CircleProfile).Diameter;
                         break;
                     case "Rectangle":
 
@@ -276,14 +290,16 @@ namespace BH.Adapter.RFEM6
                         bool isSqrt = height.Equals(width);
 
 
-                        if (CornerRadius>0) {
+                        if (CornerRadius > 0)
+                        {
 
-                            rfSectionTypeName = isSqrt ? "SQR_M1 " + width +"/"+ CornerRadius : "RR_M1 " + width + "/" + height+"/"+ CornerRadius;
+                            rfSectionTypeName = isSqrt ? "SQR_M1 " + width + "/" + CornerRadius : "RR_M1 " + width + "/" + height + "/" + CornerRadius;
 
                         }
-                        else {
+                        else
+                        {
 
-                            rfSectionTypeName = isSqrt ?"SQ_M1 "+width:"R_M1 "+width+"/"+height;
+                            rfSectionTypeName = isSqrt ? "SQ_M1 " + width : "R_M1 " + width + "/" + height;
 
                         }
 
@@ -292,7 +308,7 @@ namespace BH.Adapter.RFEM6
                     case "Tube":
                         v0 = ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TubeProfile).Diameter;
                         v1 = ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TubeProfile).Thickness;
-                        rfSectionTypeName = "HCIRCLE_M1 " + v0+"/"+v1;
+                        rfSectionTypeName = "HCIRCLE_M1 " + v0 + "/" + v1;
                         break;
                     case "Box":
                         v0 = ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.BoxProfile).Height;
@@ -302,11 +318,11 @@ namespace BH.Adapter.RFEM6
                         v4 = 0;
                         v5 = 0;
 
-                        rfSectionTypeName = "RRO_M1 " + v0 + "/" + v1 +"/" + v2 + "/" + v2 + "/" + v3 + "/" + v3 ;
+                        rfSectionTypeName = "RRO_M1 " + v0 + "/" + v1 + "/" + v2 + "/" + v2 + "/" + v3 + "/" + v3;
 
                         break;
                     case "ISection":
-                       
+
                         v0 = ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.ISectionProfile).Height;
                         v1 = ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.ISectionProfile).Width;
                         v2 = ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.ISectionProfile).FlangeThickness;
@@ -322,7 +338,7 @@ namespace BH.Adapter.RFEM6
                         v1 = ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TSectionProfile).Width;
                         v2 = ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TSectionProfile).FlangeThickness;
                         v3 = ((bhSection as ConcreteSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TSectionProfile).WebThickness;
-                     
+
                         rfSectionTypeName = "T_M1 " + v0 + "/" + v1 + "/" + v2 + "/" + v3;
 
                         break;
@@ -334,26 +350,27 @@ namespace BH.Adapter.RFEM6
                         rfSectionTypeName = "CIRCLE_M1 " + 1;
                         Engine.Base.Compute.RecordWarning("Cross Section Could not be generated Round solid Section (D=1m) was generated instead");
 
-                        break; 
+                        break;
 
                 }
 
                 bhSection.Name = rfSectionTypeName;
 
-               // return rfSectionTypeName;
+                // return rfSectionTypeName;
 
             }
             return bhSection.Name;
 
         }
 
-        private static rfModel.section_parametrization_type getParametrizationType(this ISectionProperty bhSection,String materialType)
+        private static rfModel.section_parametrization_type getParametrizationType(this ISectionProperty bhSection, String materialType)
         {
 
-            
 
 
-            if (materialType.Equals("Concrete")) {
+
+            if (materialType.Equals("Concrete"))
+            {
 
                 string bhSectionTypeName = (bhSection as ConcreteSection).SectionProfile.Shape.ToString();
 
@@ -397,18 +414,21 @@ namespace BH.Adapter.RFEM6
 
 
             }
-            else  {
+            else
+            {
 
                 string bhSectionTypeName = (bhSection as SteelSection).SectionProfile.Shape.ToString();
 
-                switch (bhSectionTypeName) {
+                switch (bhSectionTypeName)
+                {
                     case "Box":
                         return rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__UNSYMMETRIC_RECTANGULAR_HOLLOW_SECTION__RHSU;
                     case "Circle":
                         return rfModel.section_parametrization_type.PARAMETRIC_BARS__ROUND_BAR__ROUND;
                     case "ISection":
 
-                        if ((bhSection as SteelSection).SectionProfile.GetType().Name.Equals("ISectionProfile")) {
+                        if ((bhSection as SteelSection).SectionProfile.GetType().Name.Equals("ISectionProfile"))
+                        {
                             return rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__I_SECTION__I;
                         }
                         else { return rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__SINGLY_SYMMETRIC_I_SECTION__IS; }
@@ -425,7 +445,7 @@ namespace BH.Adapter.RFEM6
                         double width = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.RectangleProfile).Width;
                         bool isSqrt = height.Equals(width);
 
-                        
+
 
 
                         if (CornerRadius > 0)
@@ -433,8 +453,9 @@ namespace BH.Adapter.RFEM6
 
                             //rfSectionTypeName = isSqrt ? "SQUARER " + width + "/" + CornerRadius + "/H" : "FLAT " + width + "/" + height + "/H";
                             if (isSqrt) { return rfModel.section_parametrization_type.PARAMETRIC_BARS__ROUND_CORNER_SQUARE_BAR__SQUARER; }
-                            else { 
-                                Engine.Base.Compute.RecordWarning("Corner Radius of "+bhSection.Name+" has been set to 0!");
+                            else
+                            {
+                                Engine.Base.Compute.RecordWarning("Corner Radius of " + bhSection.Name + " has been set to 0!");
                                 return rfModel.section_parametrization_type.PARAMETRIC_BARS__FLAT_BAR__FLAT;
                             }
 
@@ -459,25 +480,26 @@ namespace BH.Adapter.RFEM6
                         return rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__CIRCULAR_HOLLOW_SECTION__CHS;
 
 
-                    default: 
+                    default:
                         return rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__UNSYMMETRIC_RECTANGULAR_HOLLOW_SECTION__RHSU;
 
                 }
-            
+
             }
 
-           
+
 
 
 
         }
 
-        private static bool isStandardSteelSection(ISectionProperty bhSection) {
+        private static bool isStandardSteelSection(ISectionProperty bhSection)
+        {
 
-            String bhSecNameAbrev = bhSection.Name.Split(' ')[0].Length>3 ? bhSection.Name.TrimStart().Substring(3).ToUpper(): bhSection.Name.Split(' ')[0];
-            HashSet<String> crossSectionNameSet = new HashSet<String>() {"HE", "CHS", "IPE", "L", "RHS", "SHS", "UPE" , "PFC", "TUB", "TUC", "UB", "UBP", "UC", "1/2"};
+            String bhSecNameAbrev = bhSection.Name.Split(' ')[0].Length > 3 ? bhSection.Name.TrimStart().Substring(3).ToUpper() : bhSection.Name.Split(' ')[0];
+            HashSet<String> crossSectionNameSet = new HashSet<String>() { "HE", "CHS", "IPE", "L", "RHS", "SHS", "UPE", "PFC", "TUB", "TUC", "UB", "UBP", "UC", "1/2" };
             return crossSectionNameSet.Contains(bhSecNameAbrev);
-        
+
         }
 
     }

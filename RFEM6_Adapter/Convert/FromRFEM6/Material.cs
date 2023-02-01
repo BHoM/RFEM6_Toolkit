@@ -19,15 +19,15 @@ namespace BH.Adapter.RFEM6
         public static IMaterialFragment FromRFEM(this rfModel.material rfMaterial)
         {
 
-            string s=rfMaterial.generating_object_info;
-            IMaterialFragment bhMaterial=null;
+            string s = rfMaterial.generating_object_info;
+            IMaterialFragment bhMaterial = null;
 
             String[] matParaArray = rfMaterial.comment.Split('|');
 
 
-            if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_STEEL)|| rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_REINFORCING_STEEL))
+            if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_STEEL) || rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_REINFORCING_STEEL))
             {
-               
+
                 double density = (matParaArray.Length > 1) ? Double.Parse(matParaArray[1]) : 0;
                 double dambingRatio = (matParaArray.Length > 1) ? Double.Parse(matParaArray[2]) : 0;
                 double poissonsRatio = (matParaArray.Length > 1) ? Double.Parse(matParaArray[3]) : 0;
@@ -38,11 +38,11 @@ namespace BH.Adapter.RFEM6
 
                 bhMaterial = Engine.Structure.Create.Steel(matParaArray[0], youngsModulus, poissonsRatio, thermalExpansionCoeff, density, dambingRatio, yieldStress, ultimateStress);
 
-                //bhMaterial = Engine.Structure.Create.Steel(rfMaterial.name, material.ElasticityModulus, material.PoissonRatio, material.ThermalExpansion, material.SpecificWeight * 0.1, 0, yieldStress, ulitimateStess);
+
 
             }
-          
-            else if(rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_CONCRETE))
+
+            else if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_CONCRETE))
             {
 
                 double density = (matParaArray.Length > 1) ? Double.Parse(matParaArray[1]) : 0;
