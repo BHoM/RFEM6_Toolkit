@@ -28,7 +28,7 @@ namespace BH.Adapter.RFEM6
 
             foreach (var section in allSections) {
 
-                sectionList.Add(section.FromRFEM());
+                sectionList.Add(section.FromRFEM(model.get_material(section.material)));
 
             }
 

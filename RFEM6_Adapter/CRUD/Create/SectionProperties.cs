@@ -20,22 +20,25 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<ISectionProperty> sectionProperties)
         {
 
-            foreach (ISectionProperty section in sectionProperties) {
+            foreach (ISectionProperty section in sectionProperties)
+            {
 
                 if (csDoesAlreadyExist(section)) { continue; }
-                
+
                 rfModel.object_with_children[] materials = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
                 var materialNumbers = materials.ToList().Select(m => m.no);
                 int matNo = model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MATERIAL, 0);
 
-                foreach (int n in materialNumbers) {
+                foreach (int n in materialNumbers)
+                {
 
                     var rfMatrial = model.get_material(n);
-                    string rfMatName = rfMatrial.name.Split('|')[0].Trim(new Char[] { ' '});
+                    string rfMatName = rfMatrial.name.Split('|')[0].Trim(new Char[] { ' ' });
 
-                    if (rfMatName.Equals(section.Material.Name)) {
+                    if (rfMatName.Equals(section.Material.Name))
+                    {
                         matNo = n;
-                    
+
                         break;
                     }
                 }
@@ -50,7 +53,8 @@ namespace BH.Adapter.RFEM6
 
         }
 
-        private bool csDoesAlreadyExist(ISectionProperty bhSec) {
+        private bool csDoesAlreadyExist(ISectionProperty bhSec)
+        {
 
             rfModel.object_with_children[] sec = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
             var secNum = sec.ToList().Select(m => m.no).ToList();
@@ -59,12 +63,12 @@ namespace BH.Adapter.RFEM6
             foreach (int n in secNum)
             {
 
-                var x=bhSec.ToRFEM6(n, matNo, bhSec.Material.GetType().Name.ToString());
+                var x = bhSec.ToRFEM6(n, matNo, bhSec.Material.GetType().Name.ToString());
 
                 var rfSec = model.get_section(n);
                 string rfSecName = rfSec.name.Split('|')[0].Trim(new Char[] { ' ' });
 
-                if (rfSecName.Equals(bhSec.Name)|| rfSecName.Equals(x.name))
+                if (rfSecName.Equals(bhSec.Name) || rfSecName.Equals(x.name))
                 {
                     return true;
                 }
