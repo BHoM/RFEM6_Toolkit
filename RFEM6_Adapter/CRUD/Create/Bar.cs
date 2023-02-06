@@ -20,10 +20,11 @@ namespace BH.Adapter.RFEM6
         {
 
 
-            foreach (Bar bhBar in bhBars) {
+            foreach (Bar bhBar in bhBars)
+            {
 
                 //Find Corresponding Nodes
-                rfModel.object_with_children[] rfNodesByType =  model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
+                rfModel.object_with_children[] rfNodesByType = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
                 IEnumerable<int> rfNodeNumbers = rfNodesByType.ToList().Select(m => m.no);
 
                 List<rfModel.node> nodeList = new List<rfModel.node>();
@@ -31,11 +32,13 @@ namespace BH.Adapter.RFEM6
                 rfModel.node start = getNodeFromRFModel(bhBar.StartNode);
                 rfModel.node end = getNodeFromRFModel(bhBar.EndNode);
 
-                if (start!=null && end!=null) { 
-                
+                if (start != null && end != null)
+                {
+
                     //rfModel.line rfLine = new rfModel.line();
 
-                    if (!lineDoesExist(start,end)) {
+                    if (!lineDoesExist(start, end))
+                    {
 
                         rfModel.line rfLine = new rfModel.line()
                         {
@@ -46,7 +49,7 @@ namespace BH.Adapter.RFEM6
 
                         model.set_line(rfLine);
 
-                       
+
                         rfModel.member rfMember = bhBar.ToRFEM6(model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MEMBER, 0), rfLine, getRFSection(bhBar.SectionProperty));
 
                         model.set_member(rfMember);
@@ -60,20 +63,23 @@ namespace BH.Adapter.RFEM6
             return true;
         }
 
-        private bool lineDoesExist(rfModel.node n0, rfModel.node n1) {
+        private bool lineDoesExist(rfModel.node n0, rfModel.node n1)
+        {
 
             rfModel.object_with_children[] rfLineByType = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE);
             IEnumerable<int> rfLineNumbers = rfLineByType.ToList().Select(m => m.no);
 
-            foreach (int l in rfLineNumbers) {
+            foreach (int l in rfLineNumbers)
+            {
 
 
-                rfModel.line currentLine=model.get_line(l);
+                rfModel.line currentLine = model.get_line(l);
 
                 HashSet<int> nodeIds = currentLine.definition_nodes.ToHashSet();
 
 
-                if (nodeIds.Contains(n0.no)&& nodeIds.Contains(n1.no)) { 
+                if (nodeIds.Contains(n0.no) && nodeIds.Contains(n1.no))
+                {
 
                     return true;
 
@@ -84,17 +90,19 @@ namespace BH.Adapter.RFEM6
             return false;
         }
 
-        public  rfModel.section getRFSection(ISectionProperty bhSection) {
+        public rfModel.section getRFSection(ISectionProperty bhSection)
+        {
 
 
 
             rfModel.object_with_children[] rfSectionsByType = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
             IEnumerable<int> rfSectionNumbers = rfSectionsByType.ToList().Select(m => m.no);
-            string bhSectionName= String.Concat(bhSection.Name.Where(c => !Char.IsWhiteSpace(c))).Split('|')[0].ToUpper();
+            string bhSectionName = String.Concat(bhSection.Name.Where(c => !Char.IsWhiteSpace(c))).Split('|')[0].ToUpper();
 
-            foreach (int n in rfSectionNumbers) {
+            foreach (int n in rfSectionNumbers)
+            {
 
-                rfModel.section currSection=model.get_section(n);
+                rfModel.section currSection = model.get_section(n);
 
                 string rfSectionName = String.Concat(currSection.name.Where(c => !Char.IsWhiteSpace(c))).Split('|')[0].ToUpper(); ;
 

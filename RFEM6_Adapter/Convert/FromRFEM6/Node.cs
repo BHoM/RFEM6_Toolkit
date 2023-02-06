@@ -18,8 +18,6 @@ namespace BH.Adapter.RFEM6
         public static Node FromRFEM(this rfModel.node node)
         {
             Node bhNode = new Node { Position = new oM.Geometry.Point() { X = node.coordinate_1, Y = node.coordinate_2, Z = node.coordinate_3 } };
-           // bhNode.SetAdapterId(typeof(RFEMId), node.no);
-
 
             bhNode.Name = "Node Nr. " + node.no;
 

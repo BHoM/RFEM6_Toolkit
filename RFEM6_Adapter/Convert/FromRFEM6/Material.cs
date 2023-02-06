@@ -24,44 +24,19 @@ namespace BH.Adapter.RFEM6
 
             String[] matParaArray = rfMaterial.comment.Split('|');
 
-            //var lib=BH.Engine.Library.Query.Library("Materials");
-
             if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_STEEL) || rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_REINFORCING_STEEL))
             {
 
-                //double density = (matParaArray.Length > 1) ? Double.Parse(matParaArray[1]) : 0;
-                //double dambingRatio = (matParaArray.Length > 1) ? Double.Parse(matParaArray[2]) : 0;
-                //double poissonsRatio = (matParaArray.Length > 1) ? Double.Parse(matParaArray[3]) : 0;
-                //double thermalExpansionCoeff = (matParaArray.Length > 1) ? Double.Parse(matParaArray[4]) : 0;
-                //double youngsModulus = (matParaArray.Length > 1) ? Double.Parse(matParaArray[5]) : 0;
-                //double yieldStress = (matParaArray.Length > 1) ? Double.Parse(matParaArray[6]) : 0;
-                //double ultimateStress = (matParaArray.Length > 1) ? Double.Parse(matParaArray[7]) : 0;
-
-                //bhMaterial = Engine.Structure.Create.Steel(matParaArray[0], youngsModulus, poissonsRatio, thermalExpansionCoeff, density, dambingRatio, yieldStress, ultimateStress);
-                //bhMaterial = matLib.Find(m => m.Name.Equals(matParaArray[0].TrimEnd())) as IMaterialFragment;
                 bhMaterial=BH.Engine.Library.Query.Match("Steel", rfMaterial.name.Split('|')[0], true, true) as IMaterialFragment;
-
 
             }
 
             else if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_CONCRETE))
             {
 
-                //double density = (matParaArray.Length > 1) ? Double.Parse(matParaArray[1]) : 0;
-                //double dambingRatio = (matParaArray.Length > 1) ? Double.Parse(matParaArray[2]) : 0;
-                //double poissonsRatio = (matParaArray.Length > 1) ? Double.Parse(matParaArray[3]) : 0;
-                //double thermalExpansionCoeff = (matParaArray.Length > 1) ? Double.Parse(matParaArray[4]) : 0;
-                //double youngsModulus = (matParaArray.Length > 1) ? Double.Parse(matParaArray[5]) : 0;
-                //double cubeStrength = (matParaArray.Length > 1) ? Double.Parse(matParaArray[6]) : 0;
-                //double cylinderStrength = (matParaArray.Length > 1) ? Double.Parse(matParaArray[7]) : 0;
-
-                //bhMaterial = Engine.Structure.Create.Concrete(matParaArray[0], youngsModulus, poissonsRatio, thermalExpansionCoeff, density, dambingRatio, cubeStrength, cylinderStrength);
-
                 bhMaterial = BH.Engine.Library.Query.Match("Concrete", rfMaterial.name.Split('|')[0], true, true) as IMaterialFragment;
 
             }
-
-
 
             return bhMaterial;
         }

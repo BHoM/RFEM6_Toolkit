@@ -15,7 +15,6 @@ namespace BH.Adapter.RFEM6
 {
     public partial class Convert
     {
-
         public static rfModel.section ToRFEM6(this ISectionProperty bhSection, int secNo, int matNo, string materialType)
         {
 
@@ -50,14 +49,7 @@ namespace BH.Adapter.RFEM6
 
                     rfSection = new rfModel.section
                     {
-                        //no = secNo,
-                        //material = matNo,
-                        //materialSpecified = true,
-                        //type = rfModel.section_type.TYPE_PARAMETRIC_THIN_WALLED,
-                        //typeSpecified = true,
-                        //parametrization_type = rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__RECTANGULAR_HOLLOW_SECTION__RHS,
-                        //parametrization_typeSpecified = true,
-                        //name = bhSection.Name, // width/height as in RFEM, SI units
+
 
                         no = secNo,
                         material = matNo,
@@ -366,9 +358,6 @@ namespace BH.Adapter.RFEM6
         private static rfModel.section_parametrization_type getParametrizationType(this ISectionProperty bhSection, String materialType)
         {
 
-
-
-
             if (materialType.Equals("Concrete"))
             {
 
@@ -412,7 +401,6 @@ namespace BH.Adapter.RFEM6
                         return rfModel.section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_CIRCLE__CIRCLE_M1;
                 }
 
-
             }
             else
             {
@@ -433,10 +421,6 @@ namespace BH.Adapter.RFEM6
                         }
                         else { return rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__SINGLY_SYMMETRIC_I_SECTION__IS; }
 
-
-                    //case "Rectangle":
-                    //    return rfModel.section_parametrization_type.PARAMETRIC_BARS__SHARP_CORNER_SQUARE_BAR__SQUARES;
-
                     case "Rectangle":
 
 
@@ -444,9 +428,6 @@ namespace BH.Adapter.RFEM6
                         double height = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.RectangleProfile).Height;
                         double width = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.RectangleProfile).Width;
                         bool isSqrt = height.Equals(width);
-
-
-
 
                         if (CornerRadius > 0)
                         {
@@ -459,7 +440,6 @@ namespace BH.Adapter.RFEM6
                                 return rfModel.section_parametrization_type.PARAMETRIC_BARS__FLAT_BAR__FLAT;
                             }
 
-
                         }
                         else
                         {
@@ -469,8 +449,6 @@ namespace BH.Adapter.RFEM6
 
                         }
 
-
-
                     case "Tee":
 
                         return rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__T_SECTION__T;
@@ -479,17 +457,12 @@ namespace BH.Adapter.RFEM6
 
                         return rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__CIRCULAR_HOLLOW_SECTION__CHS;
 
-
                     default:
                         return rfModel.section_parametrization_type.PARAMETRIC_THIN_WALLED__UNSYMMETRIC_RECTANGULAR_HOLLOW_SECTION__RHSU;
 
                 }
 
             }
-
-
-
-
 
         }
 
