@@ -46,17 +46,8 @@ namespace BH.Adapter.RFEM6
 
                         model.set_line(rfLine);
 
-                        rfModel.member rfMember = new rfModel.member()
-                        {
-                            no = model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MEMBER, 0),
-                            line = rfLine.no,
-                            lineSpecified = true,
-                            section_start = getRFSection( bhBar.SectionProperty).no,
-                            section_startSpecified = true,
-                            //section_end = sectionSquare.no,
-                            section_endSpecified = true,
-                            comment = "",
-                        };
+                       
+                        rfModel.member rfMember = bhBar.ToRFEM6(model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MEMBER, 0), rfLine, getRFSection(bhBar.SectionProperty));
 
                         model.set_member(rfMember);
 
@@ -95,31 +86,6 @@ namespace BH.Adapter.RFEM6
 
         public  rfModel.section getRFSection(ISectionProperty bhSection) {
 
-
-             //String name=Convert.alterSectionName(bhSection, bhSection.Material.GetType().Name.ToString());
-
-            //convert name into right form
-            
-            //List<String> modNameArr=new List<String> {};
-            //foreach (String s in bhSection.Name.Split('/').ToArray())
-            //{
-
-            //    if (s.Equals("H")||s.Equals(bhSection.Name.Split('/').ToArray().First())) { 
-
-            //        modNameArr.Add(s);
-            //        continue;
-            //    }
-            //    else
-            //    {
-            //        double valDouble=Double.Parse(s)*1000;
-            //        int valInt =(int)valDouble;
-            //        modNameArr.Add(valInt.ToString());
-            //    }
-
-
-            //}
-            ////String modName = String.Join("/", modNameArr);
-            //String modName = "";
 
 
             rfModel.object_with_children[] rfSectionsByType = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);

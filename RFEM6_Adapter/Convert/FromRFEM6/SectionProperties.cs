@@ -98,7 +98,7 @@ namespace BH.Adapter.RFEM6
 
             }
 
-            var cs1 = BH.Engine.Library.Query.Library("StructureSectionProperties");
+            //var cs1 = BH.Engine.Library.Query.Library("StructureSectionProperties");
             var bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true);
 
             return bhSec;
