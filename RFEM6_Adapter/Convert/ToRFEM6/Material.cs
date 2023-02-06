@@ -21,16 +21,16 @@ namespace BH.Adapter.RFEM6
         {
 
 
-            Object[] nameAndType = materialTypeAndNameTranslater(bhMateraial);
+            //Object[] nameAndType = materialTypeAndNameTranslater(bhMateraial);
 
             rfModel.material rfMaterial = new rfModel.material
             {
                 no = materialNo,
-                name = nameAndType[0].ToString(),
+                name = bhMateraial.Name,
                 //name = "S235 (DIN EN 1993-1-1:2010-12)",
                 //material_type = rfModel.material_material_type.TYPE_STEEL,
-                comment = "" + nameAndType[2],
-                material_type = (rfModel.material_material_type)nameAndType[1],
+                comment = "" ,
+                material_type = bhMateraial.GetType().Name.Equals("Steel") ? rfModel.material_material_type.TYPE_STEEL:rfModel.material_material_type.TYPE_CONCRETE
             };
 
 

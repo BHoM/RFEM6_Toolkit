@@ -16,6 +16,10 @@ namespace BH.Adapter.RFEM6
 
         private List<IMaterialFragment> ReadMaterial(List<string> ids = null)
         {
+
+            var concreteLib=BH.Engine.Library.Query.Library("Concrete");
+            var steelLib = BH.Engine.Library.Query.Library("Steel");
+
             List<IMaterialFragment> materialList = new List<IMaterialFragment>();
             rfModel.object_with_children[] materialsNumbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
             List<rfModel.material> materials = new List<rfModel.material>();

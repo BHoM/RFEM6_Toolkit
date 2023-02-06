@@ -15,12 +15,22 @@ namespace BH.Adapter.RFEM6
     public partial class Convert
     {
 
-        public static rfModel.member ToRFEM6(this Bar bar)
+        public static rfModel.member ToRFEM6(this Bar bar,int memberNo,rfModel.line rfLine, rfModel.section rfSection)
         {
-            
+            rfModel.member rfMember = new rfModel.member()
+            {
+                no = memberNo,
+                line = rfLine.no,
+                lineSpecified = true,
+                section_start = rfSection.no,
+                section_startSpecified = true,
+                //section_end = sectionSquare.no,
+                section_endSpecified = true,
+                comment = "",
+            };
 
 
-            return null;
+            return rfMember;
 
         }
 
