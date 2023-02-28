@@ -23,7 +23,7 @@ namespace BH.Adapter.RFEM6
             foreach (ISectionProperty section in sectionProperties)
             {
 
-                if (csDoesAlreadyExist(section)) { continue; }
+               // if (csDoesAlreadyExist(section)) { continue; }
 
                 rfModel.object_with_children[] materials = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
                 var materialNumbers = materials.ToList().Select(m => m.no);
@@ -43,7 +43,7 @@ namespace BH.Adapter.RFEM6
                     }
                 }
 
-                rfModel.section rfSection = section.ToRFEM6(model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_SECTION, 0), matNo, section.Material.GetType().Name); ;
+                rfModel.section rfSection = section.ToRFEM6( matNo, section.Material.GetType().Name); ;
 
                 model.set_section(rfSection);
 
@@ -53,31 +53,31 @@ namespace BH.Adapter.RFEM6
 
         }
 
-        private bool csDoesAlreadyExist(ISectionProperty bhSec)
-        {
+        //private bool csDoesAlreadyExist(ISectionProperty bhSec)
+        //{
 
-            rfModel.object_with_children[] sec = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
-            var secNum = sec.ToList().Select(m => m.no).ToList();
-            int matNo = 1;
+        //    rfModel.object_with_children[] sec = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
+        //    var secNum = sec.ToList().Select(m => m.no).ToList();
+        //    int matNo = 1;
 
-            foreach (int n in secNum)
-            {
+        //    foreach (int n in secNum)
+        //    {
 
-                var x = bhSec.ToRFEM6(n, matNo, bhSec.Material.GetType().Name.ToString());
+        //        var x = bhSec.ToRFEM6(n, matNo, bhSec.Material.GetType().Name.ToString());
 
-                var rfSec = model.get_section(n);
-                string rfSecName = rfSec.name.Split('|')[0].Trim(new Char[] { ' ' });
+        //        var rfSec = model.get_section(n);
+        //        string rfSecName = rfSec.name.Split('|')[0].Trim(new Char[] { ' ' });
 
-                if (rfSecName.Equals(bhSec.Name) || rfSecName.Equals(x.name))
-                {
-                    return true;
-                }
+        //        if (rfSecName.Equals(bhSec.Name) || rfSecName.Equals(x.name))
+        //        {
+        //            return true;
+        //        }
 
-            }
+        //    }
 
-            return false;
+        //    return false;
 
-        }
+        //}
 
     }
 }

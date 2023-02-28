@@ -18,15 +18,17 @@ namespace BH.Adapter.RFEM6
     public partial class Convert
     {
 
-        public static ISectionProperty FromRFEM(this rfModel.section section, rfModel.material rfMaterial)
+        public static ISectionProperty FromRFEM(this rfModel.section section, IMaterialFragment bhMaterial)
         {
             ISectionProperty bhSection = null;
 
-            String materialType = rfMaterial.application_context.ToString();
+            //TODO: deal with this
+            //  string materialType = rfMaterial.application_context.ToString();
 
 
             //Chekc for material
-            if (materialType.Equals("STEEL_DESIGN"))
+            //if (materialType.Equals("STEEL_DESIGN"))
+            if (bhMaterial is Steel)
             {
 
                 if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_STEEL))
@@ -38,16 +40,19 @@ namespace BH.Adapter.RFEM6
                 else
                 {
 
-                    bhSection = bhSteelSectionFromRfSection_NonStandard(section, rfMaterial);
+                    bhSection = bhSteelSectionFromRfSection_NonStandard(section, bhMaterial);
                 }
 
             }
-            else if (materialType.Equals("CONCRETE_DESIGN"))
+            //else if (materialType.Equals("CONCRETE_DESIGN"))
+            else if (bhMaterial is Concrete)
             {
 
-                bhSection = bhConcreteFromRfSection_NonStandard(section, rfMaterial);
+                bhSection = bhConcreteFromRfSection_NonStandard(section, bhMaterial);
 
             }
+
+            bhSection.SetRFEM6ID(section.no);
 
             return bhSection;
         }
@@ -101,16 +106,19 @@ namespace BH.Adapter.RFEM6
             //var cs1 = BH.Engine.Library.Query.Library("StructureSectionProperties");
             var bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true);
 
+        
+
             return bhSec;
         }
 
 
-        private static ISectionProperty bhConcreteFromRfSection_NonStandard(section rfSection, material rfmaterial)
+        private static ISectionProperty bhConcreteFromRfSection_NonStandard(section rfSection, IMaterialFragment bhMaterial)
         {
             string[] sectionSignature = rfSection.name.Split(' ');
             string sectionCatName = rfSection.name;
-            var bhMaterial = rfmaterial.FromRFEM() as Concrete;
             String[] secParameters = new string[1];
+            Concrete bhConcrete = bhMaterial as Concrete;
+
 
             double width, height, diameter, thickness0, thickness1, thickness2, thickness3, radiusToe, radiusRoot;
 
@@ -123,7 +131,7 @@ namespace BH.Adapter.RFEM6
 
                     diameter = Double.Parse(sectionSignature[1]);
 
-                    bhSection = BH.Engine.Structure.Create.ConcreteCircularSection(diameter, bhMaterial, sectionCatName, null);
+                    bhSection = BH.Engine.Structure.Create.ConcreteCircularSection(diameter, bhConcrete, sectionCatName, null);
 
                     break;
 
@@ -133,7 +141,7 @@ namespace BH.Adapter.RFEM6
                     width = Double.Parse(secParameters[0]);
                     height = Double.Parse(secParameters[1]);
 
-                    bhSection = BH.Engine.Structure.Create.ConcreteRectangleSection(height, width, bhMaterial, sectionCatName, null);
+                    bhSection = BH.Engine.Structure.Create.ConcreteRectangleSection(height, width, bhConcrete, sectionCatName, null);
 
                     break;
 
@@ -145,7 +153,7 @@ namespace BH.Adapter.RFEM6
 
                     var bhProfile0 = BH.Engine.Spatial.Create.TubeProfile(diameter, thickness0);
 
-                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile0, bhMaterial, sectionCatName, null);
+                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile0, bhConcrete, sectionCatName, null);
 
                     break;
 
@@ -162,7 +170,7 @@ namespace BH.Adapter.RFEM6
 
                     BH.oM.Spatial.ShapeProfiles.BoxProfile bhProfile1 = BH.Engine.Spatial.Create.BoxProfile(height, width, thickness0);
 
-                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile1, bhMaterial, sectionCatName, null);
+                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile1, bhConcrete, sectionCatName, null);
 
                     break;
 
@@ -179,7 +187,7 @@ namespace BH.Adapter.RFEM6
 
                     BH.oM.Spatial.ShapeProfiles.ISectionProfile bhProfile2 = BH.Engine.Spatial.Create.ISectionProfile(height, width, thickness1, thickness0, 0, 0);
 
-                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile2, bhMaterial, sectionCatName, null);
+                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile2, bhConcrete, sectionCatName, null);
 
                     break;
 
@@ -196,13 +204,13 @@ namespace BH.Adapter.RFEM6
 
                     BH.oM.Spatial.ShapeProfiles.TSectionProfile bhProfile3 = BH.Engine.Spatial.Create.TSectionProfile(height, width, thickness1, thickness0, 0, 0);
 
-                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile3, bhMaterial, sectionCatName, null);
+                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile3, bhConcrete, sectionCatName, null);
 
                     break;
 
                 default:
 
-                    bhSection = BH.Engine.Structure.Create.ConcreteCircularSection(1, bhMaterial, sectionCatName, null);
+                    bhSection = BH.Engine.Structure.Create.ConcreteCircularSection(1, bhConcrete, sectionCatName, null);
 
                     break;
 
@@ -213,12 +221,12 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private static ISectionProperty bhSteelSectionFromRfSection_NonStandard(section rfSection, material rfmaterial)
+        private static ISectionProperty bhSteelSectionFromRfSection_NonStandard(section rfSection, IMaterialFragment bhMaterial)
         {
             string[] sectionSignature = rfSection.name.Split(' ');
             string sectionCatName = sectionSignature[0];
-            var bhMaterial = rfmaterial.FromRFEM() as Steel;
             String[] secParameters = new string[1];
+            Steel bhSteel = bhMaterial as Steel;
 
             double width, height, diameter, thickness0, thickness1, thickness2, thickness3, radiusToe, radiusRoot0, radiusRoot1, flangeWidthTop, flangeWidthBot;
 
@@ -233,21 +241,21 @@ namespace BH.Adapter.RFEM6
                     secParameters = sectionSignature[1].Split('/');
                     diameter = Double.Parse(secParameters[0]);
 
-                    bhSection = BH.Engine.Structure.Create.SteelCircularSection(diameter, bhMaterial, rfSection.name);
+                    bhSection = BH.Engine.Structure.Create.SteelCircularSection(diameter, bhSteel, rfSection.name);
 
                     break;
 
                 case "RHSU":
 
                     secParameters = sectionSignature[1].Split('/');
-                    width = Double.Parse(secParameters[0]);
-                    height = Double.Parse(secParameters[1]);
+                    width = Double.Parse(secParameters[1]);
+                    height = Double.Parse(secParameters[0]);
                     thickness0 = Double.Parse(secParameters[2]);//web1
                     thickness1 = Double.Parse(secParameters[3]);//web2
                     thickness2 = Double.Parse(secParameters[4]);//flange1
                     thickness3 = Double.Parse(secParameters[5]);//flange2
 
-                    bhSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(height, width, thickness0, thickness2, 0, bhMaterial, rfSection.name);
+                    bhSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(height, width, thickness0, thickness2, 0, bhSteel, rfSection.name);
 
                     break;
 
@@ -264,7 +272,7 @@ namespace BH.Adapter.RFEM6
                     radiusRoot0 = Double.Parse(secParameters[6]);//RootRadTop
                     radiusRoot1 = Double.Parse(secParameters[7]);//RootRadBot
 
-                    bhSection = BH.Engine.Structure.Create.SteelFabricatedISection(height, thickness0, flangeWidthTop, thickness1, flangeWidthBot, thickness2, 0, bhMaterial, rfSection.name);
+                    bhSection = BH.Engine.Structure.Create.SteelFabricatedISection(height, thickness0, flangeWidthTop, thickness1, flangeWidthBot, thickness2, 0, bhSteel, rfSection.name);
 
                     break;
 
@@ -279,7 +287,7 @@ namespace BH.Adapter.RFEM6
                     radiusRoot0 = Double.Parse(secParameters[4]);//RootRadTop
                     radiusToe = Double.Parse(secParameters[5]);//ToeRad
 
-                    bhSection = BH.Engine.Structure.Create.SteelISection(height, thickness0, width, thickness1, radiusRoot0, radiusToe, bhMaterial, rfSection.name);
+                    bhSection = BH.Engine.Structure.Create.SteelISection(height, thickness0, width, thickness1, radiusRoot0, radiusToe, bhSteel, rfSection.name);
 
                     break;
 
@@ -290,7 +298,7 @@ namespace BH.Adapter.RFEM6
                     height = Double.Parse(secParameters[0]);
                     width = Double.Parse(secParameters[1]);
 
-                    bhSection = BH.Engine.Structure.Create.SteelRectangleSection(height, width, 0, bhMaterial, rfSection.name);
+                    bhSection = BH.Engine.Structure.Create.SteelRectangleSection(height, width, 0, bhSteel, rfSection.name);
 
                     break;
 
@@ -305,7 +313,7 @@ namespace BH.Adapter.RFEM6
                     radiusRoot0 = Double.Parse(secParameters[4]);//RootRadTop
                     radiusToe = Double.Parse(secParameters[5]);//ToeRad
 
-                    bhSection = BH.Engine.Structure.Create.SteelTSection(height, thickness0, width, thickness1, radiusRoot0, radiusToe, bhMaterial, rfSection.name);
+                    bhSection = BH.Engine.Structure.Create.SteelTSection(height, thickness0, width, thickness1, radiusRoot0, radiusToe, bhSteel, rfSection.name);
 
                     break;
 
@@ -315,7 +323,7 @@ namespace BH.Adapter.RFEM6
                     diameter = Double.Parse(secParameters[0]);
                     thickness0 = Double.Parse(secParameters[1]);
 
-                    bhSection = BH.Engine.Structure.Create.SteelTubeSection(diameter, thickness0, bhMaterial, rfSection.name);
+                    bhSection = BH.Engine.Structure.Create.SteelTubeSection(diameter, thickness0, bhSteel, rfSection.name);
 
                     break;
 
@@ -324,15 +332,18 @@ namespace BH.Adapter.RFEM6
                     secParameters = sectionSignature[1].Split('/');
                     diameter = Double.Parse(secParameters[0]);
 
-                    bhSection = BH.Engine.Structure.Create.SteelCircularSection(1, bhMaterial, "Default Round Beam D=1m");
+                    bhSection = BH.Engine.Structure.Create.SteelCircularSection(1, bhSteel, "Default Round Beam D=1m");
 
                     break;
 
             }
 
+            bhSection.Name = rfSection.name;
 
             return bhSection;
         }
+
+
 
     }
 }

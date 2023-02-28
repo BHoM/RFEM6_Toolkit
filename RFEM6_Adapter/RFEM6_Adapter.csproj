@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net48</TargetFrameworks>
@@ -7,6 +7,23 @@
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	<BaseOutputPath>..\Build\</BaseOutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Convert\FromRFEM6\SetID.cs" />
+    <Compile Remove="CRUD\NextId\Node.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Comparers\NewFile1.txt" />
+    <None Remove="Comparers\RFEMLineComparer" />
+    <None Remove="Comparers\RFEMSectionComparer" />
+    <None Remove="Convert\FromRFEM6\NewFile1.txt" />
+    <None Remove="Convert\FromRFEM6\SetRFEM6ID" />
+    <None Remove="CRUD\NextId\NextId" />
+    <None Remove="CRUD\NextId\Node" />
+    <None Remove="Modules\GetLineModule" />
+    <None Remove="Modules\NewFile1.txt" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.2.34" />

@@ -6,6 +6,8 @@ using System.Text;
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.MaterialFragments;
+
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
@@ -15,12 +17,15 @@ namespace BH.Adapter.RFEM6
 {
     public partial class Convert
     {
-        public static rfModel.section ToRFEM6(this ISectionProperty bhSection, int secNo, int matNo, string materialType)
+        public static rfModel.section ToRFEM6(this ISectionProperty bhSection, int matNo, string materialType)
         {
+
 
             rfModel.section rfSection = null;
 
-            alterSectionName(bhSection, materialType);
+            AlterSectionName(bhSection);
+          
+            int secNo = bhSection.GetRFEM6ID();
 
             if (materialType.Equals("Steel"))
             {
@@ -88,8 +93,11 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        public static String alterSectionName(ISectionProperty bhSection, string materialType)
+        public static String AlterSectionName(ISectionProperty bhSection)
         {
+
+
+            string materialType = bhSection.Material.GetType().Name;
 
             //Parametrs for dimensioning Cross Sections
             double v0, v1, v2, v3, v4, v5;

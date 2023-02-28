@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
  *
@@ -20,45 +20,64 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.oM.Adapter;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BH.oM.Base;
+using BH.oM.Structure.SectionProperties;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter : BHoMAdapter
+    public class RFEMSectionComparer : IEqualityComparer<ISectionProperty>
     {
-        // This method gets called when appropriate by the Push method contained in the base Adapter class.
-        // Unlike the Create, Delete and Read, this method already exposes a simple implementation: it calls Delete and then Create.
-        // It can be overridden here keeping in mind the following:
-        // - it gets called once per each Type, and if equal objects are found;
-        // - the object equality is tested through this.AdapterComparers, that need to be implemented for each type.
-        // See the wiki for more info.
+        /***************************************************/
+        /**** Constructors                              ****/
+        /***************************************************/
 
-
-        protected override bool IUpdate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
+        public RFEMSectionComparer()
         {
-            return UpdateObjects(objects as dynamic);
+
+        }
+
+
+        /***************************************************/
+        /**** Public Methods                            ****/
+        /***************************************************/
+
+        public bool Equals(ISectionProperty section1, ISectionProperty section2)
+        {
+            //Check whether the compared objects reference the same data.
+            if (Object.ReferenceEquals(section1, section2)) return true;
+
+            //Check whether any of the compared objects is null.
+            if (Object.ReferenceEquals(section1, null) || Object.ReferenceEquals(section2, null))
+                return false;
+
+            Convert.AlterSectionName(section1);
+            Convert.AlterSectionName(section2);
+
+            if(section1.Name.Equals(section2.Name)) return true;
+
+
+            return false;
+
         }
 
         /***************************************************/
 
-        private bool UpdateObjects(IEnumerable<IBHoMObject> objects)
+        public int GetHashCode(ISectionProperty section)
         {
-            return base.IUpdate(objects, null);
+            return 0;
         }
 
+
         /***************************************************/
+
 
     }
 
 
-    /***************************************************/
-
 
 }
+
+
+
 

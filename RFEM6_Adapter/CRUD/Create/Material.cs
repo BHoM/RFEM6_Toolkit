@@ -17,61 +17,19 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<IMaterialFragment> materialFragments)
         {
 
-            rfModel.object_with_children[] materials = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
-            var materialNumbers = materials.ToList().Select(m => m.no);
 
-            List<rfModel.material> materialList = new List<rfModel.material>();
 
-            foreach (int m in materialNumbers)
-            {
+            foreach (IMaterialFragment bhMaterial in materialFragments) {
 
-                materialList.Add(model.get_material(m));
-
-            }
-
-            foreach (IMaterialFragment m in materialFragments)
-            {
-
-                int materialNo = model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MATERIAL, 0);
-
-                rfModel.material rfMaterial = Convert.ToRFEM6(m, materialNo);
-
-                //bool materialExistAlready = materialList.Any(k=>k.name.Split(' ')[0].Equals(rfMaterial.name));
-                bool materialExistAlready = materialDoesAlreadyExist(m);
-
-                if (!materialExistAlready)
-                {
-                    model.set_material(rfMaterial);
-                }
-
+                rfModel.material rfMaterial = bhMaterial.ToRFEM6();
+                
+                model.set_material(rfMaterial);
+            
             }
 
             return true;
         }
 
-        private bool materialDoesAlreadyExist(IMaterialFragment materialFragments)
-        {
-
-            rfModel.object_with_children[] mat = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
-            var matNum = mat.ToList().Select(m => m.no).ToList();
-
-            foreach (int n in matNum)
-            {
-
-                var rfMat = model.get_material(n);
-                string rfSecName = rfMat.name.Split('|')[0].Trim(new Char[] { ' ' });
-
-
-                if (rfSecName.Equals(materialFragments.Name))
-                {
-                    return true;
-                }
-
-            }
-
-
-            return false;
-        }
-
+       
     }
 }
