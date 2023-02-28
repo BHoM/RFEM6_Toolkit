@@ -5,6 +5,7 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
+using BH.oM.Structure.Constraints;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
@@ -15,25 +16,24 @@ namespace BH.Adapter.RFEM6
     public partial class Convert
     {
 
-        public static rfModel.nodal_support ToRFEM6(this Node bhNode, int nodalSupportNo, int constraintSupportNo)
+        public static rfModel.nodal_support ToRFEM6(this Constraint6DOF bhSupport)//, int constraintSupportNo)
         {
             rfModel.nodal_support rfNodelSupport = new rfModel.nodal_support()
             {
-                no = nodalSupportNo,
-                nodes = new int[] { constraintSupportNo },
-                spring = new rfModel.vector_3d() { x = stiffnessTranslationBHToRF("" + bhNode.Support.TranslationX), y = stiffnessTranslationBHToRF("" + bhNode.Support.TranslationY), z = stiffnessTranslationBHToRF("" + bhNode.Support.TranslationZ) },
-                rotational_restraint = new rfModel.vector_3d() { x = stiffnessTranslationBHToRF("" + bhNode.Support.RotationX), y = stiffnessTranslationBHToRF("" + bhNode.Support.RotationY), z = stiffnessTranslationBHToRF("" + bhNode.Support.RotationZ) },
+                no = bhSupport.GetRFEM6ID(),
+                name = bhSupport.Name,
+               // nodes = new int[] { constraintSupportNo },
+                spring = new rfModel.vector_3d() { x = stiffnessTranslationBHToRF("" + bhSupport.TranslationX), y = stiffnessTranslationBHToRF("" + bhSupport.TranslationY), z = stiffnessTranslationBHToRF("" + bhSupport.TranslationZ) },
+                rotational_restraint = new rfModel.vector_3d() { x = stiffnessTranslationBHToRF("" + bhSupport.RotationX), y = stiffnessTranslationBHToRF("" + bhSupport.RotationY), z = stiffnessTranslationBHToRF("" + bhSupport.RotationZ) },
             };
-
             return rfNodelSupport;
-
         }
 
 
-        public static Double stiffnessTranslationBHToRF(String stiffness)
+        public static double stiffnessTranslationBHToRF(string stiffness)
         {
 
-            Double result = stiffness == "Free" ? 0.0 : Double.PositiveInfinity;
+            double result = stiffness == "Free" ? 0.0 : double.PositiveInfinity;
 
             return result;
         }

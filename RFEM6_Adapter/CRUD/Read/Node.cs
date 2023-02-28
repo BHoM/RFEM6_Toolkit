@@ -6,6 +6,7 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
+using BH.oM.Structure.Constraints;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
@@ -20,24 +21,25 @@ namespace BH.Adapter.RFEM6
             List<Node> nodeList = new List<Node>();
 
             var nodeNumbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);
-            var allNodes = nodeNumbers.ToList().Select(n => model.get_node(n.no));
-
+            var allRfNodes = nodeNumbers.ToList().Select(n => model.get_node(n.no));
+           
+           Dictionary<int, Constraint6DOF> supports = this.GetCachedOrReadAsDictionary<int, Constraint6DOF>();
 
             if (ids == null)
             {
-                foreach (rfModel.node rfNode in allNodes)
+                foreach (rfModel.node rfNode in allRfNodes)
                 {
-                    nodeList.Add(rfNode.FromRFEM());
+                    Node node = rfNode.FromRFEM();
+
+                    int supportId = rfNode.support;
+
+                    Constraint6DOF support;
+                    if (supports.TryGetValue(supportId, out support))
+                        node.Support = support;
+
+                    nodeList.Add(node);
                 }
             }
-            else
-            {
-                //foreach (string id in ids)
-                //{
-                //    nodeList.Add(modelData.GetNode(Int32.Parse(id), rf.ItemAt.AtNo).GetData().FromRFEM());
-                //}
-            }
-
 
             return nodeList;
         }

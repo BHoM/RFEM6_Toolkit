@@ -24,11 +24,31 @@ namespace BH.Adapter.RFEM6
             var sectionNumbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
             var allSections = sectionNumbers.ToList().Select(n => model.get_section(n.no));
 
+           //  List<rfModel.section>  allSections = new List<rfModel.section>();
 
+            //foreach (var n in sectionNumbers)
+            //{
 
-            foreach (var section in allSections) {
+            //    allSections.Add(model.get_section(n.no));
 
-                sectionList.Add(section.FromRFEM(model.get_material(section.material)));
+            //}
+            Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
+
+            foreach (var section in allSections)
+            {
+
+               
+
+                IMaterialFragment material;
+                if (!materials.TryGetValue(section.material, out material))
+                {
+                    material = model.get_material(section.material).FromRFEM();
+                    materials[section.material] = material;
+                }
+
+                ISectionProperty bhSection = section.FromRFEM(material);
+
+                sectionList.Add(bhSection);
 
             }
 

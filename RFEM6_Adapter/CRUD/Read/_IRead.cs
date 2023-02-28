@@ -28,6 +28,7 @@ using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.Loads;
+using BH.oM.Geometry;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -67,10 +68,12 @@ namespace BH.Adapter.RFEM6
                     return ReadConstraints(ids as dynamic);
                 else if (type == typeof(ISectionProperty) || type.GetInterfaces().Contains(typeof(ISectionProperty)))
                     return ReadSectionProperties(ids as dynamic);
-                else if (type.Namespace == typeof(IMaterialFragment).Namespace)
+                else if (type == typeof(IMaterialFragment) || type.GetInterfaces().Contains(typeof(IMaterialFragment)))
                     return ReadMaterial(ids as dynamic);
+                //else if (type == typeof(Line))
+                //    return ReadLines(ids as dynamic);
                 else if (type == typeof(Bar))
-                    return ReadBar(ids as dynamic);
+                    return ReadBars(ids as dynamic);
                 //else if (type == typeof(Panel))
                 //    return ReadPanels(ids as dynamic);
                 //else if (type == typeof(ISurfaceProperty))

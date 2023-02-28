@@ -46,8 +46,10 @@ namespace BH.Adapter.RFEM6
             // Preferrably, different Create logic for different object types should go in separate methods.
             // We achieve this by using the ICreate method to only dynamically dispatching to *type-specific Create implementations*
             // In other words:
-            foreach (T obj in objects)
-            {
+            
+            //
+            //foreach (T obj in objects)
+            //{
                 //success &= Create(obj as dynamic);
                 if (objects.Count() > 0)
                 {
@@ -64,7 +66,8 @@ namespace BH.Adapter.RFEM6
                     }
 
                 }
-            }
+            //}
+            
             // Then place the specific Create methods below this method or, better, in separate file for each object type.
             return success;
         }

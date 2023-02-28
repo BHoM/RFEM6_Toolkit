@@ -17,25 +17,25 @@ namespace BH.Adapter.RFEM6
     public partial class Convert
     {
 
-        public static rfModel.material ToRFEM6(IMaterialFragment bhMateraial, int materialNo)
+        public static rfModel.material ToRFEM6(this IMaterialFragment material)
         {
             //Object[] nameAndType = materialTypeAndNameTranslater(bhMateraial);
 
             rfModel.material rfMaterial = new rfModel.material
             {
-                no = materialNo,
-                name = bhMateraial.Name,
+                no = material.GetRFEM6ID(),
+                name = material.Name,
                 //name = "S235 (DIN EN 1993-1-1:2010-12)",
                 //material_type = rfModel.material_material_type.TYPE_STEEL,
                 comment = "",
-                material_type = bhMateraial.GetType().Name.Equals("Steel") ? rfModel.material_material_type.TYPE_STEEL : rfModel.material_material_type.TYPE_CONCRETE
+                material_type = material.GetType().Name.Equals("Steel") ? rfModel.material_material_type.TYPE_STEEL : rfModel.material_material_type.TYPE_CONCRETE
             };
 
             return rfMaterial;
 
         }
 
-   
+
 
     }
 }

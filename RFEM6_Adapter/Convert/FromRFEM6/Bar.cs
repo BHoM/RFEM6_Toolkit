@@ -5,6 +5,7 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
+using BH.oM.Structure.SectionProperties;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.MaterialFragments;
@@ -16,19 +17,12 @@ namespace BH.Adapter.RFEM6
     public partial class Convert
     {
 
-        public static Bar FromRFEM(this rfModel.member member, rfModel.node node0, rfModel.node node1, rfModel.material rfMaterial, rfModel.section rfSection)
+        public static Bar FromRFEM(this rfModel.member member, Node node0, Node node1, ISectionProperty section)
         {
 
-   
-
-            Node bhMode0 = node0.FromRFEM();
-            Node bhMode1 = node1.FromRFEM();
-
-            BH.oM.Geometry.Line bhLine = BH.Engine.Geometry.Create.Line(bhMode0.Position, bhMode1.Position);
-            //BH.Engine.Structure.Create.Bar()
-            BH.oM.Structure.SectionProperties.ISectionProperty bhSection = rfSection.FromRFEM(rfMaterial);
-
-           return BH.Engine.Structure.Create.Bar(bhLine, bhSection,0,null,BarFEAType.Flexural,"member nr."+member.no);
+            Bar bar = new Bar { StartNode = node0, EndNode = node1, SectionProperty = section, Name = "member nr." + member.no };
+            bar.SetRFEM6ID(member.no);
+            return bar;
 
         }
 

@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -37,9 +38,21 @@ namespace BH.Adapter.RFEM6
         // Toolkits need to implement (override) this only to get the full CRUD to work.
         protected override int IDelete(Type type, IEnumerable<object> ids, ActionConfig actionConfig = null)
         {
-            //Insert code here to enable deletion of specific types of objects with specific ids
-            BH.Engine.Base.Compute.RecordError($"Delete for objects of type {type.Name} is not implemented in {(this as dynamic).GetType().Name}.");
-            return 0;
+            rfModel.object_types? rfemType = type.ToRFEM6();
+
+            if (!rfemType.HasValue)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Delete not implemented for obejcts of type {type.Name}.");
+                return 0;
+            }
+
+            int deleteCount = 0;
+            foreach (int id in ids.OfType<int>())
+            {
+                model.delete_object(rfemType.Value, id, 0);
+                deleteCount++;
+            }
+            return deleteCount;
         }
 
         // There are more virtual Delete methods you might want to override and implement.

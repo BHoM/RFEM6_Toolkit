@@ -37,10 +37,15 @@ using BH.oM.Structure.Elements;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.Constraints;
+using BH.oM.Geometry;
 using BH.Engine.Base.Objects;
 using BH.oM.Structure.SurfaceProperties;
 using BH.oM.Structure.Loads;
 using System.ServiceModel;
+using BH.oM.Adapters.RFEM6;
+using BH.Engine.Structure;
+using BH.Engine.Geometry;
+
 
 namespace BH.Adapter.RFEM6
 {
@@ -56,24 +61,29 @@ namespace BH.Adapter.RFEM6
         {
             // The Adapter constructor can be used to configure the Adapter behaviour.
             // For example:
-            m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly; // Adapter `Push` Action simply calls "Create" method.
+            m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
 
             // See the wiki, the AdapterSettings object and other Adapters to see how it can be configured.
             //AdapterIdFragmentType = typeof(RFEMId);
             BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
+            this.AdapterModules.Add(new GetLineModule());
 
             AdapterComparers = new Dictionary<Type, object>
             {
-                {typeof(Bar), new BH.Engine.Structure.BarEndNodesDistanceComparer(3) },
-                {typeof(Node), new BH.Engine.Structure.NodeDistanceComparer(3) },
-                {typeof(ISectionProperty), new BHoMObjectNameOrToStringComparer() },
-                {typeof(IMaterialFragment), new BHoMObjectNameComparer() },
-                {typeof(LinkConstraint), new BHoMObjectNameComparer() },
+                {typeof(Bar), new BarEndNodesDistanceComparer(3) },
+                {typeof(Node), new NodeDistanceComparer(3) },
+                {typeof(ISectionProperty), new RFEMSectionComparer() },
+                {typeof(IMaterialFragment), new NameOrDescriptionComparer() },
+                {typeof(LinkConstraint), new NameOrDescriptionComparer() },
+                {typeof(Constraint6DOF), new NameOrDescriptionComparer()},
+                {typeof(RFEMLine), new RFEMLineComparer(3) },
             };
-
+           
             DependencyTypes = new Dictionary<Type, List<Type>>
             {
-                {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(Node) } },
+                {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine) } },
+                {typeof(RFEMLine), new List<Type> { typeof(Node) } },
+                {typeof(Node), new List<Type> { typeof(Constraint6DOF) } },
                 {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },
                 {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
                 {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
@@ -83,7 +93,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(LoadCombination), new List<Type> { typeof(Loadcase) } }
             };
 
-
+            AdapterIdFragmentType = typeof(RFEM6ID);
 
             if (active)
             {
@@ -106,6 +116,12 @@ namespace BH.Adapter.RFEM6
 
         /***************************************************/
         /**** Private  Fields                           ****/
+        /***************************************************/
+
+        public Dictionary<int, Line> m_Line = new Dictionary<int, Line>(); 
+
+        /***************************************************/
+        /**** Private Methods                           ****/
         /***************************************************/
 
         // You can add any private variable that should be in common to any other adapter methods here.
