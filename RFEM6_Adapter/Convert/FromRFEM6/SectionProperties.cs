@@ -35,13 +35,13 @@ namespace BH.Adapter.RFEM6
                 if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_STEEL))
                 {
 
-                    bhSection = bhSteelSectionFromRfSection_Standard(section);
+                    bhSection = BhSteelSectionFromRfSection_Standard(section);
 
                 }
                 else
                 {
 
-                    bhSection = bhSteelSectionFromRfSection_NonStandard(section, bhMaterial);
+                    bhSection = BhSteelSectionFromRfSection_NonStandard(section, bhMaterial);
                 }
 
             }
@@ -49,7 +49,7 @@ namespace BH.Adapter.RFEM6
             else if (bhMaterial is Concrete)
             {
 
-                bhSection = bhConcreteFromRfSection_NonStandard(section, bhMaterial);
+                bhSection = BhConcreteFromRfSection_NonStandard(section, bhMaterial);
 
             }
 
@@ -59,7 +59,7 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private static ISectionProperty bhSteelSectionFromRfSection_Standard(rfModel.section section)
+        private static ISectionProperty BhSteelSectionFromRfSection_Standard(rfModel.section section)
         {
 
             BH.oM.Structure.SectionProperties.ISectionProperty bhSec = null;
@@ -152,7 +152,7 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private static ISectionProperty bhConcreteFromRfSection_NonStandard(section rfSection, IMaterialFragment bhMaterial)
+        private static ISectionProperty BhConcreteFromRfSection_NonStandard(section rfSection, IMaterialFragment bhMaterial)
         {
             string[] sectionSignature = rfSection.name.Split(' ');
             string sectionCatName = rfSection.name;
@@ -275,7 +275,7 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private static ISectionProperty bhSteelSectionFromRfSection_NonStandard(section rfSection, IMaterialFragment bhMaterial)
+        private static ISectionProperty BhSteelSectionFromRfSection_NonStandard(section rfSection, IMaterialFragment bhMaterial)
         {
             string[] sectionSignature = rfSection.name.Split(' ');
             string sectionCatName = sectionSignature[0];

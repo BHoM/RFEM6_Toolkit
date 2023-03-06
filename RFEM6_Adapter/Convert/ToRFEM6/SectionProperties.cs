@@ -30,7 +30,7 @@ namespace BH.Adapter.RFEM6
             if (materialType.Equals("Steel"))
             {
 
-                if (isStandardSteelSection(bhSection))
+                if (IsStandardSteelSection(bhSection))
                 {
 
                     // create section
@@ -61,7 +61,7 @@ namespace BH.Adapter.RFEM6
                         materialSpecified = true,
                         type = rfModel.section_type.TYPE_PARAMETRIC_THIN_WALLED,
                         typeSpecified = true,
-                        parametrization_type = getParametrizationType(bhSection, materialType),
+                        parametrization_type = GetParametrizationType(bhSection, materialType),
                         parametrization_typeSpecified = true,
                         manufacturing_type = rfModel.section_manufacturing_type.MANUFACTURING_TYPE_WELDED,
                         manufacturing_typeSpecified = true,
@@ -82,7 +82,7 @@ namespace BH.Adapter.RFEM6
                     materialSpecified = true,
                     type = rfModel.section_type.TYPE_PARAMETRIC_MASSIVE_I,
                     typeSpecified = true,
-                    parametrization_type = getParametrizationType(bhSection, materialType),
+                    parametrization_type = GetParametrizationType(bhSection, materialType),
                     parametrization_typeSpecified = true,
                     name = bhSection.Name, // width/height as in RFEM, SI units
                 };
@@ -105,7 +105,7 @@ namespace BH.Adapter.RFEM6
             if (materialType.Equals("Steel"))
             {
 
-                if (isStandardSteelSection(bhSection))
+                if (IsStandardSteelSection(bhSection))
                 {
 
                     if (bhSection.Name.Split(' ')[0].Equals("L"))
@@ -363,7 +363,7 @@ namespace BH.Adapter.RFEM6
 
         }
 
-        private static rfModel.section_parametrization_type getParametrizationType(this ISectionProperty bhSection, String materialType)
+        private static rfModel.section_parametrization_type GetParametrizationType(this ISectionProperty bhSection, String materialType)
         {
 
             if (materialType.Equals("Concrete"))
@@ -474,7 +474,7 @@ namespace BH.Adapter.RFEM6
 
         }
 
-        private static bool isStandardSteelSection(ISectionProperty bhSection)
+        private static bool IsStandardSteelSection(ISectionProperty bhSection)
         {
 
             String bhSecNameAbrev = bhSection.Name.Split(' ')[0].Length > 3 ? bhSection.Name.TrimStart().Substring(3).ToUpper() : bhSection.Name.Split(' ')[0];
