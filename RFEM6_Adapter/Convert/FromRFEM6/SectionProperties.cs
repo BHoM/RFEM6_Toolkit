@@ -9,6 +9,7 @@ using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
+using BH.Engine.Base;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
@@ -67,18 +68,18 @@ namespace BH.Adapter.RFEM6
             if (section.name.Split(' ')[0].Equals("L"))
             {
 
-                bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true);
+                bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
 
                 if (bhSec is null)
                 {
 
                     rfSecName_simplified += ".0";
-                    bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true);
+                    bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
 
 
                 }
 
-                return bhSec;
+                return bhSec.DeepClone();
             }
             else if (section.name.Split(' ')[0].Equals("RHSU"))
             {
@@ -130,7 +131,7 @@ namespace BH.Adapter.RFEM6
 
 
                 //var cs1 = BH.Engine.Library.Query.Library("StructureSectionProperties");
-                bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true);
+                bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
                 if (bhSec is null)
                 {
 
@@ -138,14 +139,14 @@ namespace BH.Adapter.RFEM6
 
                     rfSecName_simplified += height + "X" + width + "X" + thickness;
 
-                    bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true);
+                    bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
 
                 }
 
             }
             else 
             {
-                bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true);
+                bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
             }
             return bhSec;
         }
