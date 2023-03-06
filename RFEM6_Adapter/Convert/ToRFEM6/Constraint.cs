@@ -23,14 +23,14 @@ namespace BH.Adapter.RFEM6
                 no = bhSupport.GetRFEM6ID(),
                 name = bhSupport.Name,
                // nodes = new int[] { constraintSupportNo },
-                spring = new rfModel.vector_3d() { x = stiffnessTranslationBHToRF("" + bhSupport.TranslationX), y = stiffnessTranslationBHToRF("" + bhSupport.TranslationY), z = stiffnessTranslationBHToRF("" + bhSupport.TranslationZ) },
-                rotational_restraint = new rfModel.vector_3d() { x = stiffnessTranslationBHToRF("" + bhSupport.RotationX), y = stiffnessTranslationBHToRF("" + bhSupport.RotationY), z = stiffnessTranslationBHToRF("" + bhSupport.RotationZ) },
+                spring = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhSupport.TranslationX), y = StiffnessTranslationBHToRF("" + bhSupport.TranslationY), z = StiffnessTranslationBHToRF("" + bhSupport.TranslationZ) },
+                rotational_restraint = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhSupport.RotationX), y = StiffnessTranslationBHToRF("" + bhSupport.RotationY), z = StiffnessTranslationBHToRF("" + bhSupport.RotationZ) },
             };
             return rfNodelSupport;
         }
 
 
-        public static double stiffnessTranslationBHToRF(string stiffness)
+        public static double StiffnessTranslationBHToRF(string stiffness)
         {
 
             double result = stiffness == "Free" ? 0.0 : double.PositiveInfinity;
