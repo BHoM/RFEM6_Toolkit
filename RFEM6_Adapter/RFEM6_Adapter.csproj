@@ -49,7 +49,7 @@
       <SpecificVersion>false</SpecificVersion>
     </Reference>
     <Reference Include="Analytical_oM">
-      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Analytical_oM.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Analytical_oM.dll</HintPath>
     </Reference>
     <Reference Include="BHoM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
