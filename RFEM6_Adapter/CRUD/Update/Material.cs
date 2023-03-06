@@ -24,7 +24,7 @@ namespace BH.Adapter.RFEM6
 
             foreach (IMaterialFragment material in materials)
             {
-                model.set_material(material.ToRFEM6());
+                m_Model.set_material(material.ToRFEM6());
             }
 
             return success;

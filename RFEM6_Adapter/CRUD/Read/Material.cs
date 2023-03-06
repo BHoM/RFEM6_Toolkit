@@ -21,12 +21,12 @@ namespace BH.Adapter.RFEM6
             //var steelLib = BH.Engine.Library.Query.Library("Steel");
 
             List<IMaterialFragment> materialList = new List<IMaterialFragment>();
-            rfModel.object_with_children[] materialsNumbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
+            rfModel.object_with_children[] materialsNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
             List<rfModel.material> allMaterials = new List<rfModel.material>();
 
             foreach(var n in materialsNumbers) {
 
-                allMaterials.Add(model.get_material(n.no));
+                allMaterials.Add(m_Model.get_material(n.no));
 
             }
 

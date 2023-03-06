@@ -49,7 +49,7 @@ namespace BH.Adapter.RFEM6
                 //sections.TryGetValue(bhBar.SectionProperty.GetRFEM6ID(), out section);
 
                 rfModel.member rfMember = bhBar.ToRFEM6();
-                model.set_member(rfMember);
+                m_Model.set_member(rfMember);
                 
 
             }

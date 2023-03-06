@@ -54,7 +54,7 @@ namespace BH.Adapter.RFEM6
             Convert.AlterSectionName(section1);
             Convert.AlterSectionName(section2);
 
-            if(section1.Name.Equals(section2.Name)) return true;
+            if(section1.Name.Equals(section2.Name)&&section1.Material.Name.Equals(section2.Material.Name)) return true;
 
 
             return false;

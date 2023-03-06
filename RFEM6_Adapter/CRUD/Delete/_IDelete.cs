@@ -49,7 +49,7 @@ namespace BH.Adapter.RFEM6
             int deleteCount = 0;
             foreach (int id in ids.OfType<int>())
             {
-                model.delete_object(rfemType.Value, id, 0);
+                m_Model.delete_object(rfemType.Value, id, 0);
                 deleteCount++;
             }
             return deleteCount;

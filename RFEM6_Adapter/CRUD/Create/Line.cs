@@ -34,7 +34,7 @@ namespace BH.Adapter.RFEM6
                     type = rfModel.line_type.TYPE_POLYLINE,
                 };
 
-                model.set_line(rfLine);
+                m_Model.set_line(rfLine);
             }
 
             return true;

@@ -23,7 +23,7 @@ namespace BH.Adapter.RFEM6
 
                 rfModel.material rfMaterial = bhMaterial.ToRFEM6();
                 
-                model.set_material(rfMaterial);
+                m_Model.set_material(rfMaterial);
             
             }
 

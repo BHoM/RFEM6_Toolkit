@@ -102,10 +102,6 @@ namespace BH.Adapter.RFEM6
                 //string modelUrl = application.new_model(modelName);
 
 
-                string modelUrl = application.get_active_model();
-
-                // connects to RFEM6/RSTAB9 model
-                model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
                 //model.reset();
 
 
@@ -118,7 +114,7 @@ namespace BH.Adapter.RFEM6
         /**** Private  Fields                           ****/
         /***************************************************/
 
-        public Dictionary<int, Line> m_Line = new Dictionary<int, Line>(); 
+        public Dictionary<int, Line> m_Line = new Dictionary<int, Line>();
 
         /***************************************************/
         /**** Private Methods                           ****/
@@ -131,8 +127,23 @@ namespace BH.Adapter.RFEM6
         // See the wiki for more information.
 
 
+        private void Connect()
+        {
+
+            string modelUrl = m_Application.get_active_model();
+
+            // connects to RFEM6/RSTAB9 model
+            m_Model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
+        }
+
+        private void Disconnect()
+        {
+            m_Model.close_connection();
+            m_Model = null;
+        }
+
         //RFEM stuff ----------------------------
-        RfemModelClient model;
+        private RfemModelClient m_Model;
         public static EndpointAddress Address { get; set; } = new EndpointAddress("http://localhost:8081");
 
         private static BasicHttpBinding Binding
@@ -143,7 +154,7 @@ namespace BH.Adapter.RFEM6
                 return binding;
             }
         }
-        private static RfemApplicationClient application = new RfemApplicationClient(Binding, Address);
+        private static RfemApplicationClient m_Application = new RfemApplicationClient(Binding, Address);
 
         /***************************************************/
     }

@@ -18,8 +18,8 @@ namespace BH.Adapter.RFEM6
 
             List<Constraint6DOF> constraintList = new List<Constraint6DOF>();
 
-            rfModel.object_with_children[] numbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
-            IEnumerable<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => model.get_nodal_support(n.no));
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
+            IEnumerable<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no));
 
             foreach (rfModel.nodal_support s in foundSupports)
             {
