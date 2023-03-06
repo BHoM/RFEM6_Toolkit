@@ -56,13 +56,13 @@ namespace BH.Adapter.RFEM6
                     //AppLock();
                     try
                     {
-                        model.begin_modification("Geometry");
+                        m_Model.begin_modification("Geometry");
                         success = CreateCollection(objects as dynamic); //Calls the correct CreateCollection method based on dynamic casting
                     }
                     finally
                     {
                         //AppUnlock();
-                        model.finish_modification();
+                        m_Model.finish_modification();
                     }
 
                 }

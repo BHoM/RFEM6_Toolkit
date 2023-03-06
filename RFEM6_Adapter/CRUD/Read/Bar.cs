@@ -21,7 +21,7 @@ namespace BH.Adapter.RFEM6
 
             List<Bar> barList = new List<Bar>();
 
-            var barNumber = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER);
+            var barNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER);
             
             
             //var allRfMembers = barNumber.ToList().Select(n => model.get_member(n.no));
@@ -30,7 +30,7 @@ namespace BH.Adapter.RFEM6
 
             foreach (var n in barNumber) {
 
-                allRfMembers.Add(model.get_member(n.no));
+                allRfMembers.Add(m_Model.get_member(n.no));
 
             }
 

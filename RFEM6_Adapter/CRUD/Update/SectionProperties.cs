@@ -31,7 +31,7 @@ namespace BH.Adapter.RFEM6
                 materials.TryGetValue(materialID, out material);
                 String materialName=material.GetType().Name;
 
-                model.set_section(section.ToRFEM6(section.Material.GetRFEM6ID(), materialName));
+                m_Model.set_section(section.ToRFEM6(section.Material.GetRFEM6ID(), materialName));
             }
 
             return success;

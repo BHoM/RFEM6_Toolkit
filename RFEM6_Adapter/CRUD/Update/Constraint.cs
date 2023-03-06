@@ -24,7 +24,7 @@ namespace BH.Adapter.RFEM6
 
             foreach (Constraint6DOF constraint in constraints)
             {
-                model.set_nodal_support(constraint.ToRFEM6());
+                m_Model.set_nodal_support(constraint.ToRFEM6());
                
             }
 

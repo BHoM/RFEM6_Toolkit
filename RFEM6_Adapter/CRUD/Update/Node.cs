@@ -23,7 +23,7 @@ namespace BH.Adapter.RFEM6
 
             foreach (Node node in nodes)
             {
-                model.set_node(node.ToRFEM6());
+                m_Model.set_node(node.ToRFEM6());
             }
 
             return success;

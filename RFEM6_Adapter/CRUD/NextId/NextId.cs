@@ -37,7 +37,7 @@ namespace BH.Adapter.RFEM6
                     return null;
                 }
 
-                int id = model.get_first_free_number(rfType.Value, 0);
+                int id = m_Model.get_first_free_number(rfType.Value, 0);
                 m_FreeIds[objectType] = id;
                 return id;
         }

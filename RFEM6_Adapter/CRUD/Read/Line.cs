@@ -21,8 +21,8 @@ namespace BH.Adapter.RFEM6
 
             List<RFEMLine> lineList = new List<RFEMLine>();
 
-            var lineNumbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE);
-            var allRfLInes = lineNumbers.ToList().Select(n => model.get_line(n.no));
+            var lineNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE);
+            var allRfLInes = lineNumbers.ToList().Select(n => m_Model.get_line(n.no));
 
             Dictionary<int, Node> nodes = this.GetCachedOrReadAsDictionary<int, Node>();
 

@@ -21,8 +21,8 @@ namespace BH.Adapter.RFEM6
 
             List<ISectionProperty> sectionList = new List<ISectionProperty>();
 
-            var sectionNumbers = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
-            var allSections = sectionNumbers.ToList().Select(n => model.get_section(n.no));
+            var sectionNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
+            var allSections = sectionNumbers.ToList().Select(n => m_Model.get_section(n.no));
 
            //  List<rfModel.section>  allSections = new List<rfModel.section>();
 
@@ -42,7 +42,7 @@ namespace BH.Adapter.RFEM6
                 IMaterialFragment material;
                 if (!materials.TryGetValue(section.material, out material))
                 {
-                    material = model.get_material(section.material).FromRFEM();
+                    material = m_Model.get_material(section.material).FromRFEM();
                     materials[section.material] = material;
                 }
 
