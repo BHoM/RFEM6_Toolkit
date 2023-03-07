@@ -34,7 +34,7 @@
 
 //namespace BH.Adapter.RFEM6
 //{
-//    public partial class Convert
+//    public static partial class Convert
 //    {
 
 //        public static Line FromRFEM(rfModel.node startNode, rfModel.node endNode)

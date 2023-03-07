@@ -37,7 +37,7 @@ using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class Convert
+    public static partial class Convert
     {
 
         public static ISectionProperty FromRFEM(this rfModel.section section, IMaterialFragment bhMaterial)
