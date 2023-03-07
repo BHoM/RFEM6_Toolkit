@@ -20,7 +20,9 @@
       <SpecificVersion>false</SpecificVersion>
     </Reference>
     <Reference Include="Structure_oM">
-      <HintPath>..\..\..\ProgramData\BHoM\Assemblies\Structure_oM.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Structure_oM.dll</HintPath>
+	  <Private>false</Private>
+	  <SpecificVersion>false</SpecificVersion>
     </Reference>
   </ItemGroup>
 
