@@ -30,7 +30,7 @@ using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class Convert
+    public static partial class Convert
     {
         public static int GetRFEM6ID(this IBHoMObject obj)
         {

@@ -34,7 +34,7 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class Convert
+    public static partial class Convert
     {
 
         public static rfModel.member ToRFEM6(this Bar bar)
