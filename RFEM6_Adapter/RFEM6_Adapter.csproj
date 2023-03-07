@@ -50,6 +50,8 @@
     </Reference>
     <Reference Include="Analytical_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Analytical_oM.dll</HintPath>
+	  <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
     </Reference>
     <Reference Include="BHoM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
@@ -68,40 +70,62 @@
     </Reference>
     <Reference Include="Data_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Data_oM.dll</HintPath>
+	  <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
     </Reference>
     <Reference Include="Dimensional_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Dimensional_oM.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+	  </Reference>
     <Reference Include="Geometry_Engine">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Geometry_Engine.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+	  </Reference>
     <Reference Include="Geometry_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Geometry_oM.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+	  </Reference>
     <Reference Include="Library_Engine">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Library_Engine.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+	  </Reference>
     <Reference Include="Physical_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Physical_oM.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+	  </Reference>
     <Reference Include="RFEMWebServiceLibrary">
       <HintPath>..\packages\BHoM.Interop.RFEM6\RFEMWebServiceLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Spatial_Engine">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Spatial_Engine.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+	  </Reference>
     <Reference Include="Spatial_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Spatial_oM.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+	  </Reference>
     <Reference Include="Structure_AdapterModules">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Structure_AdapterModules.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+	  </Reference>
     <Reference Include="Structure_Engine">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Structure_Engine.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>
+	  </Reference>
     <Reference Include="Structure_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Structure_oM.dll</HintPath>
-    </Reference>
+      <SpecificVersion>false</SpecificVersion>
+      <Private>false</Private>  
+  </Reference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
