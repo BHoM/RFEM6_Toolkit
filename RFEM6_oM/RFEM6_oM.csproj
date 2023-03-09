@@ -1,39 +1,49 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net48</TargetFrameworks>
-    <BaseOutputPath>..\Build</BaseOutputPath>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<AssemblyVersion>6.0.0.0</AssemblyVersion>
+		<Description>https://github.com/BHoM/BHoM</Description>
+		<Version>5.0.0</Version>
+		<Copyright>Copyright © https://github.com/BHoM</Copyright>
+		<RootNamespace>BH.oM.Base</RootNamespace>
+		<FileVersion>6.1.0.0</FileVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Fragments\BarEdgeFramgent.cs" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+		<OutputPath>..\Build\</OutputPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Fragments\BarEdgeFramgent" />
-    <None Remove="Fragments\NewFile1.txt" />
-    <None Remove="Fragments\RFEMLine" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Fragments\BarEdgeFramgent.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Fragments\BarEdgeFramgent" />
+		<None Remove="Fragments\NewFile1.txt" />
+		<None Remove="Fragments\RFEMLine" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="BHoM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
-      <Private>false</Private>
-      <SpecificVersion>false</SpecificVersion>
-    </Reference>
-    <Reference Include="Structure_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Structure_oM.dll</HintPath>
-	  <Private>false</Private>
-	  <SpecificVersion>false</SpecificVersion>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+	</ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
-  </Target>
+	<ItemGroup>
+		<Reference Include="BHoM">
+			<HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
+			<Private>false</Private>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Structure_oM">
+			<HintPath>C:\ProgramData\BHoM\Assemblies\Structure_oM.dll</HintPath>
+			<Private>false</Private>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
+	</Target>
 
 </Project>
