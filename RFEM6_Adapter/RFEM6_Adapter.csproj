@@ -2,10 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>net48</TargetFrameworks>
+	<AssemblyVersion>6.0.0.0</AssemblyVersion>
     <AssemblyName>RFEM6_Adapter</AssemblyName>
     <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	<BaseOutputPath>..\Build\</BaseOutputPath>
+    <FileVersion>6.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
