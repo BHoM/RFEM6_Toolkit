@@ -3,10 +3,10 @@
 	<PropertyGroup>
 		<TargetFramework>net48</TargetFramework>
 		<AssemblyVersion>6.0.0.0</AssemblyVersion>
-		<Description>https://github.com/BHoM/BHoM</Description>
+		<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
 		<Version>5.0.0</Version>
 		<Copyright>Copyright © https://github.com/BHoM</Copyright>
-		<RootNamespace>BH.oM.Base</RootNamespace>
+		<RootNamespace>BH.oM.Adapters.RFEM6</RootNamespace>
 		<FileVersion>6.1.0.0</FileVersion>
 	</PropertyGroup>
 

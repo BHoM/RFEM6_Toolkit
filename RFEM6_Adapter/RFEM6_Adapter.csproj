@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net48</TargetFrameworks>
 	<AssemblyVersion>6.0.0.0</AssemblyVersion>
+	<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
     <AssemblyName>RFEM6_Adapter</AssemblyName>
     <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -10,22 +11,6 @@
 	<BaseOutputPath>..\Build\</BaseOutputPath>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Convert\FromRFEM6\SetID.cs" />
-    <Compile Remove="CRUD\NextId\Node.cs" />
-  </ItemGroup>
-
-	<ItemGroup>
-		<None Remove="Comparers\NewFile1.txt" />
-		<None Remove="Comparers\RFEMLineComparer" />
-		<None Remove="Comparers\RFEMSectionComparer" />
-		<None Remove="Convert\FromRFEM6\NewFile1.txt" />
-		<None Remove="Convert\FromRFEM6\SetRFEM6ID" />
-		<None Remove="CRUD\NextId\NextId" />
-		<None Remove="CRUD\NextId\Node" />
-		<None Remove="Modules\GetLineModule" />
-		<None Remove="Modules\NewFile1.txt" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.2.34" />
