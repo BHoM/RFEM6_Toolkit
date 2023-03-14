@@ -1,24 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net48</TargetFramework>
-		<AssemblyVersion>6.0.0.0</AssemblyVersion>
-		<Description>https://github.com/BHoM/BHoM</Description>
-		<Version>5.0.0</Version>
-		<Copyright>Copyright © https://github.com/BHoM</Copyright>
-		<RootNamespace>BH.oM.Base</RootNamespace>
-		<FileVersion>6.1.0.0</FileVersion>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net48</TargetFrameworks>
+	<AssemblyVersion>6.0.0.0</AssemblyVersion>
+    <AssemblyName>RFEM6_Adapter</AssemblyName>
+    <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<FileVersion>6.1.0.0</FileVersion>
+	<BaseOutputPath>..\Build\</BaseOutputPath>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
-		<OutputPath>..\Build\</OutputPath>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Remove="Convert\FromRFEM6\SetID.cs" />
-		<Compile Remove="CRUD\NextId\Node.cs" />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Convert\FromRFEM6\SetID.cs" />
+    <Compile Remove="CRUD\NextId\Node.cs" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<None Remove="Comparers\NewFile1.txt" />
@@ -135,8 +130,8 @@
 		</Reference>
 	</ItemGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
-	</Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
+  </Target>
 
 </Project>
