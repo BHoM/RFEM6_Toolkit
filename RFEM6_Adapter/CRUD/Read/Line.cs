@@ -59,7 +59,7 @@ namespace BH.Adapter.RFEM6
                     RFEMLine l = new RFEMLine();
                     l.StartNode = node0;
                     l.EndNode = node1;
-
+                    l.SetRFEM6ID(rfLine.no);
                     lineList.Add(l);
                 }
             }

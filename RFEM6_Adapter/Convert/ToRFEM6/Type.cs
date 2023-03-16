@@ -29,6 +29,7 @@ using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.SurfaceProperties;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
@@ -64,6 +65,10 @@ namespace BH.Adapter.RFEM6
             else if (bhType == typeof(Bar))
             {
                 return rfModel.object_types.E_OBJECT_TYPE_MEMBER;
+            }
+            else if (bhType == typeof(ISurfaceProperty))
+            {
+                return rfModel.object_types.E_OBJECT_TYPE_THICKNESS;
             }
 
             return null;

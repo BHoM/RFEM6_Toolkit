@@ -26,47 +26,40 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
-using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter
     {
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        //Has been implemented inside of Nodes.cs
+
+        private bool CreateCollection(IEnumerable<ISurfaceProperty> surfaceProperties)
         {
+            Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
+           
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
+            foreach (ISurfaceProperty surfaceProperty in surfaceProperties)
             {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {  
-                return typeof(Constraint6DOF);
-            }
-            else if(rfType== rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
-            {
-                return typeof(ISectionProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISurfaceProperty);
-            }
-      
+                
+                IMaterialFragment material = materials[surfaceProperty.Material.GetRFEM6ID()];
 
-            return null;
+                rfModel.thickness rfSurfaceThickness = Convert.ToRFEM6(surfaceProperty, material); 
+
+                m_Model.set_thickness(rfSurfaceThickness);
+
+            }
+
+            return true;
+
         }
+
 
     }
 }
