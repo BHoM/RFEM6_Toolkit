@@ -28,39 +28,41 @@ using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.SurfaceProperties;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter
     {
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        private List<ISurfaceProperty> ReadSurfaceProperties(List<string> ids = null)
         {
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
-            {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {  
-                return typeof(Constraint6DOF);
-            }
-            else if(rfType== rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISectionProperty);
-            }
-      
+            List<ISurfaceProperty> surfacePropetieList = new List<ISurfaceProperty>();
 
-            return null;
+            var thicknessNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_THICKNESS);
+            var allRFThickness = thicknessNumber.ToList().Select(n => m_Model.get_thickness(n.no));
+           
+           //Dictionary<int, Opening> supports = this.GetCachedOrReadAsDictionary<int, Opening>();
+
+            if (ids == null)
+            {
+                foreach (rfModel.thickness rfThickness in allRFThickness)
+                {
+
+                    Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
+                    ISurfaceProperty bhSurfaceProp = rfThickness.FromRFEM(materials[rfThickness.material]);
+
+
+                    bhSurfaceProp.SetRFEM6ID(rfThickness.no);
+
+                    surfacePropetieList.Add(bhSurfaceProp);
+                }
+            }
+
+            return surfacePropetieList;
         }
 
     }
