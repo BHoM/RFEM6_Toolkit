@@ -26,12 +26,11 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.SurfaceProperties;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.SurfaceProperties;
+
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
@@ -40,33 +39,56 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        public static rfModel.thickness ToRFEM6(this ISurfaceProperty bhSurfaceProperty, IMaterialFragment bhMaterial)
         {
+            //Object[] nameAndType = materialTypeAndNameTranslater(bhMateraial);
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
+            rfModel.thickness rfThickness = new rfModel.thickness()
             {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {  
-                return typeof(Constraint6DOF);
-            }
-            else if(rfType== rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
-            {
-                return typeof(ISectionProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISurfaceProperty);
-            }
-      
+                no = bhSurfaceProperty.GetRFEM6ID(),
+                material=bhMaterial.GetRFEM6ID(),
+                name = bhSurfaceProperty.Name,
+                materialSpecified = true,
+                type = rfModel.thickness_type.TYPE_UNIFORM,
+                typeSpecified = true,
+                uniform_thickness = BH.Engine.Structure.Query.ITotalThickness(bhSurfaceProperty),
+                uniform_thicknessSpecified = true,
+            };
 
-            return null;
+            //thickness slabThickness = new thickness
+            //{
+            //    no = 1,
+            //    material = materialConcrete.no,
+            //    materialSpecified = true,
+            //    type = thickness_type.TYPE_UNIFORM,
+            //    typeSpecified = true,
+            //    uniform_thickness = 0.5,
+            //    uniform_thicknessSpecified = true,
+            //};
+
+           
+
+            //// opening
+            //node openingNodeOne = new node()
+            //{
+            //    no = nodeID,
+            //    coordinates = new vector_3d()
+            //    {
+            //        x = firstNode.FirstOrDefault().coordinate_1 + 1.0,
+            //        y = firstNode.FirstOrDefault().coordinate_1 + 1.0,
+            //        z = -hc,
+            //    },
+            //    comment = "opening node",
+
+            //};
+
+
+
+            return rfThickness;
+
         }
+
+
 
     }
 }
