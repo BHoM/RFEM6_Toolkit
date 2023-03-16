@@ -26,9 +26,8 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
+using BH.oM.Structure.SurfaceProperties;
 using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
@@ -39,28 +38,16 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        public static ISurfaceProperty FromRFEM(this rfModel.thickness rfThickness, BH.oM.Structure.MaterialFragments.IMaterialFragment bhMaterial)
         {
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
-            {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {  
-                return typeof(Constraint6DOF);
-            }
-            else if(rfType== rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISectionProperty);
-            }
-      
+            ISurfaceProperty surfaceProperty = new ConstantThickness { Name = rfThickness.name, Thickness = rfThickness.thickness_1, Material = bhMaterial };
 
-            return null;
+            surfaceProperty.SetRFEM6ID(rfThickness.no);
+
+            // bhomProperty = new ConstantThickness { Name = robotLabelName, Thickness = homoData.ThickConst, Material = mat };
+
+            return surfaceProperty;
         }
 
     }
