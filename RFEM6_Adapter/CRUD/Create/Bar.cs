@@ -50,28 +50,8 @@ namespace BH.Adapter.RFEM6
             foreach (Bar bhBar in bhBars)
             {
 
-                //Node n0 = bhBar.EndNode;
-                ////nodes.TryGetValue(n0.GetRFEM6ID(), out n0);
-
-                //Node n1 = bhBar.StartNode;
-                ////nodes.TryGetValue(n1.GetRFEM6ID(), out n1);
-
-                ////Line line = new Line();
-                //rfModel.line rfLine= new rfModel.line()
-                //{
-                //    no = nextFreeLineId,
-                //    definition_nodes = new int[] { n0.GetRFEM6ID(), n1.GetRFEM6ID() },
-                //    type = rfModel.line_type.TYPE_POLYLINE,
-                //};
-
-                //model.set_line(rfLine);
-
-                //ISectionProperty section = null;
-                //sections.TryGetValue(bhBar.SectionProperty.GetRFEM6ID(), out section);
-
                 rfModel.member rfMember = bhBar.ToRFEM6();
                 m_Model.set_member(rfMember);
-                
 
             }
 
