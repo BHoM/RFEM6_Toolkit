@@ -73,6 +73,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(Bar), new BarEndNodesDistanceComparer(3) },
                 {typeof(Node), new NodeDistanceComparer(3) },
                 {typeof(ISectionProperty), new RFEMSectionComparer() },
+                {typeof(ISurfaceProperty), new RFEMSurfacePropertyComparer() },
                 {typeof(IMaterialFragment), new NameOrDescriptionComparer() },
                 {typeof(LinkConstraint), new NameOrDescriptionComparer() },
                 {typeof(Constraint6DOF), new NameOrDescriptionComparer()},
@@ -88,7 +89,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
                 {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
                 {typeof(ISurfaceProperty), new List<Type> { typeof(IMaterialFragment) } },
-                {typeof(Panel), new List<Type> { typeof(ISurfaceProperty) } },
+                {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge) } },
                 {typeof(ILoad), new List<Type> { typeof(Loadcase) } },
                 {typeof(LoadCombination), new List<Type> { typeof(Loadcase) } }
             };

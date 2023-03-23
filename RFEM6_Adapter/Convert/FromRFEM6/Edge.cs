@@ -26,10 +26,7 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.SurfaceProperties;
+using BH.oM.Geometry;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
@@ -40,36 +37,37 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        public static Edge FromRFEM(this rfModel.line rfLine, Dictionary<int, Node> nodeDict)
         {
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
-            {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {  
-                return typeof(Constraint6DOF);
-            }
-            else if(rfType== rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
-            {
-                return typeof(ISectionProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISurfaceProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SURFACE)
-            {
-                return typeof(Panel);
-            }
+            var type = rfLine.type.ToString();
+            ICurve curve = null;
 
 
-            return null;
+            if (type.Equals("TYPE_ARC")) {
+
+                Node n0 = nodeDict[rfLine.definition_nodes[0]];
+                Node n1 = nodeDict[rfLine.definition_nodes[1]];
+
+                Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
+
+                curve = Engine.Geometry.Create.Arc(n0.Position, mid, n1.Position);
+          
+
+            }
+            else if(type.Equals("TYPE_POLYLINE")){
+
+                Node n0 = nodeDict[rfLine.definition_nodes[0]];
+                Node n1 = nodeDict[rfLine.definition_nodes[1]];
+
+                curve = new Line {Start=n0.Position,End=n1.Position};
+
+            }
+
+            Edge edge = new Edge {Curve=curve};
+            edge.SetRFEM6ID(rfLine.no);
+
+            return edge;
         }
 
     }

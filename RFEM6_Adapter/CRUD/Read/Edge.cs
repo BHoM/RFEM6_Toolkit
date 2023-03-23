@@ -27,49 +27,33 @@ using System.Text;
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.SurfaceProperties;
-using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter
     {
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        private List<Edge> ReadEdges(List<string> ids = null)
         {
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
+            List<Edge> edgeList = new List<Edge>();
+
+            Dictionary<int, Node> nodes = this.GetCachedOrReadAsDictionary<int, Node>();
+            var panelNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE);
+            var allRfPanels = panelNumbers.ToList().Select(n => m_Model.get_surface(n.no));
+            var listOfRFEdgeNumbers=(allRfPanels.ToList().SelectMany(e => e.boundary_lines.ToList())).ToHashSet();
+            List<rfModel.line> listOfRFEdges = listOfRFEdgeNumbers.ToList().Select(n => m_Model.get_line(n)).ToList();
+            
+            foreach (rfModel.line l in listOfRFEdges)
             {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {  
-                return typeof(Constraint6DOF);
-            }
-            else if(rfType== rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
-            {
-                return typeof(ISectionProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISurfaceProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SURFACE)
-            {
-                return typeof(Panel);
+                edgeList.Add(l.FromRFEM(nodes));
+
             }
 
-
-            return null;
+            return edgeList;
         }
 
     }
