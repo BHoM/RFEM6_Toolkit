@@ -26,10 +26,8 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
+using BH.oM.Geometry;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
@@ -40,36 +38,16 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty)
         {
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
-            {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {  
-                return typeof(Constraint6DOF);
-            }
-            else if(rfType== rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
-            {
-                return typeof(ISectionProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISurfaceProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SURFACE)
-            {
-                return typeof(Panel);
-            }
+            List<int> rfEdgeNumbers = rfSurface.boundary_lines.ToList();
+            List<Edge> bhEdges = rfEdgeNumbers.Select(n=>edgeDict[n]).ToList();
 
+            Panel panel = Engine.Structure.Create.Panel(bhEdges,null,surfaceProperty[rfSurface.thickness],"");
+            panel.SetRFEM6ID(rfSurface.no);
 
-            return null;
+            return panel;
         }
 
     }

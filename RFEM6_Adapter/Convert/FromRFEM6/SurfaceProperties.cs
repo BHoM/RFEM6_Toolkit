@@ -41,7 +41,7 @@ namespace BH.Adapter.RFEM6
         public static ISurfaceProperty FromRFEM(this rfModel.thickness rfThickness, BH.oM.Structure.MaterialFragments.IMaterialFragment bhMaterial)
         {
 
-            ISurfaceProperty surfaceProperty = new ConstantThickness { Name = rfThickness.name, Thickness = rfThickness.thickness_1, Material = bhMaterial };
+            ISurfaceProperty surfaceProperty = new ConstantThickness { Name = rfThickness.name, Thickness = rfThickness.uniform_thickness, Material = bhMaterial };
 
             surfaceProperty.SetRFEM6ID(rfThickness.no);
 

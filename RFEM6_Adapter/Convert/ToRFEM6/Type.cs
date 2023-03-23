@@ -70,6 +70,10 @@ namespace BH.Adapter.RFEM6
             {
                 return rfModel.object_types.E_OBJECT_TYPE_THICKNESS;
             }
+            else if (bhType == typeof(Panel))
+            {
+                return rfModel.object_types.E_OBJECT_TYPE_SURFACE;
+            }
 
             return null;
 

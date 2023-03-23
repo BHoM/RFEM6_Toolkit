@@ -44,8 +44,6 @@ namespace BH.Adapter.RFEM6
             foreach (ISectionProperty section in sectionProperties)
             {
 
-               // if (csDoesAlreadyExist(section)) { continue; }
-
                 rfModel.object_with_children[] materials = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
                 var materialNumbers = materials.ToList().Select(m => m.no);
                 int matNo = m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MATERIAL, 0);
@@ -74,31 +72,6 @@ namespace BH.Adapter.RFEM6
 
         }
 
-        //private bool csDoesAlreadyExist(ISectionProperty bhSec)
-        //{
-
-        //    rfModel.object_with_children[] sec = model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
-        //    var secNum = sec.ToList().Select(m => m.no).ToList();
-        //    int matNo = 1;
-
-        //    foreach (int n in secNum)
-        //    {
-
-        //        var x = bhSec.ToRFEM6(n, matNo, bhSec.Material.GetType().Name.ToString());
-
-        //        var rfSec = model.get_section(n);
-        //        string rfSecName = rfSec.name.Split('|')[0].Trim(new Char[] { ' ' });
-
-        //        if (rfSecName.Equals(bhSec.Name) || rfSecName.Equals(x.name))
-        //        {
-        //            return true;
-        //        }
-
-        //    }
-
-        //    return false;
-
-        //}
 
     }
 }

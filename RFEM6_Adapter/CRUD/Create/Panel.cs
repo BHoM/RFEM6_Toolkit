@@ -26,50 +26,57 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
+using BH.oM.Geometry;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.SurfaceProperties;
-using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter
     {
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        private bool CreateCollection(IEnumerable<Panel> bhPanels)
         {
-
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
+            Dictionary<int, Edge> edges = this.GetCachedOrReadAsDictionary<int, Edge>();
+            foreach (Panel bhPanel in bhPanels) 
             {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {  
-                return typeof(Constraint6DOF);
-            }
-            else if(rfType== rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
-            {
-                return typeof(ISectionProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISurfaceProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SURFACE)
-            {
-                return typeof(Panel);
-            }
+                bhPanel.ExternalEdges.Select(e=>e.GetRFEM6ID()).ToArray();
+                List<int> edgeList=new List<int>();
 
 
-            return null;
+                foreach (var e in bhPanel.ExternalEdges) { 
+                
+                    edgeList.Add(e.GetRFEM6ID());
+                
+                }
+                int[] edgeArray = edgeList.ToArray();
+
+                rfModel.surface surface = new rfModel.surface
+                {
+                    no = bhPanel.GetRFEM6ID(),
+                    material = bhPanel.Property.Material.GetRFEM6ID(),
+                    materialSpecified = true,
+                    thickness = bhPanel.Property.GetRFEM6ID(),
+                    // boundary_lines = bhPanel.ExternalEdges.Select(e => e.GetRFEM6ID()).ToArray(),
+                    boundary_lines = edgeArray,
+                    type = rfModel.surface_type.TYPE_STANDARD,
+                    typeSpecified = true,
+                    geometry = rfModel.surface_geometry.GEOMETRY_PLANE,
+                    geometrySpecified = true,
+
+                };
+
+                var rfSurfaceProperties = m_Model.get_thickness(bhPanel.Property.GetRFEM6ID());
+                HashSet<int> collectionOFPropertyNo = rfSurfaceProperties.assigned_to_surfaces.ToHashSet();
+        
+                m_Model.set_surface(surface);
+            }
+          
+
+            return true;
         }
 
     }
