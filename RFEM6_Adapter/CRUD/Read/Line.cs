@@ -26,6 +26,7 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
+using BH.oM.Geometry;
 using BH.oM.Structure.Constraints;
 using BH.oM.Adapters.RFEM6;
 
@@ -50,15 +51,39 @@ namespace BH.Adapter.RFEM6
             {
                 foreach (rfModel.line rfLine in allRfLInes)
                 {
-                    Node node0;
-                    nodes.TryGetValue(rfLine.definition_nodes[0], out node0);
 
-                    Node node1;
-                    nodes.TryGetValue(rfLine.definition_nodes[1], out node1);
+                    List<Node> lineNodes = new List<Node>();
 
-                    RFEMLine l = new RFEMLine();
-                    l.StartNode = node0;
-                    l.EndNode = node1;
+                    if (rfLine.type is rfModel.line_type.TYPE_POLYLINE) {
+
+                        Node node0;
+                        nodes.TryGetValue(rfLine.definition_nodes[0], out node0);
+
+                        Node node1;
+                        nodes.TryGetValue(rfLine.definition_nodes[1], out node1);
+
+                        lineNodes = new List<Node>() { node0, node1 };
+
+                    }
+
+                    else if (rfLine.type is rfModel.line_type.TYPE_ARC) 
+                    {
+
+                        Node n0;
+                        nodes.TryGetValue(rfLine.definition_nodes[0], out n0);
+
+                        Node n1;
+                        nodes.TryGetValue(rfLine.definition_nodes[1], out n1);
+
+                        lineNodes = new List<Node>() { n0, n1 };
+
+                        //Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
+
+                        //Arc arc = Engine.Geometry.Create.Arc(n0.Position, mid, n1.Position);
+
+                    }
+
+                    RFEMLine l = new RFEMLine { Nodes = lineNodes, LineType = (RFEMLineType)Convert.FromRFEM(rfLine.type)};
                     l.SetRFEM6ID(rfLine.no);
                     lineList.Add(l);
                 }

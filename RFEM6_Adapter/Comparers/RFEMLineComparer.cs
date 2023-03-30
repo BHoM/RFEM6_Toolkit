@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using BH.oM.Structure.Elements;
 using BH.oM.Adapters.RFEM6;
 using BH.Engine.Structure;
+using System.Linq;
 
 namespace BH.Adapter.RFEM6
 {
@@ -60,16 +61,37 @@ namespace BH.Adapter.RFEM6
             if (Object.ReferenceEquals(line1, null) || Object.ReferenceEquals(line2, null))
                 return false;
 
-            if (m_nodeComparer.Equals(line1.StartNode, line2.StartNode))
+
+            if (line1.LineType != line2.LineType)
+                return false;
+
+            if(line1.Nodes.Count != line2.Nodes.Count) 
+                return false;
+
+            bool equal = true;
+            for (int i = 0; i < line1.Nodes.Count; i++)
             {
-                return m_nodeComparer.Equals(line1.EndNode, line2.EndNode);
-            }
-            else if (m_nodeComparer.Equals(line1.StartNode, line2.EndNode))
-            {
-                return m_nodeComparer.Equals(line1.EndNode, line2.StartNode);
+                if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[i]))
+                { 
+                    equal = false;
+                    break;
+                }
             }
 
-            return false;
+            if(equal)
+                return true;
+
+            equal = true;
+            int lastIndex = line2.Nodes.Count -1;
+            for (int i = 0; i < line1.Nodes.Count; i++)
+            {
+                if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[lastIndex - i]))
+                {
+                    equal = false;
+                    break;
+                }
+            }
+            return equal;
         }
 
         /***************************************************/
@@ -79,7 +101,7 @@ namespace BH.Adapter.RFEM6
             //Check whether the object is null
             if (Object.ReferenceEquals(line, null)) return 0;
 
-            return m_nodeComparer.GetHashCode(line.StartNode) ^ m_nodeComparer.GetHashCode(line.EndNode);
+            return m_nodeComparer.GetHashCode(line.Nodes.First()) ^ m_nodeComparer.GetHashCode(line.Nodes.Last());
         }
 
 

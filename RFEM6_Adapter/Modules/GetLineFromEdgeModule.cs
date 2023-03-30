@@ -19,44 +19,50 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+using BH.oM.Base;
 using BH.oM.Adapter;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
+using System.ComponentModel;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
 using BH.oM.Adapters.RFEM6;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
-using System.Security.Cryptography;
-using BH.Engine.Base;
+using System.Collections;
+using BH.oM.Geometry;
+using BH.Engine.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    [Description("Dependency module for fetching all Loadcase stored in a list of Loadcombinations.")]
+    public class GetLineFromEdgeModule : IGetDependencyModule<Edge, RFEMLine>
     {
-
-        private bool CreateCollection(IEnumerable<RFEMLine> rfemLines)
+        public IEnumerable<RFEMLine> GetDependencies(IEnumerable<Edge> objects)
         {
-
-
-            //List<RFEMLine> bhLines = new List<RFEMLine>();
-            //bhEdges.ToList().ForEach(e => bhLines.Add(e.FindFragment<RFEMLine>()));
-
-            foreach (RFEMLine tempDSLines in rfemLines)
+            List< RFEMLine> lines = new List<RFEMLine>();
+            foreach (Edge edge in objects)
             {
+                RFEMLine rfLine =null;
 
-                m_Model.set_line(tempDSLines.ToRFEM6());
+                if(edge.Curve is Line line)
+                {
+                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = line.Start }, new Node { Position = line.End } }, LineType = RFEMLineType.Polyline };
+                }
+                //Add for other line types and add convert in terms of nodes accordingly
+                if (edge.Curve is Arc arc)
+                {
 
+                    Point[] pts=arc.ControlPoints().ToArray();
+                    
+                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[1] }, new Node { Position = pts[2] }, new Node { Position = pts[3] }, new Node { Position = pts[4] } }, LineType = RFEMLineType.Arc };
+                }
+
+
+                edge.Fragments.Add(rfLine);
+                lines.Add(rfLine);
             }
 
-            return true;
+            return lines;
         }
-
     }
 }

@@ -32,6 +32,7 @@ using BH.oM.Structure.SectionProperties;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -40,39 +41,14 @@ namespace BH.Adapter.RFEM6
 
         private bool CreateCollection(IEnumerable<Panel> bhPanels)
         {
-            Dictionary<int, Edge> edges = this.GetCachedOrReadAsDictionary<int, Edge>();
+
             foreach (Panel bhPanel in bhPanels) 
             {
-                bhPanel.ExternalEdges.Select(e=>e.GetRFEM6ID()).ToArray();
-                List<int> edgeList=new List<int>();
 
+                rfModel.surface surface = bhPanel.ToRFEM6();
 
-                foreach (var e in bhPanel.ExternalEdges) { 
-                
-                    edgeList.Add(e.GetRFEM6ID());
-                
-                }
-                int[] edgeArray = edgeList.ToArray();
-
-                rfModel.surface surface = new rfModel.surface
-                {
-                    no = bhPanel.GetRFEM6ID(),
-                    material = bhPanel.Property.Material.GetRFEM6ID(),
-                    materialSpecified = true,
-                    thickness = bhPanel.Property.GetRFEM6ID(),
-                    // boundary_lines = bhPanel.ExternalEdges.Select(e => e.GetRFEM6ID()).ToArray(),
-                    boundary_lines = edgeArray,
-                    type = rfModel.surface_type.TYPE_STANDARD,
-                    typeSpecified = true,
-                    geometry = rfModel.surface_geometry.GEOMETRY_PLANE,
-                    geometrySpecified = true,
-
-                };
-
-                var rfSurfaceProperties = m_Model.get_thickness(bhPanel.Property.GetRFEM6ID());
-                HashSet<int> collectionOFPropertyNo = rfSurfaceProperties.assigned_to_surfaces.ToHashSet();
-        
                 m_Model.set_surface(surface);
+
             }
           
 

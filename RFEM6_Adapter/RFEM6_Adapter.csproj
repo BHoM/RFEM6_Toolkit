@@ -11,6 +11,10 @@
 	<BaseOutputPath>..\Build\</BaseOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="CRUD\Update\Node - Copy.cs" />
+  </ItemGroup>
+
 
 	<ItemGroup>
 		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.2.34" />

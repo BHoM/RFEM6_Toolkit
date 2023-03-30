@@ -19,33 +19,47 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using BH.oM.Base;
-using BH.oM.Adapter;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
-using System.ComponentModel;
+using System.Linq;
+using System.Text;
+
+using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
+using BH.oM.Structure.Constraints;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.SurfaceProperties;
+using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
-using System.Collections;
+
+using rfModel = Dlubal.WS.Rfem6.Model;
+using Dlubal.WS.Rfem6.Model;
+using BH.oM.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
-    [Description("Dependency module for fetching all Loadcase stored in a list of Loadcombinations.")]
-    public class GetLineModule : IGetDependencyModule<Bar, RFEMLine>
+    public static partial class Convert
     {
-        public IEnumerable<RFEMLine> GetDependencies(IEnumerable<Bar> objects)
+
+        public static RFEMLineType? FromRFEM(rfModel.line_type rfType)
         {
-            List< RFEMLine> lines = new List<RFEMLine>();
-            foreach (Bar bar in objects)
+
+            if (rfType.Equals(rfModel.line_type.TYPE_POLYLINE))
             {
-                RFEMLine rfLine = new RFEMLine() { StartNode = bar.StartNode, EndNode = bar.EndNode };
-                bar.Fragments.Add(rfLine);
-                lines.Add(rfLine);
+                return RFEMLineType.Polyline;
+            }
+            if (rfType.Equals(rfModel.line_type.TYPE_ARC))
+            {
+                return RFEMLineType.Arc;
+            }
+            if (rfType.Equals(rfModel.line_type.TYPE_CIRCLE))
+            {
+                return RFEMLineType.Circle;
             }
 
-            return lines;
+            return null;
         }
+
     }
 }

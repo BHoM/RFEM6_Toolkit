@@ -30,6 +30,7 @@ using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.Constraints;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
@@ -55,6 +56,7 @@ namespace BH.Adapter.RFEM6
             }
 
             Dictionary<int, Node> nodes = this.GetCachedOrReadAsDictionary<int, Node>();
+            Dictionary<int, RFEMLine> lines = this.GetCachedOrReadAsDictionary<int, RFEMLine>();
             Dictionary<int, ISectionProperty> sections = this.GetCachedOrReadAsDictionary<int, ISectionProperty>();
 
             foreach (var rfMember in allRfMembers)

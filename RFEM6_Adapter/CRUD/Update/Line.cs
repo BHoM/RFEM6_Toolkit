@@ -26,36 +26,28 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
-using System.Security.Cryptography;
-using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6Adapter : BHoMAdapter
     {
+        /***************************************************/
+        /**** Update Node                               ****/
+        /***************************************************/
 
-        private bool CreateCollection(IEnumerable<RFEMLine> rfemLines)
+        private bool UpdateObjects(IEnumerable<RFEMLine> lines)
         {
+            bool success = true;
 
-
-            //List<RFEMLine> bhLines = new List<RFEMLine>();
-            //bhEdges.ToList().ForEach(e => bhLines.Add(e.FindFragment<RFEMLine>()));
-
-            foreach (RFEMLine tempDSLines in rfemLines)
+            foreach (RFEMLine line in lines)
             {
-
-                m_Model.set_line(tempDSLines.ToRFEM6());
-
+                m_Model.set_line(line.ToRFEM6());
             }
 
-            return true;
+            return success;
         }
 
     }
