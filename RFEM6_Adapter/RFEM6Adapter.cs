@@ -66,7 +66,8 @@ namespace BH.Adapter.RFEM6
             // See the wiki, the AdapterSettings object and other Adapters to see how it can be configured.
             //AdapterIdFragmentType = typeof(RFEMId);
             BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
-            this.AdapterModules.Add(new GetLineModule());
+            this.AdapterModules.Add(new GetLineFromBarModule());
+            this.AdapterModules.Add(new GetLineFromEdgeModule());
 
             AdapterComparers = new Dictionary<Type, object>
             {
@@ -79,19 +80,21 @@ namespace BH.Adapter.RFEM6
                 {typeof(Constraint6DOF), new NameOrDescriptionComparer()},
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
             };
-           
+
             DependencyTypes = new Dictionary<Type, List<Type>>
             {
                 {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine) } },
-                {typeof(RFEMLine), new List<Type> { typeof(Node) } },
+                {typeof(RFEMLine), new List<Type> { typeof(Node)} },
                 {typeof(Node), new List<Type> { typeof(Constraint6DOF) } },
                 {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },
                 {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
                 {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
                 {typeof(ISurfaceProperty), new List<Type> { typeof(IMaterialFragment) } },
                 {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge) } },
+                {typeof(Edge), new List<Type> { typeof(RFEMLine) } },
                 {typeof(ILoad), new List<Type> { typeof(Loadcase) } },
                 {typeof(LoadCombination), new List<Type> { typeof(Loadcase) } }
+
             };
 
             AdapterIdFragmentType = typeof(RFEM6ID);

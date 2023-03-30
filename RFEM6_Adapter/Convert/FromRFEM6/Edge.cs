@@ -37,6 +37,29 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
+        public static Edge FromRFEMEdge(this RFEMLine rfemLine)
+        {
+            Edge edge = new Edge { Curve = rfemLine.GetCurve(), Name = rfemLine.Name };
+            edge.SetRFEM6ID(rfemLine.GetRFEM6ID());
+            return edge;
+        }
+
+        private static ICurve GetCurve(this RFEMLine rfemLine)
+        { 
+            switch (rfemLine.LineType)
+            {
+                case RFEMLineType.Polyline:
+                    return new Polyline { ControlPoints = rfemLine.Nodes.Select(x => x.Position).ToList() };
+                case RFEMLineType.Arc:
+                case RFEMLineType.Circle:
+                default:
+                    BH.Engine.Base.Compute.RecordError("Linetype not yet supported.");
+                    return null;
+                    break;
+            }
+        
+        }
+
         public static Edge FromRFEM(this rfModel.line rfLine, Dictionary<int, Node> nodeDict)
         {
 

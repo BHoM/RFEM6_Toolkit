@@ -41,20 +41,14 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private bool CreateCollection(IEnumerable<RFEMLine> rfemLines)
+        private bool CreateCollection(IEnumerable<Edge> edge)
         {
-
-
-            //List<RFEMLine> bhLines = new List<RFEMLine>();
-            //bhEdges.ToList().ForEach(e => bhLines.Add(e.FindFragment<RFEMLine>()));
-
-            foreach (RFEMLine tempDSLines in rfemLines)
+            
+            foreach (Edge e in edge) 
             {
-
-                m_Model.set_line(tempDSLines.ToRFEM6());
-
+                e.SetRFEM6ID(e.FindFragment<RFEMLine>().GetRFEM6ID());
             }
-
+ 
             return true;
         }
 

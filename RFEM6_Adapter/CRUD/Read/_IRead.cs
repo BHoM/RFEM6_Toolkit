@@ -34,6 +34,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
@@ -69,8 +70,8 @@ namespace BH.Adapter.RFEM6
                     return ReadSectionProperties(ids as dynamic);
                 else if (type == typeof(IMaterialFragment) || type.GetInterfaces().Contains(typeof(IMaterialFragment)))
                     return ReadMaterial(ids as dynamic);
-                //else if (type == typeof(Line))
-                //    return ReadLines(ids as dynamic);
+                else if (type == typeof(Line)||type==typeof(RFEMLine))
+                    return ReadLines(ids as dynamic);
                 else if (type == typeof(Bar))
                     return ReadBars(ids as dynamic);
                 else if (type == typeof(Panel))

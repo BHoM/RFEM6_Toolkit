@@ -85,9 +85,12 @@ namespace BH.Adapter.RFEM6
         /***************************************************/
 
         // Fallback case. If no specific Create is found, here we should handle what happens then.
-        protected bool Create(IBHoMObject obj)
+        protected bool CreateCollection(IEnumerable<IBHoMObject> obj)
         {
-            BH.Engine.Base.Compute.RecordError("No specific Create method found for" + obj.GetType().Name);
+            if (obj.Any())
+            {
+                BH.Engine.Base.Compute.RecordError("No specific Create method found for" + obj.First()?.GetType()?.Name);
+            }
             return false;
         }
     }

@@ -55,5 +55,42 @@ namespace BH.Adapter.RFEM6
 
         }
 
+        public static rfModel.line ToRFEM6(this RFEMLine rfemLine)
+        {
+
+            List<Node> nodes = rfemLine.Nodes;
+
+            rfModel.line rfLine = new rfModel.line();
+
+            if (rfemLine.LineType is RFEMLineType.Polyline)
+            {
+
+                rfLine = new rfModel.line()
+                {
+                    no = rfemLine.GetRFEM6ID(),
+                    definition_nodes = rfemLine.Nodes.Select(x => x.GetRFEM6ID()).ToArray(),
+                    type = rfModel.line_type.TYPE_POLYLINE,
+                };
+            }
+
+            if (rfemLine.LineType is RFEMLineType.Arc)
+            {
+
+                Node n00 = rfemLine.Nodes.First();
+                Node mid = rfemLine.Nodes.ToArray()[2];
+                Node n11 = rfemLine.Nodes.Last();
+
+                rfLine = new rfModel.line()
+                {
+                    no = rfemLine.GetRFEM6ID(),
+                    definition_nodes = new int[] { n00.GetRFEM6ID(), n11.GetRFEM6ID() },
+                    arc_control_point_object = mid.GetRFEM6ID(),
+                    type = rfModel.line_type.TYPE_ARC,
+                };
+            }
+            return rfLine;
+
+        }
+
     }
 }
