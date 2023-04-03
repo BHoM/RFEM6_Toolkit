@@ -50,8 +50,12 @@ namespace BH.Adapter.RFEM6
 
             foreach (RFEMLine tempDSLines in rfemLines)
             {
-
-                m_Model.set_line(tempDSLines.ToRFEM6());
+               
+                rfModel.line rfLine= tempDSLines.ToRFEM6();
+                //rfLine.SetPropertyValue("comment", "test string");
+                m_Model.set_line(rfLine);
+                //m_Model.get_line(2).SetPropertyValue("comment", "test string");
+               
 
             }
 

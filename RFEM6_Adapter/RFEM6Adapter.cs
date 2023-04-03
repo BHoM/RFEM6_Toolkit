@@ -79,6 +79,8 @@ namespace BH.Adapter.RFEM6
                 {typeof(LinkConstraint), new NameOrDescriptionComparer() },
                 {typeof(Constraint6DOF), new NameOrDescriptionComparer()},
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
+                {typeof(Panel), new RFEMPanelComparer() }
+                
             };
 
             DependencyTypes = new Dictionary<Type, List<Type>>

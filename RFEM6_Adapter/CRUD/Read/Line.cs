@@ -76,7 +76,7 @@ namespace BH.Adapter.RFEM6
                         nodes.TryGetValue(rfLine.definition_nodes[1], out n1);
 
                         lineNodes = new List<Node>() { n0, n1 };
-
+                        
                         //Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
 
                         //Arc arc = Engine.Geometry.Create.Arc(n0.Position, mid, n1.Position);

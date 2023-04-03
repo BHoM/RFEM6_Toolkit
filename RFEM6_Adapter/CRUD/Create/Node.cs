@@ -55,7 +55,7 @@ namespace BH.Adapter.RFEM6
                     m_Model.set_nodal_support(rfSupport);
 
                 }
-
+               
                 m_Model.set_node(rfNode);
             }
             return true;
