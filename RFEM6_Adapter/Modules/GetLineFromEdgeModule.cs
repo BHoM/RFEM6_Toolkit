@@ -54,7 +54,7 @@ namespace BH.Adapter.RFEM6
 
                     Point[] pts=arc.ControlPoints().ToArray();
                     
-                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[1] }, new Node { Position = pts[2] }, new Node { Position = pts[3] }, new Node { Position = pts[4] } }, LineType = RFEMLineType.Arc };
+                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] } }, LineType = RFEMLineType.Arc };
                 }
 
 
