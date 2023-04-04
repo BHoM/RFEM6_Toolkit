@@ -26,32 +26,31 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
-using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.MaterialFragments;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6Adapter : BHoMAdapter
     {
+        /***************************************************/
+        /**** Update Node                               ****/
+        /***************************************************/
 
-        private bool CreateCollection(IEnumerable<Panel> bhPanels)
+        private bool UpdateObjects(IEnumerable<thickness> thicknesses)
         {
+            bool success = true;
 
-            foreach (Panel bhPanel in bhPanels) 
+            foreach (thickness thickness in thicknesses)
             {
-
-                rfModel.surface surface = bhPanel.ToRFEM6();
-          
-                m_Model.set_surface(surface);
-
+         
+                m_Model.set_thickness(thickness);
             }
 
-            return true;
+            return success;
         }
 
     }

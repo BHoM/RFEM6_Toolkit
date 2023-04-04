@@ -32,6 +32,7 @@ using BH.oM.Geometry;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -49,12 +50,13 @@ namespace BH.Adapter.RFEM6
             {
 
                 no = bhPanel.GetRFEM6ID(),
-                material = bhPanel.Property.Material.GetRFEM6ID(),
-                materialSpecified = true,
+                //material = bhPanel.Property.Material.GetRFEM6ID(),
+                //materialSpecified = true,
                 thickness = bhPanel.Property.GetRFEM6ID(),
+                thicknessSpecified = true,
                 boundary_lines = edgeIdList.ToArray(),
-                //type = surface_type.TYPE_STANDARD,
-                //typeSpecified = true,
+                type = surface_type.TYPE_STANDARD,
+                typeSpecified = true,
                 //geometry = surface_geometry.GEOMETRY_PLANE,
                 //geometrySpecified = true,
                 //concrete_durability_top = concrete_Durability.no,
