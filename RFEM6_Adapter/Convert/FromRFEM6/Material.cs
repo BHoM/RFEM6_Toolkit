@@ -31,6 +31,7 @@ using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.MaterialFragments;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -48,14 +49,14 @@ namespace BH.Adapter.RFEM6
             if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_STEEL) || rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_REINFORCING_STEEL))
             {
 
-                bhMaterial = BH.Engine.Library.Query.Match("Steel", rfMaterial.name.Split('|')[0], true, true) as IMaterialFragment;
+                bhMaterial = BH.Engine.Library.Query.Match("Steel", rfMaterial.name.Split('|')[0], true, true).DeepClone() as IMaterialFragment;
 
             }
 
             else if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_CONCRETE))
             {
 
-                bhMaterial = BH.Engine.Library.Query.Match("Concrete", rfMaterial.name.Split('|')[0], true, true) as IMaterialFragment;
+                bhMaterial = BH.Engine.Library.Query.Match("Concrete", rfMaterial.name.Split('|')[0], true, true).DeepClone() as IMaterialFragment;
 
             }
             bhMaterial.SetRFEM6ID(rfMaterial.no);

@@ -7,7 +7,7 @@
     <AssemblyName>RFEM6_Adapter</AssemblyName>
     <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-	<FileVersion>6.1.0.0</FileVersion>
+	<FileVersion>6.2.0.0</FileVersion>
 	<BaseOutputPath>..\Build\</BaseOutputPath>
   </PropertyGroup>
 
