@@ -31,6 +31,7 @@ namespace BH.oM.Adapters.RFEM6
     {
         Polyline,
         Arc,
-        Circle
+        Circle,
+        Nurb
     }
 }
