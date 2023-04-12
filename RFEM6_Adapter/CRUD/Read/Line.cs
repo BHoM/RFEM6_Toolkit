@@ -51,7 +51,7 @@ namespace BH.Adapter.RFEM6
             {
                 foreach (rfModel.line rfLine in allRfLInes)
                 {
-
+                    double radius = 0;
                     List<Node> lineNodes = new List<Node>();
 
                     if (rfLine.type is rfModel.line_type.TYPE_POLYLINE) {
@@ -82,11 +82,18 @@ namespace BH.Adapter.RFEM6
 
                         lineNodes = new List<Node>() { n0, new Node { Position = mid }, n1, new Node { Position = centre } };
 
-                        //Arc arc = Engine.Geometry.Create.Arc(n0.Position, mid, n1.Position);
+                    }
+
+                    else if (rfLine.type is rfModel.line_type.TYPE_CIRCLE)
+                    {
+
+                        lineNodes = new List<Node>() { new Node { Position = new Point { X = rfLine.circle_center.x, Y = rfLine.circle_center.y, Z = rfLine.circle_center.z } } };
+                        radius = rfLine.circle_radius;
 
                     }
 
                     RFEMLine l = new RFEMLine { Nodes = lineNodes, LineType = (RFEMLineType)Convert.FromRFEM(rfLine.type)};
+                    if (radius > 0) l.Radius = radius;
                     l.SetRFEM6ID(rfLine.no);
                     lineList.Add(l);
                 }
