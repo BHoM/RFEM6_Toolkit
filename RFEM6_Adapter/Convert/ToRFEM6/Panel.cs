@@ -50,67 +50,13 @@ namespace BH.Adapter.RFEM6
             {
 
                 no = bhPanel.GetRFEM6ID(),
-                //material = bhPanel.Property.Material.GetRFEM6ID(),
-                //materialSpecified = true,
                 thickness = bhPanel.Property.GetRFEM6ID(),
                 thicknessSpecified = true,
                 boundary_lines = edgeIdList.ToArray(),
                 type = surface_type.TYPE_STANDARD,
                 typeSpecified = true,
-                //geometry = surface_geometry.GEOMETRY_PLANE,
-                //geometrySpecified = true,
-                //concrete_durability_top = concrete_Durability.no,
-                //concrete_durability_topSpecified = true,
-                //concrete_durability_bottom = concrete_Durability.no,
-                //concrete_durability_bottomSpecified = true,
-                //reinforcement_direction_top = Reinforcement_Direction.no,
-                //reinforcement_direction_topSpecified = true,
-                //reinforcement_direction_bottom = Reinforcement_Direction.no,
-                //reinforcement_direction_bottomSpecified = true,
-                //surface_reinforcements = new int[] { Surface_Reinforcement.no, Surface_ReinforcementMesh.no },
-                //surface_concrete_design_sls_configuration = 1,
-                //surface_concrete_design_sls_configurationSpecified = true,
-                //surface_concrete_design_uls_configuration = 1,
-                //surface_concrete_design_uls_configurationSpecified = true,
-                //deflection_check_surface_type = surface_deflection_check_surface_type.DEFLECTION_CHECK_SURFACE_TYPE_DOUBLE_SUPPORTED,
-                //deflection_check_surface_typeSpecified = true,
-                //deflection_check_displacement_reference = surface_deflection_check_displacement_reference.DEFLECTION_CHECK_DISPLACEMENT_REFERENCE_DEFORMED_USER_DEFINED_REFERENCE_PLANE,
-                //deflection_check_reference_length_z_definition_type = surface_deflection_check_reference_length_z_definition_type.DEFLECTION_CHECK_REFERENCE_LENGTH_DEFINITION_TYPE_BY_MAXIMUM_BOUNDARY_LINE,
-                //deflection_check_reference_length_z_definition_typeSpecified = true,
+              
             };
-
-
-                 //surface concreteSlab = new()
-                 //{
-                 //    no = 1,
-                 //    material = materialConcrete.no,
-                 //    materialSpecified = true,
-                 //    thickness = slabThickness.no,
-                 //    boundary_lines = new int[] { slabLine.no },
-                 //    type = surface_type.TYPE_STANDARD,
-                 //    typeSpecified = true,
-                 //    geometry = surface_geometry.GEOMETRY_PLANE,
-                 //    geometrySpecified = true,
-                 //    concrete_durability_top = concrete_Durability.no,
-                 //    concrete_durability_topSpecified = true,
-                 //    concrete_durability_bottom = concrete_Durability.no,
-                 //    concrete_durability_bottomSpecified = true,
-                 //    reinforcement_direction_top = Reinforcement_Direction.no,
-                 //    reinforcement_direction_topSpecified = true,
-                 //    reinforcement_direction_bottom = Reinforcement_Direction.no,
-                 //    reinforcement_direction_bottomSpecified = true,
-                 //    surface_reinforcements = new int[] { Surface_Reinforcement.no, Surface_ReinforcementMesh.no },
-                 //    surface_concrete_design_sls_configuration = 1,
-                 //    surface_concrete_design_sls_configurationSpecified = true,
-                 //    surface_concrete_design_uls_configuration = 1,
-                 //    surface_concrete_design_uls_configurationSpecified = true,
-                 //    deflection_check_surface_type = surface_deflection_check_surface_type.DEFLECTION_CHECK_SURFACE_TYPE_DOUBLE_SUPPORTED,
-                 //    deflection_check_surface_typeSpecified = true,
-                 //    deflection_check_displacement_reference = surface_deflection_check_displacement_reference.DEFLECTION_CHECK_DISPLACEMENT_REFERENCE_DEFORMED_USER_DEFINED_REFERENCE_PLANE,
-                 //    deflection_check_reference_length_z_definition_type = surface_deflection_check_reference_length_z_definition_type.DEFLECTION_CHECK_REFERENCE_LENGTH_DEFINITION_TYPE_BY_MAXIMUM_BOUNDARY_LINE,
-                 //    deflection_check_reference_length_z_definition_typeSpecified = true,
-                 //};
-
 
 
             return rfSurface;

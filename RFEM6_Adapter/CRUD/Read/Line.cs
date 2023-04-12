@@ -56,13 +56,15 @@ namespace BH.Adapter.RFEM6
 
                     if (rfLine.type is rfModel.line_type.TYPE_POLYLINE) {
 
-                        Node node0;
-                        nodes.TryGetValue(rfLine.definition_nodes[0], out node0);
 
-                        Node node1;
-                        nodes.TryGetValue(rfLine.definition_nodes[1], out node1);
+                        foreach (var n in rfLine.definition_nodes.ToList()) {
 
-                        lineNodes = new List<Node>() { node0, node1 };
+                            Node nd;
+                            nodes.TryGetValue(n, out nd);
+
+                            lineNodes.Add(nd);
+
+                        }
 
                     }
 
@@ -75,9 +77,10 @@ namespace BH.Adapter.RFEM6
                         Node n1;
                         nodes.TryGetValue(rfLine.definition_nodes[1], out n1);
 
-                        lineNodes = new List<Node>() { n0, n1 };
-                        
-                        //Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
+                        Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
+                        Point centre = Engine.Geometry.Create.Point(rfLine.arc_center_x, rfLine.arc_center_y, rfLine.arc_center_z);
+
+                        lineNodes = new List<Node>() { n0, new Node { Position = mid }, n1, new Node { Position = centre } };
 
                         //Arc arc = Engine.Geometry.Create.Arc(n0.Position, mid, n1.Position);
 
