@@ -77,58 +77,22 @@ namespace BH.Adapter.RFEM6
             if (rfemLine.LineType is RFEMLineType.Arc)
             {
 
-                Node n00 = rfemLine.Nodes.First();
+                Node n00 = rfemLine.Nodes.ToArray()[0];
                 Node mid = rfemLine.Nodes.ToArray()[1];
-                Node n11 = rfemLine.Nodes.Last();
-                
+                Node n11 = rfemLine.Nodes.ToArray()[2];
+
 
                 rfLine = new rfModel.line()
                 {
-                    //type = rfModel.line_type.TYPE_ARC,
                     no = rfemLine.GetRFEM6ID(),
                     definition_nodes = new int[] { n00.GetRFEM6ID(), n11.GetRFEM6ID() },
-                    comment = "test string",
-                    arc_control_point_object = 1,
-                    arc_control_point_objectSpecified = true,
+                    type = rfModel.line_type.TYPE_ARC,
+                    typeSpecified = true,
                     arc_control_point = new rfModel.vector_3d() { x = mid.Position.X, y = mid.Position.Y, z = mid.Position.Z },
+                    arc_control_point_objectSpecified = true,
+                    arc_alpha_adjustment_target = rfModel.line_arc_alpha_adjustment_target.ALPHA_ADJUSTMENT_TARGET_BEGINNING_OF_ARC,
+                    arc_alpha_adjustment_targetSpecified = true
 
-                    arc_control_point_xSpecified= true,
-                    arc_control_point_x =  mid.Position.X,
-                    arc_control_point_ySpecified = true,
-                    arc_control_point_y = mid.Position.Y,
-                    arc_control_point_zSpecified = true,
-                    arc_control_point_z = mid.Position.Z,
-                    //arc_control_point_object = 1,
-                    arc_alpha= 3.1415926535897931,
-                    arc_alphaSpecified= true,
-                    arc_alpha_adjustment_target= rfModel.line_arc_alpha_adjustment_target.ALPHA_ADJUSTMENT_TARGET_BEGINNING_OF_ARC,
-                    arc_alpha_adjustment_targetSpecified= true
-    //arc_center: { Dlubal.WS.Rfem6.Model.vector_3d}
-    //        arc_center_x: 19.999999999999996
-    //arc_center_xSpecified: true
-    //arc_center_y: -1.7763568394002505E-15
-    //arc_center_ySpecified: true
-    //arc_center_z: 0
-    //arc_center_zSpecified: true
-    //arc_control_point: { Dlubal.WS.Rfem6.Model.vector_3d}
-    //        arc_control_point_object: 1
-    //arc_control_point_objectSpecified: true
-    //arc_control_point_x: 19.999999999999996
-    //arc_control_point_xSpecified: true
-    //arc_control_point_y: 9.9999999999999982
-    //arc_control_point_ySpecified: true
-    //arc_control_point_z: 0
-    //arc_control_point_zSpecified: true
-    //arc_first_node: 1
-    //arc_first_nodeSpecified: true
-    //arc_height: 9.9999999999999964
-    //arc_heightSpecified: true
-    //arc_radius: 9.9999999999999982
-    //arc_radiusSpecified: true
-    //arc_second_node: 2
-    //arc_second_nodeSpecified: true
-
-                  
                 };
 
                 rfLine.SetPropertyValue("type", rfModel.line_type.TYPE_ARC);
@@ -140,32 +104,3 @@ namespace BH.Adapter.RFEM6
 
     }
 }
-//arc_control_point_object = mid.GetRFEM6ID(),
-//                arc_alpha: 3.1415926535897931
-//arc_alphaSpecified: true
-//arc_alpha_adjustment_target: ALPHA_ADJUSTMENT_TARGET_BEGINNING_OF_ARC
-//arc_alpha_adjustment_targetSpecified: true
-//arc_center: { Dlubal.WS.Rfem6.Model.vector_3d}
-//        arc_center_x: 19.999999999999996
-//arc_center_xSpecified: true
-//arc_center_y: -1.7763568394002505E-15
-//arc_center_ySpecified: true
-//arc_center_z: 0
-//arc_center_zSpecified: true
-//arc_control_point: { Dlubal.WS.Rfem6.Model.vector_3d}
-//        arc_control_point_object: 1
-//arc_control_point_objectSpecified: true
-//arc_control_point_x: 19.999999999999996
-//arc_control_point_xSpecified: true
-//arc_control_point_y: 9.9999999999999982
-//arc_control_point_ySpecified: true
-//arc_control_point_z: 0
-//arc_control_point_zSpecified: true
-//arc_first_node: 1
-//arc_first_nodeSpecified: true
-//arc_height: 9.9999999999999964
-//arc_heightSpecified: true
-//arc_radius: 9.9999999999999982
-//arc_radiusSpecified: true
-//arc_second_node: 2
-//arc_second_nodeSpecified: true

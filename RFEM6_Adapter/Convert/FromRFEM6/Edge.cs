@@ -51,7 +51,10 @@ namespace BH.Adapter.RFEM6
                 case RFEMLineType.Polyline:
                     return new Polyline { ControlPoints = rfemLine.Nodes.Select(x => x.Position).ToList() };
                 case RFEMLineType.Arc:
+                    return Engine.Geometry.Create.ArcByCentre(rfemLine.Nodes[3].Position, rfemLine.Nodes[0].Position, rfemLine.Nodes[2].Position, 1E-03);
                 case RFEMLineType.Circle:
+                    return Engine.Geometry.Create.Circle(rfemLine.Nodes[0].Position, rfemLine.Radius);
+
                 default:
                     BH.Engine.Base.Compute.RecordError("Linetype not yet supported.");
                     return null;
@@ -80,10 +83,14 @@ namespace BH.Adapter.RFEM6
             }
             else if(type.Equals("TYPE_POLYLINE")){
 
-                Node n0 = nodeDict[rfLine.definition_nodes[0]];
-                Node n1 = nodeDict[rfLine.definition_nodes[1]];
+                //Node n0 = nodeDict[rfLine.definition_nodes[0]];
+                //Node n1 = nodeDict[rfLine.definition_nodes[1]];
 
-                curve = new Line {Start=n0.Position,End=n1.Position};
+                //curve = new Line {Start=n0.Position,End=n1.Position};
+                List<Point> pts = new List<Point>();
+                rfLine.definition_nodes.ToList().ForEach(n=>pts.Add(nodeDict[rfLine.definition_nodes[0]].Position));
+
+                curve= new Polyline { ControlPoints = pts };
 
             }
 

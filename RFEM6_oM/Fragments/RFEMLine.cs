@@ -40,5 +40,9 @@ namespace BH.oM.Adapters.RFEM6
         public virtual List<Node> Nodes { get; set; } = new List<Node>();
 
         public virtual RFEMLineType LineType { get; set; }
+
+        public virtual double Radius { get; set; }
+
+        public virtual double[] Normal { get; set; }
     }
 }

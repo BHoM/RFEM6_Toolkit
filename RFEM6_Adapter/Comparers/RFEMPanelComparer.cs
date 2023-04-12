@@ -27,6 +27,7 @@ using BH.oM.Adapters.RFEM6;
 using BH.Engine.Structure;
 using System.Linq;
 using BH.oM.Geometry;
+using BH.Engine.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
@@ -60,14 +61,32 @@ namespace BH.Adapter.RFEM6
 
             var lst1 = panel1.ExternalEdges.Select(e => (e.Curve)).ToList();
             PolyCurve pol1=Engine.Geometry.Create.PolyCurve(lst1);
+            
            // List<PolyCurve> polCurveList1= new List<PolyCurve>() {pol1};
             //var joinedCurve1 = Engine.Geometry.Compute.Join(polCurveList1);
 
             var lst2 = panel2.ExternalEdges.Select(e => (e.Curve)).ToList();
             PolyCurve pol2 = Engine.Geometry.Create.PolyCurve(lst2);
+
+            try
+            {
+                pol1 = pol1.Close();
+                pol2 = pol2.Close();
+
+            }
+            catch {
+
+                BH.Engine.Base.Compute.RecordError($"Not all Curve segments of either panel {panel1.Name} or panel {panel2.Name} are joined!");
+            
+            }
+            
             List<PolyCurve> polCurveList2 = new List<PolyCurve>() { pol2 };
 
+            //if ((pol1.IsClosed() == false || pol2.IsClosed()) == false) return false;
+
             var compare = Engine.Geometry.Compute.BooleanDifference(pol1,polCurveList2);
+
+            
 
             if (compare.Count.Equals(0)) equal = true;
 

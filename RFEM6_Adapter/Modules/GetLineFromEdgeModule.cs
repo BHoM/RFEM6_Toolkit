@@ -48,15 +48,24 @@ namespace BH.Adapter.RFEM6
                 {
                     rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = line.Start }, new Node { Position = line.End } }, LineType = RFEMLineType.Polyline };
                 }
+
+                if (edge.Curve is Polyline polyline)
+                {
+                    List<Node> controlNodes=new List<Node>();
+                    polyline.ControlPoints.ForEach(p=>controlNodes.Add(new Node {Position=p }));
+               
+                    rfLine = new RFEMLine() { Nodes = controlNodes, LineType = RFEMLineType.Polyline };
+                }
+
                 //Add for other line types and add convert in terms of nodes accordingly
                 if (edge.Curve is Arc arc)
                 {
 
                     Point[] pts=arc.ControlPoints().ToArray();
                     
-                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] } }, LineType = RFEMLineType.Arc };
-                }
+                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] }, new Node { Position = arc.Centre() } }, LineType = RFEMLineType.Arc };
 
+                }
 
                 edge.Fragments.Add(rfLine);
                 lines.Add(rfLine);
