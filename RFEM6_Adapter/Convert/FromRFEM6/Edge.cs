@@ -94,6 +94,17 @@ namespace BH.Adapter.RFEM6
 
             }
 
+            else if (type.Equals("TYPE_CIRCLE"))
+            {
+
+                Node n0 = nodeDict[rfLine.definition_nodes[0]];
+                //Node n1 = nodeDict[rfLine.definition_nodes[1]];
+
+                curve = Engine.Geometry.Create.Circle(n0.Position, rfLine.circle_radius);
+
+            }
+
+
             Edge edge = new Edge {Curve=curve};
             edge.SetRFEM6ID(rfLine.no);
 

@@ -58,12 +58,20 @@ namespace BH.Adapter.RFEM6
                 }
 
                 //Add for other line types and add convert in terms of nodes accordingly
-                if (edge.Curve is Arc arc)
+                else if (edge.Curve is Arc arc)
                 {
 
                     Point[] pts=arc.ControlPoints().ToArray();
                     
                     rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] }, new Node { Position = arc.Centre() } }, LineType = RFEMLineType.Arc };
+
+                }
+
+                else if (edge.Curve is Circle circle1)
+                {
+                    List<Node> controlePoints = new List<Node>();
+                    controlePoints.Add(new Node { Position = circle1.Centre });
+                    rfLine = new RFEMLine() { Nodes = controlePoints, Radius = circle1.Radius, Normal = new double[] { circle1.Normal.X, circle1.Normal.Y, circle1.Normal.Z }, LineType = RFEMLineType.Circle };
 
                 }
 
