@@ -98,6 +98,26 @@ namespace BH.Adapter.RFEM6
                 rfLine.SetPropertyValue("type", rfModel.line_type.TYPE_ARC);
                 
             }
+
+            if (rfemLine.LineType is RFEMLineType.Circle)
+            {
+
+                Node circleNodes = rfemLine.Nodes.ToArray()[0];
+
+                rfLine = new rfModel.line()
+                {
+                    no = rfemLine.GetRFEM6ID(),
+                    type = rfModel.line_type.TYPE_CIRCLE,
+                    typeSpecified = true,
+                    circle_center = new rfModel.vector_3d { x = circleNodes.Position.X, y = circleNodes.Position.Y, z = circleNodes.Position.Z },
+                    circle_normal = new rfModel.vector_3d { x = rfemLine.Normal[0], y = rfemLine.Normal[1], z = rfemLine.Normal[2] },
+                    circle_radius = rfemLine.Radius,
+                    circle_radiusSpecified = true,
+
+                };
+
+            }
+
             return rfLine;
 
         }
