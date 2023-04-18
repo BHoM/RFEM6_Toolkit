@@ -46,7 +46,7 @@ namespace BH.Adapter.RFEM6
             {
 
                 rfModel.surface surface = bhPanel.ToRFEM6();
-          
+
                 m_Model.set_surface(surface);
 
             }

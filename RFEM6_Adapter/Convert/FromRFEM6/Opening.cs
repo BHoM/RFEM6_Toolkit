@@ -26,41 +26,37 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
+using BH.oM.Structure.SurfaceProperties;
+using BH.oM.Geometry;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
-using BH.oM.Geometry;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
+using BH.Engine.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
 
-        public static rfModel.surface ToRFEM6(this Panel bhPanel)
+        public static Opening FromRFEM(this rfModel.opening rfOpening, Dictionary<int, Edge> edgeDict)
         {
 
-            List<int> edgeIdList = new List<int>();
-            bhPanel.ExternalEdges.ForEach(e => edgeIdList.Add(e.GetRFEM6ID()));
-    
-            rfModel.surface rfSurface = new rfModel.surface
-            {
+            List<ICurve> curves = new List<ICurve>();
 
-                no = bhPanel.GetRFEM6ID(),
-                thickness = bhPanel.Property.GetRFEM6ID(),
-                thicknessSpecified = true,
-                boundary_lines = edgeIdList.ToArray(),
-                type = surface_type.TYPE_STANDARD,
-                typeSpecified = true,
+            rfOpening.boundary_lines.ToList().ForEach(l => curves.Add(edgeDict[l].Curve));
 
-            };
+            PolyCurve polyCurve = Engine.Geometry.Create.PolyCurve(curves);
+
+            var polyCurves=Engine.Geometry.Compute.Join(new List<PolyCurve>() { polyCurve });
 
 
 
-            return rfSurface;
+            Opening opening=Engine.Structure.Create.Opening(Engine.Geometry.Modify.Close(polyCurves.First()));
 
+            opening.SetRFEM6ID(rfOpening.no);
+
+            return opening;
         }
 
     }

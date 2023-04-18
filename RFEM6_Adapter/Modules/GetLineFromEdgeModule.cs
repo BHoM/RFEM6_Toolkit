@@ -31,17 +31,24 @@ using BH.oM.Adapters.RFEM6;
 using System.Collections;
 using BH.oM.Geometry;
 using BH.Engine.Geometry;
+using System.Security.Cryptography;
 
 namespace BH.Adapter.RFEM6
 {
     [Description("Dependency module for fetching all Loadcase stored in a list of Loadcombinations.")]
     public class GetLineFromEdgeModule : IGetDependencyModule<Edge, RFEMLine>
     {
+
+        //TODO 
+        //Make this work for polylines ....you need to split them and run the method over each curve
         public IEnumerable<RFEMLine> GetDependencies(IEnumerable<Edge> objects)
         {
             List< RFEMLine> lines = new List<RFEMLine>();
+    
             foreach (Edge edge in objects)
             {
+                
+
                 RFEMLine rfLine =null;
 
                 if(edge.Curve is Line line)
@@ -61,9 +68,28 @@ namespace BH.Adapter.RFEM6
                 else if (edge.Curve is Arc arc)
                 {
 
+                    double radius = 0;
+                    //BH.oM.Geometry.CoordinateSystem.Cartesian coordSyst = new oM.Geometry.CoordinateSystem.Cartesian();
+                    double angle = 0;
+                    double[] x_VectorArr = new double[3];
+                    double[] y_VectorArr = new double[3];
+
                     Point[] pts=arc.ControlPoints().ToArray();
+                    Vector x_Vector = Engine.Geometry.Create.Vector(arc.Centre(), arc.StartPoint()).Normalise();
+                    Vector tempVector = Engine.Geometry.Create.Vector(arc.Centre(), arc.PointAtLength(0.5)*arc.Length()).Normalise();
+
+                    Vector z_Vector = Engine.Geometry.Query.CrossProduct(x_Vector, tempVector).Normalise();
+                    Vector y_Vector = Engine.Geometry.Query.CrossProduct(x_Vector, z_Vector).Normalise();
+
+
+
+                    x_VectorArr = new double[] { x_Vector.X, x_Vector.Y, x_Vector.Z };
+                    y_VectorArr = new double[] { y_Vector.X, y_Vector.Y, y_Vector.Z };
+
+                    angle = arc.Angle();
+                    radius = arc.Radius();
                     
-                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] }, new Node { Position = arc.Centre() } }, LineType = RFEMLineType.Arc };
+                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] }, new Node { Position = arc.Centre() } },Angle=angle,Radius=radius, X_Vector= x_VectorArr, Y_Vector= y_VectorArr, LineType = RFEMLineType.Arc };
 
                 }
 

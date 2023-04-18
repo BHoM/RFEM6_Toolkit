@@ -80,6 +80,8 @@ namespace BH.Adapter.RFEM6
                     return ReadSurfaceProperties(ids as dynamic);
                 else if (type == typeof(Edge))
                     return ReadEdges(ids as dynamic);
+                else if (type == typeof(Opening))
+                    return ReadOpening(ids as dynamic);
                 //else if (type == typeof(RigidLink))
                 //    return ReadLinks(ids as dynamic);
                 //else if (type == typeof(ILoad))

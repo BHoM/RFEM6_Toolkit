@@ -39,24 +39,19 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static rfModel.surface ToRFEM6(this Panel bhPanel)
+        public static rfModel.opening ToRFEM6(this Opening bhOpening)
         {
+            
+            List<int> edgeIdList=new List<int>();
 
-            List<int> edgeIdList = new List<int>();
-            bhPanel.ExternalEdges.ForEach(e => edgeIdList.Add(e.GetRFEM6ID()));
-    
-            rfModel.surface rfSurface = new rfModel.surface
+
+            rfModel.opening rfSurface = new opening
             {
-
-                no = bhPanel.GetRFEM6ID(),
-                thickness = bhPanel.Property.GetRFEM6ID(),
-                thicknessSpecified = true,
-                boundary_lines = edgeIdList.ToArray(),
-                type = surface_type.TYPE_STANDARD,
-                typeSpecified = true,
-
+                no = bhOpening.GetRFEM6ID(),
+                boundary_lines = bhOpening.Edges.Select(b=>b.GetRFEM6ID()).ToArray(),
+                //boundary_lines = new int[] { openingLine.no },
+                //surfaces = new int[] { 1},
             };
-
 
 
             return rfSurface;

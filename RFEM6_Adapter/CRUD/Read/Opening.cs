@@ -26,41 +26,33 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
-using BH.oM.Geometry;
+using BH.oM.Structure.Constraints;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.SurfaceProperties;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter
     {
 
-        public static rfModel.surface ToRFEM6(this Panel bhPanel)
+        private List<Opening> ReadOpening(List<string> ids = null)
         {
+            List<Opening> bhOpenings = new List<Opening>();
+            Dictionary<int, Edge> edges = this.GetCachedOrReadAsDictionary<int, Edge>();
 
-            List<int> edgeIdList = new List<int>();
-            bhPanel.ExternalEdges.ForEach(e => edgeIdList.Add(e.GetRFEM6ID()));
-    
-            rfModel.surface rfSurface = new rfModel.surface
+            var openingNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_OPENING);
+            var allRFOpeinings = openingNumber.ToList().Select(n => m_Model.get_opening(n.no));
+
+            foreach (var opening in allRFOpeinings.ToList())
             {
+               bhOpenings.Add(opening.FromRFEM(edges));
 
-                no = bhPanel.GetRFEM6ID(),
-                thickness = bhPanel.Property.GetRFEM6ID(),
-                thicknessSpecified = true,
-                boundary_lines = edgeIdList.ToArray(),
-                type = surface_type.TYPE_STANDARD,
-                typeSpecified = true,
-
-            };
+            }
 
 
-
-            return rfSurface;
-
+            return bhOpenings;
         }
 
     }

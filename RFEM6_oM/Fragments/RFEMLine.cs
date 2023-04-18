@@ -43,6 +43,11 @@ namespace BH.oM.Adapters.RFEM6
 
         public virtual double Radius { get; set; }
 
+        public virtual double Angle { get; set; }
+
+        public virtual double[] X_Vector { get; set; }
+        public virtual double[] Y_Vector { get; set; }
+
         public virtual double[] Normal { get; set; }
     }
 }

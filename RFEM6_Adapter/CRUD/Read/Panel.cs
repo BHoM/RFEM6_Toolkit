@@ -43,14 +43,14 @@ namespace BH.Adapter.RFEM6
 
             Dictionary<int, Edge> edges = this.GetCachedOrReadAsDictionary<int, Edge>();
             Dictionary<int, ISurfaceProperty> surfaceProperties = this.GetCachedOrReadAsDictionary<int, ISurfaceProperty>();
-
+            Dictionary<int, Opening> surfaceOpening = this.GetCachedOrReadAsDictionary<int, Opening>();
 
             var panelNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE);
             var allRfPanels = panelNumbers.ToList().Select(n => m_Model.get_surface(n.no)).ToList();
 
             foreach (rfModel.surface rfPanel in allRfPanels) {
 
-                bhPanel.Add(rfPanel.FromRFEM(edges,surfaceProperties));
+                bhPanel.Add(rfPanel.FromRFEM(edges,surfaceProperties, surfaceOpening));
 
 
             }

@@ -67,6 +67,10 @@ namespace BH.Adapter.RFEM6
             {
                 return typeof(Panel);
             }
+            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_OPENING)
+            {
+                return typeof(Opening);
+            }
 
 
             return null;

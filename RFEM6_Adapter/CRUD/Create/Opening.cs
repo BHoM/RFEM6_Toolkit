@@ -26,41 +26,32 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
 using BH.oM.Geometry;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.SectionProperties;
+using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter
     {
 
-        public static rfModel.surface ToRFEM6(this Panel bhPanel)
+        private bool CreateCollection(IEnumerable<Opening> bhOpenings)
         {
 
-            List<int> edgeIdList = new List<int>();
-            bhPanel.ExternalEdges.ForEach(e => edgeIdList.Add(e.GetRFEM6ID()));
-    
-            rfModel.surface rfSurface = new rfModel.surface
+            foreach (Opening bhOpening in bhOpenings) 
             {
 
-                no = bhPanel.GetRFEM6ID(),
-                thickness = bhPanel.Property.GetRFEM6ID(),
-                thicknessSpecified = true,
-                boundary_lines = edgeIdList.ToArray(),
-                type = surface_type.TYPE_STANDARD,
-                typeSpecified = true,
+                rfModel.opening rfOpening = bhOpening.ToRFEM6();
+          
+                m_Model.set_opening(rfOpening);
 
-            };
+            }
 
-
-
-            return rfSurface;
-
+            return true;
         }
 
     }
