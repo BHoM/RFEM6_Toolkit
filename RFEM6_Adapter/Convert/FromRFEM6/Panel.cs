@@ -32,19 +32,51 @@ using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.Engine.Spatial;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
 
-        public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty)
+        public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, Dictionary<int, Opening> surfaceOpening)
         {
 
             List<int> rfEdgeNumbers = rfSurface.boundary_lines.ToList();
             List<Edge> bhEdges = rfEdgeNumbers.Select(n=>edgeDict[n]).ToList();
+            Panel panel = new Panel();
 
-            Panel panel = Engine.Structure.Create.Panel(bhEdges,null,surfaceProperty[rfSurface.thickness],"");
+
+            if (rfSurface.integrated_openings.Length > 0)
+            {
+
+                List<Opening> openingins = new List<Opening>();
+
+                foreach (int openingNumber in rfSurface.integrated_openings.ToList())
+                {
+                    Opening opening = surfaceOpening[openingNumber];
+
+                    openingins.Add(opening);
+
+                    //List<ICurve> openingCurves = opening.Edges.Select(e => e.Curve).ToList();
+
+                    //openingCurves.Join();
+
+                    //PolyCurve polyCurve = Engine.Geometry.Create.PolyCurve(openingCurves);
+                }
+
+
+                //panel = Engine.Structure.Create.Panel(bhEdges, null, surfaceProperty[rfSurface.thickness], "");
+                panel=Engine.Structure.Create.Panel(bhEdges, openingins, surfaceProperty[rfSurface.thickness]);
+
+            }
+            else {
+
+                panel = Engine.Structure.Create.Panel(bhEdges, null, surfaceProperty[rfSurface.thickness], "");
+            }
+
+
+           
             panel.SetRFEM6ID(rfSurface.no);
 
             return panel;

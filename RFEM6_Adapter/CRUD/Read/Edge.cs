@@ -50,19 +50,6 @@ namespace BH.Adapter.RFEM6
 
             return edgeList;
 
-            //Dictionary<int, Node> nodes = this.GetCachedOrReadAsDictionary<int, Node>();
-            //var panelNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE);
-            //var allRfPanels = panelNumbers.ToList().Select(n => m_Model.get_surface(n.no));
-            //var listOfRFEdgeNumbers=(allRfPanels.ToList().SelectMany(e => e.boundary_lines.ToList())).ToHashSet();
-            //List<rfModel.line> listOfRFEdges = listOfRFEdgeNumbers.ToList().Select(n => m_Model.get_line(n)).ToList();
-
-            //foreach (rfModel.line l in listOfRFEdges)
-            //{
-            //    edgeList.Add(l.FromRFEM(nodes));
-
-            //}
-
-            return edgeList;
         }
 
     }
