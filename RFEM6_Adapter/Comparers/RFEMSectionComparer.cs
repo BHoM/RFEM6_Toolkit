@@ -62,6 +62,7 @@ namespace BH.Adapter.RFEM6
         }
 
         /***************************************************/
+        /***************************************************/
 
         public int GetHashCode(ISectionProperty section)
         {

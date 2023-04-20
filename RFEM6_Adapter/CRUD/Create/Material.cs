@@ -40,17 +40,18 @@ namespace BH.Adapter.RFEM6
 
 
 
-            foreach (IMaterialFragment bhMaterial in materialFragments) {
+            foreach (IMaterialFragment bhMaterial in materialFragments)
+            {
 
                 rfModel.material rfMaterial = bhMaterial.ToRFEM6();
-                
+
                 m_Model.set_material(rfMaterial);
-            
+
             }
 
             return true;
         }
 
-       
+
     }
 }

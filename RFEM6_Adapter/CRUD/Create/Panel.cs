@@ -42,7 +42,7 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<Panel> bhPanels)
         {
 
-            foreach (Panel bhPanel in bhPanels) 
+            foreach (Panel bhPanel in bhPanels)
             {
 
                 rfModel.surface surface = bhPanel.ToRFEM6();
