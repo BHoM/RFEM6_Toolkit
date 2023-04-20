@@ -67,9 +67,14 @@ namespace BH.Adapter.RFEM6
                     materials[section.material] = material;
                 }
 
-                ISectionProperty bhSection = section.FromRFEM(material);
+                if (material != null)
+                {
 
-                sectionList.Add(bhSection);
+                    ISectionProperty bhSection = section.FromRFEM(material);
+
+                    sectionList.Add(bhSection);
+
+                }
 
             }
 
