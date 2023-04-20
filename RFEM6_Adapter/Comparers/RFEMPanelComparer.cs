@@ -60,7 +60,7 @@ namespace BH.Adapter.RFEM6
             bool equal = false;
 
             var lst1 = panel1.ExternalEdges.Select(e => (e.Curve)).ToList();
-            PolyCurve pol1=Engine.Geometry.Create.PolyCurve(lst1);
+            PolyCurve pol1 = Engine.Geometry.Create.PolyCurve(lst1);
 
             var lst2 = panel2.ExternalEdges.Select(e => (e.Curve)).ToList();
             PolyCurve pol2 = Engine.Geometry.Create.PolyCurve(lst2);
@@ -71,15 +71,16 @@ namespace BH.Adapter.RFEM6
                 pol2 = pol2.Close();
 
             }
-            catch {
+            catch
+            {
 
                 BH.Engine.Base.Compute.RecordError($"Not all Curve segments of either panel {panel1.Name} or panel {panel2.Name} are joined!");
-            
+
             }
-            
+
             List<PolyCurve> polCurveList2 = new List<PolyCurve>() { pol2 };
 
-            var compare = Engine.Geometry.Compute.BooleanDifference(pol1,polCurveList2);
+            var compare = Engine.Geometry.Compute.BooleanDifference(pol1, polCurveList2);
 
             if (compare.Count.Equals(0)) equal = true;
 

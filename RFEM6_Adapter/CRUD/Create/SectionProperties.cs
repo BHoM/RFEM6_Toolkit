@@ -62,7 +62,7 @@ namespace BH.Adapter.RFEM6
                     }
                 }
 
-                rfModel.section rfSection = section.ToRFEM6( matNo, section.Material.GetType().Name); ;
+                rfModel.section rfSection = section.ToRFEM6(matNo, section.Material.GetType().Name); ;
 
                 m_Model.set_section(rfSection);
 

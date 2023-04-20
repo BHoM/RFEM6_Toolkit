@@ -43,14 +43,14 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<ISurfaceProperty> surfaceProperties)
         {
             Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
-           
+
 
             foreach (ISurfaceProperty surfaceProperty in surfaceProperties)
             {
-                
+
                 IMaterialFragment material = materials[surfaceProperty.Material.GetRFEM6ID()];
 
-                rfModel.thickness rfSurfaceThickness = Convert.ToRFEM6(surfaceProperty, material); 
+                rfModel.thickness rfSurfaceThickness = Convert.ToRFEM6(surfaceProperty, material);
 
                 m_Model.set_thickness(rfSurfaceThickness);
 

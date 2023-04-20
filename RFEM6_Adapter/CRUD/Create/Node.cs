@@ -51,11 +51,11 @@ namespace BH.Adapter.RFEM6
                     var rfSupport = m_Model.get_nodal_support(rfNode.support);
                     HashSet<int> collectionOFSupporNo = rfSupport.nodes.ToHashSet();
                     collectionOFSupporNo.Add(rfNode.no);
-                    rfSupport.nodes= collectionOFSupporNo.ToArray();
+                    rfSupport.nodes = collectionOFSupporNo.ToArray();
                     m_Model.set_nodal_support(rfSupport);
 
                 }
-               
+
                 m_Model.set_node(rfNode);
             }
             return true;

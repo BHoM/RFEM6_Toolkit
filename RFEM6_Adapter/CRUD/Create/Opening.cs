@@ -42,11 +42,11 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<Opening> bhOpenings)
         {
 
-            foreach (Opening bhOpening in bhOpenings) 
+            foreach (Opening bhOpening in bhOpenings)
             {
 
                 rfModel.opening rfOpening = bhOpening.ToRFEM6();
-          
+
                 m_Model.set_opening(rfOpening);
 
             }
