@@ -59,6 +59,14 @@ namespace BH.Adapter.RFEM6
                 bhMaterial = BH.Engine.Library.Query.Match("Concrete", rfMaterial.name.Split('|')[0], true, true).DeepClone() as IMaterialFragment;
 
             }
+           
+            
+            if (bhMaterial == null)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Material {rfMaterial.name} could not be read and will be generated as GenericIsotropicMaterial with all parameters set to 0!");
+                bhMaterial = new BH.oM.Structure.MaterialFragments.GenericIsotropicMaterial { Name = rfMaterial.name, Density = 0, DampingRatio = 0, PoissonsRatio = 0, ThermalExpansionCoeff=0, YoungsModulus=0 }; 
+
+            }
             bhMaterial.SetRFEM6ID(rfMaterial.no);
             return bhMaterial;
         }

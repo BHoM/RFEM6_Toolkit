@@ -57,10 +57,13 @@ namespace BH.Adapter.RFEM6
                 foreach (var rfMaterial in allMaterials)
                 {
 
-
                     IMaterialFragment material = rfMaterial.FromRFEM();
+                    if (material != null)
+                    {
 
-                    materialList.Add(material);
+                        materialList.Add(material);
+
+                    }
 
                 }
 

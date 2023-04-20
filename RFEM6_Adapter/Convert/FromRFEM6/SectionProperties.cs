@@ -34,6 +34,7 @@ using BH.Engine.Base;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
+using BH.oM.Physical.Materials;
 
 namespace BH.Adapter.RFEM6
 {
@@ -73,6 +74,16 @@ namespace BH.Adapter.RFEM6
                 bhSection = BhConcreteFromRfSection_NonStandard(section, bhMaterial);
 
             }
+
+
+            if (bhSection==null) 
+            
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Section {section.name} could not be read and will be set to Explicite parameters set to 0!");
+                bhSection = new BH.oM.Structure.SectionProperties.ExplicitSection { Name = section.name }; 
+            
+            }
+
 
             bhSection.SetRFEM6ID(section.no);
 

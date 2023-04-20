@@ -43,8 +43,8 @@ namespace BH.Adapter.RFEM6
 
             ISurfaceProperty surfaceProperty = new ConstantThickness { Name = rfThickness.name, Thickness = rfThickness.uniform_thickness, Material = bhMaterial };
 
-            surfaceProperty.SetRFEM6ID(rfThickness.no);
-
+            if (surfaceProperty!=null) surfaceProperty.SetRFEM6ID(rfThickness.no);
+            else BH.Engine.Base.Compute.RecordNote($"The Thickness {surfaceProperty.Name} could not be read and will be ingnored for now!");
             // bhomProperty = new ConstantThickness { Name = robotLabelName, Thickness = homoData.ThickConst, Material = mat };
 
             return surfaceProperty;
