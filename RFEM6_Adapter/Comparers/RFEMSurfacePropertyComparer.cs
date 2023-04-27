@@ -58,8 +58,6 @@ namespace BH.Adapter.RFEM6
             var type2 = surfaceProp2.GetType().Name;
             var thickness1 = Engine.Base.Query.PropertyValue(surfaceProp1, "Thickness");
             var thickness2 = Engine.Base.Query.PropertyValue(surfaceProp2, "Thickness");
-            //var type1 = Engine.Base.Query.PropertyValue(surfaceProp1, "Thickness")
-
 
             if (material1.Equals(material2) && type1.Equals(type2) && (thickness1.Equals(thickness2))) return true;
 

@@ -58,7 +58,7 @@ namespace BH.Adapter.RFEM6
             // else if (type == typeof(SomeType3))
             //     return ReadSomeType3(ids as dynamic);
 
-           // AppLock();
+            // AppLock();
 
             try
             {
@@ -70,7 +70,7 @@ namespace BH.Adapter.RFEM6
                     return ReadSectionProperties(ids as dynamic);
                 else if (type == typeof(IMaterialFragment) || type.GetInterfaces().Contains(typeof(IMaterialFragment)))
                     return ReadMaterial(ids as dynamic);
-                else if (type == typeof(Line)||type==typeof(RFEMLine))
+                else if (type == typeof(Line) || type == typeof(RFEMLine))
                     return ReadLines(ids as dynamic);
                 else if (type == typeof(Bar))
                     return ReadBars(ids as dynamic);
@@ -95,7 +95,7 @@ namespace BH.Adapter.RFEM6
             }
             finally
             {
-               // AppUnlock();
+                // AppUnlock();
             }
 
             return new List<IBHoMObject>(); ;

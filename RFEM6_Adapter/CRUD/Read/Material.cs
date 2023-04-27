@@ -45,14 +45,16 @@ namespace BH.Adapter.RFEM6
             rfModel.object_with_children[] materialsNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
             List<rfModel.material> allMaterials = new List<rfModel.material>();
 
-            foreach(var n in materialsNumbers) {
+            foreach (var n in materialsNumbers)
+            {
 
                 allMaterials.Add(m_Model.get_material(n.no));
 
             }
 
 
-            if (ids==null) {
+            if (ids == null)
+            {
 
                 foreach (var rfMaterial in allMaterials)
                 {
@@ -68,7 +70,7 @@ namespace BH.Adapter.RFEM6
                 }
 
             }
-          
+
             return materialList;
         }
 

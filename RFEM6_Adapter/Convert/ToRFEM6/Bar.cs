@@ -36,7 +36,6 @@ namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-
         public static rfModel.member ToRFEM6(this Bar bar)
         {
             rfModel.member rfMember = new rfModel.member()
@@ -49,7 +48,6 @@ namespace BH.Adapter.RFEM6
                 section_endSpecified = true,
                 comment = "",
             };
-
 
             return rfMember;
 

@@ -41,16 +41,16 @@ namespace BH.Adapter.RFEM6
     {
 
         //public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, Dictionary<int,  HashSet<int>> openingIDDict, int rfPanelNo, Dictionary<int, RFEMOpening> surfaceOpening)
-        public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty,  HashSet<int> openingIDs, Dictionary<int, RFEMOpening> surfaceOpening)
+        public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, HashSet<int> openingIDs, Dictionary<int, RFEMOpening> surfaceOpening)
         {
 
             //HashSet<int> openingIDs = new HashSet<int>();
 
             //openingIDDict.TryGetValue(rfPanelNo,out openingIDs);
-            
-            
+
+
             List<int> rfEdgeNumbers = rfSurface.boundary_lines.ToList();
-            List<Edge> bhEdges = rfEdgeNumbers.Select(n=>edgeDict[n]).ToList();
+            List<Edge> bhEdges = rfEdgeNumbers.Select(n => edgeDict[n]).ToList();
             Panel panel = new Panel();
 
 
@@ -65,27 +65,18 @@ namespace BH.Adapter.RFEM6
 
                     openingins.Add(opening);
 
-                    //opening.GetAllFragments(typeof(RFEMOpening)).ForEach(o=>o.SetPropertyValue("Pamel",);
-                    //List<ICurve> openingCurves = opening.Edges.Select(e => e.Curve).ToList();
-
-                    //openingCurves.Join();
-
-                    //PolyCurve polyCurve = Engine.Geometry.Create.PolyCurve(openingCurves);
                 }
 
-
-                //panel = Engine.Structure.Create.Panel(bhEdges, null, surfaceProperty[rfSurface.thickness], "");
-                panel=Engine.Structure.Create.Panel(bhEdges, openingins, surfaceProperty[rfSurface.thickness]);
+                panel = Engine.Structure.Create.Panel(bhEdges, openingins, surfaceProperty[rfSurface.thickness]);
 
             }
 
-            else {
+            else
+            {
 
-                panel = Engine.Structure.Create.Panel(bhEdges,new List<ICurve>() , surfaceProperty[rfSurface.thickness], "");
+                panel = Engine.Structure.Create.Panel(bhEdges, new List<ICurve>(), surfaceProperty[rfSurface.thickness], "");
             }
 
-
-           
             panel.SetRFEM6ID(rfSurface.no);
 
             return panel;

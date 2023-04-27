@@ -42,7 +42,7 @@ namespace BH.Adapter.RFEM6
             {
                 no = bhSupport.GetRFEM6ID(),
                 name = bhSupport.Name,
-               // nodes = new int[] { constraintSupportNo },
+                // nodes = new int[] { constraintSupportNo },
                 spring = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhSupport.TranslationX), y = StiffnessTranslationBHToRF("" + bhSupport.TranslationY), z = StiffnessTranslationBHToRF("" + bhSupport.TranslationZ) },
                 rotational_restraint = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhSupport.RotationX), y = StiffnessTranslationBHToRF("" + bhSupport.RotationY), z = StiffnessTranslationBHToRF("" + bhSupport.RotationZ) },
             };

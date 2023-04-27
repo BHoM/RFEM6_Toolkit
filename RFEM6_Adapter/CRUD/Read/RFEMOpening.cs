@@ -48,7 +48,7 @@ namespace BH.Adapter.RFEM6
 
             foreach (var opening in allRFOpeinings.ToList())
             {
-                RFEMOpenings.Add(opening.FromRFEM(edges,opening.surfaces.ToList()));
+                RFEMOpenings.Add(opening.FromRFEM(edges, opening.surfaces.ToList()));
 
             }
 

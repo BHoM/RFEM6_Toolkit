@@ -45,7 +45,7 @@ namespace BH.Adapter.RFEM6
             var sectionNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
             var allSections = sectionNumbers.ToList().Select(n => m_Model.get_section(n.no));
 
-           //  List<rfModel.section>  allSections = new List<rfModel.section>();
+            //  List<rfModel.section>  allSections = new List<rfModel.section>();
 
             //foreach (var n in sectionNumbers)
             //{
@@ -58,7 +58,7 @@ namespace BH.Adapter.RFEM6
             foreach (var section in allSections)
             {
 
-               
+
 
                 IMaterialFragment material;
                 if (!materials.TryGetValue(section.material, out material))

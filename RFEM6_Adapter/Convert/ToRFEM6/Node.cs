@@ -51,7 +51,7 @@ namespace BH.Adapter.RFEM6
             if (node.Support != null)
             {
                 rfNode.support = node.Support.GetRFEM6ID();
-            }   
+            }
 
             return rfNode;
 

@@ -44,9 +44,6 @@ namespace BH.Adapter.RFEM6
 
             var barNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER);
             
-            
-            //var allRfMembers = barNumber.ToList().Select(n => model.get_member(n.no));
-            //var allRfMembers =
             List<rfModel.member> allRfMembers = new List<rfModel.member>();
 
             foreach (var n in barNumber) {

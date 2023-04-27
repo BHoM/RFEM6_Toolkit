@@ -42,8 +42,8 @@ namespace BH.Adapter.RFEM6
 
             var nodeNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);
             var allRfNodes = nodeNumbers.ToList().Select(n => m_Model.get_node(n.no));
-           
-           Dictionary<int, Constraint6DOF> supports = this.GetCachedOrReadAsDictionary<int, Constraint6DOF>();
+
+            Dictionary<int, Constraint6DOF> supports = this.GetCachedOrReadAsDictionary<int, Constraint6DOF>();
 
             if (ids == null)
             {

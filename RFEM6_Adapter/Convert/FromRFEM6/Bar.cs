@@ -37,15 +37,11 @@ namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-
         public static Bar FromRFEM(this rfModel.member member, Node node0, Node node1, ISectionProperty section)
         {
-
             Bar bar = new Bar { StartNode = node0, EndNode = node1, SectionProperty = section, Name = "member nr." + member.no };
             bar.SetRFEM6ID(member.no);
             return bar;
-
         }
-
     }
 }

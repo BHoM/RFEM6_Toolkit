@@ -41,18 +41,17 @@ namespace BH.Adapter.RFEM6
 
         public static rfModel.opening ToRFEM6(this Opening bhOpening)
         {
-            
-            List<int> edgeIdList=new List<int>();
+
+            List<int> edgeIdList = new List<int>();
 
 
             rfModel.opening rfSurface = new opening
             {
                 no = bhOpening.GetRFEM6ID(),
-                boundary_lines = bhOpening.Edges.Select(b=>b.GetRFEM6ID()).ToArray(),
+                boundary_lines = bhOpening.Edges.Select(b => b.GetRFEM6ID()).ToArray(),
                 //boundary_lines = new int[] { openingLine.no },
                 //surfaces = new int[] { 1},
             };
-
 
             return rfSurface;
 
