@@ -45,7 +45,7 @@ namespace BH.Adapter.RFEM6
             if (bhType == typeof(Node))
             {
                 return rfModel.object_types.E_OBJECT_TYPE_NODE;
-            } 
+            }
             else if (bhType == typeof(Constraint6DOF))
             {
                 return rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT;

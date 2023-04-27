@@ -76,12 +76,12 @@ namespace BH.Adapter.RFEM6
             }
 
 
-            if (bhSection==null) 
-            
+            if (bhSection == null)
+
             {
                 BH.Engine.Base.Compute.RecordWarning($"Section {section.name} could not be read and will be set to Explicite parameters set to 0!");
-                bhSection = new BH.oM.Structure.SectionProperties.ExplicitSection { Name = section.name }; 
-            
+                bhSection = new BH.oM.Structure.SectionProperties.ExplicitSection { Name = section.name };
+
             }
 
 
@@ -176,7 +176,7 @@ namespace BH.Adapter.RFEM6
                 }
 
             }
-            else 
+            else
             {
                 bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
             }
@@ -287,7 +287,7 @@ namespace BH.Adapter.RFEM6
                     BH.oM.Spatial.ShapeProfiles.TSectionProfile bhProfile3 = BH.Engine.Spatial.Create.TSectionProfile(height, width, thickness1, thickness0, 0, 0);
 
                     //bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile3, bhConcrete, sectionCatName, null);
-                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile3, bhConcrete,null);
+                    bhSection = BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile3, bhConcrete, null);
 
 
                     break;
@@ -425,11 +425,9 @@ namespace BH.Adapter.RFEM6
             }
 
             bhSection.Name = rfSection.name;
-         
+
             return bhSection;
         }
-
-
 
     }
 }

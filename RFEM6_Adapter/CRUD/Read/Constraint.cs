@@ -51,7 +51,7 @@ namespace BH.Adapter.RFEM6
             return constraintList;
         }
 
-   
+
 
     }
 }

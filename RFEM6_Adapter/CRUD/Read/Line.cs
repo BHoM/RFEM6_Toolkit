@@ -88,13 +88,13 @@ namespace BH.Adapter.RFEM6
                         Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
                         Point centre = Engine.Geometry.Create.Point(rfLine.arc_center_x, rfLine.arc_center_y, rfLine.arc_center_z);
 
-                        
+
 
                         lineNodes = new List<Node>() { n0, new Node { Position = mid }, n1, new Node { Position = centre } };
 
                         //coordSyst=BH.Engine.Geometry.Create.CartesianCoordinateSystem(centre,Engine.Geometry.Create.Vector(centre,mid), Engine.Geometry.Create.Vector(n0.Position, n1.Position));
 
-                        Vector x_Vector=Engine.Geometry.Create.Vector(centre, n0.Position).Normalise();
+                        Vector x_Vector = Engine.Geometry.Create.Vector(centre, n0.Position).Normalise();
                         Vector tempVector = Engine.Geometry.Create.Vector(centre, mid).Normalise();
 
                         Vector z_Vector = Engine.Geometry.Query.CrossProduct(x_Vector, tempVector).Normalise();
@@ -119,8 +119,8 @@ namespace BH.Adapter.RFEM6
 
                     }
 
-                    RFEMLine l = new RFEMLine { Nodes = lineNodes, LineType = (RFEMLineType)Convert.FromRFEM(rfLine.type), Radius=radius, X_Vector=x_VectorArr,Y_Vector=y_VectorArr,Angle=angle };
-                   // if (radius > 0) l.Radius = radius;
+                    RFEMLine l = new RFEMLine { Nodes = lineNodes, LineType = (RFEMLineType)Convert.FromRFEM(rfLine.type), Radius = radius, X_Vector = x_VectorArr, Y_Vector = y_VectorArr, Angle = angle };
+                    // if (radius > 0) l.Radius = radius;
                     l.SetRFEM6ID(rfLine.no);
                     lineList.Add(l);
                 }

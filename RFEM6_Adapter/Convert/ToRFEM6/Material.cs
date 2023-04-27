@@ -37,7 +37,6 @@ namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-
         public static rfModel.material ToRFEM6(this IMaterialFragment material)
         {
             //Object[] nameAndType = materialTypeAndNameTranslater(bhMateraial);
@@ -55,8 +54,6 @@ namespace BH.Adapter.RFEM6
             return rfMaterial;
 
         }
-
-
 
     }
 }

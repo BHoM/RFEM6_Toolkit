@@ -48,10 +48,10 @@ namespace BH.Adapter.RFEM6
                 return typeof(Node);
             }
             else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {  
+            {
                 return typeof(Constraint6DOF);
             }
-            else if(rfType== rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
+            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
             {
                 return typeof(IMaterialFragment);
             }

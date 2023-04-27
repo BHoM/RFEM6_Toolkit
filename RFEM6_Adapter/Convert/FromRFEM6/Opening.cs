@@ -39,7 +39,7 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static RFEMOpening FromRFEM(this rfModel.opening rfOpening, Dictionary<int, Edge> edgeDict,List<int> surfaceIDs)
+        public static RFEMOpening FromRFEM(this rfModel.opening rfOpening, Dictionary<int, Edge> edgeDict, List<int> surfaceIDs)
         {
 
             List<ICurve> curves = new List<ICurve>();
@@ -48,20 +48,16 @@ namespace BH.Adapter.RFEM6
 
             PolyCurve polyCurve = Engine.Geometry.Create.PolyCurve(curves);
 
-            var polyCurves=Engine.Geometry.Compute.Join(new List<PolyCurve>() { polyCurve });
+            var polyCurves = Engine.Geometry.Compute.Join(new List<PolyCurve>() { polyCurve });
 
-
-
-            Opening opening=Engine.Structure.Create.Opening(Engine.Geometry.Modify.Close(polyCurves.First()));
+            Opening opening = Engine.Structure.Create.Opening(Engine.Geometry.Modify.Close(polyCurves.First()));
 
             opening.SetRFEM6ID(rfOpening.no);
 
-
-            RFEMOpening rfemOpening = new RFEMOpening() { Opening=opening, SurfaceIDs=surfaceIDs};
+            RFEMOpening rfemOpening = new RFEMOpening() { Opening = opening, SurfaceIDs = surfaceIDs };
             rfemOpening.SetRFEM6ID(rfOpening.no);
             return rfemOpening;
 
-            //return opening;
         }
 
     }

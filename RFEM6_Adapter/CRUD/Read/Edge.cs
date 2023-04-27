@@ -43,7 +43,7 @@ namespace BH.Adapter.RFEM6
 
             List<RFEMLine> lines = GetCachedOrRead<RFEMLine>();
 
-            foreach (var line in lines) 
+            foreach (var line in lines)
             {
                 edgeList.Add(line.FromRFEMEdge());
             }

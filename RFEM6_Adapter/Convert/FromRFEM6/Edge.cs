@@ -46,38 +46,37 @@ namespace BH.Adapter.RFEM6
         }
 
         private static ICurve GetCurve(this RFEMLine rfemLine)
-        { 
+        {
             switch (rfemLine.LineType)
             {
                 case RFEMLineType.Polyline:
                     return new Polyline { ControlPoints = rfemLine.Nodes.Select(x => x.Position).ToList() };
                 case RFEMLineType.Arc:
 
-        
                     double angle = rfemLine.Angle;
-                 
+
 
                     Vector xVector = new Vector() { X = rfemLine.X_Vector[0], Y = rfemLine.X_Vector[1], Z = rfemLine.X_Vector[2] };
                     Vector yVector = new Vector() { X = rfemLine.Y_Vector[0], Y = rfemLine.Y_Vector[1], Z = rfemLine.Y_Vector[2] };
 
-                    oM.Geometry.CoordinateSystem.Cartesian coordSyst =BH.Engine.Geometry.Create.CartesianCoordinateSystem(rfemLine.Nodes[3].Position, xVector, yVector);
+                    oM.Geometry.CoordinateSystem.Cartesian coordSyst = BH.Engine.Geometry.Create.CartesianCoordinateSystem(rfemLine.Nodes[3].Position, xVector, yVector);
 
-                    Arc arC=Engine.Geometry.Create.Arc(coordSyst, rfemLine.Radius, -angle, 0);
+                    Arc arC = Engine.Geometry.Create.Arc(coordSyst, rfemLine.Radius, -angle, 0);
 
-                    Point start=arC.StartPoint();
-                    Point end=arC.EndPoint();
+                    Point start = arC.StartPoint();
+                    Point end = arC.EndPoint();
 
-                    if (start.Distance(rfemLine.Nodes[0].Position)>0.0001 || end.Distance(rfemLine.Nodes[2].Position) > 0.0001) {
+                    if (start.Distance(rfemLine.Nodes[0].Position) > 0.0001 || end.Distance(rfemLine.Nodes[2].Position) > 0.0001)
+                    {
 
-                        if (end.Distance(rfemLine.Nodes[0].Position) > 0.0001 || start.Distance(rfemLine.Nodes[2].Position) > 0.0001) {
+                        if (end.Distance(rfemLine.Nodes[0].Position) > 0.0001 || start.Distance(rfemLine.Nodes[2].Position) > 0.0001)
+                        {
                             arC = Engine.Geometry.Create.Arc(coordSyst, rfemLine.Radius, 0, angle);
                         }
-                       
+
                     }
 
                     return arC;
-
-                    //return Engine.Geometry.Create.ArcByCentre(rfemLine.Nodes[3].Position, rfemLine.Nodes[0].Position, rfemLine.Nodes[2].Position, 1E-03);
 
                 case RFEMLineType.Circle:
                     return Engine.Geometry.Create.Circle(rfemLine.Nodes[0].Position, rfemLine.Radius);
@@ -86,7 +85,7 @@ namespace BH.Adapter.RFEM6
                     BH.Engine.Base.Compute.RecordError("Linetype not yet supported.");
                     return null;
             }
-        
+
         }
 
         public static Edge FromRFEM(this rfModel.line rfLine, Dictionary<int, Node> nodeDict)
@@ -95,44 +94,28 @@ namespace BH.Adapter.RFEM6
             var type = rfLine.type.ToString();
             ICurve curve = null;
 
-
-            if (type.Equals("TYPE_ARC")) {
-
+            if (type.Equals("TYPE_ARC"))
+            {
                 Node n0 = nodeDict[rfLine.definition_nodes[0]];
                 Node n1 = nodeDict[rfLine.definition_nodes[1]];
-
                 Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
-
                 curve = Engine.Geometry.Create.Arc(n0.Position, mid, n1.Position);
-
             }
-            else if(type.Equals("TYPE_POLYLINE")){
-
-                //Node n0 = nodeDict[rfLine.definition_nodes[0]];
-                //Node n1 = nodeDict[rfLine.definition_nodes[1]];
-
-                //curve = new Line {Start=n0.Position,End=n1.Position};
+            else if (type.Equals("TYPE_POLYLINE"))
+            {
                 List<Point> pts = new List<Point>();
-                rfLine.definition_nodes.ToList().ForEach(n=>pts.Add(nodeDict[rfLine.definition_nodes[0]].Position));
-
-                curve= new Polyline { ControlPoints = pts };
-
+                rfLine.definition_nodes.ToList().ForEach(n => pts.Add(nodeDict[rfLine.definition_nodes[0]].Position));
+                curve = new Polyline { ControlPoints = pts };
             }
 
             else if (type.Equals("TYPE_CIRCLE"))
             {
-
                 Node n0 = nodeDict[rfLine.definition_nodes[0]];
-                //Node n1 = nodeDict[rfLine.definition_nodes[1]];
-
                 curve = Engine.Geometry.Create.Circle(n0.Position, rfLine.circle_radius);
-
             }
 
-
-            Edge edge = new Edge {Curve=curve};
+            Edge edge = new Edge { Curve = curve };
             edge.SetRFEM6ID(rfLine.no);
-
             return edge;
         }
 

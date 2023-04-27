@@ -43,8 +43,7 @@ namespace BH.Adapter.RFEM6
 
             var panelNumbersByType = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE);
             var allRfPanels = panelNumbersByType.ToList().Select(n => m_Model.get_surface(n.no)).ToList();
-            List<int> panelNumbers = panelNumbersByType.ToList().Select(p=>p.no).ToList();
-
+            List<int> panelNumbers = panelNumbersByType.ToList().Select(p => p.no).ToList();
 
             List<Panel> bhPanel = new List<Panel>();
 
@@ -53,11 +52,11 @@ namespace BH.Adapter.RFEM6
             Dictionary<int, RFEMOpening> surfaceOpening = this.GetCachedOrReadAsDictionary<int, RFEMOpening>();
 
             HashSet<int> surfaceIDs = surfaceOpening.SelectMany(o => o.Value.SurfaceIDs).ToHashSet();
-     
 
             Dictionary<int, HashSet<int>> surfaceOpeningIdDicionary = new Dictionary<int, HashSet<int>>();
 
-            foreach (int s in panelNumbers) {
+            foreach (int s in panelNumbers)
+            {
 
                 HashSet<int> openingIds = new HashSet<int>();
 
@@ -74,34 +73,16 @@ namespace BH.Adapter.RFEM6
 
                 }
 
-                surfaceOpeningIdDicionary.Add(s,openingIds);
-            
-            }
-
-            //foreach (int s in surfaceIDs)
-            //{
-
-            //    HashSet<int> openingIds = new HashSet<int>();
-
-            //    foreach (KeyValuePair<int, RFEMOpening> entry in surfaceOpening)
-            //    {
-
-            //        if (entry.Value.SurfaceIDs.ToHashSet().Contains(s)) { openingIds.Add(entry.Key); }
-
-            //    }
-
-            //    surfaceOpeningIdDicionary.Add(s, openingIds);
-
-            //}
-
-
-            foreach (rfModel.surface rfPanel in allRfPanels) {
-
-                bhPanel.Add(rfPanel.FromRFEM(edges,surfaceProperties, surfaceOpeningIdDicionary[rfPanel.no], surfaceOpening));
+                surfaceOpeningIdDicionary.Add(s, openingIds);
 
             }
 
-            
+            foreach (rfModel.surface rfPanel in allRfPanels)
+            {
+
+                bhPanel.Add(rfPanel.FromRFEM(edges, surfaceProperties, surfaceOpeningIdDicionary[rfPanel.no], surfaceOpening));
+
+            }
 
             return bhPanel;
         }

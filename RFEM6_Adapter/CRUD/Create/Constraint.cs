@@ -38,7 +38,7 @@ namespace BH.Adapter.RFEM6
 
         private bool CreateCollection(IEnumerable<Constraint6DOF> supports)
         {
-           
+
             foreach (Constraint6DOF supprort in supports)
             {
                 rfModel.nodal_support rfNodelSuport = supprort.ToRFEM6();

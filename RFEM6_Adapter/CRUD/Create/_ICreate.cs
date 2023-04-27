@@ -46,28 +46,28 @@ namespace BH.Adapter.RFEM6
             // Preferrably, different Create logic for different object types should go in separate methods.
             // We achieve this by using the ICreate method to only dynamically dispatching to *type-specific Create implementations*
             // In other words:
-            
+
             //
             //foreach (T obj in objects)
             //{
-                //success &= Create(obj as dynamic);
-                if (objects.Count() > 0)
+            //success &= Create(obj as dynamic);
+            if (objects.Count() > 0)
+            {
+                //AppLock();
+                try
                 {
-                    //AppLock();
-                    try
-                    {
-                        m_Model.begin_modification("Geometry");
-                        success = CreateCollection(objects as dynamic); //Calls the correct CreateCollection method based on dynamic casting
-                    }
-                    finally
-                    {
-                        //AppUnlock();
-                        m_Model.finish_modification();
-                    }
-
+                    m_Model.begin_modification("Geometry");
+                    success = CreateCollection(objects as dynamic); //Calls the correct CreateCollection method based on dynamic casting
                 }
+                finally
+                {
+                    //AppUnlock();
+                    m_Model.finish_modification();
+                }
+
+            }
             //}
-            
+
             // Then place the specific Create methods below this method or, better, in separate file for each object type.
             return success;
         }

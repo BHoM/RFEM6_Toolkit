@@ -44,8 +44,8 @@ namespace BH.Adapter.RFEM6
 
             var thicknessNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_THICKNESS);
             var allRFThickness = thicknessNumber.ToList().Select(n => m_Model.get_thickness(n.no));
-           
-           //Dictionary<int, Opening> supports = this.GetCachedOrReadAsDictionary<int, Opening>();
+
+            //Dictionary<int, Opening> supports = this.GetCachedOrReadAsDictionary<int, Opening>();
 
             if (ids == null)
             {

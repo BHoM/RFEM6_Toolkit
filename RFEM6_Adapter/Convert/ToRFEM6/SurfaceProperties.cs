@@ -46,7 +46,7 @@ namespace BH.Adapter.RFEM6
             rfModel.thickness rfThickness = new rfModel.thickness()
             {
                 no = bhSurfaceProperty.GetRFEM6ID(),
-                material=bhMaterial.GetRFEM6ID(),
+                material = bhMaterial.GetRFEM6ID(),
                 name = bhSurfaceProperty.Name,
                 materialSpecified = true,
                 type = rfModel.thickness_type.TYPE_UNIFORM,
@@ -66,7 +66,7 @@ namespace BH.Adapter.RFEM6
             //    uniform_thicknessSpecified = true,
             //};
 
-           
+
 
             //// opening
             //node openingNodeOne = new node()

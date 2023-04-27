@@ -44,7 +44,7 @@ namespace BH.Adapter.RFEM6
 
             List<int> edgeIdList = new List<int>();
             bhPanel.ExternalEdges.ForEach(e => edgeIdList.Add(e.GetRFEM6ID()));
-    
+
             rfModel.surface rfSurface = new rfModel.surface
             {
 
@@ -56,8 +56,6 @@ namespace BH.Adapter.RFEM6
                 typeSpecified = true,
 
             };
-
-
 
             return rfSurface;
 

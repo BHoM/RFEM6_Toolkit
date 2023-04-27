@@ -45,7 +45,7 @@ namespace BH.Adapter.RFEM6
             rfModel.section rfSection = null;
 
             AlterSectionName(bhSection);
-          
+
             int secNo = bhSection.GetRFEM6ID();
 
             if (materialType.Equals("Steel"))

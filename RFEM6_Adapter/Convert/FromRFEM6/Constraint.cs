@@ -35,7 +35,6 @@ namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-
         public static BH.oM.Structure.Constraints.Constraint6DOF FromRFEM(this rfModel.nodal_support support)
         {
 

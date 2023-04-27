@@ -51,7 +51,6 @@ namespace BH.Adapter.RFEM6
                 typeSpecified = true,
             };
 
-        
             return rfLine;
 
         }
@@ -96,7 +95,7 @@ namespace BH.Adapter.RFEM6
                 };
 
                 rfLine.SetPropertyValue("type", rfModel.line_type.TYPE_ARC);
-                
+
             }
 
             if (rfemLine.LineType is RFEMLineType.Circle)
