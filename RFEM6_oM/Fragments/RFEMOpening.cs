@@ -38,9 +38,9 @@ namespace BH.oM.Adapters.RFEM6
         //public virtual Node EndNode { get; set; }
 
 
-        public Opening Opening { get; set; }
+        public virtual Opening Opening { get; set; }
 
-        public List<int> SurfaceIDs { get; set; } = new List<int>();
+        public virtual List<int> SurfaceIDs { get; set; } = new List<int>();
 
         //public List<Panel> Panels { get; set; } = new List<Panel>();
 
