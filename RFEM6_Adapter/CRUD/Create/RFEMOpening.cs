@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
  *
@@ -19,49 +19,40 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-
-using BH.oM.Adapter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using BH.oM.Base;
+
+using BH.oM.Adapter;
+using BH.oM.Structure.Elements;
+using BH.oM.Geometry;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.SectionProperties;
+using BH.oM.Adapters.RFEM6;
+
+using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter : BHoMAdapter
+    public partial class RFEM6Adapter
     {
-        // This method gets called when appropriate by the Push method contained in the base Adapter class.
-        // Unlike the Create, Delete and Read, this method already exposes a simple implementation: it calls Delete and then Create.
-        // It can be overridden here keeping in mind the following:
-        // - it gets called once per each Type, and if equal objects are found;
-        // - the object equality is tested through this.AdapterComparers, that need to be implemented for each type.
-        // See the wiki for more info.
 
-
-        protected override bool IUpdate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
+        private bool CreateCollection(IEnumerable<RFEMOpening> rfemOpening)
         {
-            //return ICreate<T>(objects, actionConfig);
-            if (!UpdateObjects(objects as dynamic))
-                return base.IUpdate(objects, actionConfig);
+
+            foreach (RFEMOpening bhOpening in rfemOpening)
+            {
+
+                rfModel.opening rfOpening = bhOpening.Opening.ToRFEM6();
+
+                m_Model.set_opening(rfOpening);
+
+            }
+
             return true;
         }
 
-        /***************************************************/
-
-        private bool UpdateObjects(IEnumerable<IBHoMObject> objects)
-        {
-            return false;
-        }
-
-        /***************************************************/
-
     }
-
-
-    /***************************************************/
-
-
 }
-

@@ -39,17 +39,15 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private bool CreateCollection(IEnumerable<Opening> bhOpenings)
+        private bool CreateCollection(IEnumerable<Opening> rfemOpening)
         {
 
-            foreach (Opening bhOpening in bhOpenings)
-            {
+            //foreach (Opening bhOpening in rfemOpening)
+            //{
 
-                rfModel.opening rfOpening = bhOpening.ToRFEM6();
+            //    bhOpening.SetRFEM6ID(bhOpening.FindFragment<RFEMOpening>().GetRFEM6ID());
 
-                m_Model.set_opening(rfOpening);
-
-            }
+            //}
 
             return true;
         }

@@ -68,6 +68,7 @@ namespace BH.Adapter.RFEM6
             BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
             this.AdapterModules.Add(new GetLineFromBarModule());
             this.AdapterModules.Add(new GetLineFromEdgeModule());
+            this.AdapterModules.Add(new GetOpeningFromOpeningModule());
 
             AdapterComparers = new Dictionary<Type, object>
             {
@@ -92,7 +93,9 @@ namespace BH.Adapter.RFEM6
                 {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
                 {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
                 {typeof(ISurfaceProperty), new List<Type> { typeof(IMaterialFragment) } },
-                {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge),typeof(Opening) } },
+                //{typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge), typeof(Opening) } },
+                {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge), typeof(Opening), typeof(RFEMOpening) } },
+                {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
                 {typeof(Opening), new List<Type> { typeof(Edge)} },
                 {typeof(Edge), new List<Type> { typeof(RFEMLine) } },
                 {typeof(ILoad), new List<Type> { typeof(Loadcase) } },
@@ -121,7 +124,7 @@ namespace BH.Adapter.RFEM6
         /**** Private  Fields                           ****/
         /***************************************************/
 
-        public Dictionary<int, Line> m_Line = new Dictionary<int, Line>();
+        //public Dictionary<int, Line> m_Line = new Dictionary<int, Line>();
 
         /***************************************************/
         /**** Private Methods                           ****/

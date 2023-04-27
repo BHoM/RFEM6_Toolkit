@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
  *
@@ -19,49 +19,31 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-
-using BH.oM.Adapter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Base;
+using System.ComponentModel;
+using BH.oM.Structure.Elements;
 
-namespace BH.Adapter.RFEM6
+namespace BH.oM.Adapters.RFEM6
 {
-    public partial class RFEM6Adapter : BHoMAdapter
+    public class RFEMOpening : BHoMObject, IFragment
     {
-        // This method gets called when appropriate by the Push method contained in the base Adapter class.
-        // Unlike the Create, Delete and Read, this method already exposes a simple implementation: it calls Delete and then Create.
-        // It can be overridden here keeping in mind the following:
-        // - it gets called once per each Type, and if equal objects are found;
-        // - the object equality is tested through this.AdapterComparers, that need to be implemented for each type.
-        // See the wiki for more info.
+        //[Description("Defines the start position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
+        //public virtual Node StartNode { get; set; }
+        //[Description("Defines the end position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
+        //public virtual Node EndNode { get; set; }
 
 
-        protected override bool IUpdate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
-        {
-            //return ICreate<T>(objects, actionConfig);
-            if (!UpdateObjects(objects as dynamic))
-                return base.IUpdate(objects, actionConfig);
-            return true;
-        }
+        public Opening Opening { get; set; }
 
-        /***************************************************/
+        public List<int> SurfaceIDs { get; set; } = new List<int>();
 
-        private bool UpdateObjects(IEnumerable<IBHoMObject> objects)
-        {
-            return false;
-        }
+        //public List<Panel> Panels { get; set; } = new List<Panel>();
 
-        /***************************************************/
 
     }
-
-
-    /***************************************************/
-
-
 }
-

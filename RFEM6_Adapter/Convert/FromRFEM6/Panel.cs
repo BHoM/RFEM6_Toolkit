@@ -33,31 +33,39 @@ using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Spatial;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
 
-        public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, Dictionary<int, Opening> surfaceOpening)
+        //public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, Dictionary<int,  HashSet<int>> openingIDDict, int rfPanelNo, Dictionary<int, RFEMOpening> surfaceOpening)
+        public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty,  HashSet<int> openingIDs, Dictionary<int, RFEMOpening> surfaceOpening)
         {
 
+            //HashSet<int> openingIDs = new HashSet<int>();
+
+            //openingIDDict.TryGetValue(rfPanelNo,out openingIDs);
+            
+            
             List<int> rfEdgeNumbers = rfSurface.boundary_lines.ToList();
             List<Edge> bhEdges = rfEdgeNumbers.Select(n=>edgeDict[n]).ToList();
             Panel panel = new Panel();
 
 
-            if (rfSurface.integrated_openings.Length > 0)
+            if (openingIDs.Contains(rfSurface.no))
             {
 
                 List<Opening> openingins = new List<Opening>();
 
-                foreach (int openingNumber in rfSurface.integrated_openings.ToList())
+                foreach (int o in openingIDs)
                 {
-                    Opening opening = surfaceOpening[openingNumber];
+                    Opening opening = surfaceOpening[o].Opening;
 
                     openingins.Add(opening);
 
+                    //opening.GetAllFragments(typeof(RFEMOpening)).ForEach(o=>o.SetPropertyValue("Pamel",);
                     //List<ICurve> openingCurves = opening.Edges.Select(e => e.Curve).ToList();
 
                     //openingCurves.Join();
@@ -70,9 +78,10 @@ namespace BH.Adapter.RFEM6
                 panel=Engine.Structure.Create.Panel(bhEdges, openingins, surfaceProperty[rfSurface.thickness]);
 
             }
+
             else {
 
-                panel = Engine.Structure.Create.Panel(bhEdges, null, surfaceProperty[rfSurface.thickness], "");
+                panel = Engine.Structure.Create.Panel(bhEdges,new List<ICurve>() , surfaceProperty[rfSurface.thickness], "");
             }
 
 

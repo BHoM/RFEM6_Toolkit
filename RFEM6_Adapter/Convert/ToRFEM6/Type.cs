@@ -78,6 +78,10 @@ namespace BH.Adapter.RFEM6
             {
                 return rfModel.object_types.E_OBJECT_TYPE_LINE;
             }
+            else if (bhType == typeof(RFEMOpening))
+            {
+                return rfModel.object_types.E_OBJECT_TYPE_OPENING;
+            }
             else if (bhType == typeof(Opening))
             {
                 return rfModel.object_types.E_OBJECT_TYPE_OPENING;

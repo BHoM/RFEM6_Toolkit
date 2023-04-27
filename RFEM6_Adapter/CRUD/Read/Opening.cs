@@ -31,6 +31,7 @@ using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SurfaceProperties;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
@@ -40,18 +41,13 @@ namespace BH.Adapter.RFEM6
         private List<Opening> ReadOpening(List<string> ids = null)
         {
             List<Opening> bhOpenings = new List<Opening>();
-            Dictionary<int, Edge> edges = this.GetCachedOrReadAsDictionary<int, Edge>();
+            List<RFEMOpening> rfemOpenings = GetCachedOrRead<RFEMOpening>();
 
-            var openingNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_OPENING);
-            var allRFOpeinings = openingNumber.ToList().Select(n => m_Model.get_opening(n.no));
-
-            foreach (var opening in allRFOpeinings.ToList())
+            foreach (var rfemOpening in rfemOpenings)
             {
-               bhOpenings.Add(opening.FromRFEM(edges));
+                bhOpenings.Add(rfemOpening.Opening);
 
             }
-
-
             return bhOpenings;
         }
 
