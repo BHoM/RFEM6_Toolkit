@@ -39,15 +39,15 @@ namespace BH.oM.Adapters.RFEM6
 
         public virtual List<Node> Nodes { get; set; } = new List<Node>();
 
-        public virtual RFEMLineType LineType { get; set; }
+        public virtual RFEMLineType LineType { get; set; } = RFEMLineType.Polyline;
 
-        public virtual double Radius { get; set; }
+        public virtual double Radius { get; set; } = 0;
 
-        public virtual double Angle { get; set; }
+        public virtual double Angle { get; set; } = 0;
 
-        public virtual double[] X_Vector { get; set; }
-        public virtual double[] Y_Vector { get; set; }
+        public virtual double[] X_Vector { get; set; } = new double[3];
+        public virtual double[] Y_Vector { get; set; } = new double[3];
 
-        public virtual double[] Normal { get; set; }
+        public virtual double[] Normal { get; set; } = new double[3];
     }
 }

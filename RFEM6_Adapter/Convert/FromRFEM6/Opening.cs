@@ -39,7 +39,7 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static Opening FromRFEM(this rfModel.opening rfOpening, Dictionary<int, Edge> edgeDict)
+        public static RFEMOpening FromRFEM(this rfModel.opening rfOpening, Dictionary<int, Edge> edgeDict,List<int> surfaceIDs)
         {
 
             List<ICurve> curves = new List<ICurve>();
@@ -56,7 +56,12 @@ namespace BH.Adapter.RFEM6
 
             opening.SetRFEM6ID(rfOpening.no);
 
-            return opening;
+
+            RFEMOpening rfemOpening = new RFEMOpening() { Opening=opening, SurfaceIDs=surfaceIDs};
+            rfemOpening.SetRFEM6ID(rfOpening.no);
+            return rfemOpening;
+
+            //return opening;
         }
 
     }

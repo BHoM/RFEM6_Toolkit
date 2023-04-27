@@ -85,7 +85,6 @@ namespace BH.Adapter.RFEM6
                 default:
                     BH.Engine.Base.Compute.RecordError("Linetype not yet supported.");
                     return null;
-                    break;
             }
         
         }
@@ -105,7 +104,6 @@ namespace BH.Adapter.RFEM6
                 Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
 
                 curve = Engine.Geometry.Create.Arc(n0.Position, mid, n1.Position);
-          
 
             }
             else if(type.Equals("TYPE_POLYLINE")){

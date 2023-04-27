@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
  *
@@ -19,49 +19,52 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-
+using BH.oM.Base;
 using BH.oM.Adapter;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BH.oM.Base;
+using System.Collections.Generic;
+using System.Reflection;
+using System.ComponentModel;
+using BH.oM.Structure.Elements;
+using BH.oM.Adapters.RFEM6;
+using System.Collections;
+using BH.oM.Geometry;
+using BH.Engine.Geometry;
+using System.Security.Cryptography;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter : BHoMAdapter
+    [Description("Dependency module for fetching all Loadcase stored in a list of Loadcombinations.")]
+    public class GetOpeningFromOpeningModule : IGetDependencyModule<Panel, RFEMOpening>
     {
-        // This method gets called when appropriate by the Push method contained in the base Adapter class.
-        // Unlike the Create, Delete and Read, this method already exposes a simple implementation: it calls Delete and then Create.
-        // It can be overridden here keeping in mind the following:
-        // - it gets called once per each Type, and if equal objects are found;
-        // - the object equality is tested through this.AdapterComparers, that need to be implemented for each type.
-        // See the wiki for more info.
 
-
-        protected override bool IUpdate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
+        //TODO 
+        //Make this work for polylines ....you need to split them and run the method over each curve
+        public IEnumerable<RFEMOpening> GetDependencies(IEnumerable<Panel> objects)
         {
-            //return ICreate<T>(objects, actionConfig);
-            if (!UpdateObjects(objects as dynamic))
-                return base.IUpdate(objects, actionConfig);
-            return true;
+            List< RFEMOpening> rfOpnings = new List<RFEMOpening>();
+    
+            foreach (Panel panel in objects)
+            {
+
+                foreach (var opening in panel.Openings)
+                {
+
+                    RFEMOpening rfOpening = new RFEMOpening() { Opening = opening, SurfaceIDs = new List<int>() { panel.GetRFEM6ID() }};
+                    //RFEMOpening rfOpening = new RFEMOpening() {Opening=opening, SurfaceIDs=new List<int>() { panel.GetRFEM6ID() },Panels=new List<Panel> {panel } };
+                    //RFEMOpening rfOpening = new RFEMOpening() {Opening=opening,Panels=new List<Panel> {panel } };
+
+
+                    rfOpnings.Add(rfOpening);
+                    opening.AddFragment(rfOpening);
+                }
+
+
+            }
+
+            return rfOpnings;
         }
-
-        /***************************************************/
-
-        private bool UpdateObjects(IEnumerable<IBHoMObject> objects)
-        {
-            return false;
-        }
-
-        /***************************************************/
-
     }
-
-
-    /***************************************************/
-
-
 }
-
