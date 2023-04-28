@@ -51,7 +51,7 @@ namespace BH.Adapter.RFEM6
             Dictionary<int, ISurfaceProperty> surfaceProperties = this.GetCachedOrReadAsDictionary<int, ISurfaceProperty>();
             Dictionary<int, RFEMOpening> surfaceOpening = this.GetCachedOrReadAsDictionary<int, RFEMOpening>();
 
-            HashSet<int> surfaceIDs = surfaceOpening.SelectMany(o => o.Value.SurfaceIDs).ToHashSet();
+            HashSet<int> surfaceWithOpeningIDs = surfaceOpening.SelectMany(o => o.Value.SurfaceIDs).ToHashSet();
 
             Dictionary<int, HashSet<int>> surfaceOpeningIdDicionary = new Dictionary<int, HashSet<int>>();
 
@@ -60,14 +60,19 @@ namespace BH.Adapter.RFEM6
 
                 HashSet<int> openingIds = new HashSet<int>();
 
-                if (surfaceIDs.Contains(s))
+                if (surfaceWithOpeningIDs.Contains(s))
                 {
 
 
                     foreach (KeyValuePair<int, RFEMOpening> entry in surfaceOpening)
                     {
 
-                        if (entry.Value.SurfaceIDs.ToHashSet().Contains(s)) { openingIds.Add(entry.Key); }
+                        if (entry.Value.SurfaceIDs.ToHashSet().Contains(s))
+                        {
+                            openingIds.Add(entry.Value.Opening.GetRFEM6ID());
+                        }
+
+                        //if (entry.Value.SurfaceIDs.ToHashSet().Contains(s)) { openingIds.Add(entry.Key); }
 
                     }
 

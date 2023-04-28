@@ -54,7 +54,7 @@ namespace BH.Adapter.RFEM6
             Panel panel = new Panel();
 
 
-            if (openingIDs.Contains(rfSurface.no))
+            if (openingIDs.Count>0)
             {
 
                 List<Opening> openingins = new List<Opening>();
