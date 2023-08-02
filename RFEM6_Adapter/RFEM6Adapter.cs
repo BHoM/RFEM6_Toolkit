@@ -59,6 +59,7 @@ namespace BH.Adapter.RFEM6
         [Output("The created RFEM6 adapter.")]
         public RFEM6Adapter(bool active = false)
         {
+
             // The Adapter constructor can be used to configure the Adapter behaviour.
             // For example:
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
