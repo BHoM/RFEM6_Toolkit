@@ -19,38 +19,38 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Numerics;
-
+using BH.oM.Base;
 using BH.oM.Adapter;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
+using System.ComponentModel;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6;
+using System.Collections;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    [Description("Dependency module for fetching all Loadcase stored in a list of Loadcombinations.")]
+    public class GetRFEMNodalSupportModule : IGetDependencyModule<Node, RFEMNodalSupport>
     {
-
-        private bool CreateCollection(IEnumerable<Constraint6DOF> supports)
+        public IEnumerable<RFEMNodalSupport> GetDependencies(IEnumerable<Node> objects)
         {
+            List<RFEMNodalSupport> nodalSuportList = new List<RFEMNodalSupport>();
 
-            //foreach (Constraint6DOF supprort in supports)
-            //{
-            //    rfModel.nodal_support rfNodelSuport = supprort.ToRFEM6();
-            //    m_Model.set_nodal_support(rfNodelSuport);
-            //}
+            foreach (Node node in objects)
+            {
+                if (node.Support!=null) {
+                    RFEMNodalSupport nodalSupport = new RFEMNodalSupport() { Constraint = node.Support, nodes = new List<Node> { node } };
+                    nodalSuportList.Add(nodalSupport);
 
-            return true;
+                    node.Fragments.Add(nodalSupport);
 
-            //Has been implemented inside of Nodes.cs
+                }
+            }
 
-
+            return nodalSuportList;
         }
-
     }
 }

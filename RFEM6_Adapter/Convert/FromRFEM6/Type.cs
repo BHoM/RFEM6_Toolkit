@@ -49,7 +49,7 @@ namespace BH.Adapter.RFEM6
             }
             else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
             {
-                return typeof(Constraint6DOF);
+                return typeof(RFEMNodalSupport);
             }
             else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
             {

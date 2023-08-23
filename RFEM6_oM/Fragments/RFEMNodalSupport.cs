@@ -23,34 +23,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Numerics;
-
-using BH.oM.Adapter;
+using System.Threading.Tasks;
+using BH.oM.Base;
+using System.ComponentModel;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
-
-namespace BH.Adapter.RFEM6
+namespace BH.oM.Adapters.RFEM6
 {
-    public partial class RFEM6Adapter
+    public class RFEMNodalSupport : BHoMObject, IFragment
     {
-
-        private bool CreateCollection(IEnumerable<Constraint6DOF> supports)
-        {
-
-            //foreach (Constraint6DOF supprort in supports)
-            //{
-            //    rfModel.nodal_support rfNodelSuport = supprort.ToRFEM6();
-            //    m_Model.set_nodal_support(rfNodelSuport);
-            //}
-
-            return true;
-
-            //Has been implemented inside of Nodes.cs
+        //[Description("Defines the start position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
+        //public virtual Node StartNode { get; set; }
+        //[Description("Defines the end position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
+        //public virtual Node EndNode { get; set; }
 
 
-        }
+        public virtual Constraint6DOF Constraint { get; set; }
+
+        public virtual List<Node> nodes { get; set; } = new List<Node>();
+
+        public virtual List<int> nodesIDs { get; set; } = new List<int>();
+
+        //public List<Panel> Panels { get; set; } = new List<Panel>();
+
 
     }
 }
