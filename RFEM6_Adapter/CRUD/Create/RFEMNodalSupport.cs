@@ -23,32 +23,34 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Numerics;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter : BHoMAdapter
+    public partial class RFEM6Adapter
     {
-        /***************************************************/
-        /**** Update Node                               ****/
-        /***************************************************/
 
-        private bool UpdateObjects(IEnumerable<Constraint6DOF> constraints)
+        private bool CreateCollection(IEnumerable<RFEMNodalSupport> supportList)
         {
-            bool success = true;
 
-            foreach (Constraint6DOF constraint in constraints)
+            foreach (RFEMNodalSupport support in supportList)
             {
-                m_Model.set_nodal_support(constraint.ToRFEM6());
-               
+                rfModel.nodal_support rfNodelSuport = support.ToRFEM6();
+                m_Model.set_nodal_support(rfNodelSuport);
             }
 
-            return success;
+            return true;
+
+            //Has been implemented inside of Nodes.cs
+
+
         }
 
     }

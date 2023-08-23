@@ -44,7 +44,7 @@ namespace BH.Adapter.RFEM6
 
             foreach (rfModel.nodal_support s in foundSupports)
             {
-                Constraint6DOF rfConstraint = Convert.FromRFEM(s);
+                Constraint6DOF rfConstraint = Convert.FromRFEM(s).Constraint;
                 constraintList.Add(rfConstraint);
             }
 

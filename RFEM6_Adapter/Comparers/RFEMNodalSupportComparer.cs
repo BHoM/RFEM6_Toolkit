@@ -19,38 +19,55 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Numerics;
-
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.SurfaceProperties;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public class RFEMNodalSupportComparer : IEqualityComparer<RFEMNodalSupport>
     {
+        /***************************************************/
+        /**** Constructors                              ****/
+        /***************************************************/
 
-        private bool CreateCollection(IEnumerable<Constraint6DOF> supports)
+        public RFEMNodalSupportComparer()
         {
-
-            //foreach (Constraint6DOF supprort in supports)
-            //{
-            //    rfModel.nodal_support rfNodelSuport = supprort.ToRFEM6();
-            //    m_Model.set_nodal_support(rfNodelSuport);
-            //}
-
-            return true;
-
-            //Has been implemented inside of Nodes.cs
-
 
         }
 
+
+        /***************************************************/
+        /**** Public Methods                            ****/
+        /***************************************************/
+
+        public bool Equals(RFEMNodalSupport surfaceProp1, RFEMNodalSupport RFEMNodalSupport)
+        {
+           
+            return false;
+
+        }
+
+        /***************************************************/
+
+        public int GetHashCode(RFEMNodalSupport surfaceSupport)
+        {
+            return 0;
+        }
+
+
+        /***************************************************/
+
+
     }
+
+
+
 }
+
+
+
+

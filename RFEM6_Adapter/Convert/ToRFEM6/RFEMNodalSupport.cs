@@ -18,39 +18,44 @@
  *                                                                            
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
- */
-using System;
+ */using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Numerics;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
+using BH.Engine.Adapter;
+using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public static partial class Convert
     {
 
-        private bool CreateCollection(IEnumerable<Constraint6DOF> supports)
+        public static rfModel.nodal_support ToRFEM6(this RFEMNodalSupport bhNodalSupport)//, int constraintSupportNo)
         {
-
-            //foreach (Constraint6DOF supprort in supports)
-            //{
-            //    rfModel.nodal_support rfNodelSuport = supprort.ToRFEM6();
-            //    m_Model.set_nodal_support(rfNodelSuport);
-            //}
-
-            return true;
-
-            //Has been implemented inside of Nodes.cs
-
-
+            rfModel.nodal_support rfNodelSupport = new rfModel.nodal_support()
+            {
+                no = bhNodalSupport.GetRFEM6ID(),
+                name = bhNodalSupport.Constraint.Name,
+                // nodes = new int[] { constraintSupportNo },
+                spring = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.TranslationX), y = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.TranslationY), z = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.TranslationZ) },
+                rotational_restraint = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.RotationX), y = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.RotationY), z = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.RotationZ) },
+            };
+            return rfNodelSupport;
         }
 
+
+        public static double StiffnessTranslationBHToRF(string stiffness)
+        {
+
+            double result = stiffness == "Free" ? 0.0 : double.PositiveInfinity;
+
+            return result;
+        }
     }
 }

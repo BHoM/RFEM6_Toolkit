@@ -67,6 +67,7 @@ namespace BH.Adapter.RFEM6
             // See the wiki, the AdapterSettings object and other Adapters to see how it can be configured.
             //AdapterIdFragmentType = typeof(RFEMId);
             BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
+            this.AdapterModules.Add(new GetRFEMNodalSupportModule());
             this.AdapterModules.Add(new GetLineFromBarModule());
             this.AdapterModules.Add(new GetLineFromEdgeModule());
             this.AdapterModules.Add(new GetOpeningFromOpeningModule());
@@ -80,6 +81,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(IMaterialFragment), new NameOrDescriptionComparer() },
                 {typeof(LinkConstraint), new NameOrDescriptionComparer() },
                 {typeof(Constraint6DOF), new NameOrDescriptionComparer()},
+                {typeof(RFEMNodalSupport), new RFEMNodalSupportComparer()},
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
                 {typeof(Panel), new RFEMPanelComparer() }
                 
@@ -89,12 +91,12 @@ namespace BH.Adapter.RFEM6
             {
                 {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine) } },
                 {typeof(RFEMLine), new List<Type> { typeof(Node)} },
-                {typeof(Node), new List<Type> { typeof(Constraint6DOF) } },
+                //{typeof(Node), new List<Type> { typeof(RFEMNodalSupport) } },
+                {typeof(RFEMNodalSupport), new List<Type> { typeof(Node) } },
                 {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },
                 {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
                 {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
                 {typeof(ISurfaceProperty), new List<Type> { typeof(IMaterialFragment) } },
-                //{typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge), typeof(Opening) } },
                 {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge), typeof(Opening), typeof(RFEMOpening) } },
                 {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
                 {typeof(Opening), new List<Type> { typeof(Edge)} },

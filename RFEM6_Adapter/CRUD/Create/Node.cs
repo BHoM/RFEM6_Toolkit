@@ -43,18 +43,18 @@ namespace BH.Adapter.RFEM6
             {
                 rfModel.node rfNode = bhNode.ToRFEM6();
 
-                if (bhNode.Support != null)
-                {
+                //if (bhNode.Support != null)
+                //{
 
-                    //TODO: 
-                    //API Call could possibly be reduced by combining the Node and Constraing6DOF Push...Problem, RFEM6 Needs Refernces in both Directions Nodes<->Nodal Support but BHoM has only a reference in o
-                    var rfSupport = m_Model.get_nodal_support(rfNode.support);
-                    HashSet<int> collectionOFSupporNo = rfSupport.nodes.ToHashSet();
-                    collectionOFSupporNo.Add(rfNode.no);
-                    rfSupport.nodes = collectionOFSupporNo.ToArray();
-                    m_Model.set_nodal_support(rfSupport);
+                //    //TODO: 
+                //    //API Call could possibly be reduced by combining the Node and Constraing6DOF Push...Problem, RFEM6 Needs Refernces in both Directions Nodes<->Nodal Support but BHoM has only a reference in o
+                //    var rfSupport = m_Model.get_nodal_support(rfNode.support);
+                //    HashSet<int> collectionOFSupporNo = rfSupport.nodes.ToHashSet();
+                //    collectionOFSupporNo.Add(rfNode.no);
+                //    rfSupport.nodes = collectionOFSupporNo.ToArray();
+                //    m_Model.set_nodal_support(rfSupport);
 
-                }
+                //}
 
                 m_Model.set_node(rfNode);
             }
