@@ -41,8 +41,9 @@ namespace BH.Adapter.RFEM6
 
             List<Node> nodeList = new List<Node>();
 
-            var nodeNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);
-            var allRfNodes = nodeNumbers.ToList().Select(n => m_Model.get_node(n.no));
+            rfModel.object_with_children[] nodeNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);
+            nodeNumbers=nodeNumbers.ToList().Where(n => n.no != 0).ToArray();
+            IEnumerable<rfModel.node> allRfNodes =nodeNumbers.Length>1? nodeNumbers.ToList().Select(n => m_Model.get_node(n.no)): new List<rfModel.node>();
 
             Dictionary<int, RFEMNodalSupport> supports = this.GetCachedOrReadAsDictionary<int, RFEMNodalSupport>();
 

@@ -48,7 +48,7 @@ namespace BH.Adapter.RFEM6
             {
                 this.Disconnect();
             }
-           
+
         }
 
     }

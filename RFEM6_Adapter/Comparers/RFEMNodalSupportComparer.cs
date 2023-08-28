@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.Constraints;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
 
@@ -44,10 +45,29 @@ namespace BH.Adapter.RFEM6
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public bool Equals(RFEMNodalSupport surfaceProp1, RFEMNodalSupport RFEMNodalSupport)
+        public bool Equals(RFEMNodalSupport support1, RFEMNodalSupport support2)
         {
-           
-            return false;
+
+            Constraint6DOF constraint1 = support1.Constraint;
+            Constraint6DOF constraint2 = support2.Constraint;
+
+            if (!constraint1.TranslationalStiffnessX.Equals(constraint2.TranslationalStiffnessX)) return false;
+            if (!constraint1.TranslationalStiffnessY.Equals(constraint2.TranslationalStiffnessY)) return false;
+            if (!constraint1.TranslationalStiffnessZ.Equals(constraint2.TranslationalStiffnessZ)) return false;
+            if (!constraint1.TranslationX.Equals(constraint2.TranslationX)) return false;
+            if (!constraint1.TranslationY.Equals(constraint2.TranslationY)) return false;
+            if (!constraint1.TranslationZ.Equals(constraint2.TranslationZ)) return false;
+
+            if (!constraint1.RotationalStiffnessX.Equals(constraint2.RotationalStiffnessX)) return false;
+            if (!constraint1.RotationalStiffnessY.Equals(constraint2.RotationalStiffnessY)) return false;
+            if (!constraint1.RotationalStiffnessZ.Equals(constraint2.RotationalStiffnessZ)) return false;
+            if (!constraint1.RotationX.Equals(constraint2.RotationX)) return false;
+            if (!constraint1.RotationY.Equals(constraint2.RotationY)) return false;
+            if (!constraint1.RotationZ.Equals(constraint2.RotationZ)) return false;
+
+
+
+            return true;
 
         }
 

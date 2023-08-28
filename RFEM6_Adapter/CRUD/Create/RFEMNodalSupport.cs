@@ -43,6 +43,13 @@ namespace BH.Adapter.RFEM6
             foreach (RFEMNodalSupport support in supportList)
             {
                 rfModel.nodal_support rfNodelSuport = support.ToRFEM6();
+                //Adding additional Node ID to support
+                //HashSet<int> allReferecedNodes = rfNodelSuport.nodes==null? new HashSet<int>():rfNodelSuport.nodes.ToHashSet();
+                //allReferecedNodes.Union(support.nodes.ToList().Select(n=>n.GetRFEM6ID()).ToHashSet());
+                //rfNodelSuport.nodes = allReferecedNodes.ToArray();
+
+
+                //rfNodelSuport.nodes = support.nodesIDs.ToArray();
                 m_Model.set_nodal_support(rfNodelSuport);
             }
 

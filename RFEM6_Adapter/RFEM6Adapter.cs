@@ -91,8 +91,9 @@ namespace BH.Adapter.RFEM6
             {
                 {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine) } },
                 {typeof(RFEMLine), new List<Type> { typeof(Node)} },
+                //{typeof(RFEMNodalSupport), new List<Type> { typeof(Node) } },
+                {typeof(Node), new List<Type> { typeof(RFEMNodalSupport) } },
                 {typeof(Point), new List<Type> { typeof(Node) } },
-                {typeof(RFEMNodalSupport), new List<Type> { typeof(Node) } },
                 {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },
                 {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
                 {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
@@ -140,7 +141,7 @@ namespace BH.Adapter.RFEM6
         // See the wiki for more information.
 
 
-        private void Connect()
+        public void Connect()
         {
 
             string modelUrl = m_Application.get_active_model();
@@ -149,7 +150,7 @@ namespace BH.Adapter.RFEM6
             m_Model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
         }
 
-        private void Disconnect()
+        public void Disconnect()
         {
             m_Model.close_connection();
             m_Model = null;

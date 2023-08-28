@@ -30,6 +30,7 @@ using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -48,10 +49,12 @@ namespace BH.Adapter.RFEM6
                 comment = ""
             };
 
-            if (node.Support != null)
-            {
-                rfNode.support = node.Support.GetRFEM6ID();
-            }
+            //if (node.Support != null)
+            //{
+            //    //rfNode.support = node.Support.GetRFEM6ID();
+            //    rfNode.support = node.Support.FindFragment<RFEMNodalSupport>().GetRFEM6ID();
+            //    //bar.FindFragment<RFEMLine>().GetRFEM6ID()
+            //}
 
             return rfNode;
 
