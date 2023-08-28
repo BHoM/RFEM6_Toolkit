@@ -101,7 +101,12 @@ namespace BH.Adapter.RFEM6
 
                 }
 
+                if (edge.Support != null) { rfLine.Support = edge.Support; }
+
                 edge.Fragments.Add(rfLine);
+
+               
+
                 lines.Add(rfLine);
             }
 

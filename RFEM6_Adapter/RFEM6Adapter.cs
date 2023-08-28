@@ -68,6 +68,7 @@ namespace BH.Adapter.RFEM6
             //AdapterIdFragmentType = typeof(RFEMId);
             BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
             this.AdapterModules.Add(new GetRFEMNodalSupportModule());
+            this.AdapterModules.Add(new GetRFEMLineSupportModule());
             this.AdapterModules.Add(new GetLineFromBarModule());
             this.AdapterModules.Add(new GetLineFromEdgeModule());
             this.AdapterModules.Add(new GetOpeningFromOpeningModule());
@@ -90,8 +91,8 @@ namespace BH.Adapter.RFEM6
             DependencyTypes = new Dictionary<Type, List<Type>>
             {
                 {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine) } },
-                {typeof(RFEMLine), new List<Type> { typeof(Node)} },
-                //{typeof(RFEMNodalSupport), new List<Type> { typeof(Node) } },
+                //{typeof(RFEMLine), new List<Type> {typeof(Node)} },
+                {typeof(RFEMLine), new List<Type> {typeof(Node), typeof(RFEMLineSupport) } },
                 {typeof(Node), new List<Type> { typeof(RFEMNodalSupport) } },
                 {typeof(Point), new List<Type> { typeof(Node) } },
                 {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },
@@ -101,7 +102,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge), typeof(Opening), typeof(RFEMOpening) } },
                 {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
                 {typeof(Opening), new List<Type> { typeof(Edge)} },
-                {typeof(Edge), new List<Type> { typeof(RFEMLine) } },
+                {typeof(Edge), new List<Type> { typeof(RFEMLineSupport),typeof(RFEMLine) } },
                 {typeof(ILoad), new List<Type> { typeof(Loadcase) } },
                 {typeof(LoadCombination), new List<Type> { typeof(Loadcase) } }
 

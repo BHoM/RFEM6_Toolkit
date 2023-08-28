@@ -33,19 +33,12 @@ namespace BH.oM.Adapters.RFEM6
 {
     public class RFEMNodalSupport : BHoMObject, IFragment
     {
-        //[Description("Defines the start position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
-        //public virtual Node StartNode { get; set; }
-        //[Description("Defines the end position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
-        //public virtual Node EndNode { get; set; }
-
 
         public virtual Constraint6DOF Constraint { get; set; }
 
         public virtual List<Node> nodes { get; set; } = new List<Node>();
 
         public virtual List<int> nodesIDs { get; set; } = new List<int>();
-
-        //public List<Panel> Panels { get; set; } = new List<Panel>();
 
 
     }

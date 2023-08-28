@@ -25,45 +25,31 @@ using System.Linq;
 using System.Text;
 
 using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
+using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Constraints;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter
     {
 
-        private List<Node> ReadNodes(List<string> ids = null)
+        private List<RFEMLineSupport> ReadLineSupports(List<string> ids = null)
         {
 
-            List<Node> nodeList = new List<Node>();
+            List<RFEMLineSupport> constraintList = new List<RFEMLineSupport>();
 
-            rfModel.object_with_children[] nodeNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);
-            nodeNumbers=nodeNumbers.ToList().Where(n => n.no != 0).ToArray();
-            IEnumerable<rfModel.node> allRfNodes =nodeNumbers.Length>1? nodeNumbers.ToList().Select(n => m_Model.get_node(n.no)): new List<rfModel.node>();
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE_SUPPORT);
+            IEnumerable<rfModel.line_support> foundSupports = numbers.ToList().Select(n => m_Model.get_line_support(n.no));
 
-            Dictionary<int, RFEMNodalSupport> supportMap = this.GetCachedOrReadAsDictionary<int, RFEMNodalSupport>();
-
-            if (ids == null)
+            foreach (rfModel.line_support s in foundSupports)
             {
-                foreach (rfModel.node rfNode in allRfNodes)
-                {
-                    Node node = rfNode.FromRFEM();
-
-                    int supportId = rfNode.support;
-
-                    RFEMNodalSupport support;
-                    if (supportMap.TryGetValue(supportId, out support))
-                        node.Support = support.Constraint;
-
-                    nodeList.Add(node);
-                }
+                RFEMLineSupport rfConstraint = Convert.FromRFEM(s);
+                constraintList.Add(rfConstraint);
             }
 
-            return nodeList;
+            return constraintList;
         }
 
     }

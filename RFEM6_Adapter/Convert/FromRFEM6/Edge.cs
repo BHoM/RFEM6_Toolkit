@@ -38,7 +38,7 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static Edge FromRFEMEdge(this RFEMLine rfemLine)
+        public static Edge FromRFEMLineToEdge(this RFEMLine rfemLine)
         {
             Edge edge = new Edge { Curve = rfemLine.GetCurve(), Name = rfemLine.Name };
             edge.SetRFEM6ID(rfemLine.GetRFEM6ID());

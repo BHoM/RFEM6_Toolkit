@@ -120,6 +120,9 @@ namespace BH.Adapter.RFEM6
                     }
 
                     RFEMLine l = new RFEMLine { Nodes = lineNodes, LineType = (RFEMLineType)Convert.FromRFEM(rfLine.type), Radius = radius, X_Vector = x_VectorArr, Y_Vector = y_VectorArr, Angle = angle };
+
+                    if (rfLine.support != 0 && rfLine != null) { l.supportID = rfLine.support; };
+
                     // if (radius > 0) l.Radius = radius;
                     l.SetRFEM6ID(rfLine.no);
                     lineList.Add(l);

@@ -23,48 +23,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using BH.oM.Adapter;
+using System.Threading.Tasks;
+using BH.oM.Base;
+using System.ComponentModel;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.oM.Adapters.RFEM6;
-
-namespace BH.Adapter.RFEM6
+namespace BH.oM.Adapters.RFEM6
 {
-    public partial class RFEM6Adapter
+    public class RFEMLineSupport : BHoMObject, IFragment
     {
+      
+        public virtual Constraint6DOF Constraint { get; set; }
 
-        private List<Node> ReadNodes(List<string> ids = null)
-        {
+        public virtual List<Edge> edges { get; set; } = new List<Edge>();
 
-            List<Node> nodeList = new List<Node>();
-
-            rfModel.object_with_children[] nodeNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);
-            nodeNumbers=nodeNumbers.ToList().Where(n => n.no != 0).ToArray();
-            IEnumerable<rfModel.node> allRfNodes =nodeNumbers.Length>1? nodeNumbers.ToList().Select(n => m_Model.get_node(n.no)): new List<rfModel.node>();
-
-            Dictionary<int, RFEMNodalSupport> supportMap = this.GetCachedOrReadAsDictionary<int, RFEMNodalSupport>();
-
-            if (ids == null)
-            {
-                foreach (rfModel.node rfNode in allRfNodes)
-                {
-                    Node node = rfNode.FromRFEM();
-
-                    int supportId = rfNode.support;
-
-                    RFEMNodalSupport support;
-                    if (supportMap.TryGetValue(supportId, out support))
-                        node.Support = support.Constraint;
-
-                    nodeList.Add(node);
-                }
-            }
-
-            return nodeList;
-        }
+        public virtual List<int> nodesIDs { get; set; } = new List<int>();
 
     }
 }

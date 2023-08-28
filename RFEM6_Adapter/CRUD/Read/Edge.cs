@@ -30,6 +30,7 @@ using BH.oM.Structure.Constraints;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -41,11 +42,21 @@ namespace BH.Adapter.RFEM6
 
             List<Edge> edgeList = new List<Edge>();
 
-            List<RFEMLine> lines = GetCachedOrRead<RFEMLine>();
+            List<RFEMLine> rfemLineList = GetCachedOrRead<RFEMLine>();
 
-            foreach (var line in lines)
+            Dictionary<int, RFEMLineSupport> supportMap = this.GetCachedOrReadAsDictionary<int, RFEMLineSupport>();
+
+            foreach (var rfemLine in rfemLineList)
             {
-                edgeList.Add(line.FromRFEMEdge());
+
+                Edge edge = rfemLine.FromRFEMLineToEdge();
+
+                RFEMLineSupport support;
+                if (supportMap.TryGetValue(rfemLine.supportID, out support))
+                    edge.Support = support.Constraint;
+
+
+                edgeList.Add(edge);
             }
 
             return edgeList;

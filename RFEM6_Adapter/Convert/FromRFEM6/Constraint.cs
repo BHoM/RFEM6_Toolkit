@@ -62,5 +62,33 @@ namespace BH.Adapter.RFEM6
             return rfemNodalSupport;
         }
 
+
+        public static RFEMLineSupport FromRFEM(this rfModel.line_support support)
+        {
+
+            BH.oM.Structure.Constraints.Constraint6DOF constraint = new BH.oM.Structure.Constraints.Constraint6DOF();
+            constraint.TranslationX = (support.spring.x == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.TranslationY = (support.spring.y == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.TranslationZ = (support.spring.z == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.RotationX = (support.rotational_restraint.x == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.RotationY = (support.rotational_restraint.y == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.RotationZ = (support.rotational_restraint.z == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            //constraint.TranslationalStiffnessX = support.spring.x;
+            //constraint.TranslationalStiffnessY = support.spring.y;
+            //constraint.TranslationalStiffnessZ = support.spring.z;
+            //constraint.RotationalStiffnessX = support.rotational_restraint.x;
+            //constraint.RotationalStiffnessY = support.rotational_restraint.y;
+            //constraint.RotationalStiffnessZ = support.rotational_restraint.z;
+
+
+            constraint.SetRFEM6ID(support.no);
+            constraint.Name = support.name;
+
+            RFEMLineSupport rfemLineSupport = new RFEMLineSupport() { Constraint = constraint };
+            rfemLineSupport.SetRFEM6ID(support.no);
+
+            return rfemLineSupport;
+        }
+
     }
 }
