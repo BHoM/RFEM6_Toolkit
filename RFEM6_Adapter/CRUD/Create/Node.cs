@@ -42,25 +42,66 @@ namespace BH.Adapter.RFEM6
             foreach (Node bhNode in bhNodes)
             {
                 rfModel.node rfNode = bhNode.ToRFEM6();
-
-                //if (bhNode.Support != null)
-                //{
-
-                //    //TODO: 
-                //    //API Call could possibly be reduced by combining the Node and Constraing6DOF Push...Problem, RFEM6 Needs Refernces in both Directions Nodes<->Nodal Support but BHoM has only a reference in o
-                //    var rfSupport = m_Model.get_nodal_support(rfNode.support);
-                //    HashSet<int> collectionOFSupporNo = rfSupport.nodes.ToHashSet();
-                //    collectionOFSupporNo.Add(rfNode.no);
-                //    rfSupport.nodes = collectionOFSupporNo.ToArray();
-                //    m_Model.set_nodal_support(rfSupport);
-
-                //}
-
                 m_Model.set_node(rfNode);
+
+                if (bhNode.Support != null)
+                {
+                    rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
+                    List<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no)).ToList();
+                    var foundRFNodalSupport = foundSupports.Where(s => ComparerRFEMSupportAndBHoMConstraint(s,bhNode.Support)).FirstOrDefault();
+                    foundRFNodalSupport.nodes = foundRFNodalSupport.nodes.Append(rfNode.no).ToArray();
+                    m_Model.set_nodal_support(foundRFNodalSupport);
+
+                    ////TODO: 
+                    ////API Call could possibly be reduced by combining the Node and Constraing6DOF Push...Problem, RFEM6 Needs Refernces in both Directions Nodes<->Nodal Support but BHoM has only a reference in o
+                    //var rfSupport = m_Model.get_nodal_support(rfNode.support);
+                    //HashSet<int> collectionOFSupporNo = rfSupport.nodes.ToHashSet();
+                    //collectionOFSupporNo.Add(rfNode.no);
+                    //rfSupport.nodes = collectionOFSupporNo.ToArray();
+                    //m_Model.set_nodal_support(rfSupport);
+
+                }
+
             }
             return true;
         }
 
+
+        private static bool ComparerRFEMSupportAndBHoMConstraint(rfModel.nodal_support rfSupport, Constraint6DOF bhConstraint)
+        {
+
+            if (!tranlate(rfSupport.spring_x).Equals(bhConstraint.TranslationX)) { return false; }
+            if (!tranlate(rfSupport.spring_y).Equals(bhConstraint.TranslationY)) { return false; }
+            if (!tranlate(rfSupport.spring_z).Equals(bhConstraint.TranslationZ)) { return false; }
+            if (!tranlate(rfSupport.rotational_restraint_x).Equals(bhConstraint.RotationX)) { return false; }
+            if (!tranlate(rfSupport.rotational_restraint_y).Equals(bhConstraint.RotationY)) { return false; }
+            if (!tranlate(rfSupport.rotational_restraint_z).Equals(bhConstraint.RotationZ)) { return false; }
+
+
+            //if (!(rfSupport.spring_y.Equals(double.PositiveInfinity) && bhConstraint.TranslationY.Equals(DOFType.Fixed))) { return false; }
+            //if (!(rfSupport.spring_z.Equals(double.PositiveInfinity) && bhConstraint.TranslationZ.Equals(DOFType.Fixed))) { return false; }
+            //if (!(rfSupport.rotational_restraint_x.Equals(double.PositiveInfinity) && bhConstraint.RotationX.Equals(DOFType.Fixed))) { return false; }
+            //if (!(rfSupport.rotational_restraint_y.Equals(double.PositiveInfinity) && bhConstraint.RotationY.Equals(DOFType.Fixed))) { return false; }
+            //if (!(rfSupport.rotational_restraint_z.Equals(double.PositiveInfinity) && bhConstraint.RotationZ.Equals(DOFType.Fixed))) { return false; }
+
+
+            //if (rfSupport.spring.y != bhConstraint.TranslationalStiffnessY) { return false; }
+            //if (rfSupport.spring.z != bhConstraint.TranslationalStiffnessZ) { return false; }
+            //if (rfSupport.rotational_restraint.x != bhConstraint.RotationalStiffnessX) { return false; }
+            //if (rfSupport.rotational_restraint.y != bhConstraint.RotationalStiffnessY) { return false; }
+            //if (rfSupport.rotational_restraint.z != bhConstraint.RotationalStiffnessZ) { return false; }
+            //rfSupport.spring_x = double.PositiveInfinity;
+            return true;
+        }
+
+        private static DOFType tranlate(double input) {
+
+            if (input.Equals(double.PositiveInfinity)) return DOFType.Fixed;
+            else return DOFType.Free;
+
+            
+        
+        }
 
     }
 }

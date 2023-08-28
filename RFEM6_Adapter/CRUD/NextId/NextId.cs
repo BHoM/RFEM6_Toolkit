@@ -59,6 +59,7 @@ namespace BH.Adapter.RFEM6
                 }
 
                 int id = m_Model.get_first_free_number(rfType.Value, 0);
+                //id=rfType.Equals(rfModel.object_types.E_OBJECT_TYPE_NODE)?id-1:id;
                 m_FreeIds[objectType] = id;
                 return id;
             }
