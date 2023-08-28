@@ -34,7 +34,7 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private List<Constraint6DOF> ReadConstraints(List<string> ids = null)
+        private List<Constraint6DOF> ReadNodalSupports(List<string> ids = null)
         {
 
             List<Constraint6DOF> constraintList = new List<Constraint6DOF>();
@@ -51,7 +51,7 @@ namespace BH.Adapter.RFEM6
             return constraintList;
         }
 
-
+    
 
     }
 }

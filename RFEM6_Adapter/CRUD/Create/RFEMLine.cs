@@ -35,6 +35,7 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
 using System.Security.Cryptography;
 using BH.Engine.Base;
+using BH.oM.Structure.Constraints;
 
 namespace BH.Adapter.RFEM6
 {
@@ -53,6 +54,17 @@ namespace BH.Adapter.RFEM6
 
                 rfModel.line rfLine = tempDSLines.ToRFEM6();
                 //rfLine.SetPropertyValue("comment", "test string");
+                if (tempDSLines.Support!=null) {
+
+                    rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE_SUPPORT);
+                    List<rfModel.line_support> foundSupports = numbers.ToList().Select(n => m_Model.get_line_support(n.no)).ToList();
+                    var foundLineSupport = foundSupports.Where(s => ComparerRFEMSupportAndBHoMConstraint(s, tempDSLines.Support)).FirstOrDefault();
+                    foundLineSupport.lines = foundLineSupport.lines.Append(rfLine.no).ToArray();
+                    m_Model.set_line_support(foundLineSupport);
+
+
+                }
+
                 m_Model.set_line(rfLine);
                 //m_Model.get_line(2).SetPropertyValue("comment", "test string");
 
@@ -61,6 +73,22 @@ namespace BH.Adapter.RFEM6
 
             return true;
         }
+
+
+        private static bool ComparerRFEMSupportAndBHoMConstraint(rfModel.line_support rfSupport, Constraint6DOF bhConstraint) 
+        {
+
+            if (!tranlate(rfSupport.spring_x).Equals(bhConstraint.TranslationX)) { return false; }
+            if (!tranlate(rfSupport.spring_y).Equals(bhConstraint.TranslationY)) { return false; }
+            if (!tranlate(rfSupport.spring_z).Equals(bhConstraint.TranslationZ)) { return false; }
+            if (!tranlate(rfSupport.rotational_restraint_x).Equals(bhConstraint.RotationX)) { return false; }
+            if (!tranlate(rfSupport.rotational_restraint_y).Equals(bhConstraint.RotationY)) { return false; }
+            if (!tranlate(rfSupport.rotational_restraint_z).Equals(bhConstraint.RotationZ)) { return false; }
+
+            return true;
+        }
+
+  
 
     }
 }

@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Numerics;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
@@ -36,34 +37,27 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private List<Node> ReadNodes(List<string> ids = null)
+        private bool CreateCollection(IEnumerable<RFEMLineSupport> supportList)
         {
 
-            List<Node> nodeList = new List<Node>();
-
-            rfModel.object_with_children[] nodeNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE);
-            nodeNumbers=nodeNumbers.ToList().Where(n => n.no != 0).ToArray();
-            IEnumerable<rfModel.node> allRfNodes =nodeNumbers.Length>1? nodeNumbers.ToList().Select(n => m_Model.get_node(n.no)): new List<rfModel.node>();
-
-            Dictionary<int, RFEMNodalSupport> supportMap = this.GetCachedOrReadAsDictionary<int, RFEMNodalSupport>();
-
-            if (ids == null)
+            foreach (RFEMLineSupport support in supportList)
             {
-                foreach (rfModel.node rfNode in allRfNodes)
-                {
-                    Node node = rfNode.FromRFEM();
+                rfModel.line_support rfLineSuport = support.ToRFEM6();
+                //Adding additional Node ID to support
+                //HashSet<int> allReferecedNodes = rfNodelSuport.nodes==null? new HashSet<int>():rfNodelSuport.nodes.ToHashSet();
+                //allReferecedNodes.Union(support.nodes.ToList().Select(n=>n.GetRFEM6ID()).ToHashSet());
+                //rfNodelSuport.nodes = allReferecedNodes.ToArray();
 
-                    int supportId = rfNode.support;
 
-                    RFEMNodalSupport support;
-                    if (supportMap.TryGetValue(supportId, out support))
-                        node.Support = support.Constraint;
-
-                    nodeList.Add(node);
-                }
+                //rfNodelSuport.nodes = support.nodesIDs.ToArray();
+                m_Model.set_line_support(rfLineSuport);
             }
 
-            return nodeList;
+            return true;
+
+            //Has been implemented inside of Nodes.cs
+
+
         }
 
     }

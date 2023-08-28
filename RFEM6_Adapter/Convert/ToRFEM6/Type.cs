@@ -50,6 +50,10 @@ namespace BH.Adapter.RFEM6
             {
                 return rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT;
             }
+            else if (bhType == typeof(RFEMLineSupport))
+            {
+                return rfModel.object_types.E_OBJECT_TYPE_LINE_SUPPORT;
+            }
             else if (bhType == typeof(IMaterialFragment) || bhType.GetInterfaces().Contains(typeof(IMaterialFragment)))
             {
                 return rfModel.object_types.E_OBJECT_TYPE_MATERIAL;

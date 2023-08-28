@@ -50,12 +50,12 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        public static double StiffnessTranslationBHToRF(string stiffness)
-        {
+        //public static double StiffnessTranslationBHToRF(string stiffness)
+        //{
 
-            double result = stiffness == "Free" ? 0.0 : double.PositiveInfinity;
+        //    double result = stiffness == "Free" ? 0.0 : double.PositiveInfinity;
 
-            return result;
-        }
+        //    return result;
+        //}
     }
 }

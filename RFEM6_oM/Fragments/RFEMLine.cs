@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 using BH.oM.Base;
 using System.ComponentModel;
 using BH.oM.Structure.Elements;
+using BH.oM.Structure.Constraints;
 
 namespace BH.oM.Adapters.RFEM6
 {
@@ -49,5 +50,8 @@ namespace BH.oM.Adapters.RFEM6
         public virtual double[] Y_Vector { get; set; } = new double[3];
 
         public virtual double[] Normal { get; set; } = new double[3];
+
+        public virtual int supportID { get; set; } = 0;
+        public virtual Constraint6DOF Support { get; set; } = null;
     }
 }

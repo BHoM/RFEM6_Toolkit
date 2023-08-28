@@ -51,6 +51,10 @@ namespace BH.Adapter.RFEM6
             {
                 return typeof(RFEMNodalSupport);
             }
+            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_LINE_SUPPORT)
+            {
+                return typeof(RFEMLineSupport);
+            }
             else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
             {
                 return typeof(IMaterialFragment);
