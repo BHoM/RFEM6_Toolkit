@@ -38,8 +38,6 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<IMaterialFragment> materialFragments)
         {
 
-
-
             foreach (IMaterialFragment bhMaterial in materialFragments)
             {
 

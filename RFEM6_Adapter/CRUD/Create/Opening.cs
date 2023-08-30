@@ -42,12 +42,6 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<Opening> rfemOpening)
         {
 
-            //foreach (Opening bhOpening in rfemOpening)
-            //{
-
-            //    bhOpening.SetRFEM6ID(bhOpening.FindFragment<RFEMOpening>().GetRFEM6ID());
-
-            //}
 
             return true;
         }

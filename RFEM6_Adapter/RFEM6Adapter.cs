@@ -63,6 +63,7 @@ namespace BH.Adapter.RFEM6
             // The Adapter constructor can be used to configure the Adapter behaviour.
             // For example:
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
+            m_AdapterSettings.OnlyUpdateChangedObjects = false;
 
             // See the wiki, the AdapterSettings object and other Adapters to see how it can be configured.
             //AdapterIdFragmentType = typeof(RFEMId);
@@ -77,21 +78,23 @@ namespace BH.Adapter.RFEM6
             {
                 {typeof(Bar), new BarEndNodesDistanceComparer(3) },
                 {typeof(Node), new NodeDistanceComparer(3) },
+                //{typeof(Point), new NodeDistanceComparer(3) },
                 {typeof(ISectionProperty), new RFEMSectionComparer() },
                 {typeof(ISurfaceProperty), new RFEMSurfacePropertyComparer() },
                 {typeof(IMaterialFragment), new NameOrDescriptionComparer() },
                 {typeof(LinkConstraint), new NameOrDescriptionComparer() },
-                {typeof(Constraint6DOF), new NameOrDescriptionComparer()},
+                {typeof(Constraint6DOF), new Constraint6DOFComparer()},
                 {typeof(RFEMNodalSupport), new RFEMNodalSupportComparer()},
+                //{typeof(RFEMNodalSupport), new NameOrDescriptionComparer()},
+
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
                 {typeof(Panel), new RFEMPanelComparer() }
-                
+
             };
 
             DependencyTypes = new Dictionary<Type, List<Type>>
             {
                 {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine) } },
-                //{typeof(RFEMLine), new List<Type> {typeof(Node)} },
                 {typeof(RFEMLine), new List<Type> {typeof(Node), typeof(RFEMLineSupport) } },
                 {typeof(Node), new List<Type> { typeof(RFEMNodalSupport) } },
                 {typeof(Point), new List<Type> { typeof(Node) } },

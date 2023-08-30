@@ -32,18 +32,10 @@ namespace BH.oM.Adapters.RFEM6
 {
     public class RFEMOpening : BHoMObject, IFragment
     {
-        //[Description("Defines the start position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
-        //public virtual Node StartNode { get; set; }
-        //[Description("Defines the end position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
-        //public virtual Node EndNode { get; set; }
-
-
+      
         public virtual Opening Opening { get; set; }
 
         public virtual List<int> SurfaceIDs { get; set; } = new List<int>();
-
-        //public List<Panel> Panels { get; set; } = new List<Panel>();
-
 
     }
 }

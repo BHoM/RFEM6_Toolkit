@@ -42,11 +42,6 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<Bar> bhBars)
         {
 
-            //Dictionary<int, Node> nodes = this.GetCachedOrReadAsDictionary<int, Node>();
-            //Dictionary<int, ISectionProperty> sections = this.GetCachedOrReadAsDictionary<int, ISectionProperty>();
-            //int nextFreeLineId = model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_LINE, 0);
-
-
             foreach (Bar bhBar in bhBars)
             {
 
