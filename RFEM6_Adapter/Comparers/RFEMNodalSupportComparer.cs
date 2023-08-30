@@ -75,7 +75,11 @@ namespace BH.Adapter.RFEM6
 
         public int GetHashCode(RFEMNodalSupport surfaceSupport)
         {
+
+            //return surfaceSupport.GetHashCode();
+
             return 0;
+            
         }
 
 

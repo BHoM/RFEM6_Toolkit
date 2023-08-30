@@ -33,10 +33,6 @@ namespace BH.oM.Adapters.RFEM6
 {
     public class RFEMLine : BHoMObject, IFragment
     {
-        //[Description("Defines the start position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
-        //public virtual Node StartNode { get; set; }
-        //[Description("Defines the end position of the element. Note that Nodes can contain Supports which should not be confused with Releases.")]
-        //public virtual Node EndNode { get; set; }
 
         public virtual List<Node> Nodes { get; set; } = new List<Node>();
 

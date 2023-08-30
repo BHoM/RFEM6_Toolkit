@@ -46,15 +46,13 @@ namespace BH.Adapter.RFEM6
         {
 
 
-            //List<RFEMLine> bhLines = new List<RFEMLine>();
-            //bhEdges.ToList().ForEach(e => bhLines.Add(e.FindFragment<RFEMLine>()));
-
             foreach (RFEMLine tempDSLines in rfemLines)
             {
 
                 rfModel.line rfLine = tempDSLines.ToRFEM6();
-                //rfLine.SetPropertyValue("comment", "test string");
-                if (tempDSLines.Support!=null) {
+
+                if (tempDSLines.Support != null)
+                {
 
                     rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE_SUPPORT);
                     List<rfModel.line_support> foundSupports = numbers.ToList().Select(n => m_Model.get_line_support(n.no)).ToList();
@@ -66,7 +64,7 @@ namespace BH.Adapter.RFEM6
                 }
 
                 m_Model.set_line(rfLine);
-                //m_Model.get_line(2).SetPropertyValue("comment", "test string");
+
 
 
             }
@@ -75,7 +73,7 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private static bool ComparerRFEMSupportAndBHoMConstraint(rfModel.line_support rfSupport, Constraint6DOF bhConstraint) 
+        private static bool ComparerRFEMSupportAndBHoMConstraint(rfModel.line_support rfSupport, Constraint6DOF bhConstraint)
         {
 
             if (!tranlate(rfSupport.spring_x).Equals(bhConstraint.TranslationX)) { return false; }
@@ -88,7 +86,7 @@ namespace BH.Adapter.RFEM6
             return true;
         }
 
-  
+
 
     }
 }
