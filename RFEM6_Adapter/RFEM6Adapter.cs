@@ -45,6 +45,7 @@ using System.ServiceModel;
 using BH.oM.Adapters.RFEM6;
 using BH.Engine.Structure;
 using BH.Engine.Geometry;
+using BH.oM.Adapter;
 
 
 namespace BH.Adapter.RFEM6
@@ -85,8 +86,8 @@ namespace BH.Adapter.RFEM6
                 {typeof(LinkConstraint), new NameOrDescriptionComparer() },
                 {typeof(Constraint6DOF), new Constraint6DOFComparer()},
                 {typeof(RFEMNodalSupport), new RFEMNodalSupportComparer()},
-                //{typeof(RFEMNodalSupport), new NameOrDescriptionComparer()},
-
+                {typeof(Edge), new EdgeComparer()},
+                {typeof(RFEMLineSupport), new RFEMLineSupportComparer() },
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
                 {typeof(Panel), new RFEMPanelComparer() }
 
