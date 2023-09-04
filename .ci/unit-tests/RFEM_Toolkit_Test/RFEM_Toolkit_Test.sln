@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RFEM_Toolkit_Test", "RFEM_Toolkit_Test.csproj", "{736A6D49-9B29-4D88-B54A-488CFB351999}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RFEM_Toolkit_Test", "RFEM_Toolkit_Test.csproj", "{736A6D49-9B29-4D88-B54A-488CFB351999}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RFEM6_Adapter", "..\..\..\RFEM6_Adapter\RFEM6_Adapter.csproj", "{7E2D4910-58B3-4220-A14D-DD008093C7AE}"
 EndProject

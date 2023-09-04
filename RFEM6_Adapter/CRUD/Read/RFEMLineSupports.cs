@@ -49,6 +49,11 @@ namespace BH.Adapter.RFEM6
                 constraintList.Add(rfConstraint);
             }
 
+            // The serialization below can be helpful to debug the Stackoverflow Exception that occurs when setting m_AdapterSettings.OnlyUpdateChangedObjects to true.
+
+            //Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
+            //settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.All;
+            //System.IO.File.WriteAllText(@"C:\BHoMGit\RFEM6_Toolkit\RFEMNodalSupports.json", Newtonsoft.Json.JsonConvert.SerializeObject(constraintList, settings));
             return constraintList;
         }
 
