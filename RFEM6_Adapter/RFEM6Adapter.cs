@@ -64,7 +64,7 @@ namespace BH.Adapter.RFEM6
             // The Adapter constructor can be used to configure the Adapter behaviour.
             // For example:
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
-            m_AdapterSettings.OnlyUpdateChangedObjects = false;
+            m_AdapterSettings.OnlyUpdateChangedObjects = false; // Setting this to true causes a Stackoverflow in some cases from the HashComparer called from the base FullCRUD.
 
             // See the wiki, the AdapterSettings object and other Adapters to see how it can be configured.
             //AdapterIdFragmentType = typeof(RFEMId);
