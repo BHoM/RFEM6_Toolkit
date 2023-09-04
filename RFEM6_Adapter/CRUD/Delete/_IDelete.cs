@@ -21,6 +21,7 @@
  */
 
 using BH.oM.Adapter;
+using BH.oM.Structure.Elements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +58,7 @@ namespace BH.Adapter.RFEM6
 
         // There are more virtual Delete methods you might want to override and implement.
         // Check the base BHoM_Adapter solution and the wiki for more info.
-
+  
         /***************************************************/
     }
 }
