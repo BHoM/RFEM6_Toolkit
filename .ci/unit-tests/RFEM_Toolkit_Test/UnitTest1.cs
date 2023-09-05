@@ -19,6 +19,7 @@ namespace RFEM_Toolkit_Test
         [SetUp]
         public void Setup()
         {
+            adapter.Wipeout();
         }
 
         [OneTimeSetUp]
@@ -30,7 +31,7 @@ namespace RFEM_Toolkit_Test
         [Test]
         public void SequentialEdgePush()
         {
-            adapter.WipeOut();
+           
 
             Point point0 = new Point() { X = 0, Y = 0, Z = 0 };
             Point point1 = new Point() { X = 1, Y = 0, Z = 0 };
@@ -45,22 +46,40 @@ namespace RFEM_Toolkit_Test
             Node node2 = new Node() { Position = point2, Support = constraint2 };
 
             Arc arc0 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point0, Vector.XAxis, Vector.YAxis), Radius = 5, StartAngle = 0, EndAngle = 180 };
-            Arc arc1 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point1, Vector.XAxis, Vector.YAxis), Radius = 5, StartAngle = 0, EndAngle = 180 };
+            Arc arc1 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point1, Vector.XAxis, Vector.YAxis), Radius =10, StartAngle = 0, EndAngle = 180 };
 
-            Edge edge0 = new Edge() { Curve = arc0, Support = constraint0 };
-            Edge edge1 = new Edge() { Curve = arc1, Support = constraint1 };
+            Edge edge0_push = new Edge() { Curve = arc0, Support = constraint0 };
+            Edge edge1 = new Edge() { Curve = arc1, Support = constraint0 };
 
+            //First Pushs
 
-
-            adapter.Push(new List<object> { edge0 });
-
+            adapter.Push(new List<object> { edge0_push });
+            adapter.Push(new List<object> { edge1 });
 
             BH.oM.Data.Requests.FilterRequest filterRequest1 = new BH.oM.Data.Requests.FilterRequest() { Type = typeof(Edge) };
-            var edges = adapter.Pull(filterRequest1);
-            var edge = edges.First();
+            IEnumerable<Object> edges = adapter.Pull(filterRequest1);
+            Edge edge0_pull = (Edge)edges.First();
 
-            adapter.Push(new List<object> { node0 });
-            adapter.Push(new List<object> { node0 });
+
+            //Seciond Pushs
+            //adapter.Push(new List<object> { edge0_pull });
+            //adapter.Push(new List<object> { edge1 });
+
+
+            //EdgeComparer edgeComparer = new EdgeComparer();
+            //bool bo = edgeComparer.Equals(edge0_push, edge0_pull);
+            //Assert.IsTrue(edgeComparer.Equals(edge0_push, edge0_pull));
+
+
+
+            //adapter.Push(new List<object> { edge0 });
+            //adapter.Push(new List<object> { edge1 });
+
+
+
+            //Assert.IsTrue((new EdgeComparer()).Equals(edge0,edge));
+
+            //adapter.Push(new List<object> { edge });
 
             //adapter.Push(new List<object> { edge0 });
 
@@ -96,55 +115,58 @@ namespace RFEM_Toolkit_Test
         }
             
 
-        [Test]
-        [Description("This test requires to set m_AdapterSettings.OnlyUpdateChangedObjects to True." +
-            "It will throw a StackOverflow exception in the base FullCRUD when using the HashComparer.")] 
-        public void testHashString()
-        {
-            Point point0 = new Point() { X = 0, Y = 0, Z = 0 };
-            Point point1 = new Point() { X = 1, Y = 0, Z = 0 };
-            Point point2 = new Point() { X = 2, Y = 0, Z = 0 };
+        //[Test]
+        //[Description("This test requires to set m_AdapterSettings.OnlyUpdateChangedObjects to True." +
+        //    "It will throw a StackOverflow exception in the base FullCRUD when using the HashComparer.")] 
+        //public void testHashString()
+        //{
 
-            Constraint6DOF constraint0 = BH.Engine.Structure.Create.Constraint6DOF(true, true, false, false, false, false);
-            Constraint6DOF constraint1 = BH.Engine.Structure.Create.FixConstraint6DOF("");
-            Constraint6DOF constraint2 = BH.Engine.Structure.Create.PinConstraint6DOF("");
+        //    //adapter.WipeOut();
 
-            Node node0 = new Node() { Position = point0, Support = constraint0 };
-            Node node1 = new Node() { Position = point1, Support = constraint1 };
-            Node node2 = new Node() { Position = point2, Support = constraint2 };
+        //    Point point0 = new Point() { X = 0, Y = 0, Z = 0 };
+        //    Point point1 = new Point() { X = 1, Y = 0, Z = 0 };
+        //    Point point2 = new Point() { X = 2, Y = 0, Z = 0 };
 
-            Arc arc0 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point0, Vector.XAxis, Vector.YAxis), Radius = 5, StartAngle = 0, EndAngle = 180 };
-            Arc arc1 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point1, Vector.XAxis, Vector.YAxis), Radius = 5, StartAngle = 0, EndAngle = 180 };
+        //    Constraint6DOF constraint0 = BH.Engine.Structure.Create.Constraint6DOF(true, true, false, false, false, false);
+        //    Constraint6DOF constraint1 = BH.Engine.Structure.Create.FixConstraint6DOF("");
+        //    Constraint6DOF constraint2 = BH.Engine.Structure.Create.PinConstraint6DOF("");
 
-            Edge edge0 = new Edge() { Curve = arc0, Support = constraint0 };
-            Edge edge1 = new Edge() { Curve = arc1, Support = constraint1 };
+        //    Node node0 = new Node() { Position = point0, Support = constraint0 };
+        //    Node node1 = new Node() { Position = point1, Support = constraint1 };
+        //    Node node2 = new Node() { Position = point2, Support = constraint2 };
 
+        //    Arc arc0 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point0, Vector.XAxis, Vector.YAxis), Radius = 5, StartAngle = 0, EndAngle = 180 };
+        //    Arc arc1 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point1, Vector.XAxis, Vector.YAxis), Radius = 5, StartAngle = 0, EndAngle = 180 };
 
-            adapter.Push(new List<object> { edge0 });
-
-            BH.oM.Data.Requests.FilterRequest filterRequest1 = new BH.oM.Data.Requests.FilterRequest() { Type = typeof(Edge) };
-            var edges = adapter.Pull(filterRequest1);
-            var edge = edges.First();
-
-            adapter.Push(new List<object> { node0 });
-            adapter.Push(new List<object> { node0 });
-
-            //adapter.Push(new List<object> { edge0 });
+        //    Edge edge0 = new Edge() { Curve = arc0, Support = constraint0 };
+        //    Edge edge1 = new Edge() { Curve = arc1, Support = constraint1 };
 
 
-            //BH.oM.Data.Requests.FilterRequest filterRequest2 = new BH.oM.Data.Requests.FilterRequest() { Type = typeof(RFEMLine) };
-            //var rfemLines = adapter.Pull(filterRequest2);
+        //    adapter.Push(new List<object> { edge0 });
 
-            //var edgePulled = ((Edge)edges.First());
-            ////var rfemLinePulled = ((RFEMLine)rfemLines.First());
+        //    BH.oM.Data.Requests.FilterRequest filterRequest1 = new BH.oM.Data.Requests.FilterRequest() { Type = typeof(Edge) };
+        //    var edges = adapter.Pull(filterRequest1);
+        //    var edge = edges.First();
 
-            //EdgeComparer edgeComparer = new EdgeComparer();
-            //Assert.IsTrue(edgeComparer.Equals(edge0, edgePulled));
+        //    adapter.Push(new List<object> { node0 });
+        //    adapter.Push(new List<object> { node0 });
 
-            //RFEMLineComparer rfemLineComparer = new RFEMLineComparer(3);
-            //Assert.IsTrue(rfemLineComparer.Equals(rfemLinePulled, EdgeComparer.RFEMLineFromEdge(edge0)));
+        //    //adapter.Push(new List<object> { edge0 });
 
-        }
+
+        //    //BH.oM.Data.Requests.FilterRequest filterRequest2 = new BH.oM.Data.Requests.FilterRequest() { Type = typeof(RFEMLine) };
+        //    //var rfemLines = adapter.Pull(filterRequest2);
+
+        //    //var edgePulled = ((Edge)edges.First());
+        //    ////var rfemLinePulled = ((RFEMLine)rfemLines.First());
+
+        //    //EdgeComparer edgeComparer = new EdgeComparer();
+        //    //Assert.IsTrue(edgeComparer.Equals(edge0, edgePulled));
+
+        //    //RFEMLineComparer rfemLineComparer = new RFEMLineComparer(3);
+        //    //Assert.IsTrue(rfemLineComparer.Equals(rfemLinePulled, EdgeComparer.RFEMLineFromEdge(edge0)));
+
+        //}
 
 
         //[Test]

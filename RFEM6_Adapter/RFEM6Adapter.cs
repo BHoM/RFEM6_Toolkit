@@ -133,7 +133,7 @@ namespace BH.Adapter.RFEM6
         /**** Private  Fields                           ****/
         /***************************************************/
 
-        //public Dictionary<int, Line> m_Line = new Dictionary<int, Line>();
+        public HashSet<Constraint6DOF> m_LineSupport = new HashSet<Constraint6DOF>();
 
         /***************************************************/
         /**** Private Methods                           ****/

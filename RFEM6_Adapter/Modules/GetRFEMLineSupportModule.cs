@@ -39,6 +39,7 @@ namespace BH.Adapter.RFEM6
         {
             List<RFEMLineSupport> lineSupportList = new List<RFEMLineSupport>();
 
+           
             foreach (Edge edge in objects)
             {
                 if (edge.Support!=null) {

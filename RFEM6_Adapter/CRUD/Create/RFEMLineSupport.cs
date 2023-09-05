@@ -48,6 +48,8 @@ namespace BH.Adapter.RFEM6
                 //allReferecedNodes.Union(support.nodes.ToList().Select(n=>n.GetRFEM6ID()).ToHashSet());
                 //rfNodelSuport.nodes = allReferecedNodes.ToArray();
 
+                //if (support.nodesIDs.Count > 0) rfLineSuport.lines = support.nodesIDs.ToArray();
+                ////rfLineSuport.lines =support.nodesIDs.Count>0? support.nodesIDs.ToArray(): new int[] { 0} ;
 
                 //rfNodelSuport.nodes = support.nodesIDs.ToArray();
                 m_Model.set_line_support(rfLineSuport);
