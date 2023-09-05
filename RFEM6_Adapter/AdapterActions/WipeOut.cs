@@ -35,7 +35,7 @@ namespace BH.Adapter.RFEM6
     {
       
 
-        public void WipeOut()
+        public void Wipeout()
         {
             try
             {

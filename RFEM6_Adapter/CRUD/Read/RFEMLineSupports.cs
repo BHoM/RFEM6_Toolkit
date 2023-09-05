@@ -54,6 +54,7 @@ namespace BH.Adapter.RFEM6
             //Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
             //settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.All;
             //System.IO.File.WriteAllText(@"C:\BHoMGit\RFEM6_Toolkit\RFEMNodalSupports.json", Newtonsoft.Json.JsonConvert.SerializeObject(constraintList, settings));
+            
             return constraintList;
         }
 
