@@ -77,8 +77,8 @@ namespace BH.Adapter.RFEM6
                             
 
                         }
-
-                        Curve= new Polyline { ControlPoints=(lineNodes.Select(n=>n.Position)).ToList()};
+                        // Intentionally added Error
+                        //Curve= new Polyline { ControlPoints=(lineNodes.Select(n=>n.Position)).ToList()};
 
                     }
 
