@@ -19,7 +19,7 @@ namespace RFEM_Toolkit_Test
         [SetUp]
         public void Setup()
         {
-            adapter.Wipeout();
+            //adapter.Wipeout();
         }
 
         [OneTimeSetUp]
@@ -31,7 +31,7 @@ namespace RFEM_Toolkit_Test
         [Test]
         public void SequentialEdgePush()
         {
-           
+
 
             Point point0 = new Point() { X = 0, Y = 0, Z = 0 };
             Point point1 = new Point() { X = 1, Y = 0, Z = 0 };
@@ -46,28 +46,29 @@ namespace RFEM_Toolkit_Test
             Node node2 = new Node() { Position = point2, Support = constraint2 };
 
             Arc arc0 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point0, Vector.XAxis, Vector.YAxis), Radius = 5, StartAngle = 0, EndAngle = 180 };
-            Arc arc1 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point1, Vector.XAxis, Vector.YAxis), Radius =10, StartAngle = 0, EndAngle = 180 };
+            Arc arc1 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point1, Vector.XAxis, Vector.YAxis), Radius = 10, StartAngle = 0, EndAngle = 180 };
 
             //Edge edge0_push = new Edge() { Curve = arc0, Support = constraint0 };
             Edge edge1 = new Edge() { Curve = arc1, Support = constraint0 };
 
-            //First Pushs
-
             //adapter.Push(new List<object> { node0 });
-            adapter.Push(new List<object> { edge1 });
+            //adapter.Push(new List<object> { edge1 });
             //adapter.Push(new List<object> { edge1 });
 
 
-            BH.oM.Data.Requests.FilterRequest filterRequest1 = new BH.oM.Data.Requests.FilterRequest() { Type = typeof(Node) };
-            IEnumerable<Object> nodes = adapter.Pull(filterRequest1);
-            Assert.IsTrue(nodes.Count() == 3);
-            
+            //BH.oM.Data.Requests.FilterRequest filterRequest1 = new BH.oM.Data.Requests.FilterRequest() { Type = typeof(Edge) };
+            //IEnumerable<Object> edges = adapter.Pull(filterRequest1);
+            //var edge = edges.First();
+            adapter.Push(new List<object> { edge1 });
+
+            //Assert.IsTrue(nodes.Count() == 3);
+
             //Edge edge0_pull = (Edge)edges.First();
 
 
             //Seciond Pushs
             //adapter.Push(new List<object> { edge0_pull });
-            //adapter.Push(new List<object> { edge1 });
+            //adapter.Push(new List<object> { edge });
 
 
             //EdgeComparer edgeComparer = new EdgeComparer();

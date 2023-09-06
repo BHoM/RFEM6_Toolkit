@@ -46,7 +46,7 @@ namespace BH.Adapter.RFEM6
 
             Dictionary<int, RFEMLineSupport> supportMap = this.GetCachedOrReadAsDictionary<int, RFEMLineSupport>();
 
-            foreach (var rfemLine in rfemLineList)
+            foreach (RFEMLine rfemLine in rfemLineList)
             {
 
                 Edge edge = rfemLine.FromRFEMLineToEdge();

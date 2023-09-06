@@ -52,6 +52,8 @@ namespace BH.Adapter.RFEM6
             {
                 foreach (rfModel.line rfLine in allRfLInes)
                 {
+             
+                    ICurve Curve = null;
                     double radius = 0;
                     //BH.oM.Geometry.CoordinateSystem.Cartesian coordSyst = new oM.Geometry.CoordinateSystem.Cartesian();
                     double angle = 0;
@@ -72,7 +74,11 @@ namespace BH.Adapter.RFEM6
 
                             lineNodes.Add(nd);
 
+                            
+
                         }
+
+                        Curve= new Polyline { ControlPoints=(lineNodes.Select(n=>n.Position)).ToList()};
 
                     }
 
@@ -85,12 +91,16 @@ namespace BH.Adapter.RFEM6
                         Node n1;
                         nodes.TryGetValue(rfLine.definition_nodes[1], out n1);
 
+                        //Point start = Engine.Geometry.Create.Point(rfLine.arc_control_point, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
                         Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
                         Point centre = Engine.Geometry.Create.Point(rfLine.arc_center_x, rfLine.arc_center_y, rfLine.arc_center_z);
+                        Point end = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
 
 
 
-                        lineNodes = new List<Node>() { n0, new Node { Position = mid }, n1, new Node { Position = centre } };
+                        lineNodes = new List<Node>() { n0, new Node { Position = mid }, n1 };
+                        //lineNodes = new List<Node>() { n0, new Node { Position = mid }, n1, new Node { Position = centre } };
+
 
                         //coordSyst=BH.Engine.Geometry.Create.CartesianCoordinateSystem(centre,Engine.Geometry.Create.Vector(centre,mid), Engine.Geometry.Create.Vector(n0.Position, n1.Position));
 
@@ -109,6 +119,9 @@ namespace BH.Adapter.RFEM6
 
                         angle = rfLine.arc_alpha;
                         radius = rfLine.arc_radius;
+
+                        Curve = Engine.Geometry.Create.Arc(n1.Position,mid,n0.Position).Flip();    
+
                     }
 
                     else if (rfLine.type is rfModel.line_type.TYPE_CIRCLE)
@@ -119,7 +132,7 @@ namespace BH.Adapter.RFEM6
 
                     }
 
-                    RFEMLine l = new RFEMLine { Nodes = lineNodes, LineType = (RFEMLineType)Convert.FromRFEM(rfLine.type), Radius = radius, X_Vector = x_VectorArr, Y_Vector = y_VectorArr, Angle = angle };
+                    RFEMLine l = new RFEMLine {Curve=Curve,Nodes = lineNodes };
 
                     if (rfLine.support != 0 && rfLine != null) { l.supportID = rfLine.support; };
 
