@@ -26,6 +26,8 @@ using BH.oM.Structure.Elements;
 using BH.oM.Adapters.RFEM6;
 using BH.Engine.Structure;
 using System.Linq;
+using BH.oM.Geometry;
+using BH.Engine.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
@@ -62,27 +64,63 @@ namespace BH.Adapter.RFEM6
                 return false;
 
 
-            if (line1.LineType != line2.LineType)
-                return false;
+            //if (line1.LineType != line2.LineType)
+            if ((!line1.Curve.GetType().Equals(line2.Curve.GetType())))
+            {
+                if (!((line1.Curve is Polyline) && (line2.Curve is Line) || (line1.Curve is Line) && (line2.Curve is Polyline))) { return false; }
+                //return false;
+            }
 
-            if(line1.Nodes.Count != line2.Nodes.Count) 
+            if (line1.Nodes.Count != line2.Nodes.Count)
                 return false;
 
             bool equal = true;
-            for (int i = 0; i < line1.Nodes.Count; i++)
-            {
-                if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[i]))
-                { 
-                    equal = false;
-                    break;
-                }
-            }
 
-            if(equal)
+            //As Arcs needs differnt test as polylines/Poly curves the has been split into two parts
+            if ((line1.Curve is Arc))
+            {
+                Arc arc1 = line1.Curve as Arc;
+                Arc arc2 = line2.Curve as Arc;
+
+                if (Math.Abs(arc1.Radius - arc2.Radius) > 0.001)
+                    return false;
+
+                if (!arc1.Normal().Normalise().Equals(arc2.Normal().Normalise()) && !arc1.Normal().Normalise().Reverse().Equals(arc2.Normal().Normalise()))
+                    return false;
+
+
+                Point startPoint1 = Engine.Geometry.Query.StartPoint(arc1);
+                Point endPoint1 = Engine.Geometry.Query.EndPoint(arc1);
+                Point startPoint2 = Engine.Geometry.Query.StartPoint(arc2);
+                Point endPoint2 = Engine.Geometry.Query.EndPoint(arc2);
+
+                //Check for equality of start and end point of arc and flipped arc
+                if ((startPoint1.Distance(startPoint2) > 0.001 || endPoint1.Distance(endPoint2) > 0.001) && (startPoint1.Distance(endPoint2) > 0.001 || endPoint1.Distance(startPoint2) > 0.001))
+                    return false;
+            }
+            else
+            {
+
+
+
+                for (int i = 0; i < line1.Nodes.Count; i++)
+                {
+                    if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[i]))
+                    {
+                        equal = false;
+                        break;
+                    }
+                }
+
+
+            };
+
+
+            if (equal)
                 return true;
 
             equal = true;
-            int lastIndex = line2.Nodes.Count -1;
+            int lastIndex = line2.Nodes.Count - 1;
             for (int i = 0; i < line1.Nodes.Count; i++)
             {
                 if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[lastIndex - i]))

@@ -62,7 +62,10 @@ namespace BH.Adapter.RFEM6
 
             rfModel.line rfLine = new rfModel.line();
 
-            if (rfemLine.LineType is RFEMLineType.Polyline)
+
+
+            //if (rfemLine.LineType is RFEMLineType.Polyline)
+            if (rfemLine.Curve is Polyline || rfemLine.Curve is Line)
             {
 
                 rfLine = new rfModel.line()
@@ -73,13 +76,14 @@ namespace BH.Adapter.RFEM6
                 };
             }
 
-            if (rfemLine.LineType is RFEMLineType.Arc)
+            //if (rfemLine.LineType is RFEMLineType.Arc)
+
+            if (rfemLine.Curve is Arc)
             {
 
                 Node n00 = rfemLine.Nodes.ToArray()[0];
-                //Node mid = rfemLine.Nodes.ToArray()[1];
-                Point mid0 = Engine.Geometry.Query.Centre((Arc)rfemLine.Curve);
-                Point mid = Engine.Geometry.Query.PointAtLength((Arc)rfemLine.Curve,0.5);
+
+                Point mid = Engine.Geometry.Query.PointAtLength((Arc)rfemLine.Curve, 0.5);
 
                 Node n11 = rfemLine.Nodes.ToArray()[2];
 
@@ -87,7 +91,7 @@ namespace BH.Adapter.RFEM6
                 rfLine = new rfModel.line()
                 {
                     no = rfemLine.GetRFEM6ID(),
-                    definition_nodes = new int[] { n00.GetRFEM6ID(), n11.GetRFEM6ID() },
+                    definition_nodes = new int[] { n11.GetRFEM6ID(), n00.GetRFEM6ID() },
                     type = rfModel.line_type.TYPE_ARC,
                     typeSpecified = true,
                     arc_control_point = new rfModel.vector_3d() { x = mid.X, y = mid.Y, z = mid.Z },
@@ -95,7 +99,7 @@ namespace BH.Adapter.RFEM6
                     arc_control_point_objectSpecified = true,
                     arc_alpha_adjustment_target = rfModel.line_arc_alpha_adjustment_target.ALPHA_ADJUSTMENT_TARGET_BEGINNING_OF_ARC,
                     arc_alpha_adjustment_targetSpecified = true,
-                    
+
 
                 };
 
@@ -103,19 +107,24 @@ namespace BH.Adapter.RFEM6
 
             }
 
-            if (rfemLine.LineType is RFEMLineType.Circle)
+            //if (rfemLine.LineType is RFEMLineType.Circle)
+            if (rfemLine.Curve is Circle)
+
             {
 
                 Node circleNodes = rfemLine.Nodes.ToArray()[0];
+                Point Centre = (rfemLine.Curve as Circle).Centre;
+                var normal = (rfemLine.Curve as Circle).Normal;
+                double rardius = (rfemLine.Curve as Circle).Radius;
 
                 rfLine = new rfModel.line()
                 {
                     no = rfemLine.GetRFEM6ID(),
                     type = rfModel.line_type.TYPE_CIRCLE,
                     typeSpecified = true,
-                    circle_center = new rfModel.vector_3d { x = circleNodes.Position.X, y = circleNodes.Position.Y, z = circleNodes.Position.Z },
-                    circle_normal = new rfModel.vector_3d { x = rfemLine.Normal[0], y = rfemLine.Normal[1], z = rfemLine.Normal[2] },
-                    circle_radius = rfemLine.Radius,
+                    circle_center = new rfModel.vector_3d { x = Centre.X, y = Centre.Y, z = Centre.Z },
+                    circle_normal = new rfModel.vector_3d { x = normal.X, y = normal.Y, z = normal.Z },
+                    circle_radius = rardius,
                     circle_radiusSpecified = true,
 
                 };

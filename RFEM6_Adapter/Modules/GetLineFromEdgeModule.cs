@@ -53,7 +53,10 @@ namespace BH.Adapter.RFEM6
 
                 if(edge.Curve is Line line)
                 {
-                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = line.Start }, new Node { Position = line.End } }, LineType = RFEMLineType.Polyline };
+                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = line.Start }, new Node { Position = line.End } }};
+
+                    rfLine.Curve = line;
+
                 }
 
                 if (edge.Curve is Polyline polyline)
@@ -61,7 +64,10 @@ namespace BH.Adapter.RFEM6
                     List<Node> controlNodes=new List<Node>();
                     polyline.ControlPoints.ForEach(p=>controlNodes.Add(new Node {Position=p }));
                
-                    rfLine = new RFEMLine() { Nodes = controlNodes, LineType = RFEMLineType.Polyline };
+                    rfLine = new RFEMLine() { Nodes = controlNodes};
+
+
+                    rfLine.Curve = polyline;
                 }
 
                 //Add for other line types and add convert in terms of nodes accordingly
@@ -88,9 +94,11 @@ namespace BH.Adapter.RFEM6
 
                     angle = arc.Angle();
                     radius = arc.Radius();
-                    
+
                     //rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] }, new Node { Position = arc.Centre() } },Angle=angle,Radius=radius, X_Vector= x_VectorArr, Y_Vector= y_VectorArr, LineType = RFEMLineType.Arc };
-                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] } },Angle=angle,Radius=radius, X_Vector= x_VectorArr, Y_Vector= y_VectorArr, LineType = RFEMLineType.Arc };
+                    //rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] } },Angle=angle, X_Vector= x_VectorArr, Y_Vector= y_VectorArr, LineType = RFEMLineType.Arc };
+                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] } }};
+
 
                     rfLine.Curve = arc;
                     
@@ -100,8 +108,10 @@ namespace BH.Adapter.RFEM6
                 {
                     List<Node> controlePoints = new List<Node>();
                     controlePoints.Add(new Node { Position = circle1.Centre });
-                    rfLine = new RFEMLine() { Nodes = controlePoints, Radius = circle1.Radius, Normal = new double[] { circle1.Normal.X, circle1.Normal.Y, circle1.Normal.Z }, LineType = RFEMLineType.Circle };
+                    rfLine = new RFEMLine() { Nodes = controlePoints};
+                    //rfLine = new RFEMLine() { Nodes = controlePoints, Radius = circle1.Radius, Normal = new double[] { circle1.Normal.X, circle1.Normal.Y, circle1.Normal.Z }, LineType = RFEMLineType.Circle };
 
+                    rfLine.Curve = circle1;
                 }
 
                 if (edge.Support != null) { rfLine.Support = edge.Support; }

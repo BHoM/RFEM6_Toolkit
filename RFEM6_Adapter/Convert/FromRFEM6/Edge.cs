@@ -32,6 +32,7 @@ using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Geometry;
+using BH.oM.Geometry.CoordinateSystem;
 
 namespace BH.Adapter.RFEM6
 {
@@ -40,58 +41,11 @@ namespace BH.Adapter.RFEM6
 
         public static Edge FromRFEMLineToEdge(this RFEMLine rfemLine)
         {
-            Edge edge = new Edge { Curve = rfemLine.GetCurve(), Name = rfemLine.Name };
+            Edge edge = new Edge { Curve = (ICurve)rfemLine.Curve, Name = rfemLine.Name };
             edge.SetRFEM6ID(rfemLine.GetRFEM6ID());
             return edge;
         }
 
-        private static ICurve GetCurve(this RFEMLine rfemLine)
-        {
-            switch (rfemLine.LineType)
-            {
-                case RFEMLineType.Polyline:
-                    return new Polyline { ControlPoints = rfemLine.Nodes.Select(x => x.Position).ToList() };
-                case RFEMLineType.Arc:
-
-                    double angle = rfemLine.Angle;
-
-
-                    Vector xVector = new Vector() { X = rfemLine.X_Vector[0], Y = rfemLine.X_Vector[1], Z = rfemLine.X_Vector[2] };
-                    Vector yVector = new Vector() { X = rfemLine.Y_Vector[0], Y = rfemLine.Y_Vector[1], Z = rfemLine.Y_Vector[2] };
-
-                    Arc arc =rfemLine.Curve as Arc;
-                    
-
-                    //oM.Geometry.CoordinateSystem.Cartesian coordSyst = BH.Engine.Geometry.Create.CartesianCoordinateSystem(rfemLine.Nodes[3].Position, xVector, yVector);
-                    oM.Geometry.CoordinateSystem.Cartesian coordSyst = BH.Engine.Geometry.Create.CartesianCoordinateSystem(arc.Centre(), xVector, yVector);
-
-
-                    Arc arC = Engine.Geometry.Create.Arc(coordSyst, rfemLine.Radius, -angle, 0);
-
-                    Point start = arC.StartPoint();
-                    Point end = arC.EndPoint();
-
-                    if (start.Distance(rfemLine.Nodes[0].Position) > 0.0001 || end.Distance(rfemLine.Nodes[2].Position) > 0.0001)
-                    {
-
-                        if (end.Distance(rfemLine.Nodes[0].Position) > 0.0001 || start.Distance(rfemLine.Nodes[2].Position) > 0.0001)
-                        {
-                            arC = Engine.Geometry.Create.Arc(coordSyst, rfemLine.Radius, 0, angle);
-                        }
-
-                    }
-
-                    return arC;
-
-                case RFEMLineType.Circle:
-                    return Engine.Geometry.Create.Circle(rfemLine.Nodes[0].Position, rfemLine.Radius);
-
-                default:
-                    BH.Engine.Base.Compute.RecordError("Linetype not yet supported.");
-                    return null;
-            }
-
-        }
 
         public static Edge FromRFEM(this rfModel.line rfLine, Dictionary<int, Node> nodeDict)
         {
