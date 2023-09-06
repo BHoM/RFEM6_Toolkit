@@ -77,7 +77,10 @@ namespace BH.Adapter.RFEM6
             {
 
                 Node n00 = rfemLine.Nodes.ToArray()[0];
-                Node mid = rfemLine.Nodes.ToArray()[1];
+                //Node mid = rfemLine.Nodes.ToArray()[1];
+                Point mid0 = Engine.Geometry.Query.Centre((Arc)rfemLine.Curve);
+                Point mid = Engine.Geometry.Query.PointAtLength((Arc)rfemLine.Curve,0.5);
+
                 Node n11 = rfemLine.Nodes.ToArray()[2];
 
 
@@ -87,10 +90,12 @@ namespace BH.Adapter.RFEM6
                     definition_nodes = new int[] { n00.GetRFEM6ID(), n11.GetRFEM6ID() },
                     type = rfModel.line_type.TYPE_ARC,
                     typeSpecified = true,
-                    arc_control_point = new rfModel.vector_3d() { x = mid.Position.X, y = mid.Position.Y, z = mid.Position.Z },
+                    arc_control_point = new rfModel.vector_3d() { x = mid.X, y = mid.Y, z = mid.Z },
+                    //arc_control_point = new rfModel.vector_3d() { x = mid.Position.X, y = mid.Position.Y, z = mid.Position.Z },
                     arc_control_point_objectSpecified = true,
                     arc_alpha_adjustment_target = rfModel.line_arc_alpha_adjustment_target.ALPHA_ADJUSTMENT_TARGET_BEGINNING_OF_ARC,
-                    arc_alpha_adjustment_targetSpecified = true
+                    arc_alpha_adjustment_targetSpecified = true,
+                    
 
                 };
 

@@ -42,7 +42,9 @@ namespace BH.Adapter.RFEM6
             foreach (Node node in objects)
             {
                 if (node.Support!=null) {
-                    RFEMNodalSupport nodalSupport = new RFEMNodalSupport() { Constraint = node.Support, nodes = new List<Node> { node }, nodesIDs = new List<int> { node.GetRFEM6ID() } };
+                    //RFEMNodalSupport nodalSupport = new RFEMNodalSupport() { Constraint = node.Support, nodes = new List<Node> { node }, nodesIDs = new List<int> { node.GetRFEM6ID() } };
+                    RFEMNodalSupport nodalSupport = new RFEMNodalSupport() { Constraint = node.Support, nodes = new List<Node> { node }};
+
                     nodalSuportList.Add(nodalSupport);
 
                     node.Fragments.Add(nodalSupport);

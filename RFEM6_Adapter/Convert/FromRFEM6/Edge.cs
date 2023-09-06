@@ -59,7 +59,12 @@ namespace BH.Adapter.RFEM6
                     Vector xVector = new Vector() { X = rfemLine.X_Vector[0], Y = rfemLine.X_Vector[1], Z = rfemLine.X_Vector[2] };
                     Vector yVector = new Vector() { X = rfemLine.Y_Vector[0], Y = rfemLine.Y_Vector[1], Z = rfemLine.Y_Vector[2] };
 
-                    oM.Geometry.CoordinateSystem.Cartesian coordSyst = BH.Engine.Geometry.Create.CartesianCoordinateSystem(rfemLine.Nodes[3].Position, xVector, yVector);
+                    Arc arc =rfemLine.Curve as Arc;
+                    
+
+                    //oM.Geometry.CoordinateSystem.Cartesian coordSyst = BH.Engine.Geometry.Create.CartesianCoordinateSystem(rfemLine.Nodes[3].Position, xVector, yVector);
+                    oM.Geometry.CoordinateSystem.Cartesian coordSyst = BH.Engine.Geometry.Create.CartesianCoordinateSystem(arc.Centre(), xVector, yVector);
+
 
                     Arc arC = Engine.Geometry.Create.Arc(coordSyst, rfemLine.Radius, -angle, 0);
 
