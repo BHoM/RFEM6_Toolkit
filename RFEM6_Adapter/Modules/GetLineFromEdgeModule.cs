@@ -89,8 +89,11 @@ namespace BH.Adapter.RFEM6
                     angle = arc.Angle();
                     radius = arc.Radius();
                     
-                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] }, new Node { Position = arc.Centre() } },Angle=angle,Radius=radius, X_Vector= x_VectorArr, Y_Vector= y_VectorArr, LineType = RFEMLineType.Arc };
+                    //rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] }, new Node { Position = arc.Centre() } },Angle=angle,Radius=radius, X_Vector= x_VectorArr, Y_Vector= y_VectorArr, LineType = RFEMLineType.Arc };
+                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] },  new Node { Position = pts[4] } },Angle=angle,Radius=radius, X_Vector= x_VectorArr, Y_Vector= y_VectorArr, LineType = RFEMLineType.Arc };
 
+                    rfLine.Curve = arc;
+                    
                 }
 
                 else if (edge.Curve is Circle circle1)

@@ -43,7 +43,9 @@ namespace BH.Adapter.RFEM6
             foreach (Edge edge in objects)
             {
                 if (edge.Support!=null) {
-                    RFEMLineSupport lineSupport = new RFEMLineSupport() { Constraint = edge.Support, edges = new List<Edge> { edge }, nodesIDs = new List<int> { edge.GetRFEM6ID() } };
+                    //RFEMLineSupport lineSupport = new RFEMLineSupport() { Constraint = edge.Support, edges = new List<Edge> { edge }, nodesIDs = new List<int> { edge.GetRFEM6ID() } };
+                    RFEMLineSupport lineSupport = new RFEMLineSupport() { Constraint = edge.Support, edges = new List<Edge> { edge }};
+
                     lineSupportList.Add(lineSupport);
 
                     edge.Fragments.Add(lineSupport);

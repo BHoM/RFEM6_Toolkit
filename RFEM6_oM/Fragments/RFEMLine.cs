@@ -28,6 +28,7 @@ using BH.oM.Base;
 using System.ComponentModel;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
+using System.Security.Cryptography;
 
 namespace BH.oM.Adapters.RFEM6
 {
@@ -38,16 +39,23 @@ namespace BH.oM.Adapters.RFEM6
 
         public virtual RFEMLineType LineType { get; set; } = RFEMLineType.Polyline;
 
+        public virtual object Curve { get; set; } = null;
+
         public virtual double Radius { get; set; } = 0;
 
         public virtual double Angle { get; set; } = 0;
 
         public virtual double[] X_Vector { get; set; } = new double[3];
+
         public virtual double[] Y_Vector { get; set; } = new double[3];
 
         public virtual double[] Normal { get; set; } = new double[3];
 
         public virtual int supportID { get; set; } = 0;
+
         public virtual Constraint6DOF Support { get; set; } = null;
     }
+
+
+
 }
