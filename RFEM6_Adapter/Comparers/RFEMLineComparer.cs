@@ -103,7 +103,7 @@ namespace BH.Adapter.RFEM6
                 //    return false;
 
                 if (arc1.CoordinateSystem.Origin.Distance(arc2.CoordinateSystem.Origin) > 0.001) { return false; };
-                
+
 
                 List<Point> pts = new List<Point>() { Engine.Geometry.Query.StartPoint(arc1), Engine.Geometry.Query.EndPoint(arc1) };
                 List<Point> pts2 = new List<Point>() { Engine.Geometry.Query.StartPoint(arc2), Engine.Geometry.Query.EndPoint(arc2) };
@@ -116,6 +116,21 @@ namespace BH.Adapter.RFEM6
 
                 }
 
+
+            }
+            else if ((line1.Curve is Circle))
+            {
+
+
+                Circle c0 = line1.Curve as Circle;
+                Circle c1 = line2.Curve as Circle;
+
+                if (Math.Abs(c0.Radius - c1.Radius) > 0.001) { return false; }
+
+
+                if (c0.Normal.Normalise().Distance(c1.Normal.Normalise()) > 0.001) { return false; };
+
+                if (c0.Centre.Distance(c1.Centre) > 0.001) { return false; };
 
             }
             else
@@ -157,9 +172,10 @@ namespace BH.Adapter.RFEM6
         public int GetHashCode(RFEMLine line)
         {
             //Check whether the object is null
-            if (Object.ReferenceEquals(line, null)) return 0;
+            //if (Object.ReferenceEquals(line, null)) return 0;
 
-            return m_nodeComparer.GetHashCode(line.Nodes.First()) ^ m_nodeComparer.GetHashCode(line.Nodes.Last());
+            //return m_nodeComparer.GetHashCode(line.Nodes.First()) ^ m_nodeComparer.GetHashCode(line.Nodes.Last());
+            return 0;
         }
 
 
