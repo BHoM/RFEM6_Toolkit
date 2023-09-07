@@ -41,7 +41,6 @@ namespace BH.Adapter.RFEM6
 
         public static rfModel.thickness ToRFEM6(this ISurfaceProperty bhSurfaceProperty, IMaterialFragment bhMaterial)
         {
-            //Object[] nameAndType = materialTypeAndNameTranslater(bhMateraial);
 
             rfModel.thickness rfThickness = new rfModel.thickness()
             {
@@ -54,34 +53,6 @@ namespace BH.Adapter.RFEM6
                 uniform_thickness = BH.Engine.Structure.Query.ITotalThickness(bhSurfaceProperty),
                 uniform_thicknessSpecified = true,
             };
-
-            //thickness slabThickness = new thickness
-            //{
-            //    no = 1,
-            //    material = materialConcrete.no,
-            //    materialSpecified = true,
-            //    type = thickness_type.TYPE_UNIFORM,
-            //    typeSpecified = true,
-            //    uniform_thickness = 0.5,
-            //    uniform_thicknessSpecified = true,
-            //};
-
-
-
-            //// opening
-            //node openingNodeOne = new node()
-            //{
-            //    no = nodeID,
-            //    coordinates = new vector_3d()
-            //    {
-            //        x = firstNode.FirstOrDefault().coordinate_1 + 1.0,
-            //        y = firstNode.FirstOrDefault().coordinate_1 + 1.0,
-            //        z = -hc,
-            //    },
-            //    comment = "opening node",
-
-            //};
-
 
 
             return rfThickness;

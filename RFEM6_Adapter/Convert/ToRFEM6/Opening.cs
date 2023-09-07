@@ -49,8 +49,7 @@ namespace BH.Adapter.RFEM6
             {
                 no = bhOpening.GetRFEM6ID(),
                 boundary_lines = bhOpening.Edges.Select(b => b.GetRFEM6ID()).ToArray(),
-                //boundary_lines = new int[] { openingLine.no },
-                //surfaces = new int[] { 1},
+
             };
 
             return rfSurface;

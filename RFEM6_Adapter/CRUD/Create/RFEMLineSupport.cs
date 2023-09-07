@@ -43,22 +43,11 @@ namespace BH.Adapter.RFEM6
             foreach (RFEMLineSupport support in supportList)
             {
                 rfModel.line_support rfLineSuport = support.ToRFEM6();
-                //Adding additional Node ID to support
-                //HashSet<int> allReferecedNodes = rfNodelSuport.nodes==null? new HashSet<int>():rfNodelSuport.nodes.ToHashSet();
-                //allReferecedNodes.Union(support.nodes.ToList().Select(n=>n.GetRFEM6ID()).ToHashSet());
-                //rfNodelSuport.nodes = allReferecedNodes.ToArray();
 
-                //if (support.nodesIDs.Count > 0) rfLineSuport.lines = support.nodesIDs.ToArray();
-                ////rfLineSuport.lines =support.nodesIDs.Count>0? support.nodesIDs.ToArray(): new int[] { 0} ;
-
-                //rfNodelSuport.nodes = support.nodesIDs.ToArray();
                 m_Model.set_line_support(rfLineSuport);
             }
 
             return true;
-
-            //Has been implemented inside of Nodes.cs
-
 
         }
 

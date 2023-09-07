@@ -63,8 +63,6 @@ namespace BH.Adapter.RFEM6
             rfModel.line rfLine = new rfModel.line();
 
 
-
-            //if (rfemLine.LineType is RFEMLineType.Polyline)
             if (rfemLine.Curve is Polyline || rfemLine.Curve is Line)
             {
 
@@ -76,7 +74,6 @@ namespace BH.Adapter.RFEM6
                 };
             }
 
-            //if (rfemLine.LineType is RFEMLineType.Arc)
 
             if (rfemLine.Curve is Arc)
             {
@@ -95,7 +92,6 @@ namespace BH.Adapter.RFEM6
                     type = rfModel.line_type.TYPE_ARC,
                     typeSpecified = true,
                     arc_control_point = new rfModel.vector_3d() { x = mid.X, y = mid.Y, z = mid.Z },
-                    //arc_control_point = new rfModel.vector_3d() { x = mid.Position.X, y = mid.Position.Y, z = mid.Position.Z },
                     arc_control_point_objectSpecified = true,
                     arc_alpha_adjustment_target = rfModel.line_arc_alpha_adjustment_target.ALPHA_ADJUSTMENT_TARGET_BEGINNING_OF_ARC,
                     arc_alpha_adjustment_targetSpecified = true,
@@ -107,13 +103,10 @@ namespace BH.Adapter.RFEM6
 
             }
 
-            //if (rfemLine.LineType is RFEMLineType.Circle)
             if (rfemLine.Curve is Circle c)
 
             {
                  
-
-
                 Point Centre = c.Centre;
 
                 var normal = (rfemLine.Curve as Circle).Normal;

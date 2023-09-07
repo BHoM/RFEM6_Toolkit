@@ -36,13 +36,12 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static rfModel.nodal_support ToRFEM6(this RFEMNodalSupport bhNodalSupport)//, int constraintSupportNo)
+        public static rfModel.nodal_support ToRFEM6(this RFEMNodalSupport bhNodalSupport)
         {
             rfModel.nodal_support rfNodelSupport = new rfModel.nodal_support()
             {
                 no = bhNodalSupport.GetRFEM6ID(),
                 name = bhNodalSupport.Constraint.Name,
-                // nodes = new int[] { constraintSupportNo },
                 spring = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.TranslationX), y = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.TranslationY), z = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.TranslationZ) },
                 rotational_restraint = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.RotationX), y = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.RotationY), z = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.RotationZ) },
             };
@@ -50,12 +49,5 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        //public static double StiffnessTranslationBHToRF(string stiffness)
-        //{
-
-        //    double result = stiffness == "Free" ? 0.0 : double.PositiveInfinity;
-
-        //    return result;
-        //}
     }
 }

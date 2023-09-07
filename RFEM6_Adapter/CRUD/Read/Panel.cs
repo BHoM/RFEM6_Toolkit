@@ -72,7 +72,6 @@ namespace BH.Adapter.RFEM6
                             openingIds.Add(entry.Value.Opening.GetRFEM6ID());
                         }
 
-                        //if (entry.Value.SurfaceIDs.ToHashSet().Contains(s)) { openingIds.Add(entry.Key); }
 
                     }
 

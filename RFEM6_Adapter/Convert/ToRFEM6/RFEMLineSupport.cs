@@ -36,7 +36,7 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static rfModel.line_support ToRFEM6(this RFEMLineSupport bhLineSupport)//, int constraintSupportNo)
+        public static rfModel.line_support ToRFEM6(this RFEMLineSupport bhLineSupport)
         {
             rfModel.line_support rfNodelSupport = new rfModel.line_support()
             {
