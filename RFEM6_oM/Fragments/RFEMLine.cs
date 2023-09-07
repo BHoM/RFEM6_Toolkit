@@ -39,8 +39,6 @@ namespace BH.oM.Adapters.RFEM6
 
         public virtual object Curve { get; set; } = null;
 
-        //public virtual double Angle { get; set; } = 0;
-
         public virtual int supportID { get; set; } = 0;
 
         public virtual Constraint6DOF Support { get; set; } = null;

@@ -53,12 +53,6 @@ namespace BH.Adapter.RFEM6
                 {
 
                     RFEMOpening rfOpening = new RFEMOpening() { Opening = opening};
-                    //RFEMOpening rfOpening = new RFEMOpening() { Opening = opening, SurfaceIDs = new List<int>() { panel.GetRFEM6ID() } };
-
-                    //RFEMOpening rfOpening = new RFEMOpening() {Opening=opening, SurfaceIDs=new List<int>() { panel.GetRFEM6ID() },Panels=new List<Panel> {panel } };
-                    //RFEMOpening rfOpening = new RFEMOpening() {Opening=opening,Panels=new List<Panel> {panel } };
-
-
                     rfOpnings.Add(rfOpening);
                     opening.AddFragment(rfOpening);
                 }

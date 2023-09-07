@@ -40,7 +40,6 @@ namespace BH.Adapter.RFEM6
             List<RFEMLine> lines = new List<RFEMLine>();
             foreach (Bar bar in objects)
             {
-                //RFEMLine rfLine = new RFEMLine() { StartNode = bar.StartNode, EndNode = bar.EndNode };
                 RFEMLine rfLine = new RFEMLine() { Nodes = new List<Node> { bar.StartNode, bar.EndNode } };
                 bar.Fragments.Add(rfLine);
                 lines.Add(rfLine);

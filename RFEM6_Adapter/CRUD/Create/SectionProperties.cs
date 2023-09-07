@@ -36,8 +36,6 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        //Has been implemented inside of Nodes.cs
-
         private bool CreateCollection(IEnumerable<ISectionProperty> sectionProperties)
         {
 

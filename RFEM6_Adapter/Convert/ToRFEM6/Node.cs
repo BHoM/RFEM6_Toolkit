@@ -49,13 +49,6 @@ namespace BH.Adapter.RFEM6
                 comment = ""
             };
 
-            //if (node.Support != null)
-            //{
-            //    //rfNode.support = node.Support.GetRFEM6ID();
-            //    rfNode.support = node.Support.FindFragment<RFEMNodalSupport>().GetRFEM6ID();
-            //    //bar.FindFragment<RFEMLine>().GetRFEM6ID()
-            //}
-
             return rfNode;
 
         }
