@@ -111,6 +111,7 @@ namespace BH.Adapter.RFEM6
             if (rfemLine.Curve is Circle c)
 
             {
+                 
 
 
                 Point Centre = c.Centre;
