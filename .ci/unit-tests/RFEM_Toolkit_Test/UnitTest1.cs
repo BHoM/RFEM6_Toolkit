@@ -33,23 +33,23 @@ namespace RFEM_Toolkit_Test
         {
 
 
-            Point point0 = new Point() { X = 0, Y = 0, Z = 0 };
-            Point point1 = new Point() { X = 1, Y = 0, Z = 0 };
-            Point point2 = new Point() { X = 2, Y = 0, Z = 0 };
+            //Point point0 = new Point() { X = 0, Y = 0, Z = 0 };
+            //Point point1 = new Point() { X = 1, Y = 0, Z = 0 };
+            //Point point2 = new Point() { X = 2, Y = 0, Z = 0 };
 
-            Constraint6DOF constraint0 = BH.Engine.Structure.Create.Constraint6DOF(true, true, false, false, false, false);
-            Constraint6DOF constraint1 = BH.Engine.Structure.Create.FixConstraint6DOF("");
-            Constraint6DOF constraint2 = BH.Engine.Structure.Create.PinConstraint6DOF("");
+            //Constraint6DOF constraint0 = BH.Engine.Structure.Create.Constraint6DOF(true, true, false, false, false, false);
+            //Constraint6DOF constraint1 = BH.Engine.Structure.Create.FixConstraint6DOF("");
+            //Constraint6DOF constraint2 = BH.Engine.Structure.Create.PinConstraint6DOF("");
 
-            Node node0 = new Node() { Position = point0, Support = constraint0 };
-            Node node1 = new Node() { Position = point1, Support = constraint1 };
-            Node node2 = new Node() { Position = point2, Support = constraint2 };
+            //Node node0 = new Node() { Position = point0, Support = constraint0 };
+            //Node node1 = new Node() { Position = point1, Support = constraint1 };
+            //Node node2 = new Node() { Position = point2, Support = constraint2 };
 
-            Arc arc0 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point0, Vector.XAxis, Vector.YAxis), Radius = 5, StartAngle = 0, EndAngle = 180 };
-            Arc arc1 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point1, Vector.XAxis, Vector.YAxis), Radius = 10, StartAngle = 0, EndAngle = 180 };
+            //Arc arc0 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point0, Vector.XAxis, Vector.YAxis), Radius = 5, StartAngle = 0, EndAngle = 180 };
+            //Arc arc1 = new Arc() { CoordinateSystem = BH.Engine.Geometry.Create.CartesianCoordinateSystem(point1, Vector.XAxis, Vector.YAxis), Radius = 10, StartAngle = 0, EndAngle = 180 };
 
             //Edge edge0_push = new Edge() { Curve = arc0, Support = constraint0 };
-            Edge edge1 = new Edge() { Curve = arc1, Support = constraint0 };
+            //Edge edge1 = new Edge() { Curve = arc1, Support = constraint0 };
 
             //adapter.Push(new List<object> { node0 });
             //adapter.Push(new List<object> { edge1 });
@@ -59,7 +59,7 @@ namespace RFEM_Toolkit_Test
             //BH.oM.Data.Requests.FilterRequest filterRequest1 = new BH.oM.Data.Requests.FilterRequest() { Type = typeof(Edge) };
             //IEnumerable<Object> edges = adapter.Pull(filterRequest1);
             //var edge = edges.First();
-            adapter.Push(new List<object> { edge1 });
+            //adapter.Push(new List<object> { edge1 });
 
             //Assert.IsTrue(nodes.Count() == 3);
 
@@ -100,6 +100,33 @@ namespace RFEM_Toolkit_Test
 
             //RFEMLineComparer rfemLineComparer = new RFEMLineComparer(3);
             //Assert.IsTrue(rfemLineComparer.Equals(rfemLinePulled, EdgeComparer.RFEMLineFromEdge(edge0)));
+
+
+            Point point0 = new Point() { X = -8, Y = -1, Z = 1 };
+            Point point1 = new Point() { X = -2, Y = -1, Z = -1 };
+            Point point2 = new Point() { X = -1, Y = 9, Z = 1 };
+
+            BH.oM.Geometry.CoordinateSystem.Cartesian coordSys0 = BH.Engine.Geometry.Create.CartesianCoordinateSystem(new Point() { X = 0, Y = 0, Z = 0 }, Vector.XAxis, Vector.YAxis);
+            BH.oM.Geometry.CoordinateSystem.Cartesian coordSys1 = BH.Engine.Geometry.Create.CartesianCoordinateSystem(new Point() { X = -4.642993, Y = 4.100095, Z = 6.07102 }, new Vector() { X = -0.549771, Y = -0.835234, Z = -0.011631 }, new Vector() { X = 0.776159, Y = -0.505641, Z = -0.376702 });
+
+
+
+            Arc arc0 = new Arc() { CoordinateSystem = coordSys0, Radius = 3.3, StartAngle = -0.069813, EndAngle = Math.PI };
+            Arc arc1 = BH.Engine.Geometry.Create.Arc(point0, point1, point2);
+            Arc arc2 = new Arc() { CoordinateSystem = coordSys1, Radius = 6.106186, StartAngle = 0, EndAngle = 3.079862 };
+
+            Constraint6DOF constraint0 = BH.Engine.Structure.Create.FixConstraint6DOF("");
+            Constraint6DOF constraint1 = BH.Engine.Structure.Create.PinConstraint6DOF("");
+            Constraint6DOF constraint2 = BH.Engine.Structure.Create.Constraint6DOF(true, true, false, false, false, false);
+
+
+            Edge edge0 = new Edge() { Curve = arc0, Support = constraint0 };
+            Edge edge1 = new Edge() { Curve = arc1, Support = constraint1 };
+            Edge edge2 = new Edge() { Curve = arc2, Support = constraint2 };
+
+
+            adapter.Push(new List<object> { edge1, edge2 ,edge0});
+
 
         }
 
