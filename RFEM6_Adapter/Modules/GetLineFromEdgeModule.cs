@@ -108,10 +108,12 @@ namespace BH.Adapter.RFEM6
                 {
                     List<Node> controlePoints = new List<Node>();
                     controlePoints.Add(new Node { Position = circle1.Centre });
-                    rfLine = new RFEMLine() { Nodes = controlePoints};
+                    rfLine = new RFEMLine() { Curve=circle1};
+                    //rfLine = new RFEMLine() { Nodes = controlePoints};
+
                     //rfLine = new RFEMLine() { Nodes = controlePoints, Radius = circle1.Radius, Normal = new double[] { circle1.Normal.X, circle1.Normal.Y, circle1.Normal.Z }, LineType = RFEMLineType.Circle };
 
-                    rfLine.Curve = circle1;
+                    //rfLine.Curve = circle1;
                 }
 
                 if (edge.Support != null) { rfLine.Support = edge.Support; }

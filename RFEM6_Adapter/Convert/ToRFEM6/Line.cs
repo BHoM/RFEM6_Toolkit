@@ -108,12 +108,13 @@ namespace BH.Adapter.RFEM6
             }
 
             //if (rfemLine.LineType is RFEMLineType.Circle)
-            if (rfemLine.Curve is Circle)
+            if (rfemLine.Curve is Circle c)
 
             {
 
-                Node circleNodes = rfemLine.Nodes.ToArray()[0];
-                Point Centre = (rfemLine.Curve as Circle).Centre;
+
+                Point Centre = c.Centre;
+
                 var normal = (rfemLine.Curve as Circle).Normal;
                 double rardius = (rfemLine.Curve as Circle).Radius;
 
