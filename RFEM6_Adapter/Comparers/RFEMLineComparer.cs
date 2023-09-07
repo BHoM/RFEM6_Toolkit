@@ -28,6 +28,7 @@ using BH.Engine.Structure;
 using System.Linq;
 using BH.oM.Geometry;
 using BH.Engine.Geometry;
+using System.ComponentModel;
 
 namespace BH.Adapter.RFEM6
 {
@@ -84,9 +85,11 @@ namespace BH.Adapter.RFEM6
 
                 if (Math.Abs(arc1.Radius - arc2.Radius) > 0.001)
                     return false;
-
-                if (!arc1.Normal().Normalise().Equals(arc2.Normal().Normalise()) && !arc1.Normal().Normalise().Reverse().Equals(arc2.Normal().Normalise()))
+                //Check for equality of normal
+                if (!(((arc1.Normal().Normalise().Distance(arc2.Normal().Normalise()) < 0.001)) || ((arc2.Normal().Normalise().Reverse().Distance(arc1.Normal().Normalise()) < 0.001))))
                     return false;
+
+
 
 
                 Point startPoint1 = Engine.Geometry.Query.StartPoint(arc1);
@@ -94,9 +97,26 @@ namespace BH.Adapter.RFEM6
                 Point startPoint2 = Engine.Geometry.Query.StartPoint(arc2);
                 Point endPoint2 = Engine.Geometry.Query.EndPoint(arc2);
 
-                //Check for equality of start and end point of arc and flipped arc
-                if ((startPoint1.Distance(startPoint2) > 0.001 || endPoint1.Distance(endPoint2) > 0.001) && (startPoint1.Distance(endPoint2) > 0.001 || endPoint1.Distance(startPoint2) > 0.001))
-                    return false;
+                ////Check for equality of start and end point of arc and flipped arc
+                ////if ((startPoint1.Distance(startPoint2) > 0.001 || endPoint1.Distance(endPoint2) > 0.001) && (startPoint1.Distance(endPoint2) > 0.001 || endPoint1.Distance(startPoint2) > 0.001))
+                //if (((startPoint1.Distance(startPoint2) > 0.001 && endPoint1.Distance(endPoint2) > 0.001)) || (endPoint1.Distance(startPoint2) > 0.001) && (startPoint1.Distance(endPoint2) > 0.001))
+                //    return false;
+
+                if (arc1.CoordinateSystem.Origin.Distance(arc2.CoordinateSystem.Origin) > 0.001) { return false; };
+                
+
+                List<Point> pts = new List<Point>() { Engine.Geometry.Query.StartPoint(arc1), Engine.Geometry.Query.EndPoint(arc1) };
+                List<Point> pts2 = new List<Point>() { Engine.Geometry.Query.StartPoint(arc2), Engine.Geometry.Query.EndPoint(arc2) };
+                for (int i = 0; i < pts.Count; i++)
+                {
+
+
+                    if (!(pts[i].Distance(pts2[i]) > 0.001) && (pts[1 - i].Distance(pts2[i]) > 0.001)) { return false; };
+                    //if (pts[1-i].Distance(pts2[i]) > 0.001) { return false; };
+
+                }
+
+
             }
             else
             {
