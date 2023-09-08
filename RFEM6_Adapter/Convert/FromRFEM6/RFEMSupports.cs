@@ -30,6 +30,7 @@ using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -89,6 +90,37 @@ namespace BH.Adapter.RFEM6
 
             return rfemLineSupport;
         }
+
+
+        public static RFEMHinge FromRFEM(this rfModel.member_hinge hinge)
+        {
+
+
+
+            BH.oM.Structure.Constraints.Constraint6DOF constraint = new BH.oM.Structure.Constraints.Constraint6DOF();
+            constraint.TranslationX = (hinge.axial_release_n == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.TranslationY = (hinge.axial_release_vy == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.TranslationZ = (hinge.axial_release_vz == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.RotationX = (hinge.moment_release_mt == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.RotationY = (hinge.moment_release_my == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.RotationZ = (hinge.moment_release_mz == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            //constraint.TranslationalStiffnessX = support.spring.x;
+            //constraint.TranslationalStiffnessY = support.spring.y;
+            //constraint.TranslationalStiffnessZ = support.spring.z;
+            //constraint.RotationalStiffnessX = support.rotational_restraint.x;
+            //constraint.RotationalStiffnessY = support.rotational_restraint.y;
+            //constraint.RotationalStiffnessZ = support.rotational_restraint.z;
+            
+
+            //constraint.SetRFEM6ID(hinge.no);
+            //constraint.Name = hinge.name;
+
+            RFEMHinge rfemLineSupport = new RFEMHinge() {Constraint=constraint};
+            rfemLineSupport.SetRFEM6ID(hinge.no);
+
+            return rfemLineSupport;
+        }
+
 
     }
 }

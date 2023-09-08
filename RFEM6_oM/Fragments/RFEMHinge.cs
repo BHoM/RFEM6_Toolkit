@@ -23,27 +23,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using BH.oM.Adapter;
+using System.Threading.Tasks;
+using BH.oM.Base;
+using System.ComponentModel;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.SectionProperties;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
-using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.Constraints;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
-
-namespace BH.Adapter.RFEM6
+namespace BH.oM.Adapters.RFEM6
 {
-    public static partial class Convert
+    public class RFEMHinge : BHoMObject, IFragment
     {
-        public static Bar FromRFEM(this rfModel.member member, Node node0, Node node1, ISectionProperty section)
-        {
+      
+        public virtual Constraint6DOF Constraint { get; set; }
 
+        //public virtual List<int> SurfaceIDs { get; set; } = new List<int>();
 
-            Bar bar = new Bar { StartNode = node0, EndNode = node1, SectionProperty = section, Name = "member nr." + member.no };
-            bar.SetRFEM6ID(member.no);
-            return bar;
-        }
     }
 }

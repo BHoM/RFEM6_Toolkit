@@ -25,25 +25,37 @@ using System.Linq;
 using System.Text;
 
 using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.oM.Structure.SectionProperties;
-using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
-using BH.oM.Structure.MaterialFragments;
-
+using BH.oM.Structure.Constraints;
+using Newtonsoft.Json;
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter
     {
-        public static Bar FromRFEM(this rfModel.member member, Node node0, Node node1, ISectionProperty section)
+
+        private List<RFEMHinge> ReadRFEMHinges(List<string> ids = null)
         {
 
+            List<RFEMHinge> constraintList = new List<RFEMHinge>();
 
-            Bar bar = new Bar { StartNode = node0, EndNode = node1, SectionProperty = section, Name = "member nr." + member.no };
-            bar.SetRFEM6ID(member.no);
-            return bar;
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER_HINGE);
+            IEnumerable<rfModel.member_hinge> roundHinges = numbers.ToList().Select(n => m_Model.get_member_hinge(n.no));
+
+            foreach (rfModel.member_hinge s in roundHinges)
+            {
+                RFEMHinge hinge = Convert.FromRFEM(s);
+                constraintList.Add(hinge);
+            }
+
+  
+            
+
+            return constraintList;
         }
+
+
+
     }
 }
