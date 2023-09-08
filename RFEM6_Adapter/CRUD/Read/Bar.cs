@@ -55,6 +55,8 @@ namespace BH.Adapter.RFEM6
             Dictionary<int, Node> nodes = this.GetCachedOrReadAsDictionary<int, Node>();
             Dictionary<int, RFEMLine> lines = this.GetCachedOrReadAsDictionary<int, RFEMLine>();
             Dictionary<int, ISectionProperty> sections = this.GetCachedOrReadAsDictionary<int, ISectionProperty>();
+            Dictionary<int, RFEMHinge> hinges = this.GetCachedOrReadAsDictionary<int, RFEMHinge>();
+
 
             foreach (var rfMember in allRfMembers)
             {
@@ -67,6 +69,12 @@ namespace BH.Adapter.RFEM6
 
                 ISectionProperty section = null;
                 sections.TryGetValue(rfMember.section_end, out section);
+
+                RFEMHinge hingeStart = null;
+                RFEMHinge hingeEnd = null;
+                hinges.TryGetValue(rfMember.member_hinge_start, out hingeStart);
+                hinges.TryGetValue(rfMember.member_hinge_end, out hingeStart);
+
 
                 Bar bhBar = rfMember.FromRFEM(node0,node1,section);
 

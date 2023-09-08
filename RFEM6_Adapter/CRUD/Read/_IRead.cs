@@ -70,6 +70,8 @@ namespace BH.Adapter.RFEM6
                     return ReadRFEMNodalSupports(ids as dynamic);
                 else if (type == typeof(RFEMLineSupport))
                     return ReadLineSupports(ids as dynamic);
+                else if (type == typeof(RFEMHinge))
+                    return ReadRFEMHinges(ids as dynamic);
                 else if (type == typeof(ISectionProperty) || type.GetInterfaces().Contains(typeof(ISectionProperty)))
                     return ReadSectionProperties(ids as dynamic);
                 else if (type == typeof(IMaterialFragment) || type.GetInterfaces().Contains(typeof(IMaterialFragment)))
