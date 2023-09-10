@@ -70,16 +70,18 @@ namespace BH.Adapter.RFEM6
             //AdapterIdFragmentType = typeof(RFEMId);
             BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
             this.AdapterModules.Add(new GetRFEMNodalSupportModule());
+            this.AdapterModules.Add(new GetRFEMHingeModule());
             this.AdapterModules.Add(new GetRFEMLineSupportModule());
             this.AdapterModules.Add(new GetLineFromBarModule());
             this.AdapterModules.Add(new GetLineFromEdgeModule());
             this.AdapterModules.Add(new GetOpeningFromOpeningModule());
 
+
             AdapterComparers = new Dictionary<Type, object>
             {
                 {typeof(Bar), new BarEndNodesDistanceComparer(3) },
                 {typeof(Node), new NodeDistanceComparer(3) },
-                //{typeof(Point), new NodeDistanceComparer(3) },
+                {typeof(RFEMHinge), new RFEMHingeComparer() },
                 {typeof(ISectionProperty), new RFEMSectionComparer() },
                 {typeof(ISurfaceProperty), new RFEMSurfacePropertyComparer() },
                 {typeof(IMaterialFragment), new NameOrDescriptionComparer() },
@@ -95,7 +97,7 @@ namespace BH.Adapter.RFEM6
 
             DependencyTypes = new Dictionary<Type, List<Type>>
             {
-                {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine) } },
+                {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine),typeof(RFEMHinge)} },
                 {typeof(RFEMLine), new List<Type> {typeof(Node), typeof(RFEMLineSupport) } },
                 {typeof(Node), new List<Type> { typeof(RFEMNodalSupport) } },
                 {typeof(Point), new List<Type> { typeof(Node) } },
@@ -107,8 +109,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
                 {typeof(Opening), new List<Type> { typeof(Edge)} },
                 {typeof(Edge), new List<Type> { typeof(RFEMLineSupport),typeof(RFEMLine) } },
-                {typeof(ILoad), new List<Type> { typeof(Loadcase) } },
-                {typeof(LoadCombination), new List<Type> { typeof(Loadcase) } }
+
 
             };
 

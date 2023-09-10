@@ -31,6 +31,7 @@ using BH.oM.Structure.SectionProperties;
 using BH.oM.Spatial.ShapeProfiles;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -45,37 +46,58 @@ namespace BH.Adapter.RFEM6
             var sectionNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
             var allSections = sectionNumbers.ToList().Select(n => m_Model.get_section(n.no));
 
-            //  List<rfModel.section>  allSections = new List<rfModel.section>();
-
-            //foreach (var n in sectionNumbers)
-            //{
-
-            //    allSections.Add(model.get_section(n.no));
-
-            //}
             Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
+            IMaterialFragment material;
 
             foreach (var section in allSections)
             {
 
-
-
-                IMaterialFragment material;
-                if (!materials.TryGetValue(section.material, out material))
-                {
-                    material = m_Model.get_material(section.material).FromRFEM();
-                    materials[section.material] = material;
-                }
-
-                if (material != null)
+                //String sectionName = (new string(section.name.Where(c => !char.IsWhiteSpace(c)).ToArray())).Split()[0];
+                String sectionName = new String((section.name.Where(c => !char.IsWhiteSpace(c)).ToArray())).Split()[0];
+                sectionName=sectionName.Split('|')[0];
+                ISectionProperty bhSetion;
+                //Standard steel sections
+                if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_STEEL))
                 {
 
-                    ISectionProperty bhSection = section.FromRFEM(material);
 
-                    sectionList.Add(bhSection);
+                    bhSetion = BH.Engine.Library.Query.Match("EU_SteelSections", sectionName, true, true).DeepClone() as SteelSection;
+                    bhSetion.SetRFEM6ID(section.no);
+                    sectionList.Add(bhSetion);
+
+
+                }
+                //Concrete Section Parametric Massive I
+                else if (section.type.Equals(rfModel.section_type.TYPE_PARAMETRIC_MASSIVE_I))
+                {
+
+                    if (!materials.TryGetValue(section.material, out material))
+                    {
+                        material = m_Model.get_material(section.material).FromRFEM();
+                        materials[section.material] = material;
+                    }
+
+
+                    if (material != null)
+                    {
+
+                        bhSetion = section.FromRFEM(material);
+                        bhSetion.SetRFEM6ID(section.no);
+                        sectionList.Add(bhSetion);
+
+                    }
+
+                }
+                else { 
+                
+
 
                 }
 
+
+                
+                //IMaterialFragment material;
+                
             }
 
             return sectionList;

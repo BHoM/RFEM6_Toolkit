@@ -29,13 +29,13 @@ using BH.oM.Structure.SurfaceProperties;
 
 namespace BH.Adapter.RFEM6
 {
-    public class RFEMHingeComparer : IEqualityComparer<RFEMHinge>
+    public class RFEMLineSupportComparer : IEqualityComparer<RFEMLineSupport>
     {
         /***************************************************/
         /**** Constructors                              ****/
         /***************************************************/
 
-        public RFEMHingeComparer()
+        public RFEMLineSupportComparer()
         {
 
         }
@@ -45,7 +45,7 @@ namespace BH.Adapter.RFEM6
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public bool Equals(RFEMHinge support1, RFEMHinge support2)
+        public bool Equals(RFEMLineSupport support1, RFEMLineSupport support2)
         {
 
             Constraint6DOF constraint1 = support1.Constraint;
@@ -73,7 +73,7 @@ namespace BH.Adapter.RFEM6
 
         /***************************************************/
 
-        public int GetHashCode(RFEMHinge surfaceSupport)
+        public int GetHashCode(RFEMLineSupport surfaceSupport)
         {
 
             //return surfaceSupport.GetHashCode();

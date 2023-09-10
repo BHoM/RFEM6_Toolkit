@@ -73,10 +73,11 @@ namespace BH.Adapter.RFEM6
                 RFEMHinge hingeStart = null;
                 RFEMHinge hingeEnd = null;
                 hinges.TryGetValue(rfMember.member_hinge_start, out hingeStart);
-                hinges.TryGetValue(rfMember.member_hinge_end, out hingeStart);
-
+                hinges.TryGetValue(rfMember.member_hinge_end, out hingeEnd);
+                BarRelease barRelease = new BarRelease() { StartRelease = hingeStart.Constraint, EndRelease = hingeEnd.Constraint };
 
                 Bar bhBar = rfMember.FromRFEM(node0,node1,section);
+                bhBar.Release = barRelease;
 
                 barList.Add(bhBar);
 

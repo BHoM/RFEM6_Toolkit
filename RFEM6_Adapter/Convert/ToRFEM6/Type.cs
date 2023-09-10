@@ -42,9 +42,14 @@ namespace BH.Adapter.RFEM6
 
         public static rfModel.object_types? ToRFEM6(this Type bhType)
         {
+
             if (bhType == typeof(Node))
             {
                 return rfModel.object_types.E_OBJECT_TYPE_NODE;
+            }
+            if (bhType == typeof(RFEMHinge))
+            {
+                return rfModel.object_types.E_OBJECT_TYPE_MEMBER_HINGE;
             }
             else if (bhType == typeof(RFEMNodalSupport))
             {
