@@ -27,61 +27,29 @@ using System.Text;
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.SurfaceProperties;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter : BHoMAdapter
     {
+        /***************************************************/
+        /**** Update Node                               ****/
+        /***************************************************/
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        private bool UpdateObjects(IEnumerable<RFEMHinge> hingeList)
         {
+            bool success = true;
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
+            foreach (RFEMHinge nodalSupport in hingeList)
             {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {
-                return typeof(RFEMNodalSupport);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_LINE_SUPPORT)
-            {
-                return typeof(RFEMLineSupport);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
-            {
-                return typeof(ISectionProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISurfaceProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SURFACE)
-            {
-                return typeof(Panel);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MEMBER_HINGE)
-            {
-                return typeof(RFEMHinge);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_OPENING)
-            {
-                return typeof(RFEMOpening);
+                m_Model.set_member_hinge(nodalSupport.ToRFEM6());
+               
             }
 
-
-            return null;
+            return success;
         }
 
     }
