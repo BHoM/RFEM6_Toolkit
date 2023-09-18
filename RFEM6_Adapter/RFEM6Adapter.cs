@@ -154,6 +154,8 @@ namespace BH.Adapter.RFEM6
 
             // connects to RFEM6/RSTAB9 model
             m_Model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
+
+          // var tst= m_Model.get_section(1);
         }
 
         public void Disconnect()

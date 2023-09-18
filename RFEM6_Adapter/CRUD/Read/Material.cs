@@ -41,15 +41,16 @@ namespace BH.Adapter.RFEM6
 
             List<IMaterialFragment> materialList = new List<IMaterialFragment>();
             rfModel.object_with_children[] materialsNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
-            List<rfModel.material> allMaterials = new List<rfModel.material>();
+            //List<rfModel.material> allMaterials = new List<rfModel.material>();
+            List<rfModel.material> allMaterials = materialsNumbers.ToList().Select(n => m_Model.get_material(n.no)).ToList();
 
-            foreach (var n in materialsNumbers)
-            {
+            //foreach (var n in materialsNumbers)
+            //{
 
-                allMaterials.Add(m_Model.get_material(n.no));
+            //    allMaterials.Add(m_Model.get_material(n.no));
 
-            }
-
+            //}
+            var mat = m_Model.get_material(1);
 
             if (ids == null)
             {
