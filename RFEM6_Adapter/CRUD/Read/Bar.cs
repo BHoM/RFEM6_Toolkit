@@ -43,10 +43,11 @@ namespace BH.Adapter.RFEM6
             List<Bar> barList = new List<Bar>();
 
             var barNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER);
-            
+
             List<rfModel.member> allRfMembers = new List<rfModel.member>();
 
-            foreach (var n in barNumber) {
+            foreach (var n in barNumber)
+            {
 
                 allRfMembers.Add(m_Model.get_member(n.no));
 
@@ -72,11 +73,17 @@ namespace BH.Adapter.RFEM6
 
                 RFEMHinge hingeStart = null;
                 RFEMHinge hingeEnd = null;
+                BarRelease barRelease = new BarRelease();
+
                 hinges.TryGetValue(rfMember.member_hinge_start, out hingeStart);
                 hinges.TryGetValue(rfMember.member_hinge_end, out hingeEnd);
-                BarRelease barRelease = new BarRelease() { StartRelease = hingeStart.Constraint, EndRelease = hingeEnd.Constraint };
+                
+                if (hingeStart != null) { barRelease.StartRelease = hingeStart.Constraint; }
+                if (hingeEnd != null) { barRelease.EndRelease = hingeEnd.Constraint; }
 
-                Bar bhBar = rfMember.FromRFEM(node0,node1,section);
+
+
+                Bar bhBar = rfMember.FromRFEM(node0, node1, section);
                 bhBar.Release = barRelease;
 
                 barList.Add(bhBar);
