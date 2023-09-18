@@ -1,16 +1,23 @@
-﻿using BH.Adapter.RFEM6;
+﻿using BH.Adapter;
+using BH.Adapter.RFEM6;
 using BH.Engine.Base;
+using BH.Engine.Spatial;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Geometry;
+using BH.oM.Physical.Materials;
+using BH.oM.Spatial.ShapeProfiles;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.SectionProperties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RFEM_Toolkit_Test
+namespace RFEM_Toolkit_Test.Comparer_Tests
 {
     internal class ComparerTests
     {
@@ -37,6 +44,9 @@ namespace RFEM_Toolkit_Test
         Line l1;
         Line l2;
         Line l3;
+        Circle c0;
+
+        Polyline l0PolyLine;
 
         Edge edge0;
         Edge edge1;
@@ -57,16 +67,34 @@ namespace RFEM_Toolkit_Test
         RFEMHinge hinge2;
 
         RFEMLine line0;
-        RFEMLine line0Mod;
-
         RFEMLine line1;
         RFEMLine line2;
         RFEMLine line3;
+        RFEMLine circle0;
+        RFEMLine line0Mod;
+        RFEMLine line0Polyline;
+
         RFEMLine line0Supported;
         RFEMLine line1Supported;
         RFEMLine line2Supported;
         RFEMLine line3Supported;
 
+        RFEMLineSupport lineSupport0;
+        RFEMLineSupport lineSupport1;
+
+        RFEMNodalSupport nodalSupport0;
+        RFEMNodalSupport nodalSupport1;
+
+        ISectionProperty steelSection0;
+        ISectionProperty steelSection1;
+        ISectionProperty concreteCircleSec0;
+        ISectionProperty concreteCircleSec1;
+        ISectionProperty concreteRecSec0;
+        ISectionProperty concreteRecSec1;
+
+        ISectionProperty random;
+        IProfile concreteCirculareProfile;
+        IProfile concreteRectangleProfile;
 
         [SetUp]
         public void Setup()
@@ -87,6 +115,12 @@ namespace RFEM_Toolkit_Test
             l2 = new Line() { Start = node3.Position, End = node2.Position };
             l3 = new Line() { Start = node2.Position, End = node0.Position };
 
+            c0 = new Circle() { Centre = node0.Position, Normal = new Vector() { X = 0, Y = 0, Z = 1 }, Radius = 10 };
+
+
+
+            l0PolyLine = new Polyline() { ControlPoints = new List<Point>() { node0.Position, node1.Position } };
+
             edge0 = new Edge() { Curve = l0 };
             edge1 = new Edge() { Curve = l1 };
             edge2 = new Edge() { Curve = l2 };
@@ -105,11 +139,13 @@ namespace RFEM_Toolkit_Test
             hinge1 = new RFEMHinge() { Constraint = constraint1 };
 
             line0 = new RFEMLine() { Curve = l0 };
-            line0Mod = new RFEMLine() { Curve = new Line(){ Start = l0.Start, End=new Point() {X=l0.End.X,Y= l0.End.Y, Z= l0.End.Y + 0.1} } };
             line1 = new RFEMLine() { Curve = l1 };
             line2 = new RFEMLine() { Curve = l2 };
             line3 = new RFEMLine() { Curve = l3 };
+            circle0 = new RFEMLine() { Curve = c0 };
 
+            line0Mod = new RFEMLine() { Curve = new Line() { Start = l0.Start, End = new Point() { X = l0.End.X, Y = l0.End.Y, Z = l0.End.Y + 0.1 } } };
+            line0Polyline = new RFEMLine() { Curve = l0PolyLine };
 
             line0 = new RFEMLine() { Curve = l0 };
             line1 = new RFEMLine() { Curve = l1 };
@@ -119,6 +155,37 @@ namespace RFEM_Toolkit_Test
             line0Supported = new RFEMLine() { Curve = l0, Support = constraint0 };
             line1Supported = new RFEMLine() { Curve = l1, Support = constraint1 };
             line2Supported = new RFEMLine() { Curve = l2, Support = constraint2 };
+
+            lineSupport0 = new RFEMLineSupport() { Constraint = constraint0 };
+            lineSupport1 = new RFEMLineSupport() { Constraint = constraint1 };
+
+            nodalSupport0 = new RFEMNodalSupport() { Constraint = constraint0 };
+            nodalSupport1 = new RFEMNodalSupport() { Constraint = constraint1 };
+
+            steelSection0 = BH.Engine.Library.Query.Match("EU_SteelSections", "HE1000M", true, true).DeepClone() as ISectionProperty;
+            steelSection1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE600", true, true).DeepClone() as ISectionProperty;
+
+            IMaterialFragment concrete0 = BH.Engine.Library.Query.Match("Concrete", "C30/37", true, true).DeepClone() as IMaterialFragment;
+            IMaterialFragment concrete1 = BH.Engine.Library.Query.Match("Concrete", "C16/20", true, true).DeepClone() as IMaterialFragment;
+            IMaterialFragment concrete2 = BH.Engine.Library.Query.Match("Concrete", "C20/25", true, true).DeepClone() as IMaterialFragment;
+
+            //KCcirculareProfile=BH.Engine.Spatial.Create.CircleProfile(0.5) as IProfile;
+            //rectangleProfile = BH.Engine.Spatial.Create.RectangleProfile(1,2) as IProfile;
+
+
+
+
+            BH.Engine.Structure.Create.ConcreteRectangleSection(1, 2);
+
+
+            concreteCirculareProfile = BH.Engine.Structure.Create.ConcreteCircularSection(0.5) as IProfile;
+            concreteCircleSec0 = BH.Engine.Structure.Create.SectionPropertyFromProfile(concreteCirculareProfile, concrete0);
+            concreteCircleSec1 = BH.Engine.Structure.Create.SectionPropertyFromProfile(concreteCirculareProfile, concrete1);
+
+            concreteRectangleProfile = BH.Engine.Structure.Create.ConcreteRectangleSection(2.0,1.0) as IProfile;
+            concreteRecSec0 = BH.Engine.Structure.Create.SectionPropertyFromProfile(concreteRectangleProfile, concrete0);
+            concreteRecSec1 = BH.Engine.Structure.Create.SectionPropertyFromProfile(concreteRectangleProfile, concrete1);
+
 
 
         }
@@ -149,15 +216,11 @@ namespace RFEM_Toolkit_Test
             //Test unequal Elements for inequality
             Assert.IsFalse(edgeComparer.Equals(edge0, edge1));
 
-
-
         }
 
         [Test]
         public void HingeComparer_Test()
         {
-
-
             //Test equal Elements for equality
             Assert.IsTrue(hingeComparer.Equals(hinge0, hinge0));
             Assert.IsTrue(hingeComparer.Equals(hinge0, hinge0.DeepClone()));
@@ -171,15 +234,33 @@ namespace RFEM_Toolkit_Test
         [Test]
         public void LineComparer_Test()
         {
-            //Test equal Elements for equality
+            ////Test equal Elements for equality////
+
+            //Test Two Equal lines
             Assert.IsTrue(lineComparer.Equals(line0, line0));
+
+            //Test Trow identical but not equal lines
             Assert.IsTrue(lineComparer.Equals(line0, line0.DeepClone()));
+
+            //Test two identical linese, one supported one not
             Assert.IsTrue(lineComparer.Equals(line0, line0Supported));
 
-            //Test unequal Elements for inequality
+            //Test two identical polylines
+            Assert.IsTrue(lineComparer.Equals(line0Polyline, line0Polyline.DeepClone()));
+
+            //test two Line and Polyline with identical geometry
+            Assert.IsTrue(lineComparer.Equals(line0, line0Polyline));
+
+            ////Test unequal Elements for inequality////
+
+            // Two two lines with a slightly differnt geometry, endpoint differs by 0.1 in Z
             Assert.IsFalse(lineComparer.Equals(line0, line0Mod));
+
+            //Two differnt lines with differnt geometries
             Assert.IsFalse(lineComparer.Equals(line0, line1));
 
+            //Two completely differnt curves
+            Assert.IsFalse(lineComparer.Equals(circle0, line0));
 
 
 
@@ -189,13 +270,15 @@ namespace RFEM_Toolkit_Test
         public void LineSupportComparer_Test()
         {
 
-            //Define two equal objects e0 and e1
 
-            //Compare e0 and e1
 
-            //Define third object e3, unequal to e0, and compare to e0 
+            //Compare identical line supports
+            Assert.IsTrue(lineSupportComparer.Equals(lineSupport0, lineSupport0));
+            Assert.IsTrue(lineSupportComparer.Equals(lineSupport0, lineSupport0.DeepClone()));
 
-            //Compare e0 to e3
+            //Compare unidentical line supports 
+            Assert.IsFalse(lineSupportComparer.Equals(lineSupport0, lineSupport1));
+
 
         }
 
@@ -203,15 +286,41 @@ namespace RFEM_Toolkit_Test
         public void NodalSupportComparer_Test()
         {
 
-            //Define two equal objects e0 and e1
 
-            //Compare e0 and e1
+            //Compare identical line supports
+            Assert.IsTrue(nodalSupportComparer.Equals(nodalSupport0, nodalSupport0));
+            Assert.IsTrue(nodalSupportComparer.Equals(nodalSupport0, nodalSupport0.DeepClone()));
 
-            //Define third object e3, unequal to e0, and compare to e0 
+            //Compare unidentical line supports 
+            Assert.IsFalse(nodalSupportComparer.Equals(nodalSupport0, nodalSupport1));
 
-            //Compare e0 to e3
 
         }
+
+        [Test]
+        public void SectionComparer_Test()
+        {
+
+            //Steel
+            Assert.IsTrue(sectionComparer.Equals(steelSection0, steelSection0));
+            Assert.IsTrue(sectionComparer.Equals(steelSection0, steelSection0.DeepClone()));
+
+            Assert.IsFalse(sectionComparer.Equals(steelSection0, steelSection1));
+
+            //Concrete
+            Assert.IsTrue(sectionComparer.Equals(concreteCircleSec0, concreteCircleSec0));
+            Assert.IsTrue(sectionComparer.Equals(concreteCircleSec0, concreteCircleSec0.DeepClone()));
+
+            //Assert.IsFalse(sectionComparer.Equals(concreteCircleSec0, concreteCircleSec1));
+            //Assert.IsFalse(sectionComparer.Equals(concreteRecSec0, concreteRecSec1));
+            
+            //Concrete vs Steel
+            Assert.IsFalse(sectionComparer.Equals(concreteRecSec0, concreteCircleSec0));
+
+
+
+        }
+
 
         [Test]
         public void PanelComparer_Test()
@@ -228,7 +337,7 @@ namespace RFEM_Toolkit_Test
         }
 
         [Test]
-        public void SirfaceProperty_Test()
+        public void SurfaceProperty_Test()
         {
 
             //Define two equal objects e0 and e1
@@ -241,32 +350,7 @@ namespace RFEM_Toolkit_Test
 
         }
 
-        [Test]
-        public void SectionComparer_Test()
-        {
 
-            //Define two equal objects e0 and e1
 
-            //Compare e0 and e1
-
-            //Define third object e3, unequal to e0, and compare to e0 
-
-            //Compare e0 to e3
-
-        }
-
-        [Test]
-        public void SurfaceComparer_Test()
-        {
-
-            //Define two equal objects e0 and e1
-
-            //Compare e0 and e1
-
-            //Define third object e3, unequal to e0, and compare to e0 
-
-            //Compare e0 to e3
-
-        }
     }
 }

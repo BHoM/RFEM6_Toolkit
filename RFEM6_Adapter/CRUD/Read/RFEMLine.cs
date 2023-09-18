@@ -130,6 +130,7 @@ namespace BH.Adapter.RFEM6
                         lineNodes = new List<Node>() { new Node { Position = new Point { X = rfLine.circle_center.x, Y = rfLine.circle_center.y, Z = rfLine.circle_center.z } } };
                         radius = rfLine.circle_radius;
 
+                        Curve = Engine.Geometry.Create.Circle(lineNodes[0].Position, radius);
                     }
 
                     RFEMLine l = new RFEMLine {Curve=Curve,Nodes = lineNodes };
