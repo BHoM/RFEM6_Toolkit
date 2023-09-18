@@ -137,10 +137,17 @@ namespace BH.Adapter.RFEM6
             {
 
 
+                var pts1 = Engine.Geometry.Query.ControlPoints(line1.Curve as Line);
+                var pts2 = Engine.Geometry.Query.ControlPoints(line2.Curve as Line);
 
-                for (int i = 0; i < line1.Nodes.Count; i++)
+
+                for (int i = 0; i < Engine.Geometry.Query.ControlPoints(line1.Curve as Line).Count; i++)
                 {
-                    if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[i]))
+                    //if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[i]))
+                    //if ((line1.Nodes[i].Position.Distance(line2.Nodes[i].Position) > 0.001))
+                    if ((pts1[i].Distance(pts2[i]) > 0.001))
+
+
                     {
                         equal = false;
                         break;
@@ -155,10 +162,12 @@ namespace BH.Adapter.RFEM6
                 return true;
 
             equal = true;
-            int lastIndex = line2.Nodes.Count - 1;
-            for (int i = 0; i < line1.Nodes.Count; i++)
+            int lastIndex = Engine.Geometry.Query.ControlPoints(line2.Curve as Line).Count - 1;
+            for (int i = 0; i < Engine.Geometry.Query.ControlPoints(line1.Curve as Line).Count; i++)
             {
-                if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[lastIndex - i]))
+                //if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[lastIndex - i]))
+                if ((line1.Nodes[i].Position.Distance(line2.Nodes[lastIndex - i].Position)) > 0.001)
+
                 {
                     equal = false;
                     break;
