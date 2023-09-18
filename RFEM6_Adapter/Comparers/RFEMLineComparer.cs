@@ -133,15 +133,32 @@ namespace BH.Adapter.RFEM6
                 if (c0.Centre.Distance(c1.Centre) > 0.001) { return false; };
 
             }
-            else
+            else if(line1.Curve is Line||line1.Curve is Polyline)
             {
 
 
-                var pts1 = Engine.Geometry.Query.ControlPoints(line1.Curve as Line);
-                var pts2 = Engine.Geometry.Query.ControlPoints(line2.Curve as Line);
+
+                //List<Point> pts1 = new List<Point>();
+                List<Point> pts1 = line1.Curve is Line? Engine.Geometry.Query.ControlPoints(line1.Curve as Line): Engine.Geometry.Query.ControlPoints(line1.Curve as Polyline);
+
+                List<Point> pts2 = line2.Curve is Line ? Engine.Geometry.Query.ControlPoints(line2.Curve as Line) : Engine.Geometry.Query.ControlPoints(line2.Curve as Polyline);
+
+                if (!pts1.Count.Equals(pts2.Count)) { return false; }
+
+                //if (line1.Curve is Line)
+                //{
+                //     pts1 = Engine.Geometry.Query.ControlPoints(line1.Curve as Line);
+                //     pts2 = Engine.Geometry.Query.ControlPoints(line2.Curve as Line);
+                //}
+                //else {
+
+                //    pts1 = Engine.Geometry.Query.ControlPoints(line1.Curve as Polyline);
+                //    pts2 = Engine.Geometry.Query.ControlPoints(line2.Curve as Polyline);
+
+                //}
 
 
-                for (int i = 0; i < Engine.Geometry.Query.ControlPoints(line1.Curve as Line).Count; i++)
+                for (int i = 0; i < pts1.Count; i++)
                 {
                     //if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[i]))
                     //if ((line1.Nodes[i].Position.Distance(line2.Nodes[i].Position) > 0.001))
@@ -154,25 +171,25 @@ namespace BH.Adapter.RFEM6
                     }
                 }
 
+                if (equal)
+                    return true;
+
+                equal = true;
+                int lastIndex = pts1.Count - 1;
+                for (int i = 0; i < pts1.Count; i++)
+                {
+                    //if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[lastIndex - i]))
+                    if ((pts1[i].Distance(pts2[lastIndex - i])) > 0.001)
+
+                    {
+                        equal = false;
+                        break;
+                    }
+                }
 
             };
 
 
-            if (equal)
-                return true;
-
-            equal = true;
-            int lastIndex = Engine.Geometry.Query.ControlPoints(line2.Curve as Line).Count - 1;
-            for (int i = 0; i < Engine.Geometry.Query.ControlPoints(line1.Curve as Line).Count; i++)
-            {
-                //if (!m_nodeComparer.Equals(line1.Nodes[i], line2.Nodes[lastIndex - i]))
-                if ((line1.Nodes[i].Position.Distance(line2.Nodes[lastIndex - i].Position)) > 0.001)
-
-                {
-                    equal = false;
-                    break;
-                }
-            }
             return equal;
         }
 
