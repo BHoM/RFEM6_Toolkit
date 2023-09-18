@@ -187,7 +187,7 @@ namespace BH.Adapter.RFEM6
         private static ISectionProperty BhConcreteFromRfSection_NonStandard(section rfSection, IMaterialFragment bhMaterial)
         {
             string[] sectionSignature = rfSection.name.Split(' ');
-            string sectionCatName = rfSection.name;
+            string sectionCatName = rfSection.name.Split(' ')[0].ToString();
             String[] secParameters = new string[1];
             Concrete bhConcrete = bhMaterial as Concrete;
 
@@ -202,6 +202,7 @@ namespace BH.Adapter.RFEM6
                 case "CIRCLE_M1":
 
                     diameter = Double.Parse(sectionSignature[1]);
+                    var d=rfSection.d;
 
                     //bhSection = BH.Engine.Structure.Create.ConcreteCircularSection(diameter, bhConcrete, sectionCatName, null);
                     bhSection = BH.Engine.Structure.Create.ConcreteCircularSection(diameter, bhConcrete, sectionCatName, null);
