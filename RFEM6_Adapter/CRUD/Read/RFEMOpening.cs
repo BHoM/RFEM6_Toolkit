@@ -42,6 +42,7 @@ namespace BH.Adapter.RFEM6
         {
             List<RFEMOpening> RFEMOpenings = new List<RFEMOpening>();
             Dictionary<int, Edge> edges = this.GetCachedOrReadAsDictionary<int, Edge>();
+            Dictionary<int, RFEMLineSupport> lineSupport = this.GetCachedOrReadAsDictionary<int, RFEMLineSupport>();
 
             var openingNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_OPENING);
             var allRFOpeinings = openingNumber.ToList().Select(n => m_Model.get_opening(n.no));
