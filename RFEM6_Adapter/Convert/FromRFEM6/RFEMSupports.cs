@@ -85,7 +85,7 @@ namespace BH.Adapter.RFEM6
             constraint.SetRFEM6ID(support.no);
             constraint.Name = support.name;
 
-            RFEMLineSupport rfemLineSupport = new RFEMLineSupport() { Constraint = constraint };
+            RFEMLineSupport rfemLineSupport = new RFEMLineSupport() { Constraint = constraint,nodesIDs=support.lines.ToList() };
             rfemLineSupport.SetRFEM6ID(support.no);
 
             return rfemLineSupport;

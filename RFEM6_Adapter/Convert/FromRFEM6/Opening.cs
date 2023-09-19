@@ -52,9 +52,16 @@ namespace BH.Adapter.RFEM6
 
             Opening opening = Engine.Structure.Create.Opening(Engine.Geometry.Modify.Close(polyCurves.First()));
 
-            opening.SetRFEM6ID(rfOpening.no);
+            List<Edge> edges = new List<Edge>();
+            rfOpening.boundary_lines.ToList().ForEach(l => edges.Add(edgeDict[l]));
+            Opening o = new Opening() {Edges=edges};
 
-            RFEMOpening rfemOpening = new RFEMOpening() { Opening = opening, SurfaceIDs = surfaceIDs };
+            opening.SetRFEM6ID(rfOpening.no);
+            o.SetRFEM6ID(rfOpening.no);
+
+            //RFEMOpening rfemOpening = new RFEMOpening() { Opening = opening, SurfaceIDs = surfaceIDs };
+            RFEMOpening rfemOpening = new RFEMOpening() { Opening = o, SurfaceIDs = surfaceIDs };
+
             rfemOpening.SetRFEM6ID(rfOpening.no);
             return rfemOpening;
 

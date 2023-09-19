@@ -45,6 +45,10 @@ namespace BH.Adapter.RFEM6
 
             var lineNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE);
             var allRfLInes = lineNumbers.ToList().Select(n => m_Model.get_line(n.no));
+            
+            //var lineSupportNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE);
+            //var lineSupports = lineNumbers.ToList().Select(n => m_Model.get_line(n.no));
+
 
             Dictionary<int, Node> nodes = this.GetCachedOrReadAsDictionary<int, Node>();
 

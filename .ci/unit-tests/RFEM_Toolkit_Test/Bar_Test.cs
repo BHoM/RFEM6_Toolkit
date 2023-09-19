@@ -52,7 +52,7 @@
 //            Line l5 = new Line() { Start = p4, End = p5 };
 //            Line l6 = new Line() { Start = p5, End = p3 };
 
-            
+
 
 //            Polyline lNew=BH.Engine.Geometry.Compute.Join(new List<Line>(){l1,l2,l3 }).First();
 //            Edge eNew=new Edge() { Curve=lNew};
@@ -68,15 +68,15 @@
 //            Edge e5 = new Edge() { Curve = l5 };
 //            Edge e6 = new Edge() { Curve = l6 };
 //            Opening o = new Opening() { Edges = new List<Edge> { e4, e5, e6 } };
-            
-//            //var bhMaterial = BH.Engine.Library.Query.Match("Steel", "IPE 600", true, true).DeepClone() as IMaterialFragment;
+
+//var bhMaterial = BH.Engine.Library.Query.Match("Steel", "IPE 600", true, true).DeepClone() as IMaterialFragment;
 
 //            Panel panel1 = new Panel() { ExternalEdges = new List<Edge> { e1, e2, e3 } };
 
 //            Panel panel2 = new Panel() { ExternalEdges = new List<Edge> { e1, e2, e3 } };
 //            Panel panel3 = new Panel() { ExternalEdges = new List<Edge> { e2, e3, e1 }, Openings = new List<Opening> { o } };
 
-            
+
 
 
 
