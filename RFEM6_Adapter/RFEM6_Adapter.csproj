@@ -1,13 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net48</TargetFrameworks>
-	<AssemblyVersion>6.0.0.0</AssemblyVersion>
+	<AssemblyVersion>7.0.0.0</AssemblyVersion>
 	<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
     <AssemblyName>RFEM6_Adapter</AssemblyName>
     <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-	<FileVersion>6.2.0.0</FileVersion>
+	<FileVersion>7.0.0.0</FileVersion>
 	<BaseOutputPath>..\Build\</BaseOutputPath>
   </PropertyGroup>
 
