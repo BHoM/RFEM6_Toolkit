@@ -24,9 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\RFEM6_Adapter\RFEM6_Adapter.csproj" />
-    <ProjectReference Include="..\..\..\..\RFEM6_Engine\RFEM6_Engine.csproj" />
-    <ProjectReference Include="..\..\..\..\RFEM6_oM\RFEM6_oM.csproj" />
+    <ProjectReference Include="..\..\..\RFEM6_Adapter\RFEM6_Adapter.csproj" />
+    <ProjectReference Include="..\..\..\RFEM6_Engine\RFEM6_Engine.csproj" />
+    <ProjectReference Include="..\..\..\RFEM6_oM\RFEM6_oM.csproj" />
   </ItemGroup>
 
   <ItemGroup>
