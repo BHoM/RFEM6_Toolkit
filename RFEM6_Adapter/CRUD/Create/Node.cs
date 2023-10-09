@@ -62,25 +62,28 @@ namespace BH.Adapter.RFEM6
         private static bool ComparerRFEMSupportAndBHoMConstraint(rfModel.nodal_support rfSupport, Constraint6DOF bhConstraint)
         {
 
-            if (!tranlate(rfSupport.spring_x).Equals(bhConstraint.TranslationX)) { return false; }
-            if (!tranlate(rfSupport.spring_y).Equals(bhConstraint.TranslationY)) { return false; }
-            if (!tranlate(rfSupport.spring_z).Equals(bhConstraint.TranslationZ)) { return false; }
-            if (!tranlate(rfSupport.rotational_restraint_x).Equals(bhConstraint.RotationX)) { return false; }
-            if (!tranlate(rfSupport.rotational_restraint_y).Equals(bhConstraint.RotationY)) { return false; }
-            if (!tranlate(rfSupport.rotational_restraint_z).Equals(bhConstraint.RotationZ)) { return false; }
+            if (!Translate(rfSupport.spring_x).Equals(bhConstraint.TranslationX)) 
+                return false;
+            if (!Translate(rfSupport.spring_y).Equals(bhConstraint.TranslationY)) 
+                return false;
+            if (!Translate(rfSupport.spring_z).Equals(bhConstraint.TranslationZ)) 
+                return false;
+            if (!Translate(rfSupport.rotational_restraint_x).Equals(bhConstraint.RotationX)) 
+                return false;
+            if (!Translate(rfSupport.rotational_restraint_y).Equals(bhConstraint.RotationY)) 
+                return false;
+            if (!Translate(rfSupport.rotational_restraint_z).Equals(bhConstraint.RotationZ)) 
+                return false;
 
             return true;
         }
 
-        private static DOFType tranlate(double input)
+        private static DOFType Translate(double input)
         {
-
-            if (input.Equals(double.PositiveInfinity)) return DOFType.Fixed;
-            else return DOFType.Free;
-
-
-
+            if (input.Equals(double.PositiveInfinity))
+                return DOFType.Fixed;
+            else return
+                    DOFType.Free;
         }
-
     }
 }
