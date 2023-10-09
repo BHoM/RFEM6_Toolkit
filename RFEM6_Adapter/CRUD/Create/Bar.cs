@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,12 +40,8 @@ namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter
     {
-
         private bool CreateCollection(IEnumerable<Bar> bhBars)
         {
-
-
-
             foreach (Bar bhBar in bhBars)
             {
 
@@ -63,8 +60,6 @@ namespace BH.Adapter.RFEM6
                     rfMember.member_hinge_endSpecified = true;
 
                     //m_Model.set_line_support(foundLineSupport);
-
-
                 }
 
                 m_Model.set_member(rfMember);
@@ -77,12 +72,18 @@ namespace BH.Adapter.RFEM6
         private static bool ComparerRFEMHingeAndBHoMConstraint(rfModel.member_hinge rfMemberHinge, Constraint6DOF bhConstraint)
         {
 
-            if (!tranlate(rfMemberHinge.axial_release_n).Equals(bhConstraint.TranslationX)) { return false; }
-            if (!tranlate(rfMemberHinge.axial_release_vy).Equals(bhConstraint.TranslationY)) { return false; }
-            if (!tranlate(rfMemberHinge.axial_release_vz).Equals(bhConstraint.TranslationZ)) { return false; }
-            if (!tranlate(rfMemberHinge.moment_release_mt).Equals(bhConstraint.RotationX)) { return false; }
-            if (!tranlate(rfMemberHinge.moment_release_my).Equals(bhConstraint.RotationY)) { return false; }
-            if (!tranlate(rfMemberHinge.moment_release_mz).Equals(bhConstraint.RotationZ)) { return false; }
+            if (!Translate(rfMemberHinge.axial_release_n).Equals(bhConstraint.TranslationX))
+                return false;
+            if (!Translate(rfMemberHinge.axial_release_vy).Equals(bhConstraint.TranslationY))
+                return false;
+            if (!Translate(rfMemberHinge.axial_release_vz).Equals(bhConstraint.TranslationZ))
+                return false;
+            if (!Translate(rfMemberHinge.moment_release_mt).Equals(bhConstraint.RotationX))
+                return false;
+            if (!Translate(rfMemberHinge.moment_release_my).Equals(bhConstraint.RotationY)) 
+                return false;
+            if (!Translate(rfMemberHinge.moment_release_mz).Equals(bhConstraint.RotationZ))
+                return false;
 
             return true;
         }

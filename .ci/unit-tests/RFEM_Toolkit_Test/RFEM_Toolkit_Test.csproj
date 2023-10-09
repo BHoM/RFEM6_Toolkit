@@ -10,6 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="NewFolder\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
@@ -18,15 +24,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\BHoM_Adapter\Adapter_Engine\Adapter_Engine.csproj" />
-    <ProjectReference Include="..\..\..\..\BHoM_Adapter\BHoM_Adapter\BHoM_Adapter.csproj" />
-    <ProjectReference Include="..\..\..\..\BHoM_Adapter\Structure_AdapterModules\Structure_AdapterModules.csproj" />
-    <ProjectReference Include="..\..\..\RFEM6_Adapter\RFEM6_Adapter.csproj" />
-    <ProjectReference Include="..\..\..\RFEM6_Engine\RFEM6_Engine.csproj" />
-    <ProjectReference Include="..\..\..\RFEM6_oM\RFEM6_oM.csproj" />
+    <ProjectReference Include="..\..\..\..\RFEM6_Adapter\RFEM6_Adapter.csproj" />
+    <ProjectReference Include="..\..\..\..\RFEM6_Engine\RFEM6_Engine.csproj" />
+    <ProjectReference Include="..\..\..\..\RFEM6_oM\RFEM6_oM.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Adapter_Engine">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
+    </Reference>
     <Reference Include="Adapter_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
     </Reference>
@@ -38,6 +44,9 @@
     </Reference>
     <Reference Include="BHoM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
+    </Reference>
+    <Reference Include="BHoM_Adapter">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
     </Reference>
     <Reference Include="BHoM_Engine">
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
@@ -66,16 +75,15 @@
     <Reference Include="Spatial_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Spatial_oM.dll</HintPath>
     </Reference>
+    <Reference Include="Structure_AdapterModules">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Structure_AdapterModules.dll</HintPath>
+    </Reference>
     <Reference Include="Structure_Engine">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Structure_Engine.dll</HintPath>
     </Reference>
     <Reference Include="Structure_oM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\Structure_oM.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>

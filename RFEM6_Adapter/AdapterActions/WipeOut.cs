@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,15 +34,14 @@ namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter
     {
-      
-
         public void Wipeout()
         {
             try
             {
                 this.Connect();
 
-                List<rfModel.object_types> allObjectTypes = new List<rfModel.object_types>() {
+                List<rfModel.object_types> allObjectTypes = new List<rfModel.object_types>()
+                {
                     rfModel.object_types.E_OBJECT_TYPE_MATERIAL,
                     rfModel.object_types.E_OBJECT_TYPE_SECTION,
                     rfModel.object_types.E_OBJECT_TYPE_THICKNESS,
@@ -52,20 +52,17 @@ namespace BH.Adapter.RFEM6
                     rfModel.object_types.E_OBJECT_TYPE_OPENING,
                     rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT,
                     rfModel.object_types.E_OBJECT_TYPE_LINE_SUPPORT
-
                 };
 
+                foreach (var o in allObjectTypes)
+                {
+                    //Delete all Nodes
+                    //rfModel.object_types objectType = rfModel.object_types.E_OBJECT_TYPE_NODE;
+                    rfModel.object_with_children[] nodeNumbers = m_Model.get_all_object_numbers_by_type(o);
+                    nodeNumbers = nodeNumbers.ToList().Where(n => n.no != 0).ToArray();
+                    nodeNumbers.ToList().ForEach(n => m_Model.delete_object(o, n.no, 1));
 
-                foreach (var o in allObjectTypes) {
-                    
-
-                //Delete all Nodes
-                //rfModel.object_types objectType = rfModel.object_types.E_OBJECT_TYPE_NODE;
-                rfModel.object_with_children[] nodeNumbers = m_Model.get_all_object_numbers_by_type(o);
-                nodeNumbers = nodeNumbers.ToList().Where(n => n.no != 0).ToArray();
-                nodeNumbers.ToList().ForEach(n => m_Model.delete_object(o, n.no, 1));
-
-                //m_Model.delete_object(o, 1, 1);
+                    //m_Model.delete_object(o, 1, 1);
                 }
 
 
@@ -82,8 +79,6 @@ namespace BH.Adapter.RFEM6
             {
                 this.Disconnect();
             }
-
         }
-
     }
 }
