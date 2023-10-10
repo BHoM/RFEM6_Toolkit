@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,25 +26,34 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
+using BH.Engine.Adapter;
+using BH.oM.Adapters.RFEM6;
+using BH.Engine.Base;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public static partial class Convert
     {
-        public void Wipeout()
+        public static rfModel.member ToRFEM6(this Bar bar)
         {
-            try
+            rfModel.member rfMember = new rfModel.member()
             {
-                this.Connect();
+                no = bar.GetRFEM6ID(),
+                type = bar.FEAType.ToRFEM6(),
+                typeSpecified = true,
+                line = bar.FindFragment<RFEMLine>().GetRFEM6ID(),
+                lineSpecified = true,
+                section_start = bar.SectionProperty.GetRFEM6ID(),
+                section_startSpecified = true,
+                section_endSpecified = true,
+                comment = "",
+            };
 
-                m_Model.delete_all();
-            }
-            finally
-            {
-                this.Disconnect();
-            }
+            return rfMember;
+
         }
+
     }
 }
