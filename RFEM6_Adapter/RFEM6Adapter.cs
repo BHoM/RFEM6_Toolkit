@@ -66,52 +66,57 @@ namespace BH.Adapter.RFEM6
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
             m_AdapterSettings.OnlyUpdateChangedObjects = false; // Setting this to true causes a Stackoverflow in some cases from the HashComparer called from the base FullCRUD.
 
-            // See the wiki, the AdapterSettings object and other Adapters to see how it can be configured.
-            //AdapterIdFragmentType = typeof(RFEMId);
-            BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
-            this.AdapterModules.Add(new GetRFEMNodalSupportModule());
-            this.AdapterModules.Add(new GetRFEMHingeModule());
-            this.AdapterModules.Add(new GetRFEMLineSupportModule());
-            this.AdapterModules.Add(new GetLineFromBarModule());
-            this.AdapterModules.Add(new GetLineFromEdgeModule());
-            this.AdapterModules.Add(new GetOpeningFromOpeningModule());
+            //// See the wiki, the AdapterSettings object and other Adapters to see how it can be configured.
+            ////AdapterIdFragmentType = typeof(RFEMId);
+            //BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
+            //this.AdapterModules.Add(new GetRFEMNodalSupportModule());
+            //this.AdapterModules.Add(new GetRFEMHingeModule());
+            //this.AdapterModules.Add(new GetRFEMLineSupportModule());
+            //this.AdapterModules.Add(new GetLineFromBarModule());
+            //this.AdapterModules.Add(new GetLineFromEdgeModule());
+            //this.AdapterModules.Add(new GetOpeningFromOpeningModule());
 
+            AddAdapterModules();
 
-            AdapterComparers = new Dictionary<Type, object>
-            {
-                {typeof(Bar), new BarEndNodesDistanceComparer(3) },
-                {typeof(Node), new NodeDistanceComparer(3) },
-                {typeof(RFEMHinge), new RFEMHingeComparer() },
-                {typeof(ISectionProperty), new RFEMSectionComparer() },
-                {typeof(ISurfaceProperty), new RFEMSurfacePropertyComparer() },
-                {typeof(IMaterialFragment), new NameOrDescriptionComparer() },
-                {typeof(LinkConstraint), new NameOrDescriptionComparer() },
-                {typeof(Constraint6DOF), new Constraint6DOFComparer()},
-                {typeof(RFEMNodalSupport), new RFEMNodalSupportComparer()},
-                {typeof(Edge), new EdgeComparer()},
-                {typeof(RFEMLineSupport), new RFEMLineSupportComparer() },
-                {typeof(RFEMLine), new RFEMLineComparer(3) },
-                {typeof(Panel), new RFEMPanelComparer() }
+            AdapterComparers = GenerateAdapterComparersSettings();
 
-            };
+            //AdapterComparers = new Dictionary<Type, object>
+            //{
+            //    {typeof(Bar), new BarEndNodesDistanceComparer(3) },
+            //    {typeof(Node), new NodeDistanceComparer(3) },
+            //    {typeof(RFEMHinge), new RFEMHingeComparer() },
+            //    {typeof(ISectionProperty), new RFEMSectionComparer() },
+            //    {typeof(ISurfaceProperty), new RFEMSurfacePropertyComparer() },
+            //    {typeof(IMaterialFragment), new NameOrDescriptionComparer() },
+            //    {typeof(LinkConstraint), new NameOrDescriptionComparer() },
+            //    {typeof(Constraint6DOF), new Constraint6DOFComparer()},
+            //    {typeof(RFEMNodalSupport), new RFEMNodalSupportComparer()},
+            //    {typeof(Edge), new EdgeComparer()},
+            //    {typeof(RFEMLineSupport), new RFEMLineSupportComparer() },
+            //    {typeof(RFEMLine), new RFEMLineComparer(3) },
+            //    {typeof(Panel), new RFEMPanelComparer() },
+            //    {typeof(Loadcase), new NameOrDescriptionComparer() }
 
-            DependencyTypes = new Dictionary<Type, List<Type>>
-            {
-                {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine),typeof(RFEMHinge)} },
-                {typeof(RFEMLine), new List<Type> {typeof(Node), typeof(RFEMLineSupport) } },
-                {typeof(Node), new List<Type> { typeof(RFEMNodalSupport) } },
-                {typeof(Point), new List<Type> { typeof(Node) } },
-                {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },
-                {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
-                {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
-                {typeof(ISurfaceProperty), new List<Type> { typeof(IMaterialFragment) } },
-                {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge), typeof(Opening), typeof(RFEMOpening) } },
-                {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
-                {typeof(Opening), new List<Type> { typeof(Edge)} },
-                {typeof(Edge), new List<Type> { typeof(RFEMLineSupport),typeof(RFEMLine) } },
+            //};
 
+            //DependencyTypes = new Dictionary<Type, List<Type>>
+            //{
+            //    {typeof(Point), new List<Type> { typeof(Node) } },
+            //    {typeof(Node), new List<Type> { typeof(RFEMNodalSupport) } },
+            //    {typeof(Edge), new List<Type> { typeof(RFEMLineSupport),typeof(RFEMLine) } },
+            //    {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },
+            //    {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine),typeof(RFEMHinge)} },
+            //    {typeof(ISurfaceProperty), new List<Type> { typeof(IMaterialFragment) } },
+            //    {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge), typeof(Opening), typeof(RFEMOpening) } },
+            //    {typeof(Opening), new List<Type> { typeof(Edge)} },
+            //    {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
+            //    {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
+            //    {typeof(RFEMLine), new List<Type> {typeof(Node), typeof(RFEMLineSupport) } },
+            //    {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
 
-            };
+            DependencyTypes = GenerateDependencyTypes();
+
+            //};
 
             AdapterIdFragmentType = typeof(RFEM6ID);
 
@@ -155,7 +160,7 @@ namespace BH.Adapter.RFEM6
             // connects to RFEM6/RSTAB9 model
             m_Model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
 
-          // var tst= m_Model.get_section(1);
+            // var tst= m_Model.get_section(1);
         }
 
         public void Disconnect()

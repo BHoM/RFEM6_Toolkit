@@ -26,10 +26,6 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.SurfaceProperties;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
@@ -41,53 +37,46 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static Type FromRFEM(rfModel.object_types rfType)
+        public static Loadcase FromRFEM(this rfModel.load_case loadCase)
         {
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
-            {
-                return typeof(Node);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
-            {
-                return typeof(RFEMNodalSupport);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_LINE_SUPPORT)
-            {
-                return typeof(RFEMLineSupport);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
-            {
-                return typeof(ISectionProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISurfaceProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SURFACE)
-            {
-                return typeof(Panel);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MEMBER_HINGE)
-            {
-                return typeof(RFEMHinge);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_OPENING)
-            {
-                return typeof(RFEMOpening);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE)
-            {
-                return typeof(Loadcase);
-            }
+            Loadcase bhLoadCase = new Loadcase() { Name = loadCase.name, Nature = loadCase.action_category.FromRFEM(), Number = loadCase.no };
+            bhLoadCase.SetRFEM6ID(loadCase.no);
 
 
-            return null;
+            return bhLoadCase;
         }
 
+
+        private static LoadNature FromRFEM(this String actionCat)
+        {
+
+            switch (actionCat)
+            {
+                case "ACTION_CATEGORY_SEISMIC_ACTIONS_AE":
+                    return LoadNature.Seismic;
+                case "ACTION_CATEGORY_PERMANENT_G":
+                    return LoadNature.Dead;
+                case "ACTION_CATEGORY_PERMANENT_IMPOSED_GQ":
+                    return LoadNature.SuperDead;
+                case "ACTION_CATEGORY_PRESTRESS_P":
+                    return LoadNature.Prestress;
+                case "ACTION_CATEGORY_IMPOSED_LOADS_CATEGORY_A_DOMESTIC_RESIDENTIAL_AREAS_QI_A":
+                    return LoadNature.Live;
+                case "ACTION_CATEGORY_SNOW_ICE_LOADS_FINLAND_ICELAND_QS":
+                    return LoadNature.Snow;
+                case "ACTION_CATEGORY_WIND_QW":
+                    return LoadNature.Wind;
+                case "ACTION_CATEGORY_TEMPERATURE_NON_FIRE_QT":
+                    return LoadNature.Temperature;
+                case "ACTION_CATEGORY_ACCIDENTAL_ACTIONS_A":
+                    return LoadNature.Accidental;
+                default:
+                    
+                    return LoadNature.Other;
+            }
+
+
+        }
     }
 }
