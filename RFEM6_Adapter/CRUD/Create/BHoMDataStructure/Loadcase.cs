@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
  *
@@ -19,74 +19,68 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Numerics;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.SurfaceProperties;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.Engine.Structure;
 using BH.oM.Structure.Loads;
+using BH.oM.Adapter.Commands;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter
     {
-
-        public static Type FromRFEM(rfModel.object_types rfType)
+        private bool CreateCollection(IEnumerable<Loadcase> bhLoadCase)
         {
 
-            if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODE)
+            //Check if Analysis Setting does exist already
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_STATIC_ANALYSIS_SETTINGS);
+            List<rfModel.static_analysis_settings> foundAnalysisSettings = numbers.ToList().Select(n => m_Model.get_static_analysis_settings(n.no)).ToList();
+
+
+            List<rfModel.static_analysis_settings> analysisSettingList = foundAnalysisSettings.FindAll(s => s.analysis_type == static_analysis_settings_analysis_type.GEOMETRICALLY_LINEAR);
+
+            rfModel.static_analysis_settings analysis;
+
+            if (analysisSettingList.Count == 0)
             {
-                return typeof(Node);
+                analysis = new static_analysis_settings()
+                {
+                    no = m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_STATIC_ANALYSIS_SETTINGS, 0),
+                    analysis_type = static_analysis_settings_analysis_type.GEOMETRICALLY_LINEAR,
+                    analysis_typeSpecified = true,
+                };
             }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT)
+            else
             {
-                return typeof(RFEMNodalSupport);
+                analysis = foundAnalysisSettings.FindAll(s => s.analysis_type == static_analysis_settings_analysis_type.GEOMETRICALLY_LINEAR).First();
+
             }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_LINE_SUPPORT)
+            m_Model.set_static_analysis_settings(analysis);
+
+
+            //Create Load Cases
+            foreach (Loadcase loadCase in bhLoadCase)
             {
-                return typeof(RFEMLineSupport);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MATERIAL)
-            {
-                return typeof(IMaterialFragment);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
-            {
-                return typeof(ISectionProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_THICKNESS)
-            {
-                return typeof(ISurfaceProperty);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SURFACE)
-            {
-                return typeof(Panel);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MEMBER_HINGE)
-            {
-                return typeof(RFEMHinge);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_OPENING)
-            {
-                return typeof(RFEMOpening);
-            }
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE)
-            {
-                return typeof(Loadcase);
+
+                load_case selfWeightLC = loadCase.ToRFEM6(analysis.no);
+
+                m_Model.set_load_case(selfWeightLC);
             }
 
 
-            return null;
+
+            return true;
         }
 
     }

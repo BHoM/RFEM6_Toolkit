@@ -71,11 +71,11 @@ namespace RFEM_Toolkit_Test.Elements
             adapter = new RFEM6Adapter(true);
         }
 
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //    adapter.Wipeout();
-        //}
+        [TearDown]
+        public void TearDown()
+        {
+            adapter.Wipeout();
+        }
 
         [Test]
         public void PushPullOfBars()

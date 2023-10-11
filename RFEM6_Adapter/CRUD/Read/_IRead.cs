@@ -64,8 +64,6 @@ namespace BH.Adapter.RFEM6
             {
                 if (type == typeof(Node))
                     return ReadNodes(ids as dynamic);
-                //else if (type == typeof(Constraint6DOF))
-                //    return ReadNodalSupports(ids as dynamic);
                 else if (type == typeof(RFEMNodalSupport))
                     return ReadRFEMNodalSupports(ids as dynamic);
                 else if (type == typeof(RFEMLineSupport))
@@ -90,14 +88,8 @@ namespace BH.Adapter.RFEM6
                     return ReadRFEMOpening(ids as dynamic);
                 else if (type == typeof(Opening))
                     return ReadOpening(ids as dynamic);
-                //else if (type == typeof(RigidLink))
-                //    return ReadLinks(ids as dynamic);
-                //else if (type == typeof(ILoad))
-                //    return ReadLoads(ids as dynamic);
-                //else if (type == typeof(Loadcase))
-                //    return ReadLoadcases(ids as dynamic);
-                //else if (type == typeof(LoadCombination))
-                //    return ReadLoadCombinations(ids as dynamic);
+                else if (type == typeof(Loadcase))
+                    return ReadLoadCase(ids as dynamic);
             }
             finally
             {

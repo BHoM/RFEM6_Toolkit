@@ -34,6 +34,7 @@ using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Structure.Loads;
 
 namespace BH.Adapter.RFEM6
 {
@@ -90,6 +91,10 @@ namespace BH.Adapter.RFEM6
             else if (bhType == typeof(Opening))
             {
                 return rfModel.object_types.E_OBJECT_TYPE_OPENING;
+            }
+            else if (bhType == typeof(Loadcase))
+            {
+                return rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE;
             }
 
 
