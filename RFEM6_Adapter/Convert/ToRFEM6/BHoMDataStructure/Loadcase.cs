@@ -52,10 +52,6 @@ namespace BH.Adapter.RFEM6
                 analysis_type = load_case_analysis_type.ANALYSIS_TYPE_STATIC,
                 analysis_typeSpecified = true,
                 static_analysis_settingsSpecified = true,
-                //self_weight_active = true,
-                //self_weight_activeSpecified = true,
-                //self_weight_factor_z = 1.0,
-                //self_weight_factor_zSpecified = true,
                 action_category = bhLoadcase.Nature.ToRFEM(),
                 calculate_critical_load = true,
                 calculate_critical_loadSpecified = true,
@@ -63,14 +59,7 @@ namespace BH.Adapter.RFEM6
                 stability_analysis_settingsSpecified = true,
             };
 
-            //if (bhLoadcase.Name.ToLower().Replace(" ", "").Equals("selfweight"))
-            //{
-            //    rfLoadCase.self_weight_active = true;
-            //    rfLoadCase.self_weight_activeSpecified = true;
-            //    rfLoadCase.self_weight_factor_z = 1.0;
-            //    rfLoadCase.self_weight_factor_zSpecified = true;
-            //}
-
+            
             return rfLoadCase;
 
         }
