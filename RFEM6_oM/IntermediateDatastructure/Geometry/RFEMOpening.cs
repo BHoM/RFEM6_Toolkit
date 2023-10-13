@@ -23,36 +23,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using BH.oM.Adapter;
+using System.Threading.Tasks;
+using BH.oM.Base;
+using System.ComponentModel;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
-using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
-
-namespace BH.Adapter.RFEM6
+namespace BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry
 {
-    public partial class RFEM6Adapter
+    public class RFEMOpening : BHoMObject, IFragment
     {
 
-        private bool CreateCollection(IEnumerable<RFEMOpening> rfemOpening)
-        {
+        public virtual Opening Opening { get; set; }
 
-            foreach (RFEMOpening bhOpening in rfemOpening)
-            {
-
-                rfModel.opening rfOpening = bhOpening.Opening.ToRFEM6();
-
-                m_Model.set_opening(rfOpening);
-
-            }
-
-            return true;
-        }
+        public virtual List<int> SurfaceIDs { get; set; } = new List<int>();
 
     }
 }

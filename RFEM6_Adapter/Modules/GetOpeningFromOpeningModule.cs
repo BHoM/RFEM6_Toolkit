@@ -27,12 +27,12 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.ComponentModel;
 using BH.oM.Structure.Elements;
-using BH.oM.Adapters.RFEM6;
 using System.Collections;
 using BH.oM.Geometry;
 using BH.Engine.Geometry;
 using System.Security.Cryptography;
 using BH.Engine.Base;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {

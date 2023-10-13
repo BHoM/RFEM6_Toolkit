@@ -27,15 +27,23 @@ using System.Threading.Tasks;
 using BH.oM.Base;
 using System.ComponentModel;
 using BH.oM.Structure.Elements;
+using BH.oM.Structure.Constraints;
+using System.Security.Cryptography;
 
-namespace BH.oM.Adapters.RFEM6
+namespace BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry
 {
-    public class RFEMOpening : BHoMObject, IFragment
+    public class RFEMLine : BHoMObject, IFragment
     {
-      
-        public virtual Opening Opening { get; set; }
 
-        public virtual List<int> SurfaceIDs { get; set; } = new List<int>();
+        public virtual List<Node> Nodes { get; set; } = new List<Node>();
 
+        public virtual object Curve { get; set; } = null;
+
+        public virtual int supportID { get; set; } = 0;
+
+        public virtual Constraint6DOF Support { get; set; } = null;
     }
+
+
+
 }

@@ -29,10 +29,10 @@ using BH.oM.Structure.Elements;
 using BH.oM.Structure.SurfaceProperties;
 using BH.oM.Geometry;
 using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Geometry;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {

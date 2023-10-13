@@ -29,12 +29,12 @@ using BH.oM.Structure.Elements;
 using BH.oM.Geometry;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
-using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
 using System.Security.Cryptography;
 using BH.Engine.Base;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {

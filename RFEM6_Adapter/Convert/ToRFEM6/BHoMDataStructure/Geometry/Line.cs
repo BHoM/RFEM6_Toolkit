@@ -27,11 +27,11 @@ using System.Text;
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
 using BH.oM.Geometry;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {

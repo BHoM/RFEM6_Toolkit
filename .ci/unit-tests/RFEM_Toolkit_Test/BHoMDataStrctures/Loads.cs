@@ -80,16 +80,20 @@ namespace RFEM_Toolkit_Test.Loading
 
             //LoadCases
             Loadcase loadcaseDL = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
-            BH.oM.Base.BHoMGroup<Bar> group=new BHoMGroup<Bar>() {Elements=new List<Bar>() { bar} };
 
-            HashSet<Loadcase> loadcaseSet = new HashSet<Loadcase>(new LoadCaseComparer()) {loadcaseDL};
+            var group0 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar } };
+
+            var barLoad0 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = group0, Loadcase = loadcaseDL };
+            
+
+            HashSet<ILoad> loadcaseSet = new HashSet<ILoad>() {barLoad0};
 
             adapter.Push(loadcaseSet.ToList());
 
-            FilterRequest loadCaseFilter = new FilterRequest() { Type = typeof(Loadcase) };
-            var loadCases = adapter.Pull(loadCaseFilter).ToList();
-            Loadcase lc0 = (Loadcase)loadCases[0];
-           
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(ILoad) };
+            var loads = adapter.Pull(loadFilter).ToList();
+            ILoad l0 = (ILoad)loads[0];
+
 
 
             //Assert.AreEqual(loadCases.Count(), loadcaseSet.Count());

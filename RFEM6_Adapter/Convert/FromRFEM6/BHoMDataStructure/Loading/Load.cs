@@ -28,32 +28,30 @@ using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
-using BH.Engine.Base;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Structure.Loads;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-        public static rfModel.member ToRFEM6(this Bar bar)
+
+        public static BarUniformlyDistributedLoad FromRFEM(this rfModel.member_load rfMemberLoad, List<Bar> bhBars, Loadcase bhLoadCase)
         {
-            rfModel.member rfMember = new rfModel.member()
+
+
+            BarUniformlyDistributedLoad bhLoad = new BarUniformlyDistributedLoad
             {
-                no = bar.GetRFEM6ID(),
-                type = bar.FEAType.ToRFEM6(),
-                typeSpecified = true,
-                line = bar.FindFragment<RFEMLine>().GetRFEM6ID(),
-                lineSpecified = true,
-                section_start = bar.SectionProperty.GetRFEM6ID(),
-                section_startSpecified = true,
-                section_endSpecified = true,
-                comment = "",
+                Objects = new BH.oM.Base.BHoMGroup<Bar>() { Elements = bhBars },
+                Loadcase = bhLoadCase,
+                Force = BH.Engine.Geometry.Create.Vector(0,0,rfMemberLoad.magnitude),
             };
 
-            return rfMember;
-
+            return bhLoad;
         }
+
+
 
     }
 }

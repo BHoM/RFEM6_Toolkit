@@ -26,32 +26,41 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.Constraints;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
-using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.Loads;
 
 namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter
     {
 
-        private bool CreateCollection(IEnumerable<RFEMOpening> rfemOpening)
+        private List<ILoad> ReadBarLoad(List<string> ids = null)
         {
+            //Find all possible Load cases
+            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
+            List<int> loadCaseIds = loadCaseMap.Keys.ToList();
+            Dictionary<int, Bar> memberMap = this.GetCachedOrReadAsDictionary<int, Bar>();
 
-            foreach (RFEMOpening bhOpening in rfemOpening)
+
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD);
+            
+            IEnumerable<rfModel.member_load> foundLoadCases = numbers.ToList().Select(n => m_Model.get_member_load(n.no, n.children[0]));
+
+
+            //m_Model.get_
+            //List<String> lcName = new List<string>();
+            List<ILoad> loadCases = new List<ILoad>();
+            foreach (rfModel.member_load memberLoad in foundLoadCases)
             {
 
-                rfModel.opening rfOpening = bhOpening.Opening.ToRFEM6();
-
-                m_Model.set_opening(rfOpening);
+                memberLoad.FromRFEM(memberLoad.members.ToList().Select(m => memberMap[m]), loadCaseMap[memberLoad.load_case]);
 
             }
 
-            return true;
+            return loadCases;
         }
 
     }
