@@ -46,7 +46,7 @@ using BH.oM.Adapters.RFEM6;
 using BH.Engine.Structure;
 using BH.Engine.Geometry;
 using BH.oM.Adapter;
-
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {

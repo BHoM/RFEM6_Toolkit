@@ -35,6 +35,7 @@ using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.oM.Structure.Loads;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
