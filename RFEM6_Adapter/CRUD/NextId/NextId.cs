@@ -29,6 +29,8 @@ using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.Engine.Base;
+using BH.oM.Structure.Loads;
 
 namespace BH.Adapter.RFEM6
 {
@@ -58,7 +60,19 @@ namespace BH.Adapter.RFEM6
                     return null;
                 }
 
-                int id = m_Model.get_first_free_number(rfType.Value, 0);
+                int id = 0;
+
+                if (objectType.Name.Equals("PointLoad")|| objectType.Name.Equals("BarUniformlyDistributedLoad"))
+                {
+
+                    id = m_Model.get_first_free_number(rfType.Value, 1);
+
+                }
+                else
+                {
+                    id = m_Model.get_first_free_number(rfType.Value, 0);
+                }
+
                 //id=rfType.Equals(rfModel.object_types.E_OBJECT_TYPE_NODE)?id-1:id;
                 m_FreeIds[objectType] = id;
                 return id;

@@ -70,6 +70,9 @@ namespace BH.Adapter.RFEM6
                 {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
                 {typeof(RFEMLine), new List<Type> {typeof(Node), typeof(RFEMLineSupport) } },
                 {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
+                {typeof(BarUniformlyDistributedLoad), new List<Type> { typeof(Bar),typeof(Loadcase)} },
+                {typeof(PointLoad), new List<Type> { typeof(Node), typeof(Loadcase) } },
+
 
 
             };
@@ -110,7 +113,9 @@ namespace BH.Adapter.RFEM6
                 {typeof(RFEMLineSupport), new RFEMLineSupportComparer() },
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
                 {typeof(Panel), new RFEMPanelComparer() },
-                {typeof(Loadcase), new LoadCaseComparer() }
+                {typeof(Loadcase), new LoadCaseComparer() },
+                {typeof(ILoad), new RFEMLoadComparer()  }
+
 
             };
 

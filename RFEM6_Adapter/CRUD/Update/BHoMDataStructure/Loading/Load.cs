@@ -26,41 +26,41 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.oM.Adapters.RFEM6;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.oM.Structure.Loads;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6Adapter : BHoMAdapter
     {
+        /***************************************************/
+        /**** Update Node                               ****/
+        /***************************************************/
 
-        private List<ILoad> ReadBarLoad(List<string> ids = null)
+        private bool UpdateObjects(IEnumerable<ILoad> loads)
         {
-            //Find all possible Load cases
-            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
-            List<int> loadCaseIds = loadCaseMap.Keys.ToList();
-            Dictionary<int, Bar> memberMap = this.GetCachedOrReadAsDictionary<int, Bar>();
+            bool success = true;
 
-
-            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD);
-            
-            IEnumerable<rfModel.member_load> foundLoadCases = numbers.ToList().Select(n => m_Model.get_member_load(n.no, n.children[0]));
-
-
-            //m_Model.get_
-            //List<String> lcName = new List<string>();
-            List<ILoad> loadCases = new List<ILoad>();
-            foreach (rfModel.member_load memberLoad in foundLoadCases)
+            foreach (ILoad bhLoad in loads)
             {
 
-                memberLoad.FromRFEM(memberLoad.members.ToList().Select(m => memberMap[m]), loadCaseMap[memberLoad.load_case]);
+                if (bhLoad is BarUniformlyDistributedLoad)
+                {
+                    var rfMemberLoad = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6();
+                    m_Model.set_member_load(bhLoad.Loadcase.GetRFEM6ID(), rfMemberLoad);
+                }
+                else if (bhLoad is PointLoad)
+                {
+                    var rfPointLoad = (bhLoad as PointLoad).ToRFEM6();
+                    m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
+
+                }
 
             }
 
-            return loadCases;
+            return success;
         }
 
     }

@@ -85,7 +85,14 @@ namespace BH.Adapter.RFEM6
             {
                 return typeof(Loadcase);
             }
-
+            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD)
+            {
+                return typeof(BarUniformlyDistributedLoad);
+            }
+            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_NODAL_LOAD)
+            {
+                return typeof(PointLoad);
+            }
 
             return null;
         }

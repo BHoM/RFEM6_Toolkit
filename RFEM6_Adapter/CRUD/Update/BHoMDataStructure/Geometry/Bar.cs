@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
  *
@@ -19,49 +19,40 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
+using BH.oM.Adapter;
+using BH.oM.Structure.Elements;
+using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.MaterialFragments;
+
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter : BHoMAdapter
     {
-        // Basic Delete method that deletes objects depending on their Type and Id. 
-        // It gets called by the Push or by the Remove Adapter Actions.
-        // Its implementation is facultative (not needed for a simple export/import scenario). 
-        // Toolkits need to implement (override) this only to get the full CRUD to work.
-        protected override int IDelete(Type type, IEnumerable<object> ids, ActionConfig actionConfig = null)
+        /***************************************************/
+        /**** Update Node                               ****/
+        /***************************************************/
+
+        private bool UpdateObjects(IEnumerable<Bar> bars)
         {
-            rfModel.object_types? rfemType = type.ToRFEM6();
+            bool success = true;
 
-            if (!rfemType.HasValue)
-            {
-                BH.Engine.Base.Compute.RecordWarning($"Delete not implemented for obejcts of type {type.Name}.");
-                return 0;
-            }
 
-            int deleteCount = 0;
-            foreach (int id in ids.OfType<int>())
+
+            foreach (Bar bar in bars)
             {
 
-                if (rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE|| rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_NODAL_LOAD|| rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD) { continue; }
-                m_Model.delete_object(rfemType.Value, id, 0);
-                deleteCount++;
+                m_Model.set_member(bar.ToRFEM6());
             }
-            return deleteCount;
+
+            return success;
         }
 
-        // There are more virtual Delete methods you might want to override and implement.
-        // Check the base BHoM_Adapter solution and the wiki for more info.
-  
-        /***************************************************/
     }
 }
-

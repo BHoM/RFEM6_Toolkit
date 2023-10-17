@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
  *
@@ -40,7 +40,7 @@ namespace RFEM_Toolkit_Test.Loading
 {
 
 
-    public class PushPullLoad
+    public class PushPullLoadComparer
 
     {
 
@@ -66,9 +66,9 @@ namespace RFEM_Toolkit_Test.Loading
 
 
         [Test]
-        public void PushPullLoadCase()
+        public void CompareLoads()
         {
-            n1 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 0 },Support=BH.Engine.Structure.Create.FixConstraint6DOF() };
+            n1 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
             n2 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
 
             ISectionProperty section1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
@@ -84,22 +84,18 @@ namespace RFEM_Toolkit_Test.Loading
 
             var barGroup = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar } };
             var barLoad0 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = barGroup, Loadcase = loadcaseDL, Force = new Vector() { X = 0, Y = 20000, Z = 1000 } };
-        
-            var pointGroup = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { n1,n2 } };
+
+            var pointGroup = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { n1, n2 } };
             var pointLoad = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup, Loadcase = loadcaseSDL, Force = new Vector() { X = 0, Y = 0, Z = 100000 } };
 
-            HashSet<ILoad> loadcaseSet = new HashSet<ILoad>() { barLoad0,pointLoad };
+         
+            RFEMLoadComparer loadcomparere = new RFEMLoadComparer();
 
-            adapter.Push(loadcaseSet.ToList());
+           
+            Assert.IsTrue(loadcomparere.Equals(barLoad0, barLoad0.DeepClone()));
+            Assert.IsTrue(loadcomparere.Equals(pointLoad, pointLoad.DeepClone()));
+            Assert.IsFalse(loadcomparere.Equals(barLoad0, pointLoad));
 
-            //FilterRequest loadFilter = new FilterRequest() { Type = typeof(PointLoad) };
-            //var loads = adapter.Pull(loadFilter).ToList();
-            //PointLoad l0 = (PointLoad)loads[0];
-
-
-
-            //Assert.AreEqual(loadCases.Count(), loadcaseSet.Count());
-            //Assert.True(loadcaseSet.Contains(lc0));
 
         }
 

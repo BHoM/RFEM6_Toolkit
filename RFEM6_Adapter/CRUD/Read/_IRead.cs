@@ -91,8 +91,12 @@ namespace BH.Adapter.RFEM6
                     return ReadOpening(ids as dynamic);
                 else if (type == typeof(Loadcase))
                     return ReadLoadCase(ids as dynamic);
-                else if (type == typeof(ILoad))
+                //else if (type == typeof(ILoad))
+                //    return ReadLoad(ids as dynamic);
+                else if (type == typeof(BarUniformlyDistributedLoad))
                     return ReadBarLoad(ids as dynamic);
+                else if (type == typeof(PointLoad))
+                    return ReadPointLoad(ids as dynamic);
 
             }
             finally
