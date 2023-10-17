@@ -45,12 +45,25 @@ namespace BH.Adapter.RFEM6
             {
                 Objects = new BH.oM.Base.BHoMGroup<Bar>() { Elements = bhBars },
                 Loadcase = bhLoadCase,
-                Force = BH.Engine.Geometry.Create.Vector(0,0,rfMemberLoad.magnitude),
+                Force = BH.Engine.Geometry.Create.Vector(0, 0, rfMemberLoad.magnitude),
             };
 
             return bhLoad;
         }
 
+        public static PointLoad FromRFEM(this rfModel.nodal_load nodeLoad, List<Node> bhNodes, Loadcase bhLoadCase)
+        {
+
+            PointLoad bhLoad = new PointLoad
+            {
+                Objects = new BH.oM.Base.BHoMGroup<Node>() { Elements = bhNodes },
+                Loadcase = bhLoadCase,
+                Force = BH.Engine.Geometry.Create.Vector(0, 0, nodeLoad.force_magnitude),
+                Moment = BH.Engine.Geometry.Create.Vector(nodeLoad.components_force_x, nodeLoad.components_moment_y, nodeLoad.components_moment_z),
+            };
+
+            return bhLoad;
+        }
 
 
     }
