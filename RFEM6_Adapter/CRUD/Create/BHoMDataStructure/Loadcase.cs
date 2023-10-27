@@ -63,6 +63,7 @@ namespace BH.Adapter.RFEM6
             }
             else
             {
+
                 analysis = foundAnalysisSettings.FindAll(s => s.analysis_type == static_analysis_settings_analysis_type.GEOMETRICALLY_LINEAR).First();
 
             }
