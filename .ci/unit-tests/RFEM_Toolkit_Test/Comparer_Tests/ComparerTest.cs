@@ -24,6 +24,7 @@ using BH.Adapter.RFEM6;
 using BH.Engine.Base;
 using BH.Engine.Spatial;
 using BH.oM.Adapters.RFEM6;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.oM.Geometry;
 using BH.oM.Physical.Materials;
 using BH.oM.Spatial.ShapeProfiles;

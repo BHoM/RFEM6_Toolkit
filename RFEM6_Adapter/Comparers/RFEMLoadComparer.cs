@@ -19,41 +19,74 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
-using BH.Engine.Base;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Structure.Constraints;
+using BH.oM.Structure.Loads;
+using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.SurfaceProperties;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public class RFEMLoadComparer : IEqualityComparer<ILoad>
     {
-        public static rfModel.member ToRFEM6(this Bar bar)
-        {
-            rfModel.member rfMember = new rfModel.member()
-            {
-                no = bar.GetRFEM6ID(),
-                type = bar.FEAType.ToRFEM6(),
-                typeSpecified = true,
-                line = bar.FindFragment<RFEMLine>().GetRFEM6ID(),
-                lineSpecified = true,
-                section_start = bar.SectionProperty.GetRFEM6ID(),
-                section_startSpecified = true,
-                section_endSpecified = true,
-                comment = "",
-            };
+        /***************************************************/
+        /**** Constructors                              ****/
+        /***************************************************/
 
-            return rfMember;
+        public RFEMLoadComparer()
+        {
 
         }
 
+
+        /***************************************************/
+        /**** Public Methods                            ****/
+        /***************************************************/
+
+        public bool Equals(ILoad load0, ILoad load1)
+        {
+
+            if(load0.GetHashCode().Equals(load1.GetHashCode())) return true;
+
+                LoadCaseComparer loadCaseComparer = new LoadCaseComparer();
+            if (!loadCaseComparer.Equals(load0.Loadcase, load1.Loadcase)) return false;
+
+            if (load0.Axis != load1.Axis) return false;
+
+            if (load0.Projected != load1.Projected) return false;
+
+            if (!load0.GetType().Equals(load1.GetType())) return false; 
+
+
+
+            return true;
+
+        }
+
+        /***************************************************/
+
+        public int GetHashCode(ILoad load)
+        {
+
+            //return surfaceSupport.GetHashCode();
+
+            return 0;
+            
+        }
+
+
+        /***************************************************/
+
+
     }
+
+
+
 }
+
+
+
+

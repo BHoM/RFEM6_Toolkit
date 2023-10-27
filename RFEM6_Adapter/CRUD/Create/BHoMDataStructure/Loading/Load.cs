@@ -29,8 +29,10 @@ using BH.oM.Structure.Elements;
 using BH.oM.Geometry;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
-
+using BH.oM.Structure.Loads;
 using rfModel = Dlubal.WS.Rfem6.Model;
+using Dlubal.WS.Rfem6.Model;
+using System.Security.Cryptography;
 using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
@@ -39,16 +41,44 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private bool CreateCollection(IEnumerable<RFEMOpening> rfemOpening)
+        private bool CreateCollection(IEnumerable<ILoad> bhLoads)
         {
+            //Checking presence of GeometricalLineLoads and getting all line numbers
+            List<rfModel.line> allLineNumbers = new List<rfModel.line>();
+            if (bhLoads.Where(l => l is GeometricalLineLoad).ToList().Count() > 0)
+            {
+                rfModel.object_with_children[] lineNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE);
+                allLineNumbers = lineNumber.Length > 1 ? lineNumber.ToList().Select(n => m_Model.get_line(n.no)).ToList().ToList() : new List<rfModel.line>();
+            }
 
-            foreach (RFEMOpening bhOpening in rfemOpening)
+            foreach (ILoad bhLoad in bhLoads)
             {
 
-                rfModel.opening rfOpening = bhOpening.Opening.ToRFEM6();
+                if (bhLoad is BarUniformlyDistributedLoad)
+                {
+                    var rfMemberLoad = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6();
+                    m_Model.set_member_load(bhLoad.Loadcase.GetRFEM6ID(), rfMemberLoad);
+                }
+                else if (bhLoad is PointLoad)
+                {
 
-                m_Model.set_opening(rfOpening);
+                    var rfPointLoad = (bhLoad as PointLoad).ToRFEM6();
+                    m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
 
+
+                }
+                else if (bhLoad is GeometricalLineLoad)
+                {
+
+
+                    Line loadedline= (bhLoad as GeometricalLineLoad).Location;
+                    
+
+                    var rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6();
+                    m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
+
+
+                }
             }
 
             return true;

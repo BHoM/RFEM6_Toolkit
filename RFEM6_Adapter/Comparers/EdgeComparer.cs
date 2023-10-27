@@ -23,12 +23,12 @@
 using System;
 using System.Collections.Generic;
 using BH.oM.Structure.Elements;
-using BH.oM.Adapters.RFEM6;
 using BH.Engine.Structure;
 using System.Linq;
 using BH.oM.Analytical.Elements;
 using BH.oM.Geometry;
 using BH.Engine.Geometry;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {

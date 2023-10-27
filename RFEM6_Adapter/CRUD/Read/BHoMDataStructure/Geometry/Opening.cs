@@ -26,12 +26,11 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
+using BH.oM.Structure.Constraints;
 using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.SurfaceProperties;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
@@ -39,19 +38,17 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private bool CreateCollection(IEnumerable<RFEMOpening> rfemOpening)
+        private List<Opening> ReadOpening(List<string> ids = null)
         {
+            List<Opening> bhOpenings = new List<Opening>();
+            List<RFEMOpening> rfemOpenings = GetCachedOrRead<RFEMOpening>();
 
-            foreach (RFEMOpening bhOpening in rfemOpening)
+            foreach (var rfemOpening in rfemOpenings)
             {
-
-                rfModel.opening rfOpening = bhOpening.Opening.ToRFEM6();
-
-                m_Model.set_opening(rfOpening);
+                bhOpenings.Add(rfemOpening.Opening);
 
             }
-
-            return true;
+            return bhOpenings;
         }
 
     }

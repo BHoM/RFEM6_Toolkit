@@ -26,12 +26,11 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.Constraints;
+using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
+using Dlubal.WS.Rfem6.Model;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
@@ -39,19 +38,30 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private bool CreateCollection(IEnumerable<RFEMOpening> rfemOpening)
+        private List<Edge> ReadEdges(List<string> ids = null)
         {
 
-            foreach (RFEMOpening bhOpening in rfemOpening)
+            List<Edge> edgeList = new List<Edge>();
+
+            List<RFEMLine> rfemLineList = GetCachedOrRead<RFEMLine>();
+
+            Dictionary<int, RFEMLineSupport> supportMap = this.GetCachedOrReadAsDictionary<int, RFEMLineSupport>();
+
+            foreach (RFEMLine rfemLine in rfemLineList)
             {
 
-                rfModel.opening rfOpening = bhOpening.Opening.ToRFEM6();
+                Edge edge = rfemLine.FromRFEMLineToEdge();
 
-                m_Model.set_opening(rfOpening);
+                RFEMLineSupport support;
+                if (supportMap.TryGetValue(rfemLine.supportID, out support))
+                    edge.Support = support.Constraint;
 
+
+                edgeList.Add(edge);
             }
 
-            return true;
+            return edgeList;
+
         }
 
     }

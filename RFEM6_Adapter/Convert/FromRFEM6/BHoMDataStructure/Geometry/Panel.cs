@@ -26,41 +26,60 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.SurfaceProperties;
+using BH.oM.Geometry;
+using BH.Engine.Adapter;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
+using BH.Engine.Spatial;
+using BH.Engine.Base;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public static partial class Convert
     {
 
-        private List<Edge> ReadEdges(List<string> ids = null)
+        //public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, Dictionary<int,  HashSet<int>> openingIDDict, int rfPanelNo, Dictionary<int, RFEMOpening> surfaceOpening)
+        public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, HashSet<int> openingIDs, Dictionary<int, RFEMOpening> surfaceOpening)
         {
 
-            List<Edge> edgeList = new List<Edge>();
+            //HashSet<int> openingIDs = new HashSet<int>();
 
-            List<RFEMLine> rfemLineList = GetCachedOrRead<RFEMLine>();
+            //openingIDDict.TryGetValue(rfPanelNo,out openingIDs);
 
-            Dictionary<int, RFEMLineSupport> supportMap = this.GetCachedOrReadAsDictionary<int, RFEMLineSupport>();
 
-            foreach (RFEMLine rfemLine in rfemLineList)
+            List<int> rfEdgeNumbers = rfSurface.boundary_lines.ToList();
+            List<Edge> bhEdges = rfEdgeNumbers.Select(n => edgeDict[n]).ToList();
+            Panel panel = new Panel();
+
+
+            if (openingIDs.Count>0)
             {
 
-                Edge edge = rfemLine.FromRFEMLineToEdge();
+                List<Opening> openingins = new List<Opening>();
 
-                RFEMLineSupport support;
-                if (supportMap.TryGetValue(rfemLine.supportID, out support))
-                    edge.Support = support.Constraint;
+                foreach (int o in openingIDs)
+                {
+                    Opening opening = surfaceOpening[o].Opening;
 
+                    openingins.Add(opening);
 
-                edgeList.Add(edge);
+                }
+
+                panel = Engine.Structure.Create.Panel(bhEdges, openingins, surfaceProperty[rfSurface.thickness]);
+
             }
 
-            return edgeList;
+            else
+            {
 
+                panel = Engine.Structure.Create.Panel(bhEdges, new List<ICurve>(), surfaceProperty[rfSurface.thickness], "");
+            }
+
+            panel.SetRFEM6ID(rfSurface.no);
+
+            return panel;
         }
 
     }

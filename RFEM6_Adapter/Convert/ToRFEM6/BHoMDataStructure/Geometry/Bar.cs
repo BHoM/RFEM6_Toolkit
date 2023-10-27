@@ -26,44 +26,32 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.SurfaceProperties;
-using BH.oM.Geometry;
 using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
+using BH.Engine.Base;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Geometry;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-
-        public static RFEMOpening FromRFEM(this rfModel.opening rfOpening, Dictionary<int, Edge> edgeDict, List<int> surfaceIDs)
+        public static rfModel.member ToRFEM6(this Bar bar)
         {
+            rfModel.member rfMember = new rfModel.member()
+            {
+                no = bar.GetRFEM6ID(),
+                type = bar.FEAType.ToRFEM6(),
+                typeSpecified = true,
+                line = bar.FindFragment<RFEMLine>().GetRFEM6ID(),
+                lineSpecified = true,
+                section_start = bar.SectionProperty.GetRFEM6ID(),
+                section_startSpecified = true,
+                section_endSpecified = true,
+                comment = "",
+            };
 
-            List<ICurve> curves = new List<ICurve>();
-
-            rfOpening.boundary_lines.ToList().ForEach(l => curves.Add(edgeDict[l].Curve));
-
-            PolyCurve polyCurve = Engine.Geometry.Create.PolyCurve(curves);
-
-            var polyCurves = Engine.Geometry.Compute.Join(new List<PolyCurve>() { polyCurve });
-
-            Opening opening = Engine.Structure.Create.Opening(Engine.Geometry.Modify.Close(polyCurves.First()));
-
-            List<Edge> edges = new List<Edge>();
-            rfOpening.boundary_lines.ToList().ForEach(l => edges.Add(edgeDict[l]));
-            Opening o = new Opening() {Edges=edges};
-
-            opening.SetRFEM6ID(rfOpening.no);
-            o.SetRFEM6ID(rfOpening.no);
-
-            //RFEMOpening rfemOpening = new RFEMOpening() { Opening = opening, SurfaceIDs = surfaceIDs };
-            RFEMOpening rfemOpening = new RFEMOpening() { Opening = o, SurfaceIDs = surfaceIDs };
-
-            rfemOpening.SetRFEM6ID(rfOpening.no);
-            return rfemOpening;
+            return rfMember;
 
         }
 

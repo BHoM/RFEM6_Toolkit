@@ -26,28 +26,45 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.SurfaceProperties;
+using BH.oM.Geometry;
+using BH.Engine.Adapter;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.Engine.Geometry;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter : BHoMAdapter
+    public static partial class Convert
     {
-        /***************************************************/
-        /**** Update Node                               ****/
-        /***************************************************/
 
-        private bool UpdateObjects(IEnumerable<RFEMLine> lines)
+        public static RFEMOpening FromRFEM(this rfModel.opening rfOpening, Dictionary<int, Edge> edgeDict, List<int> surfaceIDs)
         {
-            bool success = true;
 
-            foreach (RFEMLine line in lines)
-            {
-                m_Model.set_line(line.ToRFEM6());
-            }
+            List<ICurve> curves = new List<ICurve>();
 
-            return success;
+            rfOpening.boundary_lines.ToList().ForEach(l => curves.Add(edgeDict[l].Curve));
+
+            PolyCurve polyCurve = Engine.Geometry.Create.PolyCurve(curves);
+
+            var polyCurves = Engine.Geometry.Compute.Join(new List<PolyCurve>() { polyCurve });
+
+            Opening opening = Engine.Structure.Create.Opening(Engine.Geometry.Modify.Close(polyCurves.First()));
+
+            List<Edge> edges = new List<Edge>();
+            rfOpening.boundary_lines.ToList().ForEach(l => edges.Add(edgeDict[l]));
+            Opening o = new Opening() {Edges=edges};
+
+            opening.SetRFEM6ID(rfOpening.no);
+            o.SetRFEM6ID(rfOpening.no);
+
+            //RFEMOpening rfemOpening = new RFEMOpening() { Opening = opening, SurfaceIDs = surfaceIDs };
+            RFEMOpening rfemOpening = new RFEMOpening() { Opening = o, SurfaceIDs = surfaceIDs };
+
+            rfemOpening.SetRFEM6ID(rfOpening.no);
+            return rfemOpening;
+
         }
 
     }

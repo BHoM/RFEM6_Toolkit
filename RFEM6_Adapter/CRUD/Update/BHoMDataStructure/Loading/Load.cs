@@ -26,56 +26,41 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Geometry;
-using BH.oM.Geometry.CoordinateSystem;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Structure.Loads;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter : BHoMAdapter
     {
+        /***************************************************/
+        /**** Update Node                               ****/
+        /***************************************************/
 
-        public static Edge FromRFEMLineToEdge(this RFEMLine rfemLine)
+        private bool UpdateObjects(IEnumerable<ILoad> loads)
         {
-            Edge edge = new Edge { Curve = (ICurve)rfemLine.Curve, Name = rfemLine.Name };
-            edge.SetRFEM6ID(rfemLine.GetRFEM6ID());
-            return edge;
-        }
+            bool success = true;
 
-
-        public static Edge FromRFEM(this rfModel.line rfLine, Dictionary<int, Node> nodeDict)
-        {
-
-            var type = rfLine.type.ToString();
-            ICurve curve = null;
-
-            if (type.Equals("TYPE_ARC"))
+            foreach (ILoad bhLoad in loads)
             {
-                Node n0 = nodeDict[rfLine.definition_nodes[0]];
-                Node n1 = nodeDict[rfLine.definition_nodes[1]];
-                Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
-                curve = Engine.Geometry.Create.Arc(n0.Position, mid, n1.Position);
-            }
-            else if (type.Equals("TYPE_POLYLINE"))
-            {
-                List<Point> pts = new List<Point>();
-                rfLine.definition_nodes.ToList().ForEach(n => pts.Add(nodeDict[rfLine.definition_nodes[0]].Position));
-                curve = new Polyline { ControlPoints = pts };
+
+                if (bhLoad is BarUniformlyDistributedLoad)
+                {
+                    var rfMemberLoad = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6();
+                    m_Model.set_member_load(bhLoad.Loadcase.GetRFEM6ID(), rfMemberLoad);
+                }
+                else if (bhLoad is PointLoad)
+                {
+                    var rfPointLoad = (bhLoad as PointLoad).ToRFEM6();
+                    m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
+
+                }
+
             }
 
-            else if (type.Equals("TYPE_CIRCLE"))
-            {
-                Node n0 = nodeDict[rfLine.definition_nodes[0]];
-                curve = Engine.Geometry.Create.Circle(n0.Position, rfLine.circle_radius);
-            }
-
-            Edge edge = new Edge { Curve = curve };
-            edge.SetRFEM6ID(rfLine.no);
-            return edge;
+            return success;
         }
 
     }

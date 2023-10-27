@@ -120,6 +120,10 @@
 		</Reference>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Convert\ToRFEM6\BHoMDataStructure\Constraints\" />
+	</ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
 	  <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
   </Target>

@@ -30,7 +30,7 @@ using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 using System.Security.Cryptography;
 
-namespace BH.oM.Adapters.RFEM6
+namespace BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry
 {
     public class RFEMLine : BHoMObject, IFragment
     {

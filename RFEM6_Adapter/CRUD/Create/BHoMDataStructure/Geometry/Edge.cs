@@ -23,19 +23,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using BH.oM.Base;
-using System.ComponentModel;
+
+using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
+using BH.oM.Geometry;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.SectionProperties;
 
-namespace BH.oM.Adapters.RFEM6
+using rfModel = Dlubal.WS.Rfem6.Model;
+using Dlubal.WS.Rfem6.Model;
+using System.Security.Cryptography;
+using BH.Engine.Base;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+
+namespace BH.Adapter.RFEM6
 {
-    public class RFEMOpening : BHoMObject, IFragment
+    public partial class RFEM6Adapter
     {
-      
-        public virtual Opening Opening { get; set; }
 
-        public virtual List<int> SurfaceIDs { get; set; } = new List<int>();
+        private bool CreateCollection(IEnumerable<Edge> edge)
+        {
+
+            foreach (Edge e in edge)
+            {
+                e.SetRFEM6ID(e.FindFragment<RFEMLine>().GetRFEM6ID());
+                
+            }
+
+            return true;
+        }
 
     }
 }

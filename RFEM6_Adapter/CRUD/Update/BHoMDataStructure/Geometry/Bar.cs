@@ -26,29 +26,32 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
+using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SurfaceProperties;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6Adapter : BHoMAdapter
     {
+        /***************************************************/
+        /**** Update Node                               ****/
+        /***************************************************/
 
-        private List<Opening> ReadOpening(List<string> ids = null)
+        private bool UpdateObjects(IEnumerable<Bar> bars)
         {
-            List<Opening> bhOpenings = new List<Opening>();
-            List<RFEMOpening> rfemOpenings = GetCachedOrRead<RFEMOpening>();
+            bool success = true;
 
-            foreach (var rfemOpening in rfemOpenings)
+
+
+            foreach (Bar bar in bars)
             {
-                bhOpenings.Add(rfemOpening.Opening);
 
+                m_Model.set_member(bar.ToRFEM6());
             }
-            return bhOpenings;
+
+            return success;
         }
 
     }

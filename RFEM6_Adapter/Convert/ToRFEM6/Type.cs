@@ -35,6 +35,7 @@ using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.oM.Structure.Loads;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
@@ -96,7 +97,14 @@ namespace BH.Adapter.RFEM6
             {
                 return rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE;
             }
-
+            else if (bhType == typeof(PointLoad))
+            {
+                return rfModel.object_types.E_OBJECT_TYPE_NODAL_LOAD;
+            }
+            else if (bhType == typeof(BarUniformlyDistributedLoad))
+            {
+                return rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD;
+            }
 
             return null;
 

@@ -26,60 +26,32 @@ using System.Text;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.SurfaceProperties;
-using BH.oM.Geometry;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Spatial;
-using BH.Engine.Base;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Structure.Loads;
+using BH.oM.Adapter.Commands;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
+    public partial class RFEM6Adapter : BHoMAdapter
     {
+        /***************************************************/
+        /**** Update Node                               ****/
+        /***************************************************/
 
-        //public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, Dictionary<int,  HashSet<int>> openingIDDict, int rfPanelNo, Dictionary<int, RFEMOpening> surfaceOpening)
-        public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, HashSet<int> openingIDs, Dictionary<int, RFEMOpening> surfaceOpening)
+        private bool UpdateObjects(IEnumerable<Loadcase> loadcases)
         {
-
-            //HashSet<int> openingIDs = new HashSet<int>();
-
-            //openingIDDict.TryGetValue(rfPanelNo,out openingIDs);
-
-
-            List<int> rfEdgeNumbers = rfSurface.boundary_lines.ToList();
-            List<Edge> bhEdges = rfEdgeNumbers.Select(n => edgeDict[n]).ToList();
-            Panel panel = new Panel();
-
-
-            if (openingIDs.Count>0)
+            bool success = true;
+            foreach (Loadcase loadcase in loadcases)
             {
+                load_case selfWeightLC = loadcase.ToRFEM6(1);
 
-                List<Opening> openingins = new List<Opening>();
-
-                foreach (int o in openingIDs)
-                {
-                    Opening opening = surfaceOpening[o].Opening;
-
-                    openingins.Add(opening);
-
-                }
-
-                panel = Engine.Structure.Create.Panel(bhEdges, openingins, surfaceProperty[rfSurface.thickness]);
-
+                m_Model.set_load_case(selfWeightLC);
             }
 
-            else
-            {
-
-                panel = Engine.Structure.Create.Panel(bhEdges, new List<ICurve>(), surfaceProperty[rfSurface.thickness], "");
-            }
-
-            panel.SetRFEM6ID(rfSurface.no);
-
-            return panel;
+            return success;
         }
 
     }

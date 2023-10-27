@@ -35,6 +35,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Adapters.RFEM6;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
@@ -90,6 +91,13 @@ namespace BH.Adapter.RFEM6
                     return ReadOpening(ids as dynamic);
                 else if (type == typeof(Loadcase))
                     return ReadLoadCase(ids as dynamic);
+                else if (type == typeof(GeometricalLineLoad))
+                    return ReadLineLoad(ids as dynamic);
+                else if (type == typeof(BarUniformlyDistributedLoad))
+                    return ReadBarLoad(ids as dynamic);
+                else if (type == typeof(PointLoad))
+                    return ReadPointLoad(ids as dynamic);
+
             }
             finally
             {
