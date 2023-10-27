@@ -1,24 +1,24 @@
-/*
- * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
- *
- * Each contributor holds copyright over their respective contributions.
- * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
- */
+///*
+// * This file is part of the Buildings and Habitats object Model (BHoM)
+// * Copyright (c) 2015 - 2023, the respective contributors. All rights reserved.
+// *
+// * Each contributor holds copyright over their respective contributions.
+// * The project versioning (Git) records all such contribution source information.
+// *                                           
+// *                                                                              
+// * The BHoM is free software: you can redistribute it and/or modify         
+// * it under the terms of the GNU Lesser General Public License as published by  
+// * the Free Software Foundation, either version 3.0 of the License, or          
+// * (at your option) any later version.                                          
+// *                                                                              
+// * The BHoM is distributed in the hope that it will be useful,              
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of               
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
+// * GNU Lesser General Public License for more details.                          
+// *                                                                            
+// * You should have received a copy of the GNU Lesser General Public License     
+// * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+// */
 //using BH.Adapter.RFEM6;
 //using BH.Engine.Base;
 //using BH.oM.Adapters.RFEM6;
@@ -75,9 +75,9 @@
 
 
 
-//            Polyline lNew=BH.Engine.Geometry.Compute.Join(new List<Line>(){l1,l2,l3 }).First();
-//            Edge eNew=new Edge() { Curve=lNew};
-//            Panel pNew=new Panel() { ExternalEdges=new List<Edge>() { eNew}, };
+//            Polyline lNew = BH.Engine.Geometry.Compute.Join(new List<Line>() { l1, l2, l3 }).First();
+//            Edge eNew = new Edge() { Curve = lNew };
+//            Panel pNew = new Panel() { ExternalEdges = new List<Edge>() { eNew }, };
 
 //            Edge e1 = new Edge() { Curve = l1 };
 //            Edge e2 = new Edge() { Curve = l2 };
@@ -90,7 +90,7 @@
 //            Edge e6 = new Edge() { Curve = l6 };
 //            Opening o = new Opening() { Edges = new List<Edge> { e4, e5, e6 } };
 
-//var bhMaterial = BH.Engine.Library.Query.Match("Steel", "IPE 600", true, true).DeepClone() as IMaterialFragment;
+//            var bhMaterial = BH.Engine.Library.Query.Match("Steel", "IPE 600", true, true).DeepClone() as IMaterialFragment;
 
 //            Panel panel1 = new Panel() { ExternalEdges = new List<Edge> { e1, e2, e3 } };
 
