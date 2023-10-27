@@ -100,40 +100,40 @@ namespace BH.Adapter.RFEM6
 
         }
 
-        public static rfModel.nodal_load ToRFEM6(this GeometricalLineLoad bhLineLoad)
-        {
+        //public static rfModel.nodal_load ToRFEM6(this GeometricalLineLoad bhLineLoad)
+        //{
             
 
-            nodal_load rfLoadCase = new rfModel.nodal_load()
-            {
-                no = bhLineLoad.GetRFEM6ID(),
-                //members_string = (i + 1).ToString(),
-                nodes = bhLineLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
-                load_direction = nodal_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
-                load_directionSpecified = true,
-                force_magnitude = bhPointLoad.Force.Length(),
-                force_magnitudeSpecified = true,
-                components_force_x = bhPointLoad.Force.X,
-                components_force_xSpecified = true,
-                components_force_y = bhPointLoad.Force.Y,
-                components_force_ySpecified = true,
-                components_force_z = bhPointLoad.Force.Z,
-                components_force_zSpecified = true,
-                moment_magnitude = bhPointLoad.Moment.Length(),
-                moment_magnitudeSpecified = true,
-                components_moment_x = bhPointLoad.Moment.X,
-                components_moment_xSpecified = true,
-                components_moment_y = bhPointLoad.Moment.Y,
-                components_moment_ySpecified = true,
-                components_moment_z = bhPointLoad.Moment.Z,
-                components_moment_zSpecified = true,
+        //    nodal_load rfLoadCase = new rfModel.nodal_load()
+        //    {
+        //        no = bhLineLoad.GetRFEM6ID(),
+        //        //members_string = (i + 1).ToString(),
+        //        nodes = bhLineLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
+        //        load_direction = nodal_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
+        //        load_directionSpecified = true,
+        //        force_magnitude = bhPointLoad.Force.Length(),
+        //        force_magnitudeSpecified = true,
+        //        components_force_x = bhPointLoad.Force.X,
+        //        components_force_xSpecified = true,
+        //        components_force_y = bhPointLoad.Force.Y,
+        //        components_force_ySpecified = true,
+        //        components_force_z = bhPointLoad.Force.Z,
+        //        components_force_zSpecified = true,
+        //        moment_magnitude = bhPointLoad.Moment.Length(),
+        //        moment_magnitudeSpecified = true,
+        //        components_moment_x = bhPointLoad.Moment.X,
+        //        components_moment_xSpecified = true,
+        //        components_moment_y = bhPointLoad.Moment.Y,
+        //        components_moment_ySpecified = true,
+        //        components_moment_z = bhPointLoad.Moment.Z,
+        //        components_moment_zSpecified = true,
 
-            };
+        //    };
 
 
-            return rfLoadCase;
+        //    return rfLoadCase;
 
-        }
+        //}
 
 
     }
