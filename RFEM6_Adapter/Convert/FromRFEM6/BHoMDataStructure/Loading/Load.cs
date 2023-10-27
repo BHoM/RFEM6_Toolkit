@@ -31,6 +31,9 @@ using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.oM.Structure.Loads;
+using BH.oM.Geometry;
+using BH.Engine.Spatial;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -61,6 +64,58 @@ namespace BH.Adapter.RFEM6
                 Force = BH.Engine.Geometry.Create.Vector(0, 0, nodeLoad.force_magnitude),
                 Moment = BH.Engine.Geometry.Create.Vector(nodeLoad.components_force_x, nodeLoad.components_moment_y, nodeLoad.components_moment_z),
             };
+
+            return bhLoad;
+        }
+
+        public static GeometricalLineLoad FromRFEM(this rfModel.line_load lineLoad, Loadcase bhLoadCase, Edge edge)
+        {
+            bool isProjected = false;
+            Vector startImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
+            Vector endImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
+            Line line = new Line() { Start = edge.Curve.ControlPoints().ToList().First(), End = edge.Curve.ControlPoints().ToList().Last() };
+
+            switch (lineLoad.load_direction)
+            {
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
+                    isProjected = false;
+                    startImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
+                    endImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
+                    isProjected = true;
+                    startImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
+                    endImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
+                    isProjected = false;
+                    startImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
+                    endImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
+                    isProjected = true;
+                    startImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
+                    endImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
+                    isProjected = false;
+                    startImpact = new Vector() { X = 0, Y = lineLoad.magnitude, Z = 0 };
+                    endImpact = new Vector() { X = 0, Y = lineLoad.magnitude, Z = 0 };
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
+                    isProjected = true;
+                    startImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
+                    endImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
+                    break;
+                default:
+                    isProjected = false;
+                    startImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
+                    endImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
+                    break;
+            }
+
+            GeometricalLineLoad bhLoad = (lineLoad.load_type == line_load_load_type.LOAD_TYPE_FORCE) ? BH.Engine.Structure.Create.GeometricalLineLoad(line, bhLoadCase, startImpact, endImpact, new Vector(), new Vector()) : BH.Engine.Structure.Create.GeometricalLineLoad(line, bhLoadCase, new Vector(), new Vector(), startImpact, endImpact);
+            bhLoad.Projected = isProjected;
 
             return bhLoad;
         }

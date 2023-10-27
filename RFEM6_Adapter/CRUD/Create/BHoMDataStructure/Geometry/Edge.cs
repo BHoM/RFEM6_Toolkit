@@ -47,6 +47,7 @@ namespace BH.Adapter.RFEM6
             foreach (Edge e in edge)
             {
                 e.SetRFEM6ID(e.FindFragment<RFEMLine>().GetRFEM6ID());
+                
             }
 
             return true;

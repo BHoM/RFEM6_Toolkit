@@ -51,7 +51,7 @@ namespace BH.Adapter.RFEM6
             foreach (int id in ids.OfType<int>())
             {
 
-                if (rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE|| rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_NODAL_LOAD|| rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD) { continue; }
+                if (rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE|| rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_NODAL_LOAD|| rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD || rfemType.Value == rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD) { continue; }
                 m_Model.delete_object(rfemType.Value, id, 0);
                 deleteCount++;
             }
