@@ -161,14 +161,17 @@ namespace RFEM_Toolkit_Test.Loading
             List<Line> lines = new List<Line>() { l1, l2, l3, l4 };
 
             List<Edge> edges = lines.Select(l => new Edge() { Curve = l }).ToList();
-
+            Loadcase loadcaseDL = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
             var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
 
             BH.oM.Structure.SurfaceProperties.ConstantThickness surfaceProp = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.3, Material = concrete };
 
             Panel panel = new Panel() { ExternalEdges = edges, Property = surfaceProp };
+            GeometricalLineLoad lineLoad = new GeometricalLineLoad() { Location = l1, ForceA = new Vector() { X = 0, Y = 0, Z = 100 },Loadcase= loadcaseDL };
 
             adapter.Push(new List<Panel>() { panel });
+            adapter.Push(new List<ILoad>() { lineLoad });
+
 
 
 
