@@ -72,6 +72,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
                 {typeof(BarUniformlyDistributedLoad), new List<Type> { typeof(Bar),typeof(Loadcase)} },
                 {typeof(PointLoad), new List<Type> { typeof(Node), typeof(Loadcase) } },
+                {typeof(GeometricalLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } },
 
 
 
@@ -118,7 +119,8 @@ namespace BH.Adapter.RFEM6
 
 
             };
-
+             
+           
         }
 
     }
