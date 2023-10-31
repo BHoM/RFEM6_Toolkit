@@ -99,7 +99,6 @@ namespace BH.Adapter.RFEM6
 
                     int lineNo = nestedNodeToIDMap[n0][n1];
 
-                    m_Model.
 
                     line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(new List<int>() {lineNo });
                     m_Model.set_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
