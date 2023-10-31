@@ -161,7 +161,7 @@ namespace RFEM_Toolkit_Test.Loading
             GeometricalLineLoad lineLoad = new GeometricalLineLoad() { Location = l1, ForceA = new Vector() { X = 0, Y = 0, Z = 100 },Loadcase= loadcaseDL };
 
             adapter.Push(new List<Panel>() { panel });
-            adapter.Push(new List<ILoad>() { lineLoad });
+            adapter.Push(new List<GeometricalLineLoad>() { lineLoad });
 
 
 

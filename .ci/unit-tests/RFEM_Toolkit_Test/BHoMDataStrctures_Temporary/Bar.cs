@@ -107,14 +107,7 @@ namespace RFEM_Toolkit_Test.BHoMDataStrctures_Temporary
 
             comparer = new BarEndNodesDistanceComparer(3);
 
-            n1 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 0 } };
-            n2 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 } };
-            n3 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 10 } };
-            n4 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 10 } };
-            n5 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 20 } };
-            n6 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 20 } };
-            n7 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 30 } };
-            n8 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 30 } };
+
 
             ISectionProperty section1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
             ISectionProperty section2 = BH.Engine.Library.Query.Match("EU_SteelSections", "HE 1000 M", true, true) as ISectionProperty;
@@ -162,10 +155,10 @@ namespace RFEM_Toolkit_Test.BHoMDataStrctures_Temporary
             n2 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 } };
             n3 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 10 } };
             n4 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 10 } };
-            n5 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 20 } };
-            n6 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 20 } };
-            n7 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 30 } };
-            n8 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 30 } };
+            //n5 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 20 } };
+            //n6 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 20 } };
+            //n7 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 30 } };
+            //n8 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 30 } };
 
             ISectionProperty section1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
             ISectionProperty section2 = BH.Engine.Library.Query.Match("EU_SteelSections", "HE 1000 M", true, true) as ISectionProperty;
