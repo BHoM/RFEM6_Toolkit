@@ -20,23 +20,14 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 using BH.Adapter.RFEM6;
-using BH.Engine.Base;
-using BH.oM.Adapters.RFEM6;
 using BH.oM.Data.Requests;
 using BH.oM.Geometry;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
-using BH.oM.Data.Library;
-using BH.Engine.Library;
-using Dlubal.WS.Rfem6.Model;
-using BH.oM.Physical.Materials;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
-using BH.oM.Base;
 using BH.Engine.Structure;
 using BH.oM.Structure.Loads;
-using BH.Engine.Spatial;
-using BH.oM.Structure.SurfaceProperties;
 
 namespace RFEM_Toolkit_Test.Loading
 {

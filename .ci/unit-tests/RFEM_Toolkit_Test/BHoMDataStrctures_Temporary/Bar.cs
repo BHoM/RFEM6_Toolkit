@@ -20,22 +20,16 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 using BH.Adapter.RFEM6;
-using BH.Engine.Base;
-using BH.oM.Adapters.RFEM6;
 using BH.oM.Data.Requests;
 using BH.oM.Geometry;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
-using BH.oM.Data.Library;
-using BH.Engine.Library;
-using Dlubal.WS.Rfem6.Model;
-using BH.oM.Physical.Materials;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Base;
 using BH.Engine.Structure;
 
-namespace RFEM_Toolkit_Test.Elements
+namespace RFEM_Toolkit_Test.BHoMDataStrctures_Temporary
 {
 
 
@@ -48,10 +42,6 @@ namespace RFEM_Toolkit_Test.Elements
         Node n2;
         Node n3;
         Node n4;
-        Node n5;
-        Node n6;
-        Node n7;
-        Node n8;
         IMaterialFragment inputSection2;
         IMaterialFragment inputSection1;
         BarEndNodesDistanceComparer comparer;
@@ -130,10 +120,10 @@ namespace RFEM_Toolkit_Test.Elements
             ISectionProperty section2 = BH.Engine.Library.Query.Match("EU_SteelSections", "HE 1000 M", true, true) as ISectionProperty;
 
 
-            release1 = BH.Engine.Structure.Create.BarReleaseFixFix("");
-            release2 = BH.Engine.Structure.Create.BarReleaseFixFix("");
-            release3 = BH.Engine.Structure.Create.BarReleasePinPin("");
-            release4 = BH.Engine.Structure.Create.BarReleasePinSlip("");
+            release1 = Create.BarReleaseFixFix("");
+            release2 = Create.BarReleaseFixFix("");
+            release3 = Create.BarReleasePinPin("");
+            release4 = Create.BarReleasePinSlip("");
 
             bar1In = new Bar() { StartNode = n1, EndNode = n2, SectionProperty = section1, Release = release1 };
             bar2In = new Bar() { StartNode = n3, EndNode = n4, SectionProperty = section2, Release = release2 };
@@ -180,19 +170,14 @@ namespace RFEM_Toolkit_Test.Elements
             ISectionProperty section1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
             ISectionProperty section2 = BH.Engine.Library.Query.Match("EU_SteelSections", "HE 1000 M", true, true) as ISectionProperty;
 
-
-
-
-            release1 = BH.Engine.Structure.Create.BarReleaseFixFix("");
-            release2 = BH.Engine.Structure.Create.BarReleaseFixFix("");
-            release3 = BH.Engine.Structure.Create.BarReleasePinPin("");
-            release4 = BH.Engine.Structure.Create.BarReleasePinSlip("");
+            release1 = Create.BarReleaseFixFix("");
+            release2 = Create.BarReleaseFixFix("");
+            release3 = Create.BarReleasePinPin("");
+            release4 = Create.BarReleasePinSlip("");
 
             bar1In = new Bar() { StartNode = n3, EndNode = n4, SectionProperty = section2, Release = release2, FEAType = BarFEAType.Axial };
             bar2In = new Bar() { StartNode = n1, EndNode = n2, SectionProperty = section1, Release = release3, FEAType = BarFEAType.TensionOnly };
             adapter.Push(new List<IBHoMObject>() { bar1In, bar2In });
-
-
 
             FilterRequest barFilter = new FilterRequest() { Type = typeof(Bar) };
             var bars = adapter.Pull(barFilter).ToList();
