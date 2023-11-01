@@ -115,7 +115,8 @@ namespace BH.Adapter.RFEM6
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
                 {typeof(Panel), new RFEMPanelComparer() },
                 {typeof(Loadcase), new LoadCaseComparer() },
-                {typeof(ILoad), new RFEMLoadComparer()  }
+                {typeof(ILoad), new RFEMLoadComparer()  },
+
 
 
             };

@@ -105,6 +105,10 @@ namespace BH.Adapter.RFEM6
             {
                 return rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD;
             }
+            else if (bhType == typeof(GeometricalLineLoad))
+            {
+                return rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
+            }
 
             return null;
 

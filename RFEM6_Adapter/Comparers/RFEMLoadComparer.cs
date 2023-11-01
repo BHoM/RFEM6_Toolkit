@@ -22,8 +22,11 @@
 
 using System;
 using System.Collections.Generic;
+using BH.Engine.Structure;
 using BH.oM.Adapters.RFEM6;
+using BH.oM.Geometry;
 using BH.oM.Structure.Constraints;
+using BH.oM.Structure.Elements;
 using BH.oM.Structure.Loads;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
@@ -58,8 +61,33 @@ namespace BH.Adapter.RFEM6
 
             if (load0.Projected != load1.Projected) return false;
 
-            if (!load0.GetType().Equals(load1.GetType())) return false; 
+            if (!load0.GetType().Equals(load1.GetType())) return false;
 
+            if (load0 is GeometricalLineLoad) { 
+            
+                Line line0 = ((GeometricalLineLoad)load0).Location;
+                Line line1 = ((GeometricalLineLoad)load1).Location;
+
+                NodeDistanceComparer comparer = new NodeDistanceComparer(3);
+                
+                if(!comparer.Equals(new Node() {Position= line0.Start }, new Node() { Position = line1.Start })) return false;
+
+                if (!comparer.Equals(new Node() { Position = line0.End }, new Node() { Position = line1.End })) return false;
+
+
+
+            }
+            if (load0 is PointLoad)
+            {
+                //Line line0 = ((PointLoad)load0).;
+                //Line line1 = ((PointLoad)load1).;
+            }
+            if (load0 is BarUniformlyDistributedLoad) { 
+
+                //((BarUniformlyDistributedLoad)load0).
+
+            }
+            
 
 
             return true;
