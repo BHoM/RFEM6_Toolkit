@@ -112,7 +112,7 @@ namespace BH.Adapter.RFEM6
                 load_caseSpecified=true,
                 load_distribution = line_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
-                magnitude = 3000,
+                magnitude = bhLineLoad.ForceA.Length(),
                 magnitudeSpecified = true,
                 reference_to_list_of_lines=false,
                 reference_to_list_of_linesSpecified=true,
