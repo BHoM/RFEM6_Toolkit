@@ -49,18 +49,7 @@ namespace BH.Adapter.RFEM6
         // It gets called once per each Type.
         protected override IEnumerable<IBHoMObject> IRead(Type type, IList ids, ActionConfig actionConfig = null)
         {
-            // Preferrably, different Create logic for different object types should go in separate methods.
-            // We achieve this by using the ICreate method to only dynamically dispatching to *type-specific Create implementations*
-            // In other words:
-            // if (type == typeof(SomeType1))
-            //     return ReadSomeType1(ids as dynamic);
-            // else if (type == typeof(SomeType2))
-            //     return ReadSomeType2(ids as dynamic);
-            // else if (type == typeof(SomeType3))
-            //     return ReadSomeType3(ids as dynamic);
-
-            // AppLock();
-
+            
             try
             {
                 if (type == typeof(Node))
@@ -97,13 +86,13 @@ namespace BH.Adapter.RFEM6
                     return ReadBarLoad(ids as dynamic);
                 else if (type == typeof(PointLoad))
                     return ReadPointLoad(ids as dynamic);
-
+                else if (type == typeof(AreaUniformlyDistributedLoad))
+                    return ReadAreaLoad(ids as dynamic);
             }
             finally
             {
                 // AppUnlock();
             }
-
             return new List<IBHoMObject>(); ;
         }
 

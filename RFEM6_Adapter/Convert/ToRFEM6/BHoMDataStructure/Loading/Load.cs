@@ -72,7 +72,6 @@ namespace BH.Adapter.RFEM6
             nodal_load rfLoadCase = new rfModel.nodal_load()
             {
                 no = bhPointLoad.GetRFEM6ID(),
-                //members_string = (i + 1).ToString(),
                 nodes = bhPointLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_direction = nodal_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
                 load_directionSpecified = true,
@@ -105,7 +104,6 @@ namespace BH.Adapter.RFEM6
 
             line_load rfLineLoad = new rfModel.line_load()
             {
-                //no = bhLineLoad.GetRFEM6ID(),
                 no = bhLineLoad.GetRFEM6ID(),
                 lines = lineNoList.ToArray(),
                 load_case=bhLineLoad.Loadcase.GetRFEM6ID(),
@@ -128,6 +126,35 @@ namespace BH.Adapter.RFEM6
 
 
             return rfLineLoad;
+
+        }
+
+        public static rfModel.surface_load ToRFEM6(this AreaUniformlyDistributedLoad bhAreaLoad)
+        {
+
+            surface_load rfSurfaceLoad = new rfModel.surface_load()
+            {
+                no = bhAreaLoad.GetRFEM6ID(),
+                surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
+                //surfaces = new int[] {1},
+                load_case = bhAreaLoad.Loadcase.GetRFEM6ID(),
+                load_caseSpecified = true,
+                load_distribution = surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
+                load_distributionSpecified = true,
+                magnitude_force_u = bhAreaLoad.Pressure.Length(),
+                magnitude_force_uSpecified = true,
+                uniform_magnitude = bhAreaLoad.Pressure.Length(),
+                uniform_magnitudeSpecified = true,
+                is_generated = false,
+                is_generatedSpecified = true,
+                load_direction = surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
+                load_directionSpecified = true,
+                load_type = surface_load_load_type.LOAD_TYPE_FORCE,
+                load_typeSpecified = true,
+            };
+
+
+            return rfSurfaceLoad;
 
         }
 

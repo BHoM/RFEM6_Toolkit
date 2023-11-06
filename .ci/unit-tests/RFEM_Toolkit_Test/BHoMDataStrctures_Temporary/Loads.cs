@@ -28,6 +28,7 @@ using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
 using BH.Engine.Structure;
 using BH.oM.Structure.Loads;
+using BH.oM.Base;
 
 namespace RFEM_Toolkit_Test.Loading
 {
@@ -57,8 +58,6 @@ namespace RFEM_Toolkit_Test.Loading
         {
             adapter = new RFEM6Adapter(true);
         }
-
-
 
         [Test]
         public void PushPullLoadCase()
@@ -90,8 +89,6 @@ namespace RFEM_Toolkit_Test.Loading
             //FilterRequest loadFilter = new FilterRequest() { Type = typeof(PointLoad) };
             //var loads = adapter.Pull(loadFilter).ToList();
             //PointLoad l0 = (PointLoad)loads[0];
-
-
 
             //Assert.AreEqual(loadCases.Count(), loadcaseSet.Count());
             //Assert.True(loadcaseSet.Contains(lc0));
@@ -129,8 +126,6 @@ namespace RFEM_Toolkit_Test.Loading
             var loads = adapter.Pull(loadFilter).ToList();
             GeometricalLineLoad l0 = (GeometricalLineLoad)loads[0];
 
-
-
             //Assert.AreEqual(loadCases.Count(), loadcaseSet.Count());
             //Assert.True(loadcaseSet.Contains(lc0));
 
@@ -146,21 +141,46 @@ namespace RFEM_Toolkit_Test.Loading
             Loadcase loadcaseDL = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
 
             var pointGroup = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { n1, n2 } };
-            var pointLoad = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup, Loadcase = loadcaseDL  , Force = new Vector() { X = 0, Y = 0, Z = 100000 } };
+            var pointLoad = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup, Loadcase = loadcaseDL, Force = new Vector() { X = 0, Y = 0, Z = 100000 } };
 
             adapter.Push(new List<PointLoad>() { pointLoad });
             adapter.Push(new List<PointLoad>() { pointLoad });
-
-
-
-
 
         }
-
 
         [Test]
         public void PushLineLoad()
         {
+            n1 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 0 } };
+            n2 = new Node() { Position = new Point() { X = 10, Y = 0, Z = 0 } };
+            n3 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 } };
+            n4 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 0 } };
+
+            Line l1 = new Line() { Start = n1.Position, End = n2.Position };
+            Line l2 = new Line() { Start = n2.Position, End = n3.Position };
+            Line l3 = new Line() { Start = n3.Position, End = n4.Position };
+            Line l4 = new Line() { Start = n4.Position, End = n1.Position };
+
+            List<Line> lines = new List<Line>() { l1, l2, l3, l4 };
+
+            List<Edge> edges = lines.Select(l => new Edge() { Curve = l }).ToList();
+            Loadcase loadcaseDL = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
+            var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
+
+            BH.oM.Structure.SurfaceProperties.ConstantThickness surfaceProp = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.3, Material = concrete };
+
+            Panel panel = new Panel() { ExternalEdges = edges, Property = surfaceProp };
+            GeometricalLineLoad lineLoad = new GeometricalLineLoad() { Location = l1, ForceA = new Vector() { X = 0, Y = 0, Z = 100 }, Loadcase = loadcaseDL };
+
+            adapter.Push(new List<Panel>() { panel });
+            adapter.Push(new List<GeometricalLineLoad>() { lineLoad });
+
+        }
+
+        [Test]
+        public void PushPullAreaLoads()
+        {
+
 
             n1 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 0 } };
             n2 = new Node() { Position = new Point() { X = 10, Y = 0, Z = 0 } };
@@ -181,15 +201,30 @@ namespace RFEM_Toolkit_Test.Loading
             BH.oM.Structure.SurfaceProperties.ConstantThickness surfaceProp = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.3, Material = concrete };
 
             Panel panel = new Panel() { ExternalEdges = edges, Property = surfaceProp };
-            GeometricalLineLoad lineLoad = new GeometricalLineLoad() { Location = l1, ForceA = new Vector() { X = 0, Y = 0, Z = 100 },Loadcase= loadcaseDL };
-
-            adapter.Push(new List<Panel>() { panel });
-            adapter.Push(new List<GeometricalLineLoad>() { lineLoad });
 
 
+            AreaUniformlyDistributedLoad areaLoad = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcaseDL, Vector.ZAxis, new List<Panel>() { panel });
 
+
+            var k = new BH.oM.Base.BHoMGroup<IAreaElement>() { Elements = new List<IAreaElement>() { panel } };
+
+            AreaUniformlyDistributedLoad areaLoaD = new AreaUniformlyDistributedLoad()
+            {
+                Loadcase = loadcaseDL,
+                Pressure = BH.Engine.Geometry.Create.Vector(0, 0, 10000000),
+                Objects = k
+            };
+
+
+            //adapter.Push(new List<Panel>() { panel });
+            adapter.Push(new List<IObject>() { panel, areaLoaD });
+
+            //FilterRequest loadFilter = new FilterRequest() { Type = typeof(AreaUniformlyDistributedLoad) };
+            //var loads = adapter.Pull(loadFilter).ToList();
+            //AreaUniformlyDistributedLoad l0 = (AreaUniformlyDistributedLoad)loads[0];
 
         }
+
 
     }
 }

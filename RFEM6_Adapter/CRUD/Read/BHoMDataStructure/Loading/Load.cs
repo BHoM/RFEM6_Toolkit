@@ -83,7 +83,7 @@ namespace BH.Adapter.RFEM6
         {
             //Find all possible Load cases
             Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
-            List<int> loadCaseIds = loadCaseMap.Keys.ToList();
+            //List<int> loadCaseIds = loadCaseMap.Keys.ToList();
             Dictionary<int, Node> memberMap = this.GetCachedOrReadAsDictionary<int, Node>();
 
 
@@ -107,7 +107,7 @@ namespace BH.Adapter.RFEM6
         {
             //Find all possible Load cases
             Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
-            List<int> loadCaseIds = loadCaseMap.Keys.ToList();
+            //List<int> loadCaseIds = loadCaseMap.Keys.ToList();
             Dictionary<int, Edge> lineMap = this.GetCachedOrReadAsDictionary<int, Edge>();
 
 
@@ -120,14 +120,14 @@ namespace BH.Adapter.RFEM6
             foreach (rfModel.line_load lineLoad in foundLineLoad)
             {
                 List<Edge> allEdges = lineLoad.lines.ToList().Select(l => lineMap[l]).ToList();
-                List<Edge> lineEdges = allEdges.Where(e =>( (e.Curve is Line)||(e.Curve is Polyline && (e.Curve as Polyline).ControlPoints.Count==2))).ToList();
-                
+                List<Edge> lineEdges = allEdges.Where(e => ((e.Curve is Line) || (e.Curve is Polyline && (e.Curve as Polyline).ControlPoints.Count == 2))).ToList();
+
                 // if One of the edges is not a line, skip this load
                 if (!(lineEdges?.Count() != null || lineEdges?.Count() > 0)) continue;
-                
+
                 //if the load is over the total length of the line, skip this load
                 //if (lineLoad.distance_a_absolute!=0||lineLoad.distance_b_absolute!=0||lineLoad.distance_c_absolute!=0) continue;
-                if (lineLoad.load_distribution!=rfModel.line_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM) continue;
+                if (lineLoad.load_distribution != rfModel.line_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM) continue;
 
 
                 foreach (Edge lineEdge in lineEdges)
@@ -137,14 +137,38 @@ namespace BH.Adapter.RFEM6
 
                 }
 
-
-                //loads.Add(lineLoad.FromRFEM(lineLoad.lines.ToList().Select(m =>
-                //loads.Add();
-
             }
 
             return loads;
         }
 
+        private List<ILoad> ReadAreaLoad(List<string> ids = null)
+        {
+            List<ILoad> loads = new List<ILoad>();
+
+            //Find all possible Load cases
+            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
+            Dictionary<int, Panel> panelMap = this.GetCachedOrReadAsDictionary<int, Panel>();
+
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE_LOAD);
+
+            IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.ToList().Select(n => m_Model.get_surface_load(n.children[0], n.no));
+
+            foreach (rfModel.surface_load surfaceLoad in foundSurfaceLoad)
+            {
+                List<Panel> panels = surfaceLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
+                Loadcase loadcase = loadCaseMap[surfaceLoad.load_case];
+
+                if (!(surfaceLoad.load_distribution is rfModel.surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
+                {
+                    Engine.Base.Compute.RecordNote("The current RFEM6 includes Surfaceloads with a non-uniformal load distributeion, these Loads will not be pulled.");
+                }
+
+                loads.Add(surfaceLoad.FromRFEM(loadcase, panels));
+
+            }
+
+            return loads;
+        }
     }
 }
