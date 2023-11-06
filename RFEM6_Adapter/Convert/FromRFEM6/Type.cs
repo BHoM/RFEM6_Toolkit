@@ -95,7 +95,11 @@ namespace BH.Adapter.RFEM6
             }
             else if (rfType == rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD)
             {
-                return typeof(PointLoad);
+                return typeof(GeometricalLineLoad);
+            }
+            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SURFACE_LOAD)
+            {
+                return typeof(AreaUniformlyDistributedLoad);
             }
 
             return null;

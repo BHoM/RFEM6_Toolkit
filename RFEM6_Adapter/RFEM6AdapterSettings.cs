@@ -73,11 +73,10 @@ namespace BH.Adapter.RFEM6
                 {typeof(BarUniformlyDistributedLoad), new List<Type> { typeof(Bar),typeof(Loadcase)} },
                 {typeof(PointLoad), new List<Type> { typeof(Node), typeof(Loadcase) } },
                 {typeof(GeometricalLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } },
-
-
+                {typeof(AreaUniformlyDistributedLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } },
 
             };
-
+            
 
         }
 
@@ -115,7 +114,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
                 {typeof(Panel), new RFEMPanelComparer() },
                 {typeof(Loadcase), new LoadCaseComparer() },
-                {typeof(ILoad), new RFEMLoadComparer()  },
+                //{typeof(ILoad), new RFEMLoadComparer()  },
 
 
 

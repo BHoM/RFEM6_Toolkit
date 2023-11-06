@@ -81,30 +81,37 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is BarUniformlyDistributedLoad)
                 {
-                    var rfMemberLoad = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6();
+                    member_load member_load = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6();
+                    var rfMemberLoad = member_load;
                     m_Model.set_member_load(bhLoad.Loadcase.GetRFEM6ID(), rfMemberLoad);
                 }
                 else if (bhLoad is PointLoad)
                 {
 
-                    var rfPointLoad = (bhLoad as PointLoad).ToRFEM6();
+                    nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6();
                     m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
 
 
                 }
                 else if (bhLoad is GeometricalLineLoad)
                 {
-                    Node n0 = new Node() {Position= (bhLoad as GeometricalLineLoad).Location.Start };
+                    Node n0 = new Node() { Position = (bhLoad as GeometricalLineLoad).Location.Start };
                     Node n1 = new Node() { Position = (bhLoad as GeometricalLineLoad).Location.End };
 
                     int lineNo = nestedNodeToIDMap[n0][n1];
 
-
-                    line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(new List<int>() {lineNo });
+                    line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(new List<int>() { lineNo });
                     m_Model.set_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
 
+                }
+
+                else if (bhLoad is AreaUniformlyDistributedLoad) {
+
+                    surface_load rfemAreaLoad=(bhLoad as AreaUniformlyDistributedLoad).ToRFEM6();
+                    m_Model.set_surface_load(bhLoad.Loadcase.GetRFEM6ID(), rfemAreaLoad);
 
                 }
+
             }
 
             return true;

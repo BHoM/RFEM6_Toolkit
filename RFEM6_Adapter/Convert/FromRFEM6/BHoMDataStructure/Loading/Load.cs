@@ -121,5 +121,14 @@ namespace BH.Adapter.RFEM6
         }
 
 
+        public static AreaUniformlyDistributedLoad FromRFEM(this rfModel.surface_load surfaceload, Loadcase loadcase, List<Panel> panels)
+        {
+
+            AreaUniformlyDistributedLoad bhAreaload=BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, Vector.ZAxis, panels);
+
+            return bhAreaload;
+        }
+
+
     }
 }
