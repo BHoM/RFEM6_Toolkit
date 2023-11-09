@@ -87,35 +87,70 @@ namespace BH.Adapter.RFEM6
                 }
                 else if (bhLoad is PointLoad)
                 {
+                    nodal_load_load_type nodalLoadType= MomentOfForceLoad(bhLoad as PointLoad);
+                    if (nodalLoadType == 0) continue;
 
-                    nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6();
+                    nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6(nodalLoadType);
                     m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
 
 
                 }
-                else if (bhLoad is GeometricalLineLoad)
-                {
-                    Node n0 = new Node() { Position = (bhLoad as GeometricalLineLoad).Location.Start };
-                    Node n1 = new Node() { Position = (bhLoad as GeometricalLineLoad).Location.End };
+                //else if (bhLoad is GeometricalLineLoad)
+                //{
+                //    Node n0 = new Node() { Position = (bhLoad as GeometricalLineLoad).Location.Start };
+                //    Node n1 = new Node() { Position = (bhLoad as GeometricalLineLoad).Location.End };
 
-                    int lineNo = nestedNodeToIDMap[n0][n1];
+                //    int lineNo = nestedNodeToIDMap[n0][n1];
 
-                    line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(new List<int>() { lineNo });
-                    m_Model.set_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
+                //    line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(new List<int>() { lineNo });
+                //    m_Model.set_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
 
-                }
+                //}
 
-                else if (bhLoad is AreaUniformlyDistributedLoad) {
+                //else if (bhLoad is AreaUniformlyDistributedLoad) {
 
-                    surface_load rfemAreaLoad=(bhLoad as AreaUniformlyDistributedLoad).ToRFEM6();
-                    m_Model.set_surface_load(bhLoad.Loadcase.GetRFEM6ID(), rfemAreaLoad);
+                //    surface_load rfemAreaLoad=(bhLoad as AreaUniformlyDistributedLoad).ToRFEM6();
+                //    m_Model.set_surface_load(bhLoad.Loadcase.GetRFEM6ID(), rfemAreaLoad);
 
-                }
+                //}
 
             }
 
             return true;
         }
 
+
+        private nodal_load_load_type MomentOfForceLoad(PointLoad bhPointLoad) {
+
+
+            bool momentHasBeenSet = !(bhPointLoad.Moment.X == 0 && bhPointLoad.Moment.Y == 0 && bhPointLoad.Moment.Z == 0);
+            bool forceHasBeenSet = !(bhPointLoad.Force.X == 0 && bhPointLoad.Force.Y == 0 && bhPointLoad.Force.Z == 0);
+            nodal_load_load_type nodalLoadType = nodal_load_load_type.LOAD_TYPE_FORCE;
+
+            if (momentHasBeenSet && forceHasBeenSet)
+            {
+
+                BH.Engine.Base.Compute.RecordWarning($"The Point Load bh {bhPointLoad} does both include definitions for Moment Vector and Force Vector. Pleas Try to seperate those and push them individually!");
+                return 0;
+            }
+            else if (momentHasBeenSet)
+            {
+                return  nodal_load_load_type.LOAD_TYPE_MOMENT;
+
+            }
+            else if (forceHasBeenSet)
+            {
+                return  nodal_load_load_type.LOAD_TYPE_FORCE;
+
+            }
+            else {
+
+                return 0;
+            }
+
+            
+        }
+
     }
+
 }
