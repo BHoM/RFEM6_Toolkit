@@ -29,9 +29,11 @@ using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SurfaceProperties;
+using BH.oM.Geometry;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.Engine.Spatial;
 
 namespace BH.Adapter.RFEM6
 {
@@ -45,7 +47,7 @@ namespace BH.Adapter.RFEM6
             var allRfPanels = panelNumbersByType.ToList().Select(n => m_Model.get_surface(n.no)).ToList();
             List<int> panelNumbers = panelNumbersByType.ToList().Select(p => p.no).ToList();
 
-            List<Panel> bhPanel = new List<Panel>();
+            List<Panel> bhPanels = new List<Panel>();
 
             Dictionary<int, Edge> edges = this.GetCachedOrReadAsDictionary<int, Edge>();
             Dictionary<int, ISurfaceProperty> surfaceProperties = this.GetCachedOrReadAsDictionary<int, ISurfaceProperty>();
@@ -81,14 +83,19 @@ namespace BH.Adapter.RFEM6
 
             }
 
-            foreach (rfModel.surface rfPanel in allRfPanels)
-            {
+            //ComparerPoin
+            //foreach (rfModel.surface rfPanel in allRfPanels)
+            //{
 
-                bhPanel.Add(rfPanel.FromRFEM(edges, surfaceProperties, surfaceOpeningIdDicionary[rfPanel.no], surfaceOpening));
+            //    var bhPanel= rfPanel.FromRFEM(edges, surfaceProperties, surfaceOpeningIdDicionary[rfPanel.no], surfaceOpening);
+            //    bhPanels.Add(bhPanel);
+            //    HashSet<Point> panelPointSet= new HasSet<Point> { bhPanel.ExternalEdges.Select(b => b.Curve.ControlPoints()) };
 
-            }
+            //}
 
-            return bhPanel;
+            
+
+            return bhPanels;
         }
 
     }

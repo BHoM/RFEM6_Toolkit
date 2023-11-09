@@ -139,12 +139,17 @@ namespace RFEM_Toolkit_Test.Loading
             n2 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
 
             Loadcase loadcaseDL = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
+            Loadcase loadcaseDL2 = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Wind, Number = 1 };
+
 
             var pointGroup = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { n1, n2 } };
-            var pointLoad = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup, Loadcase = loadcaseDL, Force = new Vector() { X = 0, Y = 0, Z = 100000 } };
+            var pointLoad = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup, Loadcase = loadcaseDL, Moment = new Vector() { X = 0, Y = 0, Z = 100000 } };
+
 
             adapter.Push(new List<PointLoad>() { pointLoad });
             adapter.Push(new List<PointLoad>() { pointLoad });
+            adapter.Push(new List<Loadcase>() { loadcaseDL2 });
+
 
         }
 
@@ -216,12 +221,21 @@ namespace RFEM_Toolkit_Test.Loading
             };
 
 
-            //adapter.Push(new List<Panel>() { panel });
-            adapter.Push(new List<IObject>() { panel, areaLoaD });
+            adapter.Push(new List<IObject>() { panel });
+            adapter.Push(new List<IObject>() { areaLoaD });
+            //adapter.Push(new List<IObject>() { panel, areaLoaD });
+
 
             //FilterRequest loadFilter = new FilterRequest() { Type = typeof(AreaUniformlyDistributedLoad) };
             //var loads = adapter.Pull(loadFilter).ToList();
             //AreaUniformlyDistributedLoad l0 = (AreaUniformlyDistributedLoad)loads[0];
+
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(Panel) };
+            var panelRead = adapter.Pull(loadFilter).ToList();
+            Panel l0 = (Panel)panelRead[0];
+
+            RFEMPanelComparer panelComparer = new RFEMPanelComparer();
+            Assert.IsTrue(panelComparer.Equals(panel, l0));
 
         }
 
