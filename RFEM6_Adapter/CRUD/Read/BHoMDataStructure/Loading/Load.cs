@@ -86,6 +86,8 @@ namespace BH.Adapter.RFEM6
 
             }
 
+            //loads.ForEach(l=>updateLoadIdDictionary(l));
+
             return loads;
         }
 
@@ -156,5 +158,41 @@ namespace BH.Adapter.RFEM6
 
         //    return loads;
         //}
+
+        private void updateLoadIdDictionary(ILoad load) {
+
+
+            if (m_LoadcaseLoadIdDict.TryGetValue(load.Loadcase, out Dictionary<String, int> loadIdDict))
+            {
+
+                String type = load.GetType().Name;
+
+                if (loadIdDict.TryGetValue(type, out int id))
+                {
+                    loadIdDict[type] = id + 1;
+                }
+                else
+                {
+
+                    int k = m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID());
+                    loadIdDict.Add(type, k);
+
+                }
+
+
+            }
+            else { 
+            
+                
+                var d = new Dictionary<string, int>();
+                d.Add(load.GetType().Name, m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID()));
+                m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
+
+            }
+
+
+        
+        }
+        
     }
 }

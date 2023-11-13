@@ -93,8 +93,10 @@ namespace BH.Adapter.RFEM6
         /**** Private  Fields                           ****/
         /***************************************************/
 
-        public HashSet<Constraint6DOF> m_LineSupport = new HashSet<Constraint6DOF>();
-        public Dictionary<HashSet<Point>, int> m_PanelIdDictionary = new Dictionary<HashSet<Point>, int>();
+        //public HashSet<Constraint6DOF> m_LineSupport = new HashSet<Constraint6DOF>();
+        //public Dictionary<HashSet<Point>, int> m_PanelIdDictionary = new Dictionary<HashSet<Point>, int>();
+        public Dictionary<Loadcase, Dictionary<String,int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>();
+
 
         /***************************************************/
         /**** Private Methods                           ****/
