@@ -43,7 +43,6 @@ namespace BH.Adapter.RFEM6
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE);
             IEnumerable<rfModel.load_case> foundLoadCases = numbers.ToList().Select(n => m_Model.get_load_case(n.no));
 
-            //List<String> lcName = new List<string>();
             List<Loadcase> loadCases = new List<Loadcase>();
             foreach (rfModel.load_case loadCase in foundLoadCases)
             {
