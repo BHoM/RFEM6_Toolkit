@@ -46,9 +46,9 @@ namespace BH.Adapter.RFEM6
             bool success = true;
             foreach (Loadcase loadcase in loadcases)
             {
-                load_case selfWeightLC = loadcase.ToRFEM6(1);
+                //load_case selfWeightLC = loadcase.ToRFEM6(1);
 
-                m_Model.set_load_case(selfWeightLC);
+                //m_Model.set_load_case(selfWeightLC);
             }
 
             return success;

@@ -40,7 +40,7 @@ namespace BH.Adapter.RFEM6
         public static Loadcase FromRFEM(this rfModel.load_case loadCase)
         {
 
-            Loadcase bhLoadCase = new Loadcase() { Name = loadCase.name, Nature = loadCase.action_category.FromRFEM(), Number = loadCase.no };
+            Loadcase bhLoadCase = new Loadcase() { Name = (loadCase.name==""?null:loadCase.name), Nature = loadCase.action_category.FromRFEM(), Number = loadCase.no };
             bhLoadCase.SetRFEM6ID(loadCase.no);
 
 
