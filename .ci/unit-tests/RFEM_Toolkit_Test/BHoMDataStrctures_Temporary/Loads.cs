@@ -82,9 +82,13 @@ namespace RFEM_Toolkit_Test.Loading
             var pointGroup = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { n1, n2 } };
             var pointLoad = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup, Loadcase = loadcaseSDL, Force = new Vector() { X = 0, Y = 0, Z = 100000 } };
 
-            HashSet<ILoad> loadcaseSet = new HashSet<ILoad>() { barLoad0 };
+            HashSet<ILoad> barloads0 = new HashSet<ILoad>() { barLoad0 };
+            HashSet<ILoad> pointloads0 = new HashSet<ILoad>() { pointLoad };
 
-            adapter.Push(loadcaseSet.ToList());
+
+            adapter.Push(barloads0.ToList());
+            adapter.Push(pointloads0.ToList());
+
 
             //FilterRequest loadFilter = new FilterRequest() { Type = typeof(PointLoad) };
             //var loads = adapter.Pull(loadFilter).ToList();
