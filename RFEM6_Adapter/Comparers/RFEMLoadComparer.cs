@@ -52,6 +52,7 @@ namespace BH.Adapter.RFEM6
         public bool Equals(ILoad load0, ILoad load1)
         {
 
+
             if(load0.GetHashCode().Equals(load1.GetHashCode())) return true;
 
                 LoadCaseComparer loadCaseComparer = new LoadCaseComparer();

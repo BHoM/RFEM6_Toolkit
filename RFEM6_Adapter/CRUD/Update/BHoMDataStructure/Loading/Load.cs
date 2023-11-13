@@ -51,16 +51,16 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is BarUniformlyDistributedLoad)
                 {
-                    var rfMemberLoad = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6();
-                    m_Model.set_member_load(bhLoad.Loadcase.GetRFEM6ID(), rfMemberLoad);
+                    //var rfMemberLoad = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6();
+                    //m_Model.set_member_load(bhLoad.Loadcase.GetRFEM6ID(), rfMemberLoad);
                 }
                 else if (bhLoad is PointLoad)
                 {
                     nodal_load_load_type nodalLoadType = MomentOfForceLoad(bhLoad as PointLoad);
                     if (nodalLoadType == 0) continue;
 
-                    var rfPointLoad = (bhLoad as PointLoad).ToRFEM6(nodalLoadType);
-                    m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
+                    //var rfPointLoad = (bhLoad as PointLoad).ToRFEM6(nodalLoadType);
+                    //m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
 
                 }
                 //else if (bhLoad is GeometricalLineLoad)

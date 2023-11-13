@@ -42,14 +42,15 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static rfModel.member_load ToRFEM6(this BarUniformlyDistributedLoad bhBarLoad)
+        public static rfModel.member_load ToRFEM6(this BarUniformlyDistributedLoad bhBarLoad, int id)
         {
 
             var i = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToList();
 
             member_load rfLoadCase = new rfModel.member_load()
             {
-                no = bhBarLoad.GetRFEM6ID(),
+                //no = bhBarLoad.GetRFEM6ID(),
+                no = id,
                 //members_string = (i + 1).ToString(),
                 members = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_distribution = member_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
@@ -65,7 +66,7 @@ namespace BH.Adapter.RFEM6
 
         }
 
-        public static rfModel.nodal_load ToRFEM6(this PointLoad bhPointLoad, nodal_load_load_type nodalLoadType)
+        public static rfModel.nodal_load ToRFEM6(this PointLoad bhPointLoad, nodal_load_load_type nodalLoadType, int id)
         {
 
             //var i = bhPointLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToList();
@@ -80,7 +81,8 @@ namespace BH.Adapter.RFEM6
 
             nodal_load rfLoadCase = new rfModel.nodal_load()
             {
-                no = bhPointLoad.GetRFEM6ID(),
+                //no = bhPointLoad.GetRFEM6ID(),
+                no = id,
                 nodes = bhPointLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_direction = loadDirecteion,
                 load_directionSpecified = true,
