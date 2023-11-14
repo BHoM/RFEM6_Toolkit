@@ -42,20 +42,28 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static rfModel.member_load ToRFEM6(this BarUniformlyDistributedLoad bhBarLoad, int id)
+        public static rfModel.member_load ToRFEM6(this BarUniformlyDistributedLoad bhBarLoad, member_load_load_type nodalLoadType, int id)
         {
 
             var i = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToList();
+            
+            member_load_load_direction loadDirecteion;
+            Vector orientationVector = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
+            if (orientationVector.X != 0) { loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_X; }
+            else if (orientationVector.Y != 0) { loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Y; }
+            else { loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Z ; }
 
             member_load rfLoadCase = new rfModel.member_load()
             {
-                //no = bhBarLoad.GetRFEM6ID(),
                 no = id,
-                //members_string = (i + 1).ToString(),
                 members = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_distribution = member_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
-                magnitude = bhBarLoad.Force.Z,
+                load_type=nodalLoadType,
+                load_typeSpecified=true,
+                load_direction= loadDirecteion,
+                load_directionSpecified = true,
+                magnitude = nodalLoadType==member_load_load_type.LOAD_TYPE_FORCE? bhBarLoad.Force.Length(): bhBarLoad.Moment.Length(),
                 magnitudeSpecified = true,
                 load_is_over_total_length = true,
                 load_is_over_total_lengthSpecified = true,
@@ -69,9 +77,6 @@ namespace BH.Adapter.RFEM6
         public static rfModel.nodal_load ToRFEM6(this PointLoad bhPointLoad, nodal_load_load_type nodalLoadType, int id)
         {
 
-            //var i = bhPointLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToList();
-
-      
             nodal_load_load_direction loadDirecteion;
             Vector orientationVector = nodalLoadType == nodal_load_load_type.LOAD_TYPE_FORCE? bhPointLoad.Force : bhPointLoad.Moment;
             if (orientationVector.X!=0) { loadDirecteion = nodal_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U; }
@@ -81,27 +86,14 @@ namespace BH.Adapter.RFEM6
 
             nodal_load rfLoadCase = new rfModel.nodal_load()
             {
-                //no = bhPointLoad.GetRFEM6ID(),
                 no = id,
                 nodes = bhPointLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_direction = loadDirecteion,
                 load_directionSpecified = true,
                 force_magnitude = bhPointLoad.Force.Length(),
                 force_magnitudeSpecified = true,
-                //components_force_x = bhPointLoad.Force.X,
-                //components_force_xSpecified = true,
-                //components_force_y = bhPointLoad.Force.Y,
-                //components_force_ySpecified = true,
-                //components_force_z = bhPointLoad.Force.Z,
-                //components_force_zSpecified = true,
                 moment_magnitude = bhPointLoad.Moment.Length(),
                 moment_magnitudeSpecified = true,
-                //components_moment_x = bhPointLoad.Moment.X,
-                //components_moment_xSpecified = true,
-                //components_moment_y = bhPointLoad.Moment.Y,
-                //components_moment_ySpecified = true,
-                //components_moment_z = bhPointLoad.Moment.Z,
-                //components_moment_zSpecified = true,
                 load_type = nodalLoadType,
                 load_typeSpecified = true,
             };

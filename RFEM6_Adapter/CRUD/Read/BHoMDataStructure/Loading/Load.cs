@@ -33,11 +33,13 @@ using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Loads;
 using BH.oM.Geometry;
 using BH.Engine.Spatial;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter
     {
+
 
         private List<ILoad> ReadBarLoad(List<string> ids = null)
         {

@@ -80,12 +80,18 @@ namespace BH.Adapter.RFEM6
                     return ReadOpening(ids as dynamic);
                 else if (type == typeof(Loadcase))
                     return ReadLoadCase(ids as dynamic);
-                else if (type == typeof(GeometricalLineLoad))
-                //    return ReadLineLoad(ids as dynamic);
-                //else if (type == typeof(BarUniformlyDistributedLoad))
+                else if (type == typeof(BarUniformlyDistributedLoad))
                     return ReadBarLoad(ids as dynamic);
                 else if (type == typeof(PointLoad))
                     return ReadPointLoad(ids as dynamic);
+                else if (type == typeof(ILoad)) {
+                    List<ILoad> loadList = new List<ILoad>();
+                    loadList.AddRange(ReadPointLoad(ids as dynamic));
+                    loadList.AddRange(ReadBarLoad(ids as dynamic));
+                    return loadList;
+                        }
+                //else if (type == typeof(GeometricalLineLoad))
+                //    return ReadLineLoad(ids as dynamic);
                 //else if (type == typeof(AreaUniformlyDistributedLoad))
                 //    return ReadAreaLoad(ids as dynamic);
             }
