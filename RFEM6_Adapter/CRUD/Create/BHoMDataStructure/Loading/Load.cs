@@ -48,14 +48,14 @@ namespace BH.Adapter.RFEM6
             //NodeDistanceComparer nodeDistanceComparer = new NodeDistanceComparer(3);
             //Dictionary<Node, Dictionary<Node, int>> nestedNodeToIDMap = new Dictionary<Node, Dictionary<Node, int>>(nodeDistanceComparer);
             //List<rfModel.line> allLineNumbers = new List<rfModel.line>();
-            
+
             ////If necessary fill the NodeToIDMap
             //if (bhLoads.Where(l => l is GeometricalLineLoad).ToList().Count() > 0)
             //{
 
             //    rfModel.object_with_children[] lineNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE);
             //    allLineNumbers = lineNumber.Length > 1 ? lineNumber.ToList().Select(n => m_Model.get_line(n.no)).ToList().ToList() : new List<rfModel.line>();
-                
+
             //    foreach (rfModel.line l in allLineNumbers)
             //    {
 
@@ -79,23 +79,27 @@ namespace BH.Adapter.RFEM6
             foreach (ILoad bhLoad in bhLoads)
             {
 
+
+                object nodalLoadType = MomentOfForceLoad(bhLoad);
+                if (nodalLoadType is null) continue;
+
                 if (bhLoad is BarUniformlyDistributedLoad)
                 {
 
                     updateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-                    member_load member_load = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6(id);
+                    member_load member_load = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6((member_load_load_type)nodalLoadType, id);
                     var rfMemberLoad = member_load;
                     m_Model.set_member_load(bhLoad.Loadcase.GetRFEM6ID(), rfMemberLoad);
                 }
                 else if (bhLoad is PointLoad)
                 {
-                    nodal_load_load_type nodalLoadType= MomentOfForceLoad(bhLoad as PointLoad);
-                    if (nodalLoadType == 0) continue;
+                    //nodal_load_load_type nodalLoadType = MomentOfForceLoad(bhLoad as PointLoad);
+                    //if (nodalLoadType == 0) continue;
 
                     updateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-                    nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6(nodalLoadType,id);
+                    nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6((nodal_load_load_type) nodalLoadType, id);
                     m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
 
 
@@ -125,36 +129,69 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private nodal_load_load_type MomentOfForceLoad(PointLoad bhPointLoad) {
+        private object MomentOfForceLoad(ILoad bhLoad)
+        {
 
 
-            bool momentHasBeenSet = !(bhPointLoad.Moment.X == 0 && bhPointLoad.Moment.Y == 0 && bhPointLoad.Moment.Z == 0);
-            bool forceHasBeenSet = !(bhPointLoad.Force.X == 0 && bhPointLoad.Force.Y == 0 && bhPointLoad.Force.Z == 0);
-            nodal_load_load_type nodalLoadType = nodal_load_load_type.LOAD_TYPE_FORCE;
+            bool momentHasBeenSet;
+            bool forceHasBeenSet;
+            object bhLoadType;
+
+            if (bhLoad is PointLoad)
+            {
+
+                PointLoad bhPointLoad = bhLoad as PointLoad;
+                momentHasBeenSet = !(bhPointLoad.Moment.X == 0 && bhPointLoad.Moment.Y == 0 && bhPointLoad.Moment.Z == 0);
+                forceHasBeenSet = !(bhPointLoad.Force.X == 0 && bhPointLoad.Force.Y == 0 && bhPointLoad.Force.Z == 0);
+                //bhLoadType = nodal_load_load_type.LOAD_TYPE_FORCE;
+                bhLoadType = forceHasBeenSet==true? nodal_load_load_type.LOAD_TYPE_FORCE: nodal_load_load_type.LOAD_TYPE_MOMENT;
+
+            }
+            else
+            {
+
+                BarUniformlyDistributedLoad bhPointLoad = bhLoad as BarUniformlyDistributedLoad;
+                momentHasBeenSet = !(bhPointLoad.Moment.X == 0 && bhPointLoad.Moment.Y == 0 && bhPointLoad.Moment.Z == 0);
+                forceHasBeenSet = !(bhPointLoad.Force.X == 0 && bhPointLoad.Force.Y == 0 && bhPointLoad.Force.Z == 0);
+                //bhLoadType = member_load_load_type.LOAD_TYPE_FORCE;
+                bhLoadType = forceHasBeenSet == true ? member_load_load_type.LOAD_TYPE_FORCE : member_load_load_type.LOAD_TYPE_MOMENT;
+
+            }
 
             if (momentHasBeenSet && forceHasBeenSet)
             {
 
-                BH.Engine.Base.Compute.RecordWarning($"The Point Load bh {bhPointLoad} does both include definitions for Moment Vector and Force Vector. Pleas Try to seperate those and push them individually!");
-                return 0;
+                BH.Engine.Base.Compute.RecordWarning($"The Load {bhLoad} does both include definitions for Moment Vector and Force Vector. Pleas Try to seperate those and push them individually!");
+                return null;
             }
+
+            if (!momentHasBeenSet && !forceHasBeenSet)
+            {
+
+                return null;
+            }
+
+
             else if (momentHasBeenSet)
             {
-                return  nodal_load_load_type.LOAD_TYPE_MOMENT;
+                return bhLoadType;
 
             }
             else if (forceHasBeenSet)
             {
-                return  nodal_load_load_type.LOAD_TYPE_FORCE;
+                return bhLoadType;
 
             }
-            else {
+            else
+            {
 
-                return 0;
+                return null;
             }
 
-            
+
         }
+
+
 
     }
 
