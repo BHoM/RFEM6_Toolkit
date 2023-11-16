@@ -47,6 +47,7 @@ using BH.Engine.Structure;
 using BH.Engine.Geometry;
 using BH.oM.Adapter;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using System.Net.PeerToPeer.Collaboration;
 
 namespace BH.Adapter.RFEM6
 {
@@ -72,12 +73,14 @@ namespace BH.Adapter.RFEM6
                 {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
                 {typeof(BarUniformlyDistributedLoad), new List<Type> { typeof(Bar),typeof(Loadcase)} },
                 {typeof(PointLoad), new List<Type> { typeof(Node), typeof(Loadcase) } },
-                {typeof(GeometricalLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } },
-                {typeof(AreaUniformlyDistributedLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } },
+                //{typeof(IElementLoad<IAreaElement>), new List<Type> { typeof(Panel) } },
+                //{typeof(ILoad), new List<Type> { typeof(Loadcase), typeof(IElementLoad<IAreaElement>) } },
+                {typeof(AreaUniformlyDistributedLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } }
 
             };
-            
 
+            
+                //{ typeof(IElementLoad<Node>), new List<Type> { typeof(Node) } }
         }
 
         private void AddAdapterModules()
@@ -91,6 +94,7 @@ namespace BH.Adapter.RFEM6
             this.AdapterModules.Add(new GetLineFromBarModule());
             this.AdapterModules.Add(new GetLineFromEdgeModule());
             this.AdapterModules.Add(new GetOpeningFromOpeningModule());
+            //this.AdapterModules.Add(new GetPanelFreomAreaUniformlyDistributedLoadModule());
 
         }
 
@@ -114,7 +118,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
                 {typeof(Panel), new RFEMPanelComparer() },
                 {typeof(Loadcase), new LoadCaseComparer() },
-                //{typeof(Point), new ComparerPoin },
+                {typeof(BarUniformlyDistributedLoad), new NameOrDescriptionComparer()},
                 //{typeof(ILoad), new RFEMLoadComparer()  },
 
 

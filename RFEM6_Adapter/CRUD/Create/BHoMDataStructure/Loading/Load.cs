@@ -36,6 +36,7 @@ using System.Security.Cryptography;
 using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.Engine.Structure;
+using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
@@ -82,6 +83,8 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is AreaUniformlyDistributedLoad)
                 {
+                    //Dictionary<int, Panel> supportMap = this.GetCachedOrReadAsDictionary<int, Panel>();
+
                     updateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     surface_load rfemAreaLoad = (bhLoad as AreaUniformlyDistributedLoad).ToRFEM6(id);
@@ -115,8 +118,10 @@ namespace BH.Adapter.RFEM6
                     member_load member_load = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6((member_load_load_type)nodalLoadType, id);
                     var rfMemberLoad = member_load;
                     m_Model.set_member_load(bhLoad.Loadcase.GetRFEM6ID(), rfMemberLoad);
+                    continue;
                 }
-                else if (bhLoad is PointLoad)
+
+                if (bhLoad is PointLoad)
                 {
                     //nodal_load_load_type nodalLoadType = MomentOfForceLoad(bhLoad as PointLoad);
                     //if (nodalLoadType == 0) continue;
@@ -125,7 +130,7 @@ namespace BH.Adapter.RFEM6
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6((nodal_load_load_type)nodalLoadType, id);
                     m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
-
+                    continue;
 
                 }
 

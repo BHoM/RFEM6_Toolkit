@@ -51,11 +51,11 @@ namespace BH.Adapter.RFEM6
 
         public bool Equals(ILoad load0, ILoad load1)
         {
+            //return false;
 
+            if (load0.GetHashCode().Equals(load1.GetHashCode())) return true;
 
-            if(load0.GetHashCode().Equals(load1.GetHashCode())) return true;
-
-                LoadCaseComparer loadCaseComparer = new LoadCaseComparer();
+            LoadCaseComparer loadCaseComparer = new LoadCaseComparer();
             if (!loadCaseComparer.Equals(load0.Loadcase, load1.Loadcase)) return false;
 
             if (load0.Axis != load1.Axis) return false;
@@ -64,14 +64,15 @@ namespace BH.Adapter.RFEM6
 
             if (!load0.GetType().Equals(load1.GetType())) return false;
 
-            if (load0 is GeometricalLineLoad) { 
-            
+            if (load0 is GeometricalLineLoad)
+            {
+
                 Line line0 = ((GeometricalLineLoad)load0).Location;
                 Line line1 = ((GeometricalLineLoad)load1).Location;
 
                 NodeDistanceComparer comparer = new NodeDistanceComparer(3);
-                
-                if(!comparer.Equals(new Node() {Position= line0.Start }, new Node() { Position = line1.Start })) return false;
+
+                if (!comparer.Equals(new Node() { Position = line0.Start }, new Node() { Position = line1.Start })) return false;
 
                 if (!comparer.Equals(new Node() { Position = line0.End }, new Node() { Position = line1.End })) return false;
 
@@ -83,12 +84,24 @@ namespace BH.Adapter.RFEM6
                 //Line line0 = ((PointLoad)load0).;
                 //Line line1 = ((PointLoad)load1).;
             }
-            if (load0 is BarUniformlyDistributedLoad) { 
+            if (load0 is BarUniformlyDistributedLoad)
+            {
 
                 //((BarUniformlyDistributedLoad)load0).
 
             }
-            
+            if (load0 is AreaUniformlyDistributedLoad)
+            {
+
+                if ((load0 as AreaUniformlyDistributedLoad).Pressure.X != (load1 as AreaUniformlyDistributedLoad).Pressure.X) return false;
+                if ((load0 as AreaUniformlyDistributedLoad).Pressure.Y != (load1 as AreaUniformlyDistributedLoad).Pressure.Y) return false;
+                if ((load0 as AreaUniformlyDistributedLoad).Pressure.Z != (load1 as AreaUniformlyDistributedLoad).Pressure.Z) return false;
+
+
+
+
+            }
+
 
 
             return true;
@@ -103,7 +116,7 @@ namespace BH.Adapter.RFEM6
             //return surfaceSupport.GetHashCode();
 
             return 0;
-            
+
         }
 
 
