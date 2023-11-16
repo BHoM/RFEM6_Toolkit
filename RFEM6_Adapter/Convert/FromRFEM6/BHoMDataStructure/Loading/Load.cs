@@ -112,6 +112,35 @@ namespace BH.Adapter.RFEM6
             return bhLoad;
         }
 
+        public static AreaUniformlyDistributedLoad FromRFEM(this rfModel.surface_load surfaceload, Loadcase loadcase, List<Panel> panels)
+        {
+
+            Vector forceDirection;
+
+            if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE)
+            {
+                forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
+            }
+            else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE)
+            {
+                forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
+            }
+            else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE)
+            {
+                forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+            }
+            else
+            {
+                forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+            }
+
+            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels);
+
+            return bhAreaload;
+        }
+
+
+
         //public static GeometricalLineLoad FromRFEM(this rfModel.line_load lineLoad, Loadcase bhLoadCase, Edge edge)
         //{
         //    bool isProjected = false;
@@ -165,13 +194,6 @@ namespace BH.Adapter.RFEM6
         //}
 
 
-        //public static AreaUniformlyDistributedLoad FromRFEM(this rfModel.surface_load surfaceload, Loadcase loadcase, List<Panel> panels)
-        //{
-
-        //    AreaUniformlyDistributedLoad bhAreaload=BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, Vector.ZAxis, panels);
-
-        //    return bhAreaload;
-        //}
 
 
     }

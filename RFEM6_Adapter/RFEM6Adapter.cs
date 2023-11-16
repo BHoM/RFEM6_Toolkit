@@ -60,7 +60,7 @@ namespace BH.Adapter.RFEM6
         [Output("The created RFEM6 adapter.")]
         public RFEM6Adapter(bool active = false)
         {
-
+            
             // The Adapter constructor can be used to configure the Adapter behaviour.
             // For example:
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
@@ -81,8 +81,8 @@ namespace BH.Adapter.RFEM6
                 //string modelUrl = application.new_model(modelName);
 
 
-                //model.reset();
-
+                //RfemApplicationClient rfemApplicationClient = new RfemApplicationClient(Binding, Address);
+                //rfemApplicationClient.open_model("C:\\Users\\michael\\Desktop\\RFEM\\TestModel.rf5");
 
             }
         }

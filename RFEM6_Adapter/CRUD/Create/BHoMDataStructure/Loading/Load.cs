@@ -80,6 +80,15 @@ namespace BH.Adapter.RFEM6
             {
 
 
+                if (bhLoad is AreaUniformlyDistributedLoad)
+                {
+                    updateLoadIdDictionary(bhLoad);
+                    int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
+                    surface_load rfemAreaLoad = (bhLoad as AreaUniformlyDistributedLoad).ToRFEM6(id);
+                    m_Model.set_surface_load(bhLoad.Loadcase.GetRFEM6ID(), rfemAreaLoad);
+                    continue;
+                }
+
                 object nodalLoadType = MomentOfForceLoad(bhLoad);
                 if (nodalLoadType is null) continue;
 
@@ -114,7 +123,7 @@ namespace BH.Adapter.RFEM6
 
                     UpdateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-                    nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6((nodal_load_load_type) nodalLoadType, id);
+                    nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6((nodal_load_load_type)nodalLoadType, id);
                     m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
 
 
@@ -132,12 +141,7 @@ namespace BH.Adapter.RFEM6
 
                 //}
 
-                //else if (bhLoad is AreaUniformlyDistributedLoad) {
 
-                //    surface_load rfemAreaLoad=(bhLoad as AreaUniformlyDistributedLoad).ToRFEM6();
-                //    m_Model.set_surface_load(bhLoad.Loadcase.GetRFEM6ID(), rfemAreaLoad);
-
-                //}
 
             }
 
@@ -160,7 +164,7 @@ namespace BH.Adapter.RFEM6
                 momentHasBeenSet = !(bhPointLoad.Moment.X == 0 && bhPointLoad.Moment.Y == 0 && bhPointLoad.Moment.Z == 0);
                 forceHasBeenSet = !(bhPointLoad.Force.X == 0 && bhPointLoad.Force.Y == 0 && bhPointLoad.Force.Z == 0);
                 //bhLoadType = nodal_load_load_type.LOAD_TYPE_FORCE;
-                bhLoadType = forceHasBeenSet==true? nodal_load_load_type.LOAD_TYPE_FORCE: nodal_load_load_type.LOAD_TYPE_MOMENT;
+                bhLoadType = forceHasBeenSet == true ? nodal_load_load_type.LOAD_TYPE_FORCE : nodal_load_load_type.LOAD_TYPE_MOMENT;
 
             }
             else

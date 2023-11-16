@@ -131,6 +131,45 @@ namespace BH.Adapter.RFEM6
 
         }
 
+        public static rfModel.surface_load ToRFEM6(this AreaUniformlyDistributedLoad bhAreaLoad, int loadCaseSpecificLoadId)
+        {
+
+            
+
+
+            surface_load_load_direction loadDirecteion;
+            Vector orientationVector = bhAreaLoad.Pressure;
+            if (orientationVector.X != 0) { loadDirecteion = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE; }
+            else if (orientationVector.Y != 0) { loadDirecteion = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE; }
+            else { loadDirecteion = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE; }
+
+
+            surface_load rfSurfaceLoad = new rfModel.surface_load()
+            {
+                no = loadCaseSpecificLoadId,
+                surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
+                load_case = bhAreaLoad.Loadcase.GetRFEM6ID(),
+                load_caseSpecified = true,
+                load_distribution = surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
+                load_distributionSpecified = true,
+                magnitude_force_u = bhAreaLoad.Pressure.Length(),
+                magnitude_force_uSpecified = true,
+                uniform_magnitude = bhAreaLoad.Pressure.Length(),
+                uniform_magnitudeSpecified = true,
+                is_generated = false,
+                is_generatedSpecified = true,
+                load_direction = loadDirecteion,
+                load_directionSpecified = true,
+                load_type = surface_load_load_type.LOAD_TYPE_FORCE,
+                load_typeSpecified = true,
+            };
+
+
+            return rfSurfaceLoad;
+
+        }
+
+
         //public static rfModel.line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, List<int> lineNoList)
         //{
 
@@ -161,34 +200,6 @@ namespace BH.Adapter.RFEM6
 
         //}
 
-        //public static rfModel.surface_load ToRFEM6(this AreaUniformlyDistributedLoad bhAreaLoad)
-        //{
-
-        //    surface_load rfSurfaceLoad = new rfModel.surface_load()
-        //    {
-        //        no = bhAreaLoad.GetRFEM6ID(),
-        //        surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
-        //        //surfaces = new int[] {1},
-        //        load_case = bhAreaLoad.Loadcase.GetRFEM6ID(),
-        //        load_caseSpecified = true,
-        //        load_distribution = surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
-        //        load_distributionSpecified = true,
-        //        magnitude_force_u = bhAreaLoad.Pressure.Length(),
-        //        magnitude_force_uSpecified = true,
-        //        uniform_magnitude = bhAreaLoad.Pressure.Length(),
-        //        uniform_magnitudeSpecified = true,
-        //        is_generated = false,
-        //        is_generatedSpecified = true,
-        //        load_direction = surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
-        //        load_directionSpecified = true,
-        //        load_type = surface_load_load_type.LOAD_TYPE_FORCE,
-        //        load_typeSpecified = true,
-        //    };
-
-
-        //    return rfSurfaceLoad;
-
-        //}
 
 
     }
