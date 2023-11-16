@@ -29,6 +29,7 @@ using BH.oM.Structure.SectionProperties;
 using BH.Engine.Structure;
 using BH.oM.Structure.Loads;
 using BH.oM.Base;
+using System.Security.Policy;
 
 namespace RFEM_Toolkit_Test.Loading
 {
@@ -173,22 +174,49 @@ namespace RFEM_Toolkit_Test.Loading
             //AreaUniformlyDistributedLoad l0 = (AreaUniformlyDistributedLoad) areaLoadRead[0];
 
 
-            FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
-            var panelReader = adapter.Pull(panelFilter).ToList();
-            Panel p0 = (Panel)panelReader[0];
-            Panel p1 = (Panel)panelReader[1];
-            Panel p2 = (Panel)panelReader[2];
+            //FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
+            //var panelReader = adapter.Pull(panelFilter).ToList();
+            //Panel p0 = (Panel)panelReader[0];
+            //Panel p1 = (Panel)panelReader[1];
+            ////Panel p2 = (Panel)panelReader[2];
 
+            n1 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 10 } };
+            n2 = new Node() { Position = new Point() { X = 10, Y = 0, Z = 10 } };
+            n3 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 10 } };
+            n4 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 10 } };
+
+            Edge e0 = new Edge() { Curve = BH.Engine.Geometry.Create.Line(n1.Position, n2.Position) };
+            Edge e1 = new Edge() { Curve = BH.Engine.Geometry.Create.Line(n2.Position, n3.Position) };
+            Edge e2 = new Edge() { Curve = BH.Engine.Geometry.Create.Line(n3.Position, n4.Position) };
+            Edge e3 = new Edge() { Curve = BH.Engine.Geometry.Create.Line(n4.Position, n1.Position) };
+
+            var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
+
+            BH.oM.Structure.SurfaceProperties.ConstantThickness surfaceProp = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.3, Material = concrete };
+
+            Panel panel = new Panel() { ExternalEdges = new List<Edge>() {e0,e1,e2,e3}, Property = surfaceProp };
 
             Loadcase loadcaseWind = new Loadcase() { Name = "Windload", Nature = LoadNature.Wind, Number = 1 };
 
-            AreaUniformlyDistributedLoad areaLoad0 = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcaseWind, BH.Engine.Geometry.Create.Vector(100000000000,0,0), new List<Panel>() { p1 });
-            AreaUniformlyDistributedLoad areaLoad1 = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcaseWind, BH.Engine.Geometry.Create.Vector(0, 100000000000, 0), new List<Panel>() { p1 });
-            AreaUniformlyDistributedLoad areaLoad2 = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcaseWind, BH.Engine.Geometry.Create.Vector(0, 0,100000000000), new List<Panel>() { p1 });
+
+            BHoMGroup<Node> nodeGroup = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node>() { n1 } };    
+            PointLoad pointLoad = new PointLoad() { Force= BH.Engine.Geometry.Create.Vector(100000000000, 0, 0),Loadcase=loadcaseWind,  Objects=nodeGroup};
 
 
-            adapter.Push(new List<AreaUniformlyDistributedLoad>() { areaLoad0,areaLoad1,areaLoad2 });
+            //adapter.Push(new List<IObject>() { pointLoad });
+            //adapter.Push(new List<IObject>() { panel, areaLoad0 });
+            adapter.Push(new List<IObject>() { panel });
 
+
+            FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
+            var panelReader = adapter.Pull(panelFilter).ToList();
+            Panel p0 = (Panel)panelReader[0];
+
+            AreaUniformlyDistributedLoad areaLoad0 = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcaseWind, BH.Engine.Geometry.Create.Vector(100000000000,0,0), new List<Panel>() { p0 });
+            
+            
+            
+            adapter.Push(new List<IObject>() { areaLoad0 });
 
         }
 

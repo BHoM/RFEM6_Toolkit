@@ -56,7 +56,7 @@ namespace BH.Adapter.RFEM6
 
         public bool Equals(Panel panel1, Panel panel2)
         {
-
+            //return false;
             bool equal = false;
 
             var lst1 = panel1.ExternalEdges.Select(e => (e.Curve)).ToList();
