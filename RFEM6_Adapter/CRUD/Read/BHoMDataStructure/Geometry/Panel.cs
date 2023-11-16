@@ -84,16 +84,16 @@ namespace BH.Adapter.RFEM6
             }
 
             //ComparerPoin
-            //foreach (rfModel.surface rfPanel in allRfPanels)
-            //{
+            foreach (rfModel.surface rfPanel in allRfPanels)
+            {
 
-            //    var bhPanel= rfPanel.FromRFEM(edges, surfaceProperties, surfaceOpeningIdDicionary[rfPanel.no], surfaceOpening);
-            //    bhPanels.Add(bhPanel);
-            //    HashSet<Point> panelPointSet= new HasSet<Point> { bhPanel.ExternalEdges.Select(b => b.Curve.ControlPoints()) };
+                var bhPanel = rfPanel.FromRFEM(edges, surfaceProperties, surfaceOpeningIdDicionary[rfPanel.no], surfaceOpening);
+                bhPanels.Add(bhPanel);
+                //HashSet<Point> panelPointSet = new HasSet<Point> { bhPanel.ExternalEdges.Select(b => b.Curve.ControlPoints()) };
 
-            //}
+            }
 
-            
+
 
             return bhPanels;
         }

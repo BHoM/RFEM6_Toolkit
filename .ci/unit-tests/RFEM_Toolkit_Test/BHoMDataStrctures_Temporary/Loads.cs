@@ -150,10 +150,8 @@ namespace RFEM_Toolkit_Test.Loading
             n3 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 10 } };
             n4 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 10 } };
 
-
             Loadcase loadcaseDL0 = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
             Loadcase loadcaseDL1 = new Loadcase() { Name = "Windload", Nature = LoadNature.Wind, Number = 1 };
-
 
             var pointGroup0 = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { n1, n2 } };
             var pointLoad0 = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup0, Loadcase = loadcaseDL0, Moment = new Vector() { X = 100000, Y = 0, Z = 0 } };
@@ -161,9 +159,35 @@ namespace RFEM_Toolkit_Test.Loading
             var pointGroup1 = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { n3, n4 } };
             var pointLoad1 = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup1, Loadcase = loadcaseDL1, Moment = new Vector() { X = 0, Y = 100000, Z = 0 } };
 
-
             adapter.Push(new List<ILoad>() { pointLoad0 });
             adapter.Push(new List<ILoad>() { pointLoad1 });
+
+        }
+
+
+        [Test]
+        public void PullSurfaceLoad()
+        {
+            //FilterRequest loadFilter = new FilterRequest() { Type = typeof(AreaUniformlyDistributedLoad) };
+            //var areaLoadRead = adapter.Pull(loadFilter).ToList();
+            //AreaUniformlyDistributedLoad l0 = (AreaUniformlyDistributedLoad) areaLoadRead[0];
+
+
+            FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
+            var panelReader = adapter.Pull(panelFilter).ToList();
+            Panel p0 = (Panel)panelReader[0];
+            Panel p1 = (Panel)panelReader[1];
+            Panel p2 = (Panel)panelReader[2];
+
+
+            Loadcase loadcaseWind = new Loadcase() { Name = "Windload", Nature = LoadNature.Wind, Number = 1 };
+
+            AreaUniformlyDistributedLoad areaLoad0 = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcaseWind, BH.Engine.Geometry.Create.Vector(100000000000,0,0), new List<Panel>() { p1 });
+            AreaUniformlyDistributedLoad areaLoad1 = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcaseWind, BH.Engine.Geometry.Create.Vector(0, 100000000000, 0), new List<Panel>() { p1 });
+            AreaUniformlyDistributedLoad areaLoad2 = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcaseWind, BH.Engine.Geometry.Create.Vector(0, 0,100000000000), new List<Panel>() { p1 });
+
+
+            adapter.Push(new List<AreaUniformlyDistributedLoad>() { areaLoad0,areaLoad1,areaLoad2 });
 
 
         }

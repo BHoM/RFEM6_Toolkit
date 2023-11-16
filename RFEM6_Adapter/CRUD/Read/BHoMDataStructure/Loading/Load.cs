@@ -98,6 +98,35 @@ namespace BH.Adapter.RFEM6
             return loads;
         }
 
+        private List<ILoad> ReadAreaLoad(List<string> ids = null)
+        {
+            List<ILoad> loads = new List<ILoad>();
+
+            //Find all possible Load cases
+            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
+            Dictionary<int, Panel> panelMap = this.GetCachedOrReadAsDictionary<int, Panel>();
+
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE_LOAD);
+
+            IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.ToList().Select(n => m_Model.get_surface_load(n.children[0], n.no));
+
+            foreach (rfModel.surface_load surfaceLoad in foundSurfaceLoad)
+            {
+                List<Panel> panels = surfaceLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
+                Loadcase loadcase = loadCaseMap[surfaceLoad.load_case];
+
+                if (!(surfaceLoad.load_distribution is rfModel.surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
+                {
+                    Engine.Base.Compute.RecordNote("The current RFEM6 includes Surfaceloads with a non-uniformal load distributeion, these Loads will not be pulled.");
+                    continue;
+                }
+
+                loads.Add(surfaceLoad.FromRFEM(loadCaseMap[surfaceLoad.load_case], panels ));
+
+            }
+
+            return loads;
+        }
         //private List<ILoad> ReadLineLoad(List<string> ids = null)
         //{
         //    //Find all possible Load cases
@@ -137,38 +166,15 @@ namespace BH.Adapter.RFEM6
         //    return loads;
         //}
 
-        //private List<ILoad> ReadAreaLoad(List<string> ids = null)
-        //{
-        //    List<ILoad> loads = new List<ILoad>();
 
-        //    //Find all possible Load cases
-        //    Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
-        //    Dictionary<int, Panel> panelMap = this.GetCachedOrReadAsDictionary<int, Panel>();
-
-        //    rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE_LOAD);
-
-        //    IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.ToList().Select(n => m_Model.get_surface_load(n.children[0], n.no));
-
-        //    foreach (rfModel.surface_load surfaceLoad in foundSurfaceLoad)
-        //    {
-        //        List<Panel> panels = surfaceLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
-        //        Loadcase loadcase = loadCaseMap[surfaceLoad.load_case];
-
-        //        if (!(surfaceLoad.load_distribution is rfModel.surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
-        //        {
-        //            Engine.Base.Compute.RecordNote("The current RFEM6 includes Surfaceloads with a non-uniformal load distributeion, these Loads will not be pulled.");
-        //        }
-
-        //        loads.Add(surfaceLoad.FromRFEM(loadcase, panels));
-
-        //    }
+        private void updateLoadIdDictionary(ILoad load)
+        {
 
         //    return loads;
         //}
 
         private void UpdateLoadIdDictionary(ILoad load)
         {
-
 
             if (m_LoadcaseLoadIdDict.TryGetValue(load.Loadcase, out Dictionary<String, int> loadIdDict))
             {
