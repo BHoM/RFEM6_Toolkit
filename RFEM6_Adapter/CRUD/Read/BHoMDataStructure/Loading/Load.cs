@@ -71,7 +71,6 @@ namespace BH.Adapter.RFEM6
         {
             //Find all possible Load cases
             Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
-            //List<int> loadCaseIds = loadCaseMap.Keys.ToList();
             Dictionary<int, Node> memberMap = this.GetCachedOrReadAsDictionary<int, Node>();
 
 
@@ -83,12 +82,15 @@ namespace BH.Adapter.RFEM6
             List<ILoad> loads = new List<ILoad>();
             foreach (rfModel.nodal_load nodeLoad in founeNodalLoad)
             {
+                if (nodeLoad.load_type == rfModel.nodal_load_load_type.LOAD_TYPE_MASS) {
+
+                    BH.Engine.Base.Compute.RecordWarning($"Nodal Loads of type {nodeLoad.load_type} can not be read from RFEM6. If possible convert them to either Force, Moment or Components!");
+                    continue;
+                }
 
                 loads.Add(nodeLoad.FromRFEM(nodeLoad.nodes.ToList().Select(m => memberMap[m]).ToList(), loadCaseMap[nodeLoad.load_case]));
 
             }
-
-            //loads.ForEach(l=>updateLoadIdDictionary(l));
 
             return loads;
         }
