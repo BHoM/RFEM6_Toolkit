@@ -57,13 +57,38 @@ namespace BH.Adapter.RFEM6
         public static PointLoad FromRFEM(this rfModel.nodal_load nodeLoad, List<Node> bhNodes, Loadcase bhLoadCase)
         {
 
+
+            PointLoad pointLoad;
+            double[] force = new double[3];
+            double[] moment = new double[3];
+
+            if (nodeLoad.load_type == nodal_load_load_type.LOAD_TYPE_COMPONENTS)
+            {
+                force = new double[] { nodeLoad.components_force_x / 1000, nodeLoad.components_force_y / 1000, nodeLoad.components_force_z / 1000 };
+                moment = new double[] { nodeLoad.components_moment_x / 1000, nodeLoad.components_moment_y / 1000, nodeLoad.components_moment_z / 1000 }; ;
+
+            }
+            else if (nodeLoad.load_type == nodal_load_load_type.LOAD_TYPE_MOMENT)
+            {
+                force = new double[] { 0, 0, 0 };
+                moment = new double[] { nodeLoad.components_moment_x / 1000, nodeLoad.components_moment_y / 1000, nodeLoad.components_moment_z / 1000 };
+
+            }
+            else
+            { /*(nodeLoad.load_type == nodal_load_load_type.LOAD_TYPE_FORCE)*/
+                force = new double[] { nodeLoad.components_force_x / 1000, nodeLoad.components_force_y / 1000, nodeLoad.components_force_z / 1000 };
+                moment = new double[] { 0, 0, 0 }; ;
+            }
+
+
             PointLoad bhLoad = new PointLoad
             {
                 Objects = new BH.oM.Base.BHoMGroup<Node>() { Elements = bhNodes },
                 Loadcase = bhLoadCase,
-                Force = BH.Engine.Geometry.Create.Vector(0, 0, nodeLoad.force_magnitude),
-                Moment = BH.Engine.Geometry.Create.Vector(nodeLoad.components_force_x, nodeLoad.components_moment_y, nodeLoad.components_moment_z),
+                Force = BH.Engine.Geometry.Create.Vector(force[0], -force[1], -force[2]),
+                Moment = BH.Engine.Geometry.Create.Vector(moment[0], -moment[1], -moment[2]),
             };
+
 
             return bhLoad;
         }

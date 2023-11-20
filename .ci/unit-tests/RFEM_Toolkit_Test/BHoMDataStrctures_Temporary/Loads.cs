@@ -168,6 +168,15 @@ namespace RFEM_Toolkit_Test.Loading
 
         }
 
+        [Test]
+        public void PullPointLoad()
+        {
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(PointLoad) };
+            var loads = adapter.Pull(loadFilter).ToList();
+
+
+        }
+
         //[Test]
         //public void PushLineLoad()
         //{
