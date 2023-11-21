@@ -53,18 +53,18 @@ namespace BH.Adapter.RFEM6
 
             if (orientationVector.X != 0)
             {
-                loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                loadDirecteion = bhBarLoad.Projected? member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
                 loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Length() : bhBarLoad.Moment.Length();
             }
             else if (orientationVector.Y != 0)
             {
-                loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
                 loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? -1*bhBarLoad.Force.Length() : -1*bhBarLoad.Moment.Length();
 
             }
             else
             {
-                loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
                 loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Length() : bhBarLoad.Moment.Length();
             }
 
@@ -139,9 +139,14 @@ namespace BH.Adapter.RFEM6
 
             surface_load_load_direction loadDirecteion;
             Vector orientationVector = bhAreaLoad.Pressure;
-            if (orientationVector.X != 0) { loadDirecteion = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE; }
-            else if (orientationVector.Y != 0) { loadDirecteion = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE; }
-            else { loadDirecteion = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE; }
+            if (orientationVector.X != 0) { 
+                loadDirecteion = bhAreaLoad.Projected?surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED: surface_load_load_direction.LOAD_DIRECTION_LOCAL_X; }
+            else if (orientationVector.Y != 0) {
+                loadDirecteion = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+            }
+            else {
+                loadDirecteion = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+            }
 
 
             surface_load rfSurfaceLoad = new rfModel.surface_load()
