@@ -50,6 +50,7 @@ namespace BH.Adapter.RFEM6
             double loadMagintude;
             member_load_load_direction loadDirecteion;
             Vector orientationVector = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
+
             if (orientationVector.X != 0)
             {
                 loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
