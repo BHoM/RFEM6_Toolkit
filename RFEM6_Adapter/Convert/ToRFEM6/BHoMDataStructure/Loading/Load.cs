@@ -58,7 +58,7 @@ namespace BH.Adapter.RFEM6
             else if (orientationVector.Y != 0)
             {
                 loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
-                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Length() : bhBarLoad.Moment.Length();
+                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? -1*bhBarLoad.Force.Length() : -1*bhBarLoad.Moment.Length();
 
             }
             else
