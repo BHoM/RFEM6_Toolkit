@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,28 +34,20 @@ namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter
     {
-        /***************************************************/
-        /**** Override push                             ****/
-        /***************************************************/
-
-        public override List<object> Push(IEnumerable<object> objects, string tag = "", PushType pushType = PushType.AdapterDefault, ActionConfig actionConfig = null)
+        private void TwoStagePushErrorMessageCheck(IEnumerable<object> obj)
         {
-            try
-            {
-                this.Connect();
-                TwoStagePushErrorMessageCheck(objects);
-                return base.Push(objects, tag, pushType, actionConfig);
 
-            }
-            finally
+            bool hasBar = obj.Any(o => o is Bar);
+            bool hasBarLoad = obj.Any(o => o is BarUniformlyDistributedLoad);
+
+
+            if (hasBar && hasBarLoad)
             {
-                this.Disconnect();
+                BH.Engine.Base.Compute.RecordError("Pushed Set has both Bars and Loads. Please make sure that Bars and BarUDLs are pushed seperatly. First Push parts, next push BarUDL!");
             }
+
 
         }
-
-
-       
-
     }
+
 }

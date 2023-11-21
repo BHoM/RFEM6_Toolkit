@@ -52,7 +52,9 @@ namespace BH.Adapter.RFEM6
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD);
 
             //IEnumerable<rfModel.member_load> foundLoadCases = numbers.ToList().Select(n => m_Model.get_member_load(n.no, n.children[0]));
-            IEnumerable<rfModel.member_load> foundLoadCases = numbers.ToList().Select(n => m_Model.get_member_load(n.children[0], n.no));
+            //IEnumerable<rfModel.member_load> foundLoadCases = numbers.ToList().Select(n => m_Model.get_member_load(n.children[0], n.no));
+
+            IEnumerable<rfModel.member_load> foundLoadCases = numbers.SelectMany(n => n.children.ToList().Select(child => m_Model.get_member_load(child, n.no)));
 
 
 
@@ -82,7 +84,8 @@ namespace BH.Adapter.RFEM6
             List<ILoad> loads = new List<ILoad>();
             foreach (rfModel.nodal_load nodeLoad in founeNodalLoad)
             {
-                if (nodeLoad.load_type == rfModel.nodal_load_load_type.LOAD_TYPE_MASS) {
+                if (nodeLoad.load_type == rfModel.nodal_load_load_type.LOAD_TYPE_MASS)
+                {
 
                     BH.Engine.Base.Compute.RecordWarning($"Nodal Loads of type {nodeLoad.load_type} can not be read from RFEM6. If possible convert them to either Force, Moment or Components!");
                     continue;
@@ -163,7 +166,8 @@ namespace BH.Adapter.RFEM6
         //    return loads;
         //}
 
-        private void updateLoadIdDictionary(ILoad load) {
+        private void updateLoadIdDictionary(ILoad load)
+        {
 
 
             if (m_LoadcaseLoadIdDict.TryGetValue(load.Loadcase, out Dictionary<String, int> loadIdDict))
@@ -185,9 +189,10 @@ namespace BH.Adapter.RFEM6
 
 
             }
-            else { 
-            
-                
+            else
+            {
+
+
                 var d = new Dictionary<string, int>();
                 d.Add(load.GetType().Name, m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID()));
                 m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
@@ -195,8 +200,8 @@ namespace BH.Adapter.RFEM6
             }
 
 
-        
+
         }
-        
+
     }
 }
