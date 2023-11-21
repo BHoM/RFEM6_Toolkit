@@ -167,9 +167,7 @@ namespace BH.Adapter.RFEM6
         //}
 
 
-        private void updateLoadIdDictionary(ILoad load)
-        {
-
+      
         //    return loads;
         //}
 
