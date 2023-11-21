@@ -150,11 +150,13 @@ namespace BH.Adapter.RFEM6
             else
             {
 
-                BarUniformlyDistributedLoad bhPointLoad = bhLoad as BarUniformlyDistributedLoad;
-                momentHasBeenSet = !(bhPointLoad.Moment.X == 0 && bhPointLoad.Moment.Y == 0 && bhPointLoad.Moment.Z == 0);
-                forceHasBeenSet = !(bhPointLoad.Force.X == 0 && bhPointLoad.Force.Y == 0 && bhPointLoad.Force.Z == 0);
+                BarUniformlyDistributedLoad bhBarLoad = bhLoad as BarUniformlyDistributedLoad;
+                momentHasBeenSet = !(bhBarLoad.Moment.X == 0 && bhBarLoad.Moment.Y == 0 && bhBarLoad.Moment.Z == 0);
+                forceHasBeenSet = !(bhBarLoad.Force.X == 0 && bhBarLoad.Force.Y == 0 && bhBarLoad.Force.Z == 0);
                 //bhLoadType = member_load_load_type.LOAD_TYPE_FORCE;
                 bhLoadType = forceHasBeenSet == true ? member_load_load_type.LOAD_TYPE_FORCE : member_load_load_type.LOAD_TYPE_MOMENT;
+                BarLoadErrorMessage(bhBarLoad.Force);
+                BarLoadErrorMessage(bhBarLoad.Moment);
 
             }
 
@@ -192,7 +194,16 @@ namespace BH.Adapter.RFEM6
         }
 
 
+        private void BarLoadErrorMessage(Vector vector) {
 
+            if (vector.X != 0 && (!(vector.Y == 0 || vector.Z == 0))){ 
+            
+                BH.Engine.Base.Compute.RecordWarning($"The Load Vector {vector} is not aligned with the X, Y or Z axis. Please make sure your Barload is either parallel to the X, Y or Z axis!");
+            
+            }    
+
+        
+        }
     }
 
 }
