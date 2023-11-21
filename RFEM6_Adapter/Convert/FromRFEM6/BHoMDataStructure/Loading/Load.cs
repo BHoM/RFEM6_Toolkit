@@ -47,18 +47,18 @@ namespace BH.Adapter.RFEM6
 
             if (rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_LOCAL_X)
             {
-                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? new Vector() { X =rfMemberLoad.magnitude, Y = 0, Z = 0 } : new Vector() { X = 0, Y = 0, Z = 0 };
+                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? new Vector() { X = rfMemberLoad.magnitude, Y = 0, Z = 0 } : new Vector() { X = 0, Y = 0, Z = 0 };
                 forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? new Vector() { X = rfMemberLoad.magnitude, Y = 0, Z = 0 } : new Vector() { X = 0, Y = 0, Z = 0 };
 
             }
             else if (rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_LOCAL_Y)
             {
-                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 } :  new Vector() { X = 0, Y = 0, Z = 0 };
-                forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 } : new Vector() { X = 0, Y = 0, Z = 0 };
+                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? -1*(new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
+                forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? -1*(new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
             }
             else
             {
-                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ?  new Vector() { X = 0, Y = 0, Z = rfMemberLoad.magnitude } :  new Vector() { X = 0, Y = 0, Z = 0 };
+                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? new Vector() { X = 0, Y = 0, Z = rfMemberLoad.magnitude } : new Vector() { X = 0, Y = 0, Z = 0 };
                 forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? new Vector() { X = 0, Y = 0, Z = rfMemberLoad.magnitude } : new Vector() { X = 0, Y = 0, Z = 0 };
             }
 
@@ -83,19 +83,19 @@ namespace BH.Adapter.RFEM6
 
             if (nodeLoad.load_type == nodal_load_load_type.LOAD_TYPE_COMPONENTS)
             {
-                force = new double[] { nodeLoad.components_force_x / 1000, nodeLoad.components_force_y / 1000, nodeLoad.components_force_z / 1000 };
-                moment = new double[] { nodeLoad.components_moment_x / 1000, nodeLoad.components_moment_y / 1000, nodeLoad.components_moment_z / 1000 }; ;
+                force = new double[] { nodeLoad.components_force_x, nodeLoad.components_force_y, nodeLoad.components_force_z };
+                moment = new double[] { nodeLoad.components_moment_x, nodeLoad.components_moment_y, nodeLoad.components_moment_z }; ;
 
             }
             else if (nodeLoad.load_type == nodal_load_load_type.LOAD_TYPE_MOMENT)
             {
                 force = new double[] { 0, 0, 0 };
-                moment = new double[] { nodeLoad.components_moment_x / 1000, nodeLoad.components_moment_y / 1000, nodeLoad.components_moment_z / 1000 };
+                moment = new double[] { nodeLoad.components_moment_x, nodeLoad.components_moment_y, nodeLoad.components_moment_z };
 
             }
             else
             { /*(nodeLoad.load_type == nodal_load_load_type.LOAD_TYPE_FORCE)*/
-                force = new double[] { nodeLoad.components_force_x / 1000, nodeLoad.components_force_y / 1000, nodeLoad.components_force_z / 1000 };
+                force = new double[] { nodeLoad.components_force_x, nodeLoad.components_force_y, nodeLoad.components_force_z };
                 moment = new double[] { 0, 0, 0 }; ;
             }
 
