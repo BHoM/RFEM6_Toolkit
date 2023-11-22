@@ -127,6 +127,33 @@ namespace BH.Adapter.RFEM6
 
             return loads;
         }
+
+        private List<ILoad> ReadLineLoad(List<string> ids = null)
+        {
+            List<ILoad> loads = new List<ILoad>();
+
+            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
+            Dictionary<int, Panel> panelMap = this.GetCachedOrReadAsDictionary<int, Panel>();
+
+
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD);
+            //rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.line);
+
+
+            IEnumerable<rfModel.free_line_load> foundFreeLineLoads = numbers.ToList().Select(n => m_Model.get_free_line_load(n.children[0], n.no));
+
+            foreach (rfModel.free_line_load freeLineLoad in foundFreeLineLoads)
+            {
+
+                loads.Add(freeLineLoad.FromRFEM(loadCaseMap[freeLineLoad.load_case], freeLineLoad.surfaces.ToList().Select(s => panelMap[s]).ToList()));
+
+            }
+
+            return loads;
+        }
+
+    
+
         //private List<ILoad> ReadLineLoad(List<string> ids = null)
         //{
         //    //Find all possible Load cases
@@ -167,11 +194,16 @@ namespace BH.Adapter.RFEM6
         //}
 
 
+<<<<<<< HEAD
       
         //    return loads;
         //}
 
         private void UpdateLoadIdDictionary(ILoad load)
+=======
+
+        private void updateLoadIdDictionary(ILoad load)
+>>>>>>> 4a96e76 (...)
         {
 
             if (m_LoadcaseLoadIdDict.TryGetValue(load.Loadcase, out Dictionary<String, int> loadIdDict))
