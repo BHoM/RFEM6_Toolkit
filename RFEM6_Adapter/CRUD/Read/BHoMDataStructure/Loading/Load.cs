@@ -152,59 +152,10 @@ namespace BH.Adapter.RFEM6
             return loads;
         }
 
-    
 
-        //private List<ILoad> ReadLineLoad(List<string> ids = null)
-        //{
-        //    //Find all possible Load cases
-        //    Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
-        //    //List<int> loadCaseIds = loadCaseMap.Keys.ToList();
-        //    Dictionary<int, Edge> lineMap = this.GetCachedOrReadAsDictionary<int, Edge>();
+        private void UpdateLoadIdDictionary(ILoad load) { 
 
 
-        //    rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD);
-
-        //    IEnumerable<rfModel.line_load> foundLineLoad = numbers.ToList().Select(n => m_Model.get_line_load(n.children[0], n.no));
-
-
-        //    List<ILoad> loads = new List<ILoad>();
-        //    foreach (rfModel.line_load lineLoad in foundLineLoad)
-        //    {
-        //        List<Edge> allEdges = lineLoad.lines.ToList().Select(l => lineMap[l]).ToList();
-        //        List<Edge> lineEdges = allEdges.Where(e => ((e.Curve is Line) || (e.Curve is Polyline && (e.Curve as Polyline).ControlPoints.Count == 2))).ToList();
-
-        //        // if One of the edges is not a line, skip this load
-        //        if (!(lineEdges?.Count() != null || lineEdges?.Count() > 0)) continue;
-
-        //        //if the load is over the total length of the line, skip this load
-        //        //if (lineLoad.distance_a_absolute!=0||lineLoad.distance_b_absolute!=0||lineLoad.distance_c_absolute!=0) continue;
-        //        if (lineLoad.load_distribution != rfModel.line_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM) continue;
-
-
-        //        foreach (Edge lineEdge in lineEdges)
-        //        {
-
-        //            loads.Add(lineLoad.FromRFEM(loadCaseMap[lineLoad.load_case], lineEdge));
-
-        //        }
-
-        //    }
-
-        //    return loads;
-        //}
-
-
-<<<<<<< HEAD
-      
-        //    return loads;
-        //}
-
-        private void UpdateLoadIdDictionary(ILoad load)
-=======
-
-        private void updateLoadIdDictionary(ILoad load)
->>>>>>> 4a96e76 (...)
-        {
 
             if (m_LoadcaseLoadIdDict.TryGetValue(load.Loadcase, out Dictionary<String, int> loadIdDict))
             {
