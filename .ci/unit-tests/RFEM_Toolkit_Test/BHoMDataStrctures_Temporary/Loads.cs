@@ -237,6 +237,15 @@ namespace RFEM_Toolkit_Test.Loading
             var l0 = (GeometricalLineLoad)loads[0];
 
         }
+        
+        [Test]
+        public void PullBarload()
+        {
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
+            var loads = adapter.Pull(loadFilter).ToList();
+            var l0 = (BarUniformlyDistributedLoad)loads[0];
+
+        }
 
         //[Test]
         //public void PushLineLoad()
@@ -324,6 +333,31 @@ namespace RFEM_Toolkit_Test.Loading
 
         //}
 
+        [Test]
+        public void PushPullBarLoad()
+        {
+            n1 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
+            n2 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
 
+            ISectionProperty section1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
+
+            bar = new Bar() { StartNode = n1, EndNode = n2, SectionProperty = section1 };
+
+
+            //LoadCases
+            Loadcase loadcaseDL = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
+
+            var barGroup = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar } };
+            var barLoad0 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = barGroup, Loadcase = loadcaseDL, Force = new Vector() { X = 1000, Y = 0, Z = 0 } };
+
+            HashSet<ILoad> barloads = new HashSet<ILoad>() { barLoad0 };
+
+            adapter.Push(barloads.ToList());
+
+
+
+
+
+        }
     }
 }
