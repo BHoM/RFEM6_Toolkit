@@ -85,7 +85,7 @@ namespace BH.Adapter.RFEM6
                 {
                     //Dictionary<int, Panel> supportMap = this.GetCachedOrReadAsDictionary<int, Panel>();
 
-                    updateLoadIdDictionary(bhLoad);
+                    UpdateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     surface_load rfemAreaLoad = (bhLoad as AreaUniformlyDistributedLoad).ToRFEM6(id);
                     m_Model.set_surface_load(bhLoad.Loadcase.GetRFEM6ID(), rfemAreaLoad);
