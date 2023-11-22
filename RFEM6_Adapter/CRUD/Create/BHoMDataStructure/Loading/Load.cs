@@ -119,6 +119,7 @@ namespace BH.Adapter.RFEM6
 
 
                 }
+
                 //else if (bhLoad is GeometricalLineLoad)
                 //{
                 //    Node n0 = new Node() { Position = (bhLoad as GeometricalLineLoad).Location.Start };
