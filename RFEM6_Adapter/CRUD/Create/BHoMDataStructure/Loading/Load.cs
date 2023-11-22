@@ -101,7 +101,7 @@ namespace BH.Adapter.RFEM6
                         continue;
                     }
 
-                    updateLoadIdDictionary(bhLoad);
+                    UpdateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     member_load member_load = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6((member_load_load_type)nodalLoadType, id);
                     var rfMemberLoad = member_load;
@@ -112,7 +112,7 @@ namespace BH.Adapter.RFEM6
                     //nodal_load_load_type nodalLoadType = MomentOfForceLoad(bhLoad as PointLoad);
                     //if (nodalLoadType == 0) continue;
 
-                    updateLoadIdDictionary(bhLoad);
+                    UpdateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6((nodal_load_load_type) nodalLoadType, id);
                     m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
