@@ -139,7 +139,21 @@ namespace BH.Adapter.RFEM6
             return bhAreaload;
         }
 
+        public static GeometricalLineLoad FromRFEM(this rfModel.free_line_load rfLineload, Loadcase loadcase, List<Panel> panels)
+        {
 
+
+            
+            //Point p = new Point() { X=rfLineload.load_location_first_x,Y=rfLineload.load_location_first_y,Z=rfLineload.load_location_z };
+            
+
+            Line line = new BH.oM.Geometry.Line() { Start = new Point() { X = rfLineload.load_location_first_x, Y = rfLineload.load_location_first_y, Z = 0 }, End = new Point() { X = rfLineload.load_location_second_x, Y = rfLineload.load_location_second_y, Z = 0 } };
+
+            GeometricalLineLoad bhLineLoad = BH.Engine.Structure.Create.GeometricalLineLoad(line, loadcase, Vector.ZAxis, Vector.ZAxis, panels);
+
+
+            return bhLineLoad;
+        }
 
         //public static GeometricalLineLoad FromRFEM(this rfModel.line_load lineLoad, Loadcase bhLoadCase, Edge edge)
         //{

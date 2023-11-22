@@ -229,6 +229,15 @@ namespace RFEM_Toolkit_Test.Loading
 
         }
 
+        [Test]
+        public void PullGeometricalLineload()
+        {
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
+            var loads = adapter.Pull(loadFilter).ToList();
+            var l0 = (GeometricalLineLoad)loads[0];
+
+        }
+
         //[Test]
         //public void PushLineLoad()
         //{
