@@ -97,6 +97,8 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is BarUniformlyDistributedLoad)
                 {
+                    if (!DirectionVectorIsXYZAxisParallel((bhLoad as BarUniformlyDistributedLoad).Force))
+                    {
 
                     if (!DirectionVectorIsXYZAxisParallel((bhLoad as BarUniformlyDistributedLoad).Force))
                     {
