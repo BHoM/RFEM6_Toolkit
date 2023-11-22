@@ -51,12 +51,7 @@ namespace BH.Adapter.RFEM6
 
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD);
 
-            //IEnumerable<rfModel.member_load> foundLoadCases = numbers.ToList().Select(n => m_Model.get_member_load(n.no, n.children[0]));
-            //IEnumerable<rfModel.member_load> foundLoadCases = numbers.ToList().Select(n => m_Model.get_member_load(n.children[0], n.no));
-
             IEnumerable<rfModel.member_load> foundLoadCases = numbers.SelectMany(n => n.children.ToList().Select(child => m_Model.get_member_load(child, n.no)));
-
-
 
             List<ILoad> loadCases = new List<ILoad>();
             foreach (rfModel.member_load memberLoad in foundLoadCases)

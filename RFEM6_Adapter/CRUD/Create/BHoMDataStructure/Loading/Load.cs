@@ -45,37 +45,6 @@ namespace BH.Adapter.RFEM6
 
         private bool CreateCollection(IEnumerable<ILoad> bhLoads)
         {
-            ////Checking presence of GeometricalLineLoads and getting all line numbers if yes it is required to read all lines from RFEM6
-            //NodeDistanceComparer nodeDistanceComparer = new NodeDistanceComparer(3);
-            //Dictionary<Node, Dictionary<Node, int>> nestedNodeToIDMap = new Dictionary<Node, Dictionary<Node, int>>(nodeDistanceComparer);
-            //List<rfModel.line> allLineNumbers = new List<rfModel.line>();
-
-            ////If necessary fill the NodeToIDMap
-            //if (bhLoads.Where(l => l is GeometricalLineLoad).ToList().Count() > 0)
-            //{
-
-            //    rfModel.object_with_children[] lineNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE);
-            //    allLineNumbers = lineNumber.Length > 1 ? lineNumber.ToList().Select(n => m_Model.get_line(n.no)).ToList().ToList() : new List<rfModel.line>();
-
-            //    foreach (rfModel.line l in allLineNumbers)
-            //    {
-
-            //        Node n0 = m_Model.get_node(l.definition_nodes[0]).FromRFEM();
-            //        Node n1 = m_Model.get_node(l.definition_nodes[1]).FromRFEM();
-
-            //        if (!nestedNodeToIDMap.ContainsKey(n0))
-            //        {
-            //            Dictionary<Node, int> innterDictionary = new Dictionary<Node, int>(nodeDistanceComparer);
-            //            innterDictionary.Add(n1, l.no);
-            //            nestedNodeToIDMap.Add(n0, innterDictionary);
-            //        }
-            //        else
-            //        {
-            //            nestedNodeToIDMap[n0].Add(n1, l.no);
-            //        }
-            //    }
-
-            //}
 
             foreach (ILoad bhLoad in bhLoads)
             {
@@ -83,7 +52,6 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is AreaUniformlyDistributedLoad)
                 {
-                    //Dictionary<int, Panel> supportMap = this.GetCachedOrReadAsDictionary<int, Panel>();
 
                     UpdateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
@@ -97,7 +65,7 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is BarUniformlyDistributedLoad)
                 {
-                   
+
                     if (!DirectionVectorIsXYZAxisParallel((bhLoad as BarUniformlyDistributedLoad).Force))
                     {
 
@@ -123,9 +91,7 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is PointLoad)
                 {
-                    //nodal_load_load_type nodalLoadType = MomentOfForceLoad(bhLoad as PointLoad);
-                    //if (nodalLoadType == 0) continue;
-
+                    
                     UpdateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6((nodal_load_load_type)nodalLoadType, id);
@@ -222,12 +188,12 @@ namespace BH.Adapter.RFEM6
         //private void BarLoadErrorMessage(Vector vector) {
 
         //    if (vector.X != 0 && (!(vector.Y == 0 || vector.Z == 0))){ 
-            
+
         //        BH.Engine.Base.Compute.RecordWarning($"The Load Vector {vector} is not aligned with the X, Y or Z axis. Please make sure your Barload is either parallel to the X, Y or Z axis!");
-            
+
         //    }    
 
-        
+
         //}
 
         private bool DirectionVectorIsXYZAxisParallel(Vector vector)
