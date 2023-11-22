@@ -86,6 +86,21 @@ namespace BH.Adapter.RFEM6
                 if (bhLoad is BarUniformlyDistributedLoad)
                 {
 
+                    if (!DirectionVectorIsXYZAxisParallel((bhLoad as BarUniformlyDistributedLoad).Force))
+                    {
+
+                        BH.Engine.Base.Compute.RecordError($"The Force Vector of {bhLoad} is not aligned with the X, Y or Z axis. Please make sure your Barload is either parallel to the X, Y or Z axis!");
+
+                        continue;
+                    }
+                    if (!DirectionVectorIsXYZAxisParallel((bhLoad as BarUniformlyDistributedLoad).Moment))
+                    {
+
+                        BH.Engine.Base.Compute.RecordError($"The Moment Vector of {bhLoad} is not aligned with the X, Y or Z axis. Please make sure your Barload is either parallel to the X, Y or Z axis!");
+
+                        continue;
+                    }
+
                     updateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     member_load member_load = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6((member_load_load_type)nodalLoadType, id);
@@ -163,7 +178,7 @@ namespace BH.Adapter.RFEM6
             if (momentHasBeenSet && forceHasBeenSet)
             {
 
-                BH.Engine.Base.Compute.RecordError($"The Load {bhLoad} does both include definitions for Moment Vector and Force Vector. Pleas Try to seperate those and push them individually!");
+                BH.Engine.Base.Compute.RecordError($"The Load {bhLoad} does both include definitions for Moment Vector and Force Vector. Please try to seperate those and push them individually!");
                 return null;
             }
 
