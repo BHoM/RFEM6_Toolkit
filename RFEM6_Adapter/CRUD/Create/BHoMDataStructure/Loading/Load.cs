@@ -155,15 +155,15 @@ namespace BH.Adapter.RFEM6
                 forceHasBeenSet = !(bhBarLoad.Force.X == 0 && bhBarLoad.Force.Y == 0 && bhBarLoad.Force.Z == 0);
                 //bhLoadType = member_load_load_type.LOAD_TYPE_FORCE;
                 bhLoadType = forceHasBeenSet == true ? member_load_load_type.LOAD_TYPE_FORCE : member_load_load_type.LOAD_TYPE_MOMENT;
-                BarLoadErrorMessage(bhBarLoad.Force);
-                BarLoadErrorMessage(bhBarLoad.Moment);
+                //BarLoadErrorMessage(bhBarLoad.Force);
+                //BarLoadErrorMessage(bhBarLoad.Moment);
 
             }
 
             if (momentHasBeenSet && forceHasBeenSet)
             {
 
-                BH.Engine.Base.Compute.RecordWarning($"The Load {bhLoad} does both include definitions for Moment Vector and Force Vector. Pleas Try to seperate those and push them individually!");
+                BH.Engine.Base.Compute.RecordError($"The Load {bhLoad} does both include definitions for Moment Vector and Force Vector. Pleas Try to seperate those and push them individually!");
                 return null;
             }
 
@@ -194,16 +194,56 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private void BarLoadErrorMessage(Vector vector) {
+        //private void BarLoadErrorMessage(Vector vector) {
 
-            if (vector.X != 0 && (!(vector.Y == 0 || vector.Z == 0))){ 
+        //    if (vector.X != 0 && (!(vector.Y == 0 || vector.Z == 0))){ 
             
-                BH.Engine.Base.Compute.RecordWarning($"The Load Vector {vector} is not aligned with the X, Y or Z axis. Please make sure your Barload is either parallel to the X, Y or Z axis!");
+        //        BH.Engine.Base.Compute.RecordWarning($"The Load Vector {vector} is not aligned with the X, Y or Z axis. Please make sure your Barload is either parallel to the X, Y or Z axis!");
             
-            }    
+        //    }    
 
         
+        //}
+
+        private bool DirectionVectorIsXYZAxisParallel(Vector vector)
+        {
+            bool isParallel = false;
+
+            if (vector.X != 0 && ((vector.Y == 0 && vector.Z == 0)))
+            {
+
+                isParallel = true;
+
+            }
+            else if (vector.Y != 0 && ((vector.X == 0 && vector.Z == 0)))
+            {
+
+
+                isParallel = true;
+
+            }
+            else if (vector.Z != 0 && ((vector.X == 0 && vector.Y == 0)))
+            {
+
+
+                isParallel = true;
+
+            }
+            else if (vector.X == 0 && vector.Y == 0 && vector.Z == 0)
+            {
+
+
+                isParallel = true;
+
+            }
+
+
+
+
+            return isParallel;
+
         }
+
     }
 
 }
