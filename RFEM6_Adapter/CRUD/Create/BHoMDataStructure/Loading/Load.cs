@@ -37,6 +37,7 @@ using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.Engine.Structure;
 using BH.oM.Adapters.RFEM6;
+using BH.Engine.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
@@ -91,12 +92,29 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is PointLoad)
                 {
-                    
+
                     UpdateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6((nodal_load_load_type)nodalLoadType, id);
                     m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
                     continue;
+
+                }
+                if (bhLoad is GeometricalLineLoad)
+                {
+
+                    if (bhLoad.Name != "Free") { UpdateLoadIdDictionary(bhLoad); }
+
+
+
+                    UpdateLoadIdDictionary(bhLoad);
+                    int[] surfaceIds =bhLoad.CustomData.Count()>0? ((List<BH.oM.Structure.Elements.Panel>)bhLoad.CustomData.ToList()[0].Value).Select(p => p.GetRFEM6ID()).ToArray():m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE,0);
+
+                    int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
+                    free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id,surfaceIds);
+                    m_Model.set_free_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfFreeLineLoad);
+                    continue;
+
 
                 }
 
@@ -138,7 +156,7 @@ namespace BH.Adapter.RFEM6
                 bhLoadType = forceHasBeenSet == true ? nodal_load_load_type.LOAD_TYPE_FORCE : nodal_load_load_type.LOAD_TYPE_MOMENT;
 
             }
-            else
+            else if (bhLoad is BarUniformlyDistributedLoad)
             {
 
                 BarUniformlyDistributedLoad bhBarLoad = bhLoad as BarUniformlyDistributedLoad;
@@ -150,6 +168,35 @@ namespace BH.Adapter.RFEM6
                 //BarLoadErrorMessage(bhBarLoad.Moment);
 
             }
+            else if (bhLoad is GeometricalLineLoad)
+            {
+
+                GeometricalLineLoad geolLineload = bhLoad as GeometricalLineLoad;
+                if ((geolLineload.ForceA.Length() == 0 && geolLineload.ForceB.Length() == 0) && (geolLineload.MomentA.Length() == 0 && geolLineload.MomentB.Length() == 0)) { return null; }
+
+                if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.ForceA, geolLineload.ForceB)) != 1 && (geolLineload.ForceA.Length() + geolLineload.ForceB.Length() > 0))
+                {
+                    return null;
+                }
+                else if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.MomentA, geolLineload.MomentA)) != 1&&(geolLineload.MomentA.Length()+ geolLineload.MomentB.Length()>0))
+                {
+                    return null;
+                }
+                else
+                {
+                    momentHasBeenSet = !(geolLineload.MomentA.X == 0 && geolLineload.MomentA.Y == 0 && geolLineload.MomentA.Z == 0);
+                    forceHasBeenSet = !(geolLineload.ForceA.X == 0 && geolLineload.ForceA.Y == 0 && geolLineload.ForceA.Z == 0);
+                    //bhLoadType = member_load_load_type.LOAD_TYPE_FORCE;
+                    bhLoadType = forceHasBeenSet == true ? member_load_load_type.LOAD_TYPE_FORCE : member_load_load_type.LOAD_TYPE_MOMENT;
+                    //BarLoadErrorMessage(bhBarLoad.Force);
+                    //BarLoadErrorMessage(bhBarLoad.Moment);
+                }
+            }
+            else
+            {
+                return null;
+            }
+
 
             if (momentHasBeenSet && forceHasBeenSet)
             {

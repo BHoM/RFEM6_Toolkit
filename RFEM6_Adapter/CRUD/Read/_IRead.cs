@@ -93,6 +93,7 @@ namespace BH.Adapter.RFEM6
                     loadList.AddRange(ReadPointLoad(ids as dynamic));
                     loadList.AddRange(ReadBarLoad(ids as dynamic));
                     loadList.AddRange(ReadLineLoad(ids as dynamic));
+                    loadList.AddRange(ReadAreaLoad(ids as dynamic));
                     return loadList;
                         }
                 //else if (type == typeof(GeometricalLineLoad))

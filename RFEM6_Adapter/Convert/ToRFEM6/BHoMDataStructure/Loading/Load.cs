@@ -175,6 +175,46 @@ namespace BH.Adapter.RFEM6
         }
 
 
+        public static rfModel.free_line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, int loadCaseSpecificID, int[] surfaceIds)
+        {
+
+
+
+            free_line_load rfLineLoad = new rfModel.free_line_load()
+            {
+                surfaces = surfaceIds,
+                surfaces_string = string.Join(" ", surfaceIds.Select(n => n.ToString())),
+                
+                no = loadCaseSpecificID,
+                load_case = bhLineLoad.Loadcase.GetRFEM6ID(),
+                load_caseSpecified = true,
+                load_distribution = free_line_load_load_distribution.LOAD_DISTRIBUTION_LINEAR,
+                load_distributionSpecified = true,
+                magnitude_first = bhLineLoad.ForceA.Length(),
+                magnitude_firstSpecified = true,
+                magnitude_second = bhLineLoad.ForceB.Length(),
+                magnitude_secondSpecified = true,
+                is_generated = false,
+                is_generatedSpecified = true,
+                load_direction = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE,
+                load_directionSpecified = true,
+                load_location_first_x = bhLineLoad.Location.Start.X,
+                load_location_first_xSpecified = true,
+                load_location_first_y = bhLineLoad.Location.Start.Y,
+                load_location_first_ySpecified = true,
+                load_location_second_x = bhLineLoad.Location.End.X,
+                load_location_second_xSpecified = true,
+                load_location_second_y = bhLineLoad.Location.End.Y,
+                load_location_second_ySpecified = true,
+                
+              
+            };
+
+
+            return rfLineLoad;
+
+        }
+
         //public static rfModel.line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, List<int> lineNoList)
         //{
 
@@ -182,22 +222,22 @@ namespace BH.Adapter.RFEM6
         //    {
         //        no = bhLineLoad.GetRFEM6ID(),
         //        lines = lineNoList.ToArray(),
-        //        load_case=bhLineLoad.Loadcase.GetRFEM6ID(),
-        //        load_caseSpecified=true,
+        //        load_case = bhLineLoad.Loadcase.GetRFEM6ID(),
+        //        load_caseSpecified = true,
         //        load_distribution = line_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
         //        load_distributionSpecified = true,
         //        magnitude = bhLineLoad.ForceA.Length(),
         //        magnitudeSpecified = true,
-        //        reference_to_list_of_lines=false,
-        //        reference_to_list_of_linesSpecified=true,
-        //        is_generated=false,
-        //        is_generatedSpecified=true,
+        //        reference_to_list_of_lines = false,
+        //        reference_to_list_of_linesSpecified = true,
+        //        is_generated = false,
+        //        is_generatedSpecified = true,
         //        load_direction = line_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
         //        load_directionSpecified = true,
         //        load_is_over_total_length = true,
         //        load_is_over_total_lengthSpecified = true,
-        //        load_type= line_load_load_type.LOAD_TYPE_FORCE,
-        //        load_typeSpecified=true,
+        //        load_type = line_load_load_type.LOAD_TYPE_FORCE,
+        //        load_typeSpecified = true,
         //    };
 
 
