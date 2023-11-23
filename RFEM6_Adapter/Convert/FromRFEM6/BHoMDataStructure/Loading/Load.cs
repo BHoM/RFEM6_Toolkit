@@ -53,8 +53,8 @@ namespace BH.Adapter.RFEM6
             }
             else if (rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_LOCAL_Y)
             {
-                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? -1*(new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
-                forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? -1*(new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
+                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? -1 * (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
+                forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? -1 * (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
             }
             else
             {
@@ -143,13 +143,18 @@ namespace BH.Adapter.RFEM6
         {
 
 
-            
-            //Point p = new Point() { X=rfLineload.load_location_first_x,Y=rfLineload.load_location_first_y,Z=rfLineload.load_location_z };
-            
-
             Line line = new BH.oM.Geometry.Line() { Start = new Point() { X = rfLineload.load_location_first_x, Y = rfLineload.load_location_first_y, Z = 0 }, End = new Point() { X = rfLineload.load_location_second_x, Y = rfLineload.load_location_second_y, Z = 0 } };
 
-            GeometricalLineLoad bhLineLoad = BH.Engine.Structure.Create.GeometricalLineLoad(line, loadcase, Vector.ZAxis, Vector.ZAxis, panels);
+            GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
+            {
+                Loadcase = loadcase,
+                Location = line,
+                ForceA = BH.Engine.Geometry.Create.Vector(0, 0, rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform),
+                ForceB = BH.Engine.Geometry.Create.Vector(0, 0, rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform),
+
+            };
+
+            //GeometricalLineLoad bhLineLoad = BH.Engine.Structure.Create.GeometricalLineLoad(line, loadcase, Vector.ZAxis, Vector.ZAxis, panels);
 
 
             return bhLineLoad;

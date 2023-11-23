@@ -116,7 +116,7 @@ namespace BH.Adapter.RFEM6
                     continue;
                 }
 
-                loads.Add(surfaceLoad.FromRFEM(loadCaseMap[surfaceLoad.load_case], panels ));
+                loads.Add(surfaceLoad.FromRFEM(loadCaseMap[surfaceLoad.load_case], panels));
 
             }
 
@@ -139,8 +139,18 @@ namespace BH.Adapter.RFEM6
 
             foreach (rfModel.free_line_load freeLineLoad in foundFreeLineLoads)
             {
+                List<Panel> panelList;
+                if (freeLineLoad.surfaces.ToList().First() == 0)
+                {
+                    panelList = new List<Panel>();
+                }
+                else
+                {
 
-                loads.Add(freeLineLoad.FromRFEM(loadCaseMap[freeLineLoad.load_case], freeLineLoad.surfaces.ToList().Select(s => panelMap[s]).ToList()));
+                    panelList = freeLineLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
+
+                }
+                loads.Add(freeLineLoad.FromRFEM(loadCaseMap[freeLineLoad.load_case], panelList));
 
             }
 
@@ -148,7 +158,8 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private void UpdateLoadIdDictionary(ILoad load) { 
+        private void UpdateLoadIdDictionary(ILoad load)
+        {
 
 
 

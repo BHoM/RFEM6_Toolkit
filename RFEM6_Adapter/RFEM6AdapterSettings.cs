@@ -73,9 +73,9 @@ namespace BH.Adapter.RFEM6
                 {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
                 {typeof(BarUniformlyDistributedLoad), new List<Type> { typeof(Bar),typeof(Loadcase)} },
                 {typeof(PointLoad), new List<Type> { typeof(Node), typeof(Loadcase) } },
-                //{typeof(IElementLoad<IAreaElement>), new List<Type> { typeof(Panel) } },
-                //{typeof(ILoad), new List<Type> { typeof(Loadcase), typeof(IElementLoad<IAreaElement>) } },
-                {typeof(AreaUniformlyDistributedLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } }
+                {typeof(AreaUniformlyDistributedLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } },
+                {typeof(GeometricalLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } }
+
 
             };
 
@@ -118,7 +118,7 @@ namespace BH.Adapter.RFEM6
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
                 {typeof(Panel), new RFEMPanelComparer() },
                 {typeof(Loadcase), new LoadCaseComparer() },
-                {typeof(BarUniformlyDistributedLoad), new NameOrDescriptionComparer()},
+                //{typeof(BarUniformlyDistributedLoad), new NameOrDescriptionComparer()},
                 //{typeof(ILoad), new RFEMLoadComparer()  },
 
 

@@ -247,6 +247,32 @@ namespace RFEM_Toolkit_Test.Loading
 
         }
 
+        [Test]
+        public void PushFreeLineLoadload()
+        {
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(Panel) };
+            var panels = adapter.Pull(loadFilter).ToList();
+            var panel0 = (Panel)panels[0];
+
+            
+
+            Point p0 = new Point() { X = 0, Y = -10, Z = 0 };
+            Point p1 = new Point() { X = 0, Y = 10, Z = 0 };
+
+
+
+
+            GeometricalLineLoad geometricalLineLoad = new GeometricalLineLoad() { Name = "Free", Location = BH.Engine.Geometry.Create.Line(p0, p1), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 100000000000), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 100000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
+
+            geometricalLineLoad= (GeometricalLineLoad) BH.Engine.Base.Modify.SetPropertyValue(geometricalLineLoad, "Panels", new List<Panel>() { panel0 });
+
+
+            ((List<BH.oM.Structure.Elements.Panel>)geometricalLineLoad.CustomData.ToList()[0].Value).Count();
+
+            adapter.Push(new List<IObject>() { geometricalLineLoad });
+
+        }
+
         //[Test]
         //public void PushLineLoad()
         //{
@@ -353,7 +379,7 @@ namespace RFEM_Toolkit_Test.Loading
             HashSet<ILoad> barloads = new HashSet<ILoad>() { barLoad0 };
 
             adapter.Push(barloads.ToList());
-
+            adapter.Push(barloads.ToList());
 
 
 
