@@ -264,10 +264,10 @@ namespace RFEM_Toolkit_Test.Loading
 
             GeometricalLineLoad geometricalLineLoad = new GeometricalLineLoad() { Name = "Free", Location = BH.Engine.Geometry.Create.Line(p0, p1), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 100000000000), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 100000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
 
-            geometricalLineLoad= (GeometricalLineLoad) BH.Engine.Base.Modify.SetPropertyValue(geometricalLineLoad, "Panels", new List<Panel>() { panel0 });
+            geometricalLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.SetPropertyValue(geometricalLineLoad, "Panels", new List<Panel>() { panel0 });
 
 
-            ((List<BH.oM.Structure.Elements.Panel>)geometricalLineLoad.CustomData.ToList()[0].Value).Count();
+            //((List<BH.oM.Structure.Elements.Panel>)geometricalLineLoad.CustomData.ToList()[0].Value).Count();
 
             adapter.Push(new List<IObject>() { geometricalLineLoad });
 
