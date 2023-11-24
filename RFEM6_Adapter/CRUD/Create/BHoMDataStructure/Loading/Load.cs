@@ -46,6 +46,8 @@ namespace BH.Adapter.RFEM6
 
         private bool CreateCollection(IEnumerable<ILoad> bhLoads)
         {
+            //Surfaceis for GeometricalLineLoad
+            int[] surfaceIds = new int[] { };
 
             foreach (ILoad bhLoad in bhLoads)
             {
@@ -100,18 +102,32 @@ namespace BH.Adapter.RFEM6
                     continue;
 
                 }
+
                 if (bhLoad is GeometricalLineLoad)
                 {
 
-                    if (bhLoad.Name != "Free") { UpdateLoadIdDictionary(bhLoad); }
+                    if (bhLoad.Name != "Free") { continue; }
 
-
+                    int[] currrSurfaceIds = new int[] { };
 
                     UpdateLoadIdDictionary(bhLoad);
-                    int[] surfaceIds =bhLoad.CustomData.Count()>0? ((List<BH.oM.Structure.Elements.Panel>)bhLoad.CustomData.ToList()[0].Value).Select(p => p.GetRFEM6ID()).ToArray():m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE,0);
+                    if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null)
+                    {
+                        surfaceIds =  m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE, 0);
+                    }
+                    if (!((bhLoad as GeometricalLineLoad).Objects is null))
+                    {
+                        currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e=> (e as Panel).GetRFEM6ID()).ToArray();
+
+                    }
+                    else
+                    {
+                        currrSurfaceIds = surfaceIds;
+                    }
+
 
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-                    free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id,surfaceIds);
+                    free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, currrSurfaceIds);
                     m_Model.set_free_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfFreeLineLoad);
                     continue;
 
@@ -178,7 +194,7 @@ namespace BH.Adapter.RFEM6
                 {
                     return null;
                 }
-                else if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.MomentA, geolLineload.MomentA)) != 1&&(geolLineload.MomentA.Length()+ geolLineload.MomentB.Length()>0))
+                else if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.MomentA, geolLineload.MomentA)) != 1 && (geolLineload.MomentA.Length() + geolLineload.MomentB.Length() > 0))
                 {
                     return null;
                 }
