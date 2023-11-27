@@ -74,8 +74,8 @@ namespace BH.Adapter.RFEM6
                 {typeof(BarUniformlyDistributedLoad), new List<Type> { typeof(Bar),typeof(Loadcase)} },
                 {typeof(PointLoad), new List<Type> { typeof(Node), typeof(Loadcase) } },
                 {typeof(AreaUniformlyDistributedLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } },
-                {typeof(GeometricalLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } }
-
+                {typeof(GeometricalLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase), /*typeof(RFEMNonFreeLineLoad)*/ } },
+                //{typeof(RFEMNonFreeLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase), typeof(GeometricalLineLoad) } }
 
             };
 
@@ -94,7 +94,8 @@ namespace BH.Adapter.RFEM6
             this.AdapterModules.Add(new GetLineFromBarModule());
             this.AdapterModules.Add(new GetLineFromEdgeModule());
             this.AdapterModules.Add(new GetOpeningFromOpeningModule());
-            //this.AdapterModules.Add(new GetPanelFreomAreaUniformlyDistributedLoadModule());
+            //this.AdapterModules.Add(new GetNonFreeLineLoadsModule());
+
 
         }
 
