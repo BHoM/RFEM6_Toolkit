@@ -39,6 +39,8 @@ using BH.Engine.Structure;
 using BH.oM.Adapters.RFEM6;
 using BH.Engine.Geometry;
 using BH.Engine.Spatial;
+using BH.oM.Base.Attributes;
+using System.ComponentModel;
 
 namespace BH.Adapter.RFEM6
 {
@@ -47,7 +49,7 @@ namespace BH.Adapter.RFEM6
 
         private bool CreateCollection(IEnumerable<ILoad> bhLoads)
         {
-            //Surfaceis for GeometricalLineLoad
+            //Container for Potential Surface IDs. Surface IDs are onle relevant when using Free Line Loads
             int[] surfaceIds = new int[] { };
 
             foreach (ILoad bhLoad in bhLoads)
@@ -109,20 +111,24 @@ namespace BH.Adapter.RFEM6
                     // Handling Non-Free Line Loads
                     if (bhLoad.Name != "Free")
                     {
+                        EdgeComparer edgeComparer = new EdgeComparer();
+
+                        //Checking Getting all panel Edges/Lines and reviewing for prospect Edges/Lines
                         List<Panel> panelCachList = GetCachedOrRead<Panel>();
                         var lineCachDict = GetCachedOrReadAsDictionary<Line, int>();
-                        //var lineProspects = panelCachList.SelectMany(p => p.ExternalEdges.SelectMany(e=>e.Curve.ControlPoints().Count==2)).Distinct();
                         var edgeProspects = panelCachList.SelectMany(p => p.ExternalEdges).Where(e => (e.Curve is Line) || (e.Curve is Polyline && e.Curve.ControlPoints().Count == 2)).Distinct().ToHashSet();
-                        HashSet<Edge> edgeProsepectSet = new HashSet<Edge>(edgeProspects, new EdgeComparer());
+                        HashSet<Edge> edgeProsepectSet = new HashSet<Edge>(edgeProspects, edgeComparer);
+
+                        //Getting the prosepcted line with the ID attached
                         bool locationLineIsValid = edgeProsepectSet.Contains(new Edge { Curve = (bhLoad as GeometricalLineLoad).Location });
 
+                        //Local Line is Valid, if ther is a Panel with the bespoke like in it
                         if (locationLineIsValid)
                         {
-
                             UpdateLoadIdDictionary(bhLoad);
-                            int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-                            var locatedEdte=edgeProsepectSet.Where(e => (new EdgeComparer()).Equals(e, new Edge() { Curve = (bhLoad as GeometricalLineLoad).Location })).FirstOrDefault();
-                            line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id,locatedEdte.GetRFEM6ID());
+                            int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name + "_NonFree"];
+                            var locatedEdte = edgeProsepectSet.Where(e => (edgeComparer).Equals(e, new Edge() { Curve = (bhLoad as GeometricalLineLoad).Location })).FirstOrDefault();
+                            line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, locatedEdte.GetRFEM6ID(), (line_load_load_type)MomentOfForceLoad(bhLoad));
                             m_Model.set_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
                             continue;
                         }
@@ -131,34 +137,6 @@ namespace BH.Adapter.RFEM6
                             BH.Engine.Base.Compute.RecordError($"The Location Line of {(bhLoad as GeometricalLineLoad)} is not valid. Please make sure your Location Line is located on a panel Edge! Also make sure that the location line and the panel line are oriented in the same way!");
                             continue;
                         }
-
-
-                        //var lineProspects = panelCachList.SelectMany(p => p.ExternalEdges).Select(e => e.Curve).Where(c => (c is Line) || (c is Polyline && c.ControlPoints().Count == 2)).Distinct().ToList();
-
-                        //rfemLineList.Any(p=>p.ExternalEdges.Any(e=>((e.Curve is Line)&&(new HashSet<Point>() {e.Curve.ControlPoints}))));
-
-                        //int[] currrSurfaceIds = new int[] { };
-
-                        //UpdateLoadIdDictionary(bhLoad);
-                        //if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null)
-                        //{
-                        //    surfaceIds = m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE, 0);
-                        //}
-                        //if (!((bhLoad as GeometricalLineLoad).Objects is null))
-                        //{
-                        //    currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
-
-                        //}
-                        //else
-                        //{
-                        //    currrSurfaceIds = surfaceIds;
-                        //}
-
-
-                        //int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-                        //free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, currrSurfaceIds);
-                        //m_Model.set_free_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfFreeLineLoad);
-
 
                     }
 
@@ -182,8 +160,7 @@ namespace BH.Adapter.RFEM6
                             currrSurfaceIds = surfaceIds;
                         }
 
-
-                        int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
+                        int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name + "_Free"];
                         free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, currrSurfaceIds);
                         m_Model.set_free_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfFreeLineLoad);
                         continue;
@@ -191,29 +168,13 @@ namespace BH.Adapter.RFEM6
 
                 }
 
-                //else if (bhLoad is GeometricalLineLoad)
-                //{
-                //    Node n0 = new Node() { Position = (bhLoad as GeometricalLineLoad).Location.Start };
-                //    Node n1 = new Node() { Position = (bhLoad as GeometricalLineLoad).Location.End };
-
-                //    int lineNo = nestedNodeToIDMap[n0][n1];
-
-                //    line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(new List<int>() { lineNo });
-                //    m_Model.set_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
-
-                //}
-
-
-
             }
 
             return true;
         }
 
-
         private object MomentOfForceLoad(ILoad bhLoad)
         {
-
 
             bool momentHasBeenSet;
             bool forceHasBeenSet;
@@ -225,7 +186,6 @@ namespace BH.Adapter.RFEM6
                 PointLoad bhPointLoad = bhLoad as PointLoad;
                 momentHasBeenSet = !(bhPointLoad.Moment.X == 0 && bhPointLoad.Moment.Y == 0 && bhPointLoad.Moment.Z == 0);
                 forceHasBeenSet = !(bhPointLoad.Force.X == 0 && bhPointLoad.Force.Y == 0 && bhPointLoad.Force.Z == 0);
-                //bhLoadType = nodal_load_load_type.LOAD_TYPE_FORCE;
                 bhLoadType = forceHasBeenSet == true ? nodal_load_load_type.LOAD_TYPE_FORCE : nodal_load_load_type.LOAD_TYPE_MOMENT;
 
             }
@@ -235,34 +195,35 @@ namespace BH.Adapter.RFEM6
                 BarUniformlyDistributedLoad bhBarLoad = bhLoad as BarUniformlyDistributedLoad;
                 momentHasBeenSet = !(bhBarLoad.Moment.X == 0 && bhBarLoad.Moment.Y == 0 && bhBarLoad.Moment.Z == 0);
                 forceHasBeenSet = !(bhBarLoad.Force.X == 0 && bhBarLoad.Force.Y == 0 && bhBarLoad.Force.Z == 0);
-                //bhLoadType = member_load_load_type.LOAD_TYPE_FORCE;
                 bhLoadType = forceHasBeenSet == true ? member_load_load_type.LOAD_TYPE_FORCE : member_load_load_type.LOAD_TYPE_MOMENT;
-                //BarLoadErrorMessage(bhBarLoad.Force);
-                //BarLoadErrorMessage(bhBarLoad.Moment);
 
             }
             else if (bhLoad is GeometricalLineLoad)
             {
+                //Implicitly assuming that the GeometricalLineLoad is is a Non-Free Line Load as Free Line Loads only allow forces
 
                 GeometricalLineLoad geolLineload = bhLoad as GeometricalLineLoad;
                 if ((geolLineload.ForceA.Length() == 0 && geolLineload.ForceB.Length() == 0) && (geolLineload.MomentA.Length() == 0 && geolLineload.MomentB.Length() == 0)) { return null; }
 
-                if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.ForceA, geolLineload.ForceB)) != 1 && (geolLineload.ForceA.Length() + geolLineload.ForceB.Length() > 0))
+                if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.ForceA, geolLineload.ForceB)) != 1 && (geolLineload.ForceA.Length() > 0 && geolLineload.ForceB.Length() > 0))
                 {
                     return null;
                 }
-                else if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.MomentA, geolLineload.MomentA)) != 1 && (geolLineload.MomentA.Length() + geolLineload.MomentB.Length() > 0))
+                else if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.MomentA, geolLineload.MomentA)) != 1 && (geolLineload.MomentA.Length() > 0 && geolLineload.MomentB.Length() > 0))
                 {
                     return null;
                 }
                 else
                 {
+                    //boolean for check of atleas one moment Vector that has been set
                     momentHasBeenSet = !(geolLineload.MomentA.X == 0 && geolLineload.MomentA.Y == 0 && geolLineload.MomentA.Z == 0);
+                    momentHasBeenSet = momentHasBeenSet || !(geolLineload.MomentB.X == 0 && geolLineload.MomentB.Y == 0 && geolLineload.MomentB.Z == 0);
+
+                    //boolean for check of atleas one force Vector that has been set
                     forceHasBeenSet = !(geolLineload.ForceA.X == 0 && geolLineload.ForceA.Y == 0 && geolLineload.ForceA.Z == 0);
-                    //bhLoadType = member_load_load_type.LOAD_TYPE_FORCE;
-                    bhLoadType = forceHasBeenSet == true ? member_load_load_type.LOAD_TYPE_FORCE : member_load_load_type.LOAD_TYPE_MOMENT;
-                    //BarLoadErrorMessage(bhBarLoad.Force);
-                    //BarLoadErrorMessage(bhBarLoad.Moment);
+                    forceHasBeenSet = forceHasBeenSet || !(geolLineload.ForceB.X == 0 && geolLineload.ForceB.Y == 0 && geolLineload.ForceB.Z == 0);
+
+                    bhLoadType = forceHasBeenSet == true ? line_load_load_type.LOAD_TYPE_FORCE : line_load_load_type.LOAD_TYPE_MOMENT;
                 }
             }
             else
@@ -305,17 +266,6 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        //private void BarLoadErrorMessage(Vector vector) {
-
-        //    if (vector.X != 0 && (!(vector.Y == 0 || vector.Z == 0))){ 
-
-        //        BH.Engine.Base.Compute.RecordWarning($"The Load Vector {vector} is not aligned with the X, Y or Z axis. Please make sure your Barload is either parallel to the X, Y or Z axis!");
-
-        //    }    
-
-
-        //}
-
         private bool DirectionVectorIsXYZAxisParallel(Vector vector)
         {
             bool isParallel = false;
@@ -347,8 +297,6 @@ namespace BH.Adapter.RFEM6
                 isParallel = true;
 
             }
-
-
 
 
             return isParallel;

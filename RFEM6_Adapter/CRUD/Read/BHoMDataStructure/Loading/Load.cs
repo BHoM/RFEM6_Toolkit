@@ -160,13 +160,28 @@ namespace BH.Adapter.RFEM6
 
         private void UpdateLoadIdDictionary(ILoad load)
         {
-          
-         
+           
+            //Determin LoadType. Lineloads are handled differently as there is the need to discriminate between free and non-free line loads
+            var rfLoadType = load.GetType().ToRFEM6().Value;
+            if (load is GeometricalLineLoad geomLineLoad)
+            {
+                rfLoadType = geomLineLoad.Name == "Free" ? rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD : rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
+            }
+            else {
 
+                rfLoadType=load.GetType().ToRFEM6().Value;
+            }
+
+            //Check if the loadcase is already in the dictionary
             if (m_LoadcaseLoadIdDict.TryGetValue(load.Loadcase, out Dictionary<String, int> loadIdDict))
             {
-
                 String type = load.GetType().Name;
+
+                if (load is GeometricalLineLoad geoLineLoad)
+                {
+                    // Assuming 'Designation' is the property that indicates 'Free' or 'NonFree'
+                    type += "_" + geoLineLoad.Name; // e.g., "GeometricalLineLoad_Free"
+                }
 
                 if (loadIdDict.TryGetValue(type, out int id))
                 {
@@ -174,28 +189,35 @@ namespace BH.Adapter.RFEM6
                 }
                 else
                 {
-
-                    int k = m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID());
+                    int k = m_Model.get_first_free_number(rfLoadType, load.Loadcase.GetRFEM6ID());
                     loadIdDict.Add(type, k);
-
                 }
-
-
             }
             else
             {
-
-
                 var d = new Dictionary<string, int>();
-                d.Add(load.GetType().Name, m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID()));
-                m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
+                String type = load.GetType().Name;
+                if (load is GeometricalLineLoad geoLineLoad)
+                {
+                    type += "_" + geoLineLoad.Name;
+                    //var rfLoadType = geoLineLoad.Name == "Free" ? rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD : rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
+                    d.Add(type, m_Model.get_first_free_number(rfLoadType, load.Loadcase.GetRFEM6ID()));
+                    m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
+
+                }
+                else
+                {
+                    d.Add(type, m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID()));
+                    m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
                 }
 
             }
 
-
-
         }
 
+
+
     }
+
+}
 
