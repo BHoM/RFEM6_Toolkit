@@ -244,7 +244,7 @@ namespace BH.Adapter.RFEM6
                 }
                 else
                 {
-                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
                     loadMagnitude1 = bhLineLoad.MomentA.Z;
                     loadMagnitude2 = bhLineLoad.MomentB.Z;
                 }
@@ -265,7 +265,7 @@ namespace BH.Adapter.RFEM6
                 }
                 else
                 {
-                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
                     loadMagnitude1 = bhLineLoad.ForceA.Z;
                     loadMagnitude2 = bhLineLoad.ForceB.Z;
                 }

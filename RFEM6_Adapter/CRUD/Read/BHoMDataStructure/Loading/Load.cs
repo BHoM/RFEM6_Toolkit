@@ -93,6 +93,9 @@ namespace BH.Adapter.RFEM6
             return loads;
         }
 
+
+
+
         private List<ILoad> ReadAreaLoad(List<string> ids = null)
         {
             List<ILoad> loads = new List<ILoad>();
@@ -123,7 +126,7 @@ namespace BH.Adapter.RFEM6
             return loads;
         }
 
-        private List<ILoad> ReadLineLoad(List<string> ids = null)
+        private List<ILoad> ReadFreeLineLoad(List<string> ids = null)
         {
             List<ILoad> loads = new List<ILoad>();
 
@@ -158,18 +161,47 @@ namespace BH.Adapter.RFEM6
         }
 
 
+        private List<ILoad> ReadLineLoad(List<string> ids = null)
+        {
+            List<ILoad> loads = new List<ILoad>();
+
+            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
+            Dictionary<int, Edge> edgeDictionary = this.GetCachedOrReadAsDictionary<int, Edge>();
+
+
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD);
+            //rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.line);
+
+
+            IEnumerable<rfModel.line_load> foundFreeLineLoads = numbers.ToList().Select(n => m_Model.get_line_load(n.children[0], n.no));
+
+            foreach (rfModel.line_load lineLoad in foundFreeLineLoads)
+            {
+                ICurve c = edgeDictionary[lineLoad.lines[0]].Curve;
+                Line line;
+                if (c.ControlPoints().Count == 2) { line = new Line() { Start = c.ControlPoints().First(), End = c.ControlPoints().Last() }; }
+                else { continue; }
+
+                loads.Add(lineLoad.FromRFEM(loadCaseMap[lineLoad.load_case], line));
+
+            }
+
+            return loads;
+        }
+
         private void UpdateLoadIdDictionary(ILoad load)
         {
-           
+
             //Determin LoadType. Lineloads are handled differently as there is the need to discriminate between free and non-free line loads
             var rfLoadType = load.GetType().ToRFEM6().Value;
             if (load is GeometricalLineLoad geomLineLoad)
             {
                 rfLoadType = geomLineLoad.Name == "Free" ? rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD : rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
             }
-            else {
+            else
+            {
 
-                rfLoadType=load.GetType().ToRFEM6().Value;
+                rfLoadType = load.GetType().ToRFEM6().Value;
             }
 
             //Check if the loadcase is already in the dictionary
