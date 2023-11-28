@@ -38,6 +38,7 @@ using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.Engine.Structure;
 using BH.oM.Adapters.RFEM6;
 using BH.Engine.Geometry;
+using BH.Engine.Spatial;
 
 namespace BH.Adapter.RFEM6
 {
@@ -105,32 +106,88 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is GeometricalLineLoad)
                 {
-
-                    if (bhLoad.Name != "Free") { continue; }
-
-                    int[] currrSurfaceIds = new int[] { };
-
-                    UpdateLoadIdDictionary(bhLoad);
-                    if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null)
+                    // Handling Non-Free Line Loads
+                    if (bhLoad.Name != "Free")
                     {
-                        surfaceIds =  m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE, 0);
-                    }
-                    if (!((bhLoad as GeometricalLineLoad).Objects is null))
-                    {
-                        currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e=> (e as Panel).GetRFEM6ID()).ToArray();
+                        List<Panel> panelCachList = GetCachedOrRead<Panel>();
+                        var lineCachDict = GetCachedOrReadAsDictionary<Line, int>();
+                        //var lineProspects = panelCachList.SelectMany(p => p.ExternalEdges.SelectMany(e=>e.Curve.ControlPoints().Count==2)).Distinct();
+                        var edgeProspects = panelCachList.SelectMany(p => p.ExternalEdges).Where(e => (e.Curve is Line) || (e.Curve is Polyline && e.Curve.ControlPoints().Count == 2)).Distinct().ToHashSet();
+                        HashSet<Edge> edgeProsepectSet = new HashSet<Edge>(edgeProspects, new EdgeComparer());
+                        bool locationLineIsValid = edgeProsepectSet.Contains(new Edge { Curve = (bhLoad as GeometricalLineLoad).Location });
+
+                        if (locationLineIsValid)
+                        {
+
+                            UpdateLoadIdDictionary(bhLoad);
+                            int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
+                            var locatedEdte=edgeProsepectSet.Where(e => (new EdgeComparer()).Equals(e, new Edge() { Curve = (bhLoad as GeometricalLineLoad).Location })).FirstOrDefault();
+                            line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id,locatedEdte.GetRFEM6ID());
+                            m_Model.set_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
+                            continue;
+                        }
+                        else
+                        {
+                            BH.Engine.Base.Compute.RecordError($"The Location Line of {(bhLoad as GeometricalLineLoad)} is not valid. Please make sure your Location Line is located on a panel Edge! Also make sure that the location line and the panel line are oriented in the same way!");
+                            continue;
+                        }
+
+
+                        //var lineProspects = panelCachList.SelectMany(p => p.ExternalEdges).Select(e => e.Curve).Where(c => (c is Line) || (c is Polyline && c.ControlPoints().Count == 2)).Distinct().ToList();
+
+                        //rfemLineList.Any(p=>p.ExternalEdges.Any(e=>((e.Curve is Line)&&(new HashSet<Point>() {e.Curve.ControlPoints}))));
+
+                        //int[] currrSurfaceIds = new int[] { };
+
+                        //UpdateLoadIdDictionary(bhLoad);
+                        //if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null)
+                        //{
+                        //    surfaceIds = m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE, 0);
+                        //}
+                        //if (!((bhLoad as GeometricalLineLoad).Objects is null))
+                        //{
+                        //    currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
+
+                        //}
+                        //else
+                        //{
+                        //    currrSurfaceIds = surfaceIds;
+                        //}
+
+
+                        //int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
+                        //free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, currrSurfaceIds);
+                        //m_Model.set_free_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfFreeLineLoad);
+
 
                     }
+
                     else
                     {
-                        currrSurfaceIds = surfaceIds;
+                        // Hadling Free Line Loads
+                        int[] currrSurfaceIds = new int[] { };
+
+                        UpdateLoadIdDictionary(bhLoad);
+                        if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null)
+                        {
+                            surfaceIds = m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE, 0);
+                        }
+                        if (!((bhLoad as GeometricalLineLoad).Objects is null))
+                        {
+                            currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
+
+                        }
+                        else
+                        {
+                            currrSurfaceIds = surfaceIds;
+                        }
+
+
+                        int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
+                        free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, currrSurfaceIds);
+                        m_Model.set_free_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfFreeLineLoad);
+                        continue;
                     }
-
-
-                    int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-                    free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, currrSurfaceIds);
-                    m_Model.set_free_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfFreeLineLoad);
-                    continue;
-
 
                 }
 

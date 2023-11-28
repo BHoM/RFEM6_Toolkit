@@ -253,23 +253,32 @@ namespace RFEM_Toolkit_Test.Loading
             FilterRequest loadFilter = new FilterRequest() { Type = typeof(Panel) };
             var panels = adapter.Pull(loadFilter).ToList();
             var panel0 = (Panel)panels[0];
+            var panel1 = (Panel)panels[1];
 
-            
 
-            Point p0 = new Point() { X = 0, Y = -10, Z = 0 };
+
+
+            Point p0 = new Point() { X = 0, Y = -1000, Z = 0 };
             Point p1 = new Point() { X = 0, Y = 10, Z = 0 };
 
+            Point p3 = new Point() { X = 1, Y = -2, Z = 0 };
+            Point p4 = new Point() { X = 1, Y = 2, Z = 0 };
 
 
 
-            GeometricalLineLoad geometricalLineLoad = new GeometricalLineLoad() { Name = "Free", Location = BH.Engine.Geometry.Create.Line(p0, p1), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 100000000000), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 100000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
 
-            geometricalLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.SetPropertyValue(geometricalLineLoad, "Panels", new List<Panel>() { panel0 });
+            GeometricalLineLoad freeGeometricalLineLoad = new GeometricalLineLoad() { Name = "Free", Location = BH.Engine.Geometry.Create.Line(p0, p1), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 100000000000), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 100000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
+
+            GeometricalLineLoad nonFreeGeometricalLineLoad = new GeometricalLineLoad() { Name = "NonFree", Location = BH.Engine.Geometry.Create.Line(p3, p4), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 100000000000), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 100000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
+
+            //freeGeometricalLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.SetPropertyValue(freeGeometricalLineLoad, "Panels"/*, new List<Panel>() { panel0, panel1 }*/);
 
 
             //((List<BH.oM.Structure.Elements.Panel>)geometricalLineLoad.CustomData.ToList()[0].Value).Count();
 
-            adapter.Push(new List<IObject>() { geometricalLineLoad });
+            adapter.Push(new List<IObject>() { freeGeometricalLineLoad });
+            adapter.Push(new List<IObject>() { nonFreeGeometricalLineLoad });
+
 
         }
 

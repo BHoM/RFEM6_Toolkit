@@ -215,35 +215,36 @@ namespace BH.Adapter.RFEM6
 
         }
 
-        //public static rfModel.line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, List<int> lineNoList)
-        //{
+        public static rfModel.line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, int id, int foundEdgeId)
+        {
 
-        //    line_load rfLineLoad = new rfModel.line_load()
-        //    {
-        //        no = bhLineLoad.GetRFEM6ID(),
-        //        lines = lineNoList.ToArray(),
-        //        load_case = bhLineLoad.Loadcase.GetRFEM6ID(),
-        //        load_caseSpecified = true,
-        //        load_distribution = line_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
-        //        load_distributionSpecified = true,
-        //        magnitude = bhLineLoad.ForceA.Length(),
-        //        magnitudeSpecified = true,
-        //        reference_to_list_of_lines = false,
-        //        reference_to_list_of_linesSpecified = true,
-        //        is_generated = false,
-        //        is_generatedSpecified = true,
-        //        load_direction = line_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
-        //        load_directionSpecified = true,
-        //        load_is_over_total_length = true,
-        //        load_is_over_total_lengthSpecified = true,
-        //        load_type = line_load_load_type.LOAD_TYPE_FORCE,
-        //        load_typeSpecified = true,
-        //    };
+            line_load rfLineLoad = new rfModel.line_load()
+            {
+                //no = bhLineLoad.GetRFEM6ID(),
+                no = id,
+                lines = new int[] { foundEdgeId },
+                load_case = bhLineLoad.Loadcase.GetRFEM6ID(),
+                load_caseSpecified = true,
+                load_distribution = line_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
+                load_distributionSpecified = true,
+                magnitude = bhLineLoad.ForceA.Length(),
+                magnitudeSpecified = true,
+                reference_to_list_of_lines = false,
+                reference_to_list_of_linesSpecified = true,
+                is_generated = false,
+                is_generatedSpecified = true,
+                load_direction = line_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
+                load_directionSpecified = true,
+                load_is_over_total_length = true,
+                load_is_over_total_lengthSpecified = true,
+                load_type = line_load_load_type.LOAD_TYPE_FORCE,
+                load_typeSpecified = true,
+            };
 
 
-        //    return rfLineLoad;
+            return rfLineLoad;
 
-        //}
+        }
 
 
 

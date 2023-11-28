@@ -160,8 +160,8 @@ namespace BH.Adapter.RFEM6
 
         private void UpdateLoadIdDictionary(ILoad load)
         {
-
-
+          
+         
 
             if (m_LoadcaseLoadIdDict.TryGetValue(load.Loadcase, out Dictionary<String, int> loadIdDict))
             {
@@ -189,6 +189,7 @@ namespace BH.Adapter.RFEM6
                 var d = new Dictionary<string, int>();
                 d.Add(load.GetType().Name, m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID()));
                 m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
+                }
 
             }
 
@@ -197,4 +198,4 @@ namespace BH.Adapter.RFEM6
         }
 
     }
-}
+
