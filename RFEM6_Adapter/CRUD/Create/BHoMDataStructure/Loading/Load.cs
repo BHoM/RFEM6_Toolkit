@@ -241,7 +241,7 @@ namespace BH.Adapter.RFEM6
 
             if (!momentHasBeenSet && !forceHasBeenSet)
             {
-
+                BH.Engine.Base.Compute.RecordError($"The Load {bhLoad} does not include Vectors representing Moments or Forces!");
                 return null;
             }
 
@@ -258,7 +258,7 @@ namespace BH.Adapter.RFEM6
             }
             else
             {
-
+                BH.Engine.Base.Compute.RecordError($"Something went wrong! Please Check the Load {bhLoad}!");
                 return null;
             }
 

@@ -279,6 +279,12 @@ namespace RFEM_Toolkit_Test.Loading
             //adapter.Push(new List<IObject>() { freeGeometricalLineLoad });
             adapter.Push(new List<IObject>() { nonFreeGeometricalLineLoad });
 
+            FilterRequest linload = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
+            var lineloads = adapter.Pull(linload).ToList();
+            var lineload0 = (GeometricalLineLoad)lineloads[0];
+
+
+
 
         }
 

@@ -139,6 +139,7 @@ namespace BH.Adapter.RFEM6
             return bhAreaload;
         }
 
+        // convert Free Line Loads into Geometrical Line Loads
         public static GeometricalLineLoad FromRFEM(this rfModel.free_line_load rfLineload, Loadcase loadcase, List<Panel> panels)
         {
 
@@ -147,6 +148,7 @@ namespace BH.Adapter.RFEM6
 
             GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
             {
+                Name="Free",
                 Loadcase = loadcase,
                 Location = line,
                 ForceA = BH.Engine.Geometry.Create.Vector(0, 0, rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform),
@@ -156,6 +158,51 @@ namespace BH.Adapter.RFEM6
 
             //GeometricalLineLoad bhLineLoad = BH.Engine.Structure.Create.GeometricalLineLoad(line, loadcase, Vector.ZAxis, Vector.ZAxis, panels);
 
+
+            return bhLineLoad;
+        }
+
+        // convert  Line Loads into Geometrical Line Loads
+        public static GeometricalLineLoad FromRFEM(this rfModel.line_load rfLineload, Loadcase loadcase, Line line)
+        {
+            Vector impactA = new Vector();
+            Vector impactB = new Vector();
+
+            if (rfLineload.load_direction == line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE)
+            {
+
+                impactA.X = rfLineload.magnitude_1;
+                impactB.X = rfLineload.magnitude_2;
+
+            }
+            else if (rfLineload.load_direction == line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE)
+            {
+                impactA.Y = rfLineload.magnitude_1;
+                impactB.Y = rfLineload.magnitude_2;
+            }
+            else if (rfLineload.load_direction == line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE)
+            {
+                impactA.Z = rfLineload.magnitude_1;
+                impactB.Z = rfLineload.magnitude_2;
+            }
+            else
+            {
+                BH.Engine.Base.Compute.RecordError($"The Load {rfLineload} within RFEM6 is has not direction that is Parallel to the X,Y or Z axist. The Load direction will be set to a null-vector!");
+
+
+            }
+
+            GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
+            {
+                Name="NonFree",
+                Loadcase = loadcase,
+                Location = line,
+                ForceA = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_FORCE ? impactA : new Vector(),
+                ForceB = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_FORCE ? impactB : new Vector(),
+                MomentA = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_MOMENT ? impactA : new Vector(),
+                MomentB = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_MOMENT ? impactB : new Vector(),
+
+            };
 
             return bhLineLoad;
         }
