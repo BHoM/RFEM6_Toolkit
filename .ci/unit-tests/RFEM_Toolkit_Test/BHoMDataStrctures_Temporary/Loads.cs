@@ -253,7 +253,7 @@ namespace RFEM_Toolkit_Test.Loading
             FilterRequest loadFilter = new FilterRequest() { Type = typeof(Panel) };
             var panels = adapter.Pull(loadFilter).ToList();
             var panel0 = (Panel)panels[0];
-            var panel1 = (Panel)panels[1];
+            //var panel1 = (Panel)panels[1];
 
 
 
@@ -277,7 +277,7 @@ namespace RFEM_Toolkit_Test.Loading
             //((List<BH.oM.Structure.Elements.Panel>)geometricalLineLoad.CustomData.ToList()[0].Value).Count();
 
             //adapter.Push(new List<IObject>() { freeGeometricalLineLoad });
-            adapter.Push(new List<IObject>() { nonFreeGeometricalLineLoad });
+            //adapter.Push(new List<IObject>() { nonFreeGeometricalLineLoad });
 
             FilterRequest linload = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
             var lineloads = adapter.Pull(linload).ToList();

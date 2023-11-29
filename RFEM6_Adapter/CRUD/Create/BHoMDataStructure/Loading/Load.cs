@@ -66,8 +66,14 @@ namespace BH.Adapter.RFEM6
                     continue;
                 }
 
-                object nodalLoadType = MomentOfForceLoad(bhLoad);
-                if (nodalLoadType is null) continue;
+
+                    object nodalLoadType=null;
+                if (!(bhLoad is GeometricalLineLoad))
+                {
+                    nodalLoadType = MomentOfForceLoad(bhLoad);
+                    if (nodalLoadType is null) continue;
+                }
+
 
                 if (bhLoad is BarUniformlyDistributedLoad)
                 {
@@ -143,14 +149,19 @@ namespace BH.Adapter.RFEM6
                     else
                     {
                         // Hadling Free Line Loads
+
+                        if ((bhLoad as GeometricalLineLoad).MomentA.Length() > 0 || (bhLoad as GeometricalLineLoad).MomentB.Length() > 0)
+                        {
+                            BH.Engine.Base.Compute.RecordError($"Free Line Loads do not allow Moments. Please remove the Moment Vector from the Load {bhLoad}!");
+                            continue;
+                        }
                         int[] currrSurfaceIds = new int[] { };
 
                         UpdateLoadIdDictionary(bhLoad);
-                        if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null)
+                        if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null|| (bhLoad as GeometricalLineLoad).Objects.Elements.Count == 0||((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
                         {
                             surfaceIds = m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE, 0);
-                        }
-                        if (!((bhLoad as GeometricalLineLoad).Objects is null))
+                        } if (!((bhLoad as GeometricalLineLoad).Objects is null)&& (bhLoad as GeometricalLineLoad).Objects.Elements.Count()!=0 && !((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
                         {
                             currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
 
