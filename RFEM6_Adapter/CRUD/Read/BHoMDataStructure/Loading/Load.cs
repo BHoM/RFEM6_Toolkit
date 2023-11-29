@@ -177,12 +177,18 @@ namespace BH.Adapter.RFEM6
 
             foreach (rfModel.line_load lineLoad in foundFreeLineLoads)
             {
-                ICurve c = edgeDictionary[lineLoad.lines[0]].Curve;
-                Line line;
-                if (c.ControlPoints().Count == 2) { line = new Line() { Start = c.ControlPoints().First(), End = c.ControlPoints().Last() }; }
-                else { continue; }
+                
+                List<ICurve> curveList = lineLoad.lines.ToList().Select(l => edgeDictionary[l].Curve).Where(cu=> (cu is Line)||(cu is Polyline && cu.ControlPoints().Count==2) ).ToList();
+                List<Line> lines = curveList.Select(k => new Line() { Start = k.ControlPoints().First(), End = k.ControlPoints().First() }).ToList();
+                lines.ForEach(l => loads.Add(lineLoad.FromRFEM(loadCaseMap[lineLoad.load_case], l)));
 
-                loads.Add(lineLoad.FromRFEM(loadCaseMap[lineLoad.load_case], line));
+
+                //ICurve c = edgeDictionary[lineLoad.lines[0]].Curve;
+                //Line line;
+                //if (c.ControlPoints().Count == 2) { line = new Line() { Start = c.ControlPoints().First(), End = c.ControlPoints().Last() }; }
+                //else { continue; }
+
+                //loads.Add(lineLoad.FromRFEM(loadCaseMap[lineLoad.load_case], line));
 
             }
 

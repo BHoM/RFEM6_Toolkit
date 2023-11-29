@@ -167,23 +167,25 @@ namespace BH.Adapter.RFEM6
         {
             Vector impactA = new Vector();
             Vector impactB = new Vector();
+            double impactMagnitudeA = rfLineload.load_distribution == line_load_load_distribution.LOAD_DISTRIBUTION_TRAPEZOIDAL ? rfLineload.magnitude_1 : rfLineload.magnitude;
+            double impactMagnitudeB = rfLineload.load_distribution == line_load_load_distribution.LOAD_DISTRIBUTION_TRAPEZOIDAL ? rfLineload.magnitude_2 : rfLineload.magnitude;
 
             if (rfLineload.load_direction == line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE)
             {
 
-                impactA.X = rfLineload.magnitude_1;
-                impactB.X = rfLineload.magnitude_2;
+                impactA.X = impactMagnitudeA;
+                impactB.X = impactMagnitudeB;
 
             }
             else if (rfLineload.load_direction == line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE)
             {
-                impactA.Y = rfLineload.magnitude_1;
-                impactB.Y = rfLineload.magnitude_2;
+                impactA.Y = impactMagnitudeA;
+                impactB.Y = impactMagnitudeB;
             }
             else if (rfLineload.load_direction == line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE)
             {
-                impactA.Z = rfLineload.magnitude_1;
-                impactB.Z = rfLineload.magnitude_2;
+                impactA.Z = impactMagnitudeA;
+                impactB.Z = impactMagnitudeB;
             }
             else
             {
