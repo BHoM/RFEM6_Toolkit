@@ -41,6 +41,8 @@ using BH.Engine.Geometry;
 using BH.Engine.Spatial;
 using BH.oM.Base.Attributes;
 using System.ComponentModel;
+using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
+using BH.oM.Adapters.RFEM6.Fragments.Enums;
 
 namespace BH.Adapter.RFEM6
 {
@@ -67,7 +69,7 @@ namespace BH.Adapter.RFEM6
                 }
 
 
-                    object nodalLoadType=null;
+                object nodalLoadType = null;
                 if (!(bhLoad is GeometricalLineLoad))
                 {
                     nodalLoadType = MomentOfForceLoad(bhLoad);
@@ -115,7 +117,19 @@ namespace BH.Adapter.RFEM6
                 if (bhLoad is GeometricalLineLoad)
                 {
                     // Handling Non-Free Line Loads
-                    if (bhLoad.Name != "Free")
+
+
+
+                    bool lineLoadhasFragments = bhLoad.Fragments.ToList().Any(f => f.GetType().Name == "RFEM6GeometricalLineLoadTypes");
+                    if (!lineLoadhasFragments) {
+
+                        BH.Engine.Base.Compute.RecordWarning($"{bhLoad} has no geometricalLineLoadType set. As a default value geometricalLineLoadType.geometricalLineLoadEnum has been set to FreeLineLoad.\n In case you want to generate LineLoads please add the fragment geometricalLineLoadTyp to the {bhLoad} and set the parameters accordingly."); }
+
+                    //String lineType = BH.Engine.Base.Query.GetAllFragments(bhLoad)[0].PropertyValue("geometrialLineLoadType").ToString();
+
+                    if (lineLoadhasFragments&& BH.Engine.Base.Query.GetAllFragments(bhLoad)[0].PropertyValue("geometrialLineLoadType").ToString()!= "FreeLineLoad")
+                    //if (bhLoad.Name != "Free")
+
                     {
                         EdgeComparer edgeComparer = new EdgeComparer();
 
@@ -132,7 +146,7 @@ namespace BH.Adapter.RFEM6
                         if (locationLineIsValid)
                         {
                             UpdateLoadIdDictionary(bhLoad);
-                            int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name + "_NonFree"];
+                            int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name + "_NonFreeLineLoad"];
                             var locatedEdte = edgeProsepectSet.Where(e => (edgeComparer).Equals(e, new Edge() { Curve = (bhLoad as GeometricalLineLoad).Location })).FirstOrDefault();
                             line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, locatedEdte.GetRFEM6ID(), (line_load_load_type)MomentOfForceLoad(bhLoad));
                             m_Model.set_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
@@ -158,10 +172,11 @@ namespace BH.Adapter.RFEM6
                         int[] currrSurfaceIds = new int[] { };
 
                         UpdateLoadIdDictionary(bhLoad);
-                        if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null|| (bhLoad as GeometricalLineLoad).Objects.Elements.Count == 0||((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
+                        if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null || (bhLoad as GeometricalLineLoad).Objects.Elements.Count == 0 || ((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
                         {
                             surfaceIds = m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE, 0);
-                        } if (!((bhLoad as GeometricalLineLoad).Objects is null)&& (bhLoad as GeometricalLineLoad).Objects.Elements.Count()!=0 && !((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
+                        }
+                        if (!((bhLoad as GeometricalLineLoad).Objects is null) && (bhLoad as GeometricalLineLoad).Objects.Elements.Count() != 0 && !((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
                         {
                             currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
 
@@ -171,7 +186,7 @@ namespace BH.Adapter.RFEM6
                             currrSurfaceIds = surfaceIds;
                         }
 
-                        int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name + "_Free"];
+                        int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name + "_FreeLineLoad"];
                         free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, currrSurfaceIds);
                         m_Model.set_free_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfFreeLineLoad);
                         continue;

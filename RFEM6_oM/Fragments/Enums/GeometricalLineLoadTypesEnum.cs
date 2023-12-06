@@ -19,53 +19,31 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using BH.oM.Base;
-using BH.oM.Adapter;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BH.oM.Base;
 using System.ComponentModel;
 using BH.oM.Structure.Elements;
-using System.Collections;
-using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Structure.Constraints;
+using System.Security.Cryptography;
 using BH.oM.Structure.Loads;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Loading.Interfaces;
-using BH.Engine.Base;
-using BH.oM.Adapters.RFEM6.Fragments.Enums;
 
-namespace BH.Adapter.RFEM6
+namespace BH.oM.Adapters.RFEM6.Fragments.Enums
 {
-    [Description("Dependency module for fetching all IRFEMLineLoads stored in a list of Loadcombinations.")]
-    public class GetNonFreeLineLoadsModule : IGetDependencyModule<GeometricalLineLoad, IRFEMLineLoad>
+    public enum GeometricalLineLoadTypesEnum  
     {
-        public IEnumerable<IRFEMLineLoad> GetDependencies(IEnumerable<GeometricalLineLoad> lineLoads)
-        {
-            List<IRFEMLineLoad> rfLineLoad = new List<IRFEMLineLoad>();
-           
-            foreach (GeometricalLineLoad linload in lineLoads)
-            {
+        [Description("Definitin of Free Line Load in RFEM6.")]
+        FreeLineLoad = 0,
+        [Description("Definitin of Line Load in RFEM6.")]
+        NonFreeLineLoad = 1,
+     
 
-                if (linload.Name.ToUpper().Equals("FREE"))
-                {
-
-                    RFEMFreeLineLoad rfFreeLineLoad = new RFEMFreeLineLoad() { geometrialLineLoad=linload};
-
-                     rfLineLoad.Add(rfFreeLineLoad);
-
-                }
-                else {
-
-
-                    RFEMNonFreeLineLoad rfFreeLineLoad = new RFEMNonFreeLineLoad() { geometrialLineLoad = linload };
-
-                    rfLineLoad.Add(rfFreeLineLoad);
-
-                }
-
-            }
-
-            return rfLineLoad;
-        }
     }
+
+
+
 }

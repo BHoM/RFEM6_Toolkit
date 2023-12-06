@@ -34,6 +34,8 @@ using BH.oM.Structure.Loads;
 using BH.oM.Geometry;
 using BH.Engine.Spatial;
 using Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
+using BH.oM.Adapters.RFEM6.Fragments.Enums;
 
 namespace BH.Adapter.RFEM6
 {
@@ -64,10 +66,12 @@ namespace BH.Adapter.RFEM6
 
             BarUniformlyDistributedLoad bhLoad = new BarUniformlyDistributedLoad
             {
+                Name=rfMemberLoad.comment,
                 Objects = new BH.oM.Base.BHoMGroup<Bar>() { Elements = bhBars },
                 Loadcase = bhLoadCase,
                 Force = forceVector,
                 Moment = momentVector
+                
             };
 
             return bhLoad;
@@ -106,6 +110,7 @@ namespace BH.Adapter.RFEM6
                 Loadcase = bhLoadCase,
                 Force = BH.Engine.Geometry.Create.Vector(force[0], force[1], force[2]),
                 Moment = BH.Engine.Geometry.Create.Vector(moment[0], moment[1], moment[2]),
+                Name= nodeLoad.comment
             };
 
 
@@ -116,25 +121,77 @@ namespace BH.Adapter.RFEM6
         {
 
             Vector forceDirection;
+            bool isProjected = false;
 
-            if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE)
+
+            //if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE)
+            //{
+            //    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
+            //}
+            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE)
+            //{
+            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
+            //}
+            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE)
+            //{
+            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+            //}
+            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED)
+            //{
+            //    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
+            //    isProjected = true;
+            //}
+            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED)
+            //{
+            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
+            //    isProjected = true;
+            //}
+            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED)
+            //{
+            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+            //    isProjected = true;
+            //}
+            //else
+            //{
+            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+            //}
+
+            switch (surfaceload.load_direction)
             {
-                forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
-            }
-            else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE)
-            {
-                forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
-            }
-            else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE)
-            {
-                forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
-            }
-            else
-            {
-                forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
+                    break;
+
+                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
+                    break;
+
+                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+                    break;
+
+                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
+                    isProjected = true;
+                    break;
+
+                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
+                    isProjected = true;
+                    break;
+
+                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+                    isProjected = true;
+                    break;
+
+                default:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+                    break;
             }
 
-            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels);
+
+            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels,LoadAxis.Global,isProjected,surfaceload.comment);
 
             return bhAreaload;
         }
@@ -148,7 +205,7 @@ namespace BH.Adapter.RFEM6
 
             GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
             {
-                Name="Free",
+                Name=rfLineload.comment,
                 Loadcase = loadcase,
                 Location = line,
                 ForceA = BH.Engine.Geometry.Create.Vector(0, 0, rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform),
@@ -156,6 +213,7 @@ namespace BH.Adapter.RFEM6
 
             };
 
+            bhLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(bhLineLoad, (new RFEM6GeometricalLineLoadTypes() { geometrialLineLoadType = GeometricalLineLoadTypesEnum.FreeLineLoad }));
             //GeometricalLineLoad bhLineLoad = BH.Engine.Structure.Create.GeometricalLineLoad(line, loadcase, Vector.ZAxis, Vector.ZAxis, panels);
 
 
@@ -196,7 +254,7 @@ namespace BH.Adapter.RFEM6
 
             GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
             {
-                Name="NonFree",
+                Name=rfLineload.comment,
                 Loadcase = loadcase,
                 Location = line,
                 ForceA = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_FORCE ? impactA : new Vector(),
@@ -206,63 +264,12 @@ namespace BH.Adapter.RFEM6
 
             };
 
+            bhLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(bhLineLoad, (new RFEM6GeometricalLineLoadTypes() { geometrialLineLoadType = GeometricalLineLoadTypesEnum.NonFreeLineLoad }));
+
             return bhLineLoad;
         }
 
-        //public static GeometricalLineLoad FromRFEM(this rfModel.line_load lineLoad, Loadcase bhLoadCase, Edge edge)
-        //{
-        //    bool isProjected = false;
-        //    Vector startImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
-        //    Vector endImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
-        //    Line line = new Line() { Start = edge.Curve.ControlPoints().ToList().First(), End = edge.Curve.ControlPoints().ToList().Last() };
-
-        //    switch (lineLoad.load_direction)
-        //    {
-        //        case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
-        //            isProjected = false;
-        //            startImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
-        //            endImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
-        //            break;
-        //        case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
-        //            isProjected = true;
-        //            startImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
-        //            endImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
-        //            break;
-        //        case line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
-        //            isProjected = false;
-        //            startImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
-        //            endImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
-        //            break;
-        //        case line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
-        //            isProjected = true;
-        //            startImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
-        //            endImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
-        //            break;
-        //        case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
-        //            isProjected = false;
-        //            startImpact = new Vector() { X = 0, Y = lineLoad.magnitude, Z = 0 };
-        //            endImpact = new Vector() { X = 0, Y = lineLoad.magnitude, Z = 0 };
-        //            break;
-        //        case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
-        //            isProjected = true;
-        //            startImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
-        //            endImpact = new Vector() { X = lineLoad.magnitude, Y = 0, Z = 0 };
-        //            break;
-        //        default:
-        //            isProjected = false;
-        //            startImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
-        //            endImpact = new Vector() { X = 0, Y = 0, Z = lineLoad.magnitude };
-        //            break;
-        //    }
-
-        //    GeometricalLineLoad bhLoad = (lineLoad.load_type == line_load_load_type.LOAD_TYPE_FORCE) ? BH.Engine.Structure.Create.GeometricalLineLoad(line, bhLoadCase, startImpact, endImpact, new Vector(), new Vector()) : BH.Engine.Structure.Create.GeometricalLineLoad(line, bhLoadCase, new Vector(), new Vector(), startImpact, endImpact);
-        //    bhLoad.Projected = isProjected;
-
-        //    return bhLoad;
-        //}
-
-
-
+        
 
     }
 }

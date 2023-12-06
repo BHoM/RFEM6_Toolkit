@@ -34,6 +34,7 @@ using BH.oM.Structure.Loads;
 using BH.oM.Geometry;
 using BH.Engine.Spatial;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -73,8 +74,8 @@ namespace BH.Adapter.RFEM6
 
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_LOAD);
 
-            IEnumerable<rfModel.nodal_load> founeNodalLoad = numbers.ToList().Select(n => m_Model.get_nodal_load(n.children[0], n.no));
-
+            //IEnumerable<rfModel.nodal_load> founeNodalLoad = numbers.ToList().Select(n => m_Model.get_nodal_load(n.children[0], n.no));
+            IEnumerable<rfModel.nodal_load> founeNodalLoad = numbers.SelectMany(n => n.children.Select(child => m_Model.get_nodal_load(child, n.no)));
 
             List<ILoad> loads = new List<ILoad>();
             foreach (rfModel.nodal_load nodeLoad in founeNodalLoad)
@@ -106,7 +107,9 @@ namespace BH.Adapter.RFEM6
 
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE_LOAD);
 
-            IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.ToList().Select(n => m_Model.get_surface_load(n.children[0], n.no));
+            //IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.ToList().Select(n => m_Model.get_surface_load(n.children[0], n.no));
+            IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.SelectMany(n => n.children.Select(child => m_Model.get_surface_load(child, n.no)));
+
 
             foreach (rfModel.surface_load surfaceLoad in foundSurfaceLoad)
             {
@@ -138,7 +141,9 @@ namespace BH.Adapter.RFEM6
             //rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.line);
 
 
-            IEnumerable<rfModel.free_line_load> foundFreeLineLoads = numbers.ToList().Select(n => m_Model.get_free_line_load(n.children[0], n.no));
+            //IEnumerable<rfModel.free_line_load> foundFreeLineLoads = numbers.ToList().Select(n => m_Model.get_free_line_load(n.children[0], n.no));
+            IEnumerable<rfModel.free_line_load> foundFreeLineLoads = numbers.SelectMany(n => n.children.Select(child => m_Model.get_free_line_load(child, n.no)));
+
 
             foreach (rfModel.free_line_load freeLineLoad in foundFreeLineLoads)
             {
@@ -173,22 +178,16 @@ namespace BH.Adapter.RFEM6
             //rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.line);
 
 
-            IEnumerable<rfModel.line_load> foundFreeLineLoads = numbers.ToList().Select(n => m_Model.get_line_load(n.children[0], n.no));
+            //IEnumerable<rfModel.line_load> foundFreeLineLoads = numbers.ToList().Select(n => m_Model.get_line_load(n.children[0], n.no));
+            IEnumerable<rfModel.line_load> foundFreeLineLoads = numbers.SelectMany(n => n.children.Select(child => m_Model.get_line_load(child, n.no)));
+
 
             foreach (rfModel.line_load lineLoad in foundFreeLineLoads)
             {
-                
-                List<ICurve> curveList = lineLoad.lines.ToList().Select(l => edgeDictionary[l].Curve).Where(cu=> (cu is Line)||(cu is Polyline && cu.ControlPoints().Count==2) ).ToList();
+
+                List<ICurve> curveList = lineLoad.lines.ToList().Select(l => edgeDictionary[l].Curve).Where(cu => (cu is Line) || (cu is Polyline && cu.ControlPoints().Count == 2)).ToList();
                 List<Line> lines = curveList.Select(k => new Line() { Start = k.ControlPoints().First(), End = k.ControlPoints().First() }).ToList();
                 lines.ForEach(l => loads.Add(lineLoad.FromRFEM(loadCaseMap[lineLoad.load_case], l)));
-
-
-                //ICurve c = edgeDictionary[lineLoad.lines[0]].Curve;
-                //Line line;
-                //if (c.ControlPoints().Count == 2) { line = new Line() { Start = c.ControlPoints().First(), End = c.ControlPoints().Last() }; }
-                //else { continue; }
-
-                //loads.Add(lineLoad.FromRFEM(loadCaseMap[lineLoad.load_case], line));
 
             }
 
@@ -198,11 +197,20 @@ namespace BH.Adapter.RFEM6
         private void UpdateLoadIdDictionary(ILoad load)
         {
 
+
+
+
             //Determin LoadType. Lineloads are handled differently as there is the need to discriminate between free and non-free line loads
             var rfLoadType = load.GetType().ToRFEM6().Value;
+            bool lineLoadhasFragments = false;
+            bool isFreeLineLoad = false;
             if (load is GeometricalLineLoad geomLineLoad)
             {
-                rfLoadType = geomLineLoad.Name == "Free" ? rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD : rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
+
+                lineLoadhasFragments = load.Fragments.ToList().Any(f => f.GetType().Name == "RFEM6GeometricalLineLoadTypes");
+                isFreeLineLoad = lineLoadhasFragments ? BH.Engine.Base.Query.GetAllFragments(load)[0].PropertyValue("geometrialLineLoadType").ToString().Equals("FreeLineLoad") : true;
+
+                rfLoadType = (lineLoadhasFragments || isFreeLineLoad) ? rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD : rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
             }
             else
             {
@@ -218,7 +226,9 @@ namespace BH.Adapter.RFEM6
                 if (load is GeometricalLineLoad geoLineLoad)
                 {
                     // Assuming 'Designation' is the property that indicates 'Free' or 'NonFree'
-                    type += "_" + geoLineLoad.Name; // e.g., "GeometricalLineLoad_Free"
+                    //type += "_" + geoLineLoad.Name; // e.g., "GeometricalLineLoad_Free"
+                    type += "_" + (!isFreeLineLoad ? "NonFreeLineLoad" : "FreeLineLoad");
+
                 }
 
                 if (loadIdDict.TryGetValue(type, out int id))
@@ -237,7 +247,8 @@ namespace BH.Adapter.RFEM6
                 String type = load.GetType().Name;
                 if (load is GeometricalLineLoad geoLineLoad)
                 {
-                    type += "_" + geoLineLoad.Name;
+                    //type += "_" + geoLineLoad.Name;
+                    type += "_" + (!isFreeLineLoad ? "NonFreeLineLoad" : "FreeLineLoad");
                     //var rfLoadType = geoLineLoad.Name == "Free" ? rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD : rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
                     d.Add(type, m_Model.get_first_free_number(rfLoadType, load.Loadcase.GetRFEM6ID()));
                     m_LoadcaseLoadIdDict.Add(load.Loadcase, d);

@@ -71,6 +71,7 @@ namespace BH.Adapter.RFEM6
             member_load rfLoadCase = new rfModel.member_load()
             {
                 no = id,
+                comment=bhBarLoad.Name,
                 members = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_distribution = member_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
@@ -101,7 +102,9 @@ namespace BH.Adapter.RFEM6
 
             nodal_load rfLoadCase = new rfModel.nodal_load()
             {
+
                 no = id,
+                comment=bhPointLoad.Name,
                 nodes = bhPointLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 //load_direction = loadDirecteion,
                 //load_directionSpecified = true,
@@ -156,6 +159,7 @@ namespace BH.Adapter.RFEM6
             surface_load rfSurfaceLoad = new rfModel.surface_load()
             {
                 no = loadCaseSpecificLoadId,
+                comment=bhAreaLoad.Name,
                 surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
                 load_case = bhAreaLoad.Loadcase.GetRFEM6ID(),
                 load_caseSpecified = true,
@@ -210,7 +214,7 @@ namespace BH.Adapter.RFEM6
                 load_location_second_xSpecified = true,
                 load_location_second_y = bhLineLoad.Location.End.Y,
                 load_location_second_ySpecified = true,
-
+                comment= bhLineLoad.Name,
 
             };
 
@@ -296,6 +300,8 @@ namespace BH.Adapter.RFEM6
                 load_is_over_total_lengthSpecified = true,
                 load_type = rfLineLoadType,
                 load_typeSpecified = true,
+                comment = bhLineLoad.Name,
+
             };
 
 

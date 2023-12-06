@@ -30,6 +30,9 @@ using BH.Engine.Structure;
 using BH.oM.Structure.Loads;
 using BH.oM.Base;
 using System.Security.Policy;
+using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
+using BH.oM.Adapters.RFEM6.Fragments.Enums;
+using BH.Engine.Spatial;
 
 namespace RFEM_Toolkit_Test.Loading
 {
@@ -261,27 +264,30 @@ namespace RFEM_Toolkit_Test.Loading
             Point p0 = new Point() { X = 0, Y = -1000, Z = 0 };
             Point p1 = new Point() { X = 0, Y = 10, Z = 0 };
 
-            Point p3 = new Point() { X = 1, Y = -2, Z = 0 };
-            Point p4 = new Point() { X = 1, Y = 2, Z = 0 };
+            Point p3 = panel0.ExternalEdges.First().Curve.ControlPoints().First();
+            Point p4 = panel0.ExternalEdges.First().Curve.ControlPoints().Last();
 
+            GeometricalLineLoad freeGeometricalLineLoad = new GeometricalLineLoad() { Name = "name1", Location = BH.Engine.Geometry.Create.Line(p0, p1), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 100000000000), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 100000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
 
+            //GeometricalLineLoad nonFreeGeometricalLineLoad = new GeometricalLineLoad() { Name = "name2", Location = BH.Engine.Geometry.Create.Line(p3, p4), MomentA = BH.Engine.Geometry.Create.Vector(0, 0, 0), MomentB = BH.Engine.Geometry.Create.Vector(0, 0, 1000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
 
+            GeometricalLineLoad nonFreeGeometricalLineLoad = new GeometricalLineLoad() { Name = "name2", Location = BH.Engine.Geometry.Create.Line(p3, p4), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 0), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 1000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
 
-            GeometricalLineLoad freeGeometricalLineLoad = new GeometricalLineLoad() { Name = "Free", Location = BH.Engine.Geometry.Create.Line(p0, p1), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 100000000000), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 100000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
+            freeGeometricalLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(freeGeometricalLineLoad, new RFEM6GeometricalLineLoadTypes() { geometrialLineLoadType = GeometricalLineLoadTypesEnum.FreeLineLoad }, false);
 
-            GeometricalLineLoad nonFreeGeometricalLineLoad = new GeometricalLineLoad() { Name = "NonFree", Location = BH.Engine.Geometry.Create.Line(p3, p4), MomentA = BH.Engine.Geometry.Create.Vector(0, 0, 0), MomentB = BH.Engine.Geometry.Create.Vector(0, 0, 1000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
+            //nonFreeGeometricalLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(nonFreeGeometricalLineLoad, new RFEM6GeometricalLineLoadTypes() {geometrialLineLoadType=GeometricalLineLoadTypesEnum.NonFreeLineLoad }, false);
 
             //freeGeometricalLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.SetPropertyValue(freeGeometricalLineLoad, "Panels"/*, new List<Panel>() { panel0, panel1 }*/);
 
 
             //((List<BH.oM.Structure.Elements.Panel>)geometricalLineLoad.CustomData.ToList()[0].Value).Count();
 
-            //adapter.Push(new List<IObject>() { freeGeometricalLineLoad });
-            //adapter.Push(new List<IObject>() { nonFreeGeometricalLineLoad });
+            adapter.Push(new List<IObject>() { freeGeometricalLineLoad });
+            adapter.Push(new List<IObject>() { nonFreeGeometricalLineLoad });
 
-            FilterRequest linload = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
-            var lineloads = adapter.Pull(linload).ToList();
-            var lineload0 = (GeometricalLineLoad)lineloads[0];
+            //FilterRequest linload = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
+            //var lineloads = adapter.Pull(linload).ToList();
+            //var lineload0 = (GeometricalLineLoad)lineloads[0];
 
 
 
