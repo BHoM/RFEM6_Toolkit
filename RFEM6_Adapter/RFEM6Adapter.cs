@@ -81,7 +81,9 @@ namespace BH.Adapter.RFEM6
         /**** Private  Fields                           ****/
         /***************************************************/
 
-        public Dictionary<Loadcase, Dictionary<String,int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>();
+        public Dictionary<Loadcase, Dictionary<String,int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
+        public Dictionary<Panel, int> m_PanelIDdict = new Dictionary<Panel, int>(new RFEMPanelComparer());
+
 
 
         /***************************************************/

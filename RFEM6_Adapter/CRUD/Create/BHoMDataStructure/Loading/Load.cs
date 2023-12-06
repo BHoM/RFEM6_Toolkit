@@ -64,7 +64,11 @@ namespace BH.Adapter.RFEM6
                     UpdateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     surface_load rfemAreaLoad = (bhLoad as AreaUniformlyDistributedLoad).ToRFEM6(id);
+                    var currrSurfaceIds = (bhLoad as AreaUniformlyDistributedLoad).Objects.Elements.ToList().Select(e => m_PanelIDdict[e as Panel]).ToArray();
+                    rfemAreaLoad.surfaces = currrSurfaceIds;
+                    //rfemAreaLoad. = currrSurfaceIds;
                     m_Model.set_surface_load(bhLoad.Loadcase.GetRFEM6ID(), rfemAreaLoad);
+
                     continue;
                 }
 
@@ -178,7 +182,9 @@ namespace BH.Adapter.RFEM6
                         }
                         if (!((bhLoad as GeometricalLineLoad).Objects is null) && (bhLoad as GeometricalLineLoad).Objects.Elements.Count() != 0 && !((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
                         {
-                            currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
+                            //currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
+                            currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e =>m_PanelIDdict[e as Panel]).ToArray();
+
 
                         }
                         else
