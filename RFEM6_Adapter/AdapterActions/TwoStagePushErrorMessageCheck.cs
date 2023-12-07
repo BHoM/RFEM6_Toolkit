@@ -43,9 +43,16 @@ namespace BH.Adapter.RFEM6
 
             if (hasBar && hasBarLoad)
             {
-                BH.Engine.Base.Compute.RecordError("Pushed Set has both Bars and Loads. Please make sure that Bars and BarUDLs are pushed seperatly. First Push parts, next push BarUDL!");
+                BH.Engine.Base.Compute.RecordError("Pushed Set has both Bars and Loads. Please make sure that Bars and BarUDLs are pushed seperatly. First Push bars, next push BarUDL!");
             }
 
+            bool hasPanel = obj.Any(o => o is Panel);
+            bool hasAreaLoad = obj.Any(o => o is AreaUniformlyDistributedLoad);
+
+            if (hasPanel && hasAreaLoad)
+            {
+                BH.Engine.Base.Compute.RecordError("Pushed Set has both Panels and AreaUniformlyDistributedLoad. Please make sure that Panels and AreaUniformlyDistributedLoad are pushed seperatly. First Push Panels, next push AreaUniformlyDistributedLoads!");
+            }
 
         }
     }

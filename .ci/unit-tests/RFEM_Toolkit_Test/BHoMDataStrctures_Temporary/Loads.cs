@@ -29,6 +29,12 @@ using BH.oM.Structure.SectionProperties;
 using BH.Engine.Structure;
 using BH.oM.Structure.Loads;
 using BH.oM.Base;
+using System.Security.Policy;
+using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
+using BH.oM.Adapters.RFEM6.Fragments.Enums;
+using BH.Engine.Spatial;
+using BH.Engine.Base;
+using BH.oM.Analytical.Elements;
 
 namespace RFEM_Toolkit_Test.Loading
 {
@@ -51,6 +57,9 @@ namespace RFEM_Toolkit_Test.Loading
         BarRelease release3;
         BarRelease release4;
         Bar bar;
+
+
+
 
 
         [OneTimeSetUp]
@@ -150,10 +159,8 @@ namespace RFEM_Toolkit_Test.Loading
             n3 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 10 } };
             n4 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 10 } };
 
-
             Loadcase loadcaseDL0 = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
             Loadcase loadcaseDL1 = new Loadcase() { Name = "Windload", Nature = LoadNature.Wind, Number = 1 };
-
 
             var pointGroup0 = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { n1, n2 } };
             var pointLoad0 = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup0, Loadcase = loadcaseDL0, Moment = new Vector() { X = 100000, Y = 0, Z = 0 } };
@@ -161,10 +168,63 @@ namespace RFEM_Toolkit_Test.Loading
             var pointGroup1 = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { n3, n4 } };
             var pointLoad1 = new BH.oM.Structure.Loads.PointLoad() { Objects = pointGroup1, Loadcase = loadcaseDL1, Moment = new Vector() { X = 0, Y = 100000, Z = 0 } };
 
-
             adapter.Push(new List<ILoad>() { pointLoad0 });
             adapter.Push(new List<ILoad>() { pointLoad1 });
 
+        }
+
+
+        [Test]
+        public void PullSurfaceLoad()
+        {
+            //FilterRequest loadFilter = new FilterRequest() { Type = typeof(AreaUniformlyDistributedLoad) };
+            //var areaLoadRead = adapter.Pull(loadFilter).ToList();
+            //AreaUniformlyDistributedLoad l0 = (AreaUniformlyDistributedLoad) areaLoadRead[0];
+
+
+            //FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
+            //var panelReader = adapter.Pull(panelFilter).ToList();
+            //Panel p0 = (Panel)panelReader[0];
+            //Panel p1 = (Panel)panelReader[1];
+            ////Panel p2 = (Panel)panelReader[2];
+
+            n1 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 10 } };
+            n2 = new Node() { Position = new Point() { X = 10, Y = 0, Z = 10 } };
+            n3 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 10 } };
+            n4 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 10 } };
+
+            Edge e0 = new Edge() { Curve = BH.Engine.Geometry.Create.Line(n1.Position, n2.Position) };
+            Edge e1 = new Edge() { Curve = BH.Engine.Geometry.Create.Line(n2.Position, n3.Position) };
+            Edge e2 = new Edge() { Curve = BH.Engine.Geometry.Create.Line(n3.Position, n4.Position) };
+            Edge e3 = new Edge() { Curve = BH.Engine.Geometry.Create.Line(n4.Position, n1.Position) };
+
+            var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
+
+            BH.oM.Structure.SurfaceProperties.ConstantThickness surfaceProp = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.3, Material = concrete };
+
+            Panel panel = new Panel() { ExternalEdges = new List<Edge>() { e0, e1, e2, e3 }, Property = surfaceProp };
+
+            Loadcase loadcaseWind = new Loadcase() { Name = "Windload", Nature = LoadNature.Wind, Number = 1 };
+
+
+            BHoMGroup<Node> nodeGroup = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node>() { n1 } };
+            PointLoad pointLoad = new PointLoad() { Force = BH.Engine.Geometry.Create.Vector(100000000000, 0, 0), Loadcase = loadcaseWind, Objects = nodeGroup };
+
+
+            //adapter.Push(new List<IObject>() { pointLoad });
+            //adapter.Push(new List<IObject>() { panel, areaLoad0 });
+            adapter.Push(new List<IObject>() { panel });
+
+
+            FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
+            var panelReader = adapter.Pull(panelFilter).ToList();
+            Panel p0 = (Panel)panelReader[0];
+
+            AreaUniformlyDistributedLoad areaLoad0 = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcaseWind, BH.Engine.Geometry.Create.Vector(100000000000, 0, 0), new List<Panel>() { p0 });
+
+
+
+            adapter.Push(new List<IObject>() { areaLoad0 });
 
         }
 
@@ -173,6 +233,83 @@ namespace RFEM_Toolkit_Test.Loading
         {
             FilterRequest loadFilter = new FilterRequest() { Type = typeof(PointLoad) };
             var loads = adapter.Pull(loadFilter).ToList();
+
+
+        }
+
+        [Test]
+        public void PullGeometricalLineload()
+        {
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
+            var loads = adapter.Pull(loadFilter).ToList();
+            var l0 = (GeometricalLineLoad)loads[0];
+
+        }
+
+        [Test]
+        public void PullBarload()
+        {
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
+            var loads = adapter.Pull(loadFilter).ToList();
+            var l0 = (BarUniformlyDistributedLoad)loads[0];
+
+        }
+
+        [Test]
+        public void PushFreeLineLoadload()
+        {
+            Point p0 = new Point() { X = -10, Y = -10, Z = 0 };
+            Point p1 = new Point() { X = -10, Y = 10, Z = 0 };
+            Point p2 = new Point() { X = 10, Y = 10, Z = 0 };
+            Point p3 = new Point() { X = 10, Y = -10, Z = 0 };
+
+
+
+
+            // Create Panel 1
+            Edge edge1 = new Edge() { Curve = new Line() { Start = p0, End = p1 } };
+            Edge edge2 = new Edge() { Curve = new Line() { Start = p1, End = p2 } };
+            Edge edge3 = new Edge() { Curve = new Line() { Start = p2, End = p3 } };
+            Edge edge4 = new Edge() { Curve = new Line() { Start = p3, End = p0 } };
+            var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
+            //var steel = BH.Engine.Library.Query.Match("Steel", "S235", true, true) as IMaterialFragment;
+            Panel panel0 = new Panel() { ExternalEdges = new List<Edge>() { edge1, edge2, edge3, edge4 }, Openings = new List<Opening>() { }, Property = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = concrete } };
+
+
+          
+            Point pLine0 = new Point() { X = 0, Y = -10, Z = 0 };
+            Point pLine1 = new Point() { X = 0, Y = 10, Z = 0 };
+
+            Point pLine2 = panel0.ExternalEdges.First().Curve.ControlPoints().First();
+            Point pline3 = panel0.ExternalEdges.First().Curve.ControlPoints().Last();
+
+            //GeometricalLineLoad freeGeometricalLineLoad = new GeometricalLineLoad() { Name = "name1", Location = BH.Engine.Geometry.Create.Line(p0, p1), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 100000000000), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 100000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
+            GeometricalLineLoad freeGeometricalLineLoad = BH.Engine.Structure.Create.GeometricalLineLoad(new Line() { Start = pLine0, End = pLine1 }, new Loadcase() { Nature = LoadNature.Wind }, new Vector() { X = 0, Y = 0, Z = 100000 }, null, new List<Panel>() { panel0.ShallowClone() }, "LineloadNumber1");
+
+            //GeometricalLineLoad nonFreeGeometricalLineLoad = new GeometricalLineLoad() { Name = "name2", Location = BH.Engine.Geometry.Create.Line(p3, p4), MomentA = BH.Engine.Geometry.Create.Vector(0, 0, 0), MomentB = BH.Engine.Geometry.Create.Vector(0, 0, 1000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
+
+            GeometricalLineLoad nonFreeGeometricalLineLoad = new GeometricalLineLoad() { Name = "name2", Location = BH.Engine.Geometry.Create.Line(pLine2, pline3), ForceA = BH.Engine.Geometry.Create.Vector(0, 0, 0), ForceB = BH.Engine.Geometry.Create.Vector(0, 0, 1000), Loadcase = new Loadcase() { Nature = LoadNature.Wind } };
+
+            freeGeometricalLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(freeGeometricalLineLoad, new RFEM6GeometricalLineLoadTypes() { geometrialLineLoadType = GeometricalLineLoadTypesEnum.FreeLineLoad }, false);
+
+            nonFreeGeometricalLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(nonFreeGeometricalLineLoad, new RFEM6GeometricalLineLoadTypes() { geometrialLineLoadType = GeometricalLineLoadTypesEnum.NonFreeLineLoad }, false);
+
+            //freeGeometricalLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.SetPropertyValue(freeGeometricalLineLoad, "Panels"/*, new List<Panel>() { panel0, panel1 }*/);
+
+
+            //((List<BH.oM.Structure.Elements.Panel>)geometricalLineLoad.CustomData.ToList()[0].Value).Count();
+
+            adapter.Push(new List<IObject>() { panel0.DeepClone()});
+            //adapter.Push(new List<IObject>() { freeGeometricalLineLoad });
+            adapter.Push(new List<IObject>() { nonFreeGeometricalLineLoad });
+
+            //adapter.Push(new List<IObject>() { nonFreeGeometricalLineLoad });
+
+            //FilterRequest linload = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
+            //var lineloads = adapter.Pull(linload).ToList();
+            //var lineload0 = (GeometricalLineLoad)lineloads[0];
+
+
 
 
         }
@@ -263,6 +400,31 @@ namespace RFEM_Toolkit_Test.Loading
 
         //}
 
+        [Test]
+        public void PushPullBarLoad()
+        {
+            n1 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
+            n2 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
 
+            ISectionProperty section1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
+
+            bar = new Bar() { StartNode = n1, EndNode = n2, SectionProperty = section1 };
+
+
+            //LoadCases
+            Loadcase loadcaseDL = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
+
+            var barGroup = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar } };
+            var barLoad0 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = barGroup, Loadcase = loadcaseDL, Force = new Vector() { X = 1000, Y = 0, Z = 0 } };
+
+            HashSet<ILoad> barloads = new HashSet<ILoad>() { barLoad0 };
+
+            adapter.Push(barloads.ToList());
+            adapter.Push(barloads.ToList());
+
+
+
+
+        }
     }
 }

@@ -19,42 +19,53 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+using BH.oM.Base;
 using BH.oM.Adapter;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
+using System.ComponentModel;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Adapters.RFEM6;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
+using System.Collections;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Structure.Loads;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Loading.Interfaces;
 using BH.Engine.Base;
+using BH.oM.Adapters.RFEM6.Fragments.Enums;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    [Description("Dependency module for fetching all IRFEMLineLoads stored in a list of Loadcombinations.")]
+    public class GetNonFreeLineLoadsModule : IGetDependencyModule<GeometricalLineLoad, IRFEMLineLoad>
     {
-
-        private bool CreateCollection(IEnumerable<Panel> bhPanels)
+        public IEnumerable<IRFEMLineLoad> GetDependencies(IEnumerable<GeometricalLineLoad> lineLoads)
         {
-
-            foreach (Panel bhPanel in bhPanels)
+            List<IRFEMLineLoad> rfLineLoad = new List<IRFEMLineLoad>();
+           
+            foreach (GeometricalLineLoad linload in lineLoads)
             {
 
-                rfModel.surface surface = bhPanel.ToRFEM6();
-                m_PanelIDdict.Add(bhPanel, bhPanel.GetRFEM6ID());
+                if (linload.Name.ToUpper().Equals("FREE"))
+                {
+
+                    RFEMFreeLineLoad rfFreeLineLoad = new RFEMFreeLineLoad() { geometrialLineLoad=linload};
+
+                     rfLineLoad.Add(rfFreeLineLoad);
+
+                }
+                else {
 
 
-                m_Model.set_surface(surface);
+                    RFEMNonFreeLineLoad rfFreeLineLoad = new RFEMNonFreeLineLoad() { geometrialLineLoad = linload };
+
+                    rfLineLoad.Add(rfFreeLineLoad);
+
+                }
 
             }
 
-            return true;
+            return rfLineLoad;
         }
-
     }
 }

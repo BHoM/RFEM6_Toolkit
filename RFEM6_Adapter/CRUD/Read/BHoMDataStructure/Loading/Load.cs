@@ -34,6 +34,7 @@ using BH.oM.Structure.Loads;
 using BH.oM.Geometry;
 using BH.Engine.Spatial;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -51,12 +52,7 @@ namespace BH.Adapter.RFEM6
 
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD);
 
-            //IEnumerable<rfModel.member_load> foundLoadCases = numbers.ToList().Select(n => m_Model.get_member_load(n.no, n.children[0]));
-            //IEnumerable<rfModel.member_load> foundLoadCases = numbers.ToList().Select(n => m_Model.get_member_load(n.children[0], n.no));
-
             IEnumerable<rfModel.member_load> foundLoadCases = numbers.SelectMany(n => n.children.ToList().Select(child => m_Model.get_member_load(child, n.no)));
-
-
 
             List<ILoad> loadCases = new List<ILoad>();
             foreach (rfModel.member_load memberLoad in foundLoadCases)
@@ -78,8 +74,8 @@ namespace BH.Adapter.RFEM6
 
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_LOAD);
 
-            IEnumerable<rfModel.nodal_load> founeNodalLoad = numbers.ToList().Select(n => m_Model.get_nodal_load(n.children[0], n.no));
-
+            //IEnumerable<rfModel.nodal_load> founeNodalLoad = numbers.ToList().Select(n => m_Model.get_nodal_load(n.children[0], n.no));
+            IEnumerable<rfModel.nodal_load> founeNodalLoad = numbers.SelectMany(n => n.children.Select(child => m_Model.get_nodal_load(child, n.no)));
 
             List<ILoad> loads = new List<ILoad>();
             foreach (rfModel.nodal_load nodeLoad in founeNodalLoad)
@@ -98,82 +94,142 @@ namespace BH.Adapter.RFEM6
             return loads;
         }
 
-        //private List<ILoad> ReadLineLoad(List<string> ids = null)
-        //{
-        //    //Find all possible Load cases
-        //    Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
-        //    //List<int> loadCaseIds = loadCaseMap.Keys.ToList();
-        //    Dictionary<int, Edge> lineMap = this.GetCachedOrReadAsDictionary<int, Edge>();
 
 
-        //    rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD);
 
-        //    IEnumerable<rfModel.line_load> foundLineLoad = numbers.ToList().Select(n => m_Model.get_line_load(n.children[0], n.no));
+        private List<ILoad> ReadAreaLoad(List<string> ids = null)
+        {
+            List<ILoad> loads = new List<ILoad>();
 
+            //Find all possible Load cases
+            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
+            Dictionary<int, Panel> panelMap = this.GetCachedOrReadAsDictionary<int, Panel>();
 
-        //    List<ILoad> loads = new List<ILoad>();
-        //    foreach (rfModel.line_load lineLoad in foundLineLoad)
-        //    {
-        //        List<Edge> allEdges = lineLoad.lines.ToList().Select(l => lineMap[l]).ToList();
-        //        List<Edge> lineEdges = allEdges.Where(e => ((e.Curve is Line) || (e.Curve is Polyline && (e.Curve as Polyline).ControlPoints.Count == 2))).ToList();
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE_LOAD);
 
-        //        // if One of the edges is not a line, skip this load
-        //        if (!(lineEdges?.Count() != null || lineEdges?.Count() > 0)) continue;
-
-        //        //if the load is over the total length of the line, skip this load
-        //        //if (lineLoad.distance_a_absolute!=0||lineLoad.distance_b_absolute!=0||lineLoad.distance_c_absolute!=0) continue;
-        //        if (lineLoad.load_distribution != rfModel.line_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM) continue;
+            //IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.ToList().Select(n => m_Model.get_surface_load(n.children[0], n.no));
+            IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.SelectMany(n => n.children.Select(child => m_Model.get_surface_load(child, n.no)));
 
 
-        //        foreach (Edge lineEdge in lineEdges)
-        //        {
+            foreach (rfModel.surface_load surfaceLoad in foundSurfaceLoad)
+            {
+                List<Panel> panels = surfaceLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
+                Loadcase loadcase = loadCaseMap[surfaceLoad.load_case];
 
-        //            loads.Add(lineLoad.FromRFEM(loadCaseMap[lineLoad.load_case], lineEdge));
+                if (!(surfaceLoad.load_distribution is rfModel.surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
+                {
+                    Engine.Base.Compute.RecordNote("The current RFEM6 includes Surfaceloads with a non-uniformal load distributeion, these Loads will not be pulled.");
+                    continue;
+                }
 
-        //        }
+                loads.Add(surfaceLoad.FromRFEM(loadCaseMap[surfaceLoad.load_case], panels));
 
-        //    }
+            }
 
-        //    return loads;
-        //}
+            return loads;
+        }
 
-        //private List<ILoad> ReadAreaLoad(List<string> ids = null)
-        //{
-        //    List<ILoad> loads = new List<ILoad>();
+        private List<ILoad> ReadFreeLineLoad(List<string> ids = null)
+        {
+            List<ILoad> loads = new List<ILoad>();
 
-        //    //Find all possible Load cases
-        //    Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
-        //    Dictionary<int, Panel> panelMap = this.GetCachedOrReadAsDictionary<int, Panel>();
+            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
+            Dictionary<int, Panel> panelMap = this.GetCachedOrReadAsDictionary<int, Panel>();
 
-        //    rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE_LOAD);
 
-        //    IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.ToList().Select(n => m_Model.get_surface_load(n.children[0], n.no));
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD);
+            //rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.line);
 
-        //    foreach (rfModel.surface_load surfaceLoad in foundSurfaceLoad)
-        //    {
-        //        List<Panel> panels = surfaceLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
-        //        Loadcase loadcase = loadCaseMap[surfaceLoad.load_case];
 
-        //        if (!(surfaceLoad.load_distribution is rfModel.surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
-        //        {
-        //            Engine.Base.Compute.RecordNote("The current RFEM6 includes Surfaceloads with a non-uniformal load distributeion, these Loads will not be pulled.");
-        //        }
+            //IEnumerable<rfModel.free_line_load> foundFreeLineLoads = numbers.ToList().Select(n => m_Model.get_free_line_load(n.children[0], n.no));
+            IEnumerable<rfModel.free_line_load> foundFreeLineLoads = numbers.SelectMany(n => n.children.Select(child => m_Model.get_free_line_load(child, n.no)));
 
-        //        loads.Add(surfaceLoad.FromRFEM(loadcase, panels));
 
-        //    }
+            foreach (rfModel.free_line_load freeLineLoad in foundFreeLineLoads)
+            {
+                List<Panel> panelList;
+                if (freeLineLoad.surfaces.ToList().First() == 0)
+                {
+                    panelList = new List<Panel>();
+                }
+                else
+                {
 
-        //    return loads;
-        //}
+                    panelList = freeLineLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
+
+                }
+                loads.Add(freeLineLoad.FromRFEM(loadCaseMap[freeLineLoad.load_case], panelList));
+
+            }
+
+            return loads;
+        }
+
+
+        private List<ILoad> ReadLineLoad(List<string> ids = null)
+        {
+            List<ILoad> loads = new List<ILoad>();
+
+            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
+            Dictionary<int, Edge> edgeDictionary = this.GetCachedOrReadAsDictionary<int, Edge>();
+
+
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD);
+            //rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.line);
+
+
+            //IEnumerable<rfModel.line_load> foundFreeLineLoads = numbers.ToList().Select(n => m_Model.get_line_load(n.children[0], n.no));
+            IEnumerable<rfModel.line_load> foundFreeLineLoads = numbers.SelectMany(n => n.children.Select(child => m_Model.get_line_load(child, n.no)));
+
+
+            foreach (rfModel.line_load lineLoad in foundFreeLineLoads)
+            {
+
+                List<ICurve> curveList = lineLoad.lines.ToList().Select(l => edgeDictionary[l].Curve).Where(cu => (cu is Line) || (cu is Polyline && cu.ControlPoints().Count == 2)).ToList();
+                List<Line> lines = curveList.Select(k => new Line() { Start = k.ControlPoints().First(), End = k.ControlPoints().First() }).ToList();
+                lines.ForEach(l => loads.Add(lineLoad.FromRFEM(loadCaseMap[lineLoad.load_case], l)));
+
+            }
+
+            return loads;
+        }
 
         private void UpdateLoadIdDictionary(ILoad load)
         {
 
 
-            if (m_LoadcaseLoadIdDict.TryGetValue(load.Loadcase, out Dictionary<String, int> loadIdDict))
+
+
+            //Determin LoadType. Lineloads are handled differently as there is the need to discriminate between free and non-free line loads
+            var rfLoadType = load.GetType().ToRFEM6().Value;
+            bool lineLoadhasFragments = false;
+            bool isFreeLineLoad = false;
+            if (load is GeometricalLineLoad geomLineLoad)
             {
 
+                lineLoadhasFragments = load.Fragments.ToList().Any(f => f.GetType().Name == "RFEM6GeometricalLineLoadTypes");
+                isFreeLineLoad = lineLoadhasFragments ? BH.Engine.Base.Query.GetAllFragments(load)[0].PropertyValue("geometrialLineLoadType").ToString().Equals("FreeLineLoad") : true;
+
+                rfLoadType = (lineLoadhasFragments || isFreeLineLoad) ? rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD : rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
+            }
+            else
+            {
+
+                rfLoadType = load.GetType().ToRFEM6().Value;
+            }
+
+            //Check if the loadcase is already in the dictionary
+            if (m_LoadcaseLoadIdDict.TryGetValue(load.Loadcase, out Dictionary<String, int> loadIdDict))
+            {
                 String type = load.GetType().Name;
+
+                if (load is GeometricalLineLoad geoLineLoad)
+                {
+                    // Assuming 'Designation' is the property that indicates 'Free' or 'NonFree'
+                    //type += "_" + geoLineLoad.Name; // e.g., "GeometricalLineLoad_Free"
+                    type += "_" + (!isFreeLineLoad ? "NonFreeLineLoad" : "FreeLineLoad");
+
+                }
 
                 if (loadIdDict.TryGetValue(type, out int id))
                 {
@@ -181,27 +237,36 @@ namespace BH.Adapter.RFEM6
                 }
                 else
                 {
-
-                    int k = m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID());
+                    int k = m_Model.get_first_free_number(rfLoadType, load.Loadcase.GetRFEM6ID());
                     loadIdDict.Add(type, k);
-
                 }
-
-
             }
             else
             {
-
-
                 var d = new Dictionary<string, int>();
-                d.Add(load.GetType().Name, m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID()));
-                m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
+                String type = load.GetType().Name;
+                if (load is GeometricalLineLoad geoLineLoad)
+                {
+                    //type += "_" + geoLineLoad.Name;
+                    type += "_" + (!isFreeLineLoad ? "NonFreeLineLoad" : "FreeLineLoad");
+                    //var rfLoadType = geoLineLoad.Name == "Free" ? rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD : rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
+                    d.Add(type, m_Model.get_first_free_number(rfLoadType, load.Loadcase.GetRFEM6ID()));
+                    m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
+
+                }
+                else
+                {
+                    d.Add(type, m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID()));
+                    m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
+                }
 
             }
 
-
-
         }
 
+
+
     }
+
 }
+

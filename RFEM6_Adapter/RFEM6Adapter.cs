@@ -60,11 +60,12 @@ namespace BH.Adapter.RFEM6
         [Output("The created RFEM6 adapter.")]
         public RFEM6Adapter(bool active = false)
         {
-
+            
             // The Adapter constructor can be used to configure the Adapter behaviour.
             // For example:
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
             m_AdapterSettings.OnlyUpdateChangedObjects = false; // Setting this to true causes a Stackoverflow in some cases from the HashComparer called from the base FullCRUD.
+            m_AdapterSettings.CreateOnly_DistinctObjects = false; 
 
             AddAdapterModules();
 
@@ -74,28 +75,15 @@ namespace BH.Adapter.RFEM6
 
             AdapterIdFragmentType = typeof(RFEM6ID);
 
-            if (active)
-            {
-                // creates new model
-                //string modelName = "MyTestModel";
-                //string modelUrl = application.new_model(modelName);
-
-
-                //model.reset();
-
-
-            }
         }
-
-        // You can add any other constructors that take more inputs here. 
 
         /***************************************************/
         /**** Private  Fields                           ****/
         /***************************************************/
 
-        //public HashSet<Constraint6DOF> m_LineSupport = new HashSet<Constraint6DOF>();
-        //public Dictionary<HashSet<Point>, int> m_PanelIdDictionary = new Dictionary<HashSet<Point>, int>();
-        public Dictionary<Loadcase, Dictionary<String,int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>();
+        public Dictionary<Loadcase, Dictionary<String,int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
+        public Dictionary<Panel, int> m_PanelIDdict = new Dictionary<Panel, int>(new RFEMPanelComparer());
+
 
 
         /***************************************************/

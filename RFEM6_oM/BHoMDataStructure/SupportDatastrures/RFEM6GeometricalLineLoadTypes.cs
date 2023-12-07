@@ -23,38 +23,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using BH.oM.Adapter;
+using System.Threading.Tasks;
+using BH.oM.Base;
+using System.ComponentModel;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.Constraints;
+using System.Security.Cryptography;
+using BH.oM.Structure.Loads;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Loading.Interfaces;
+using BH.oM.Adapters.RFEM6.Fragments.Enums;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
-
-namespace BH.Adapter.RFEM6
+namespace BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures
 {
-    public partial class RFEM6Adapter
+    public class RFEM6GeometricalLineLoadTypes : IFragment
     {
-
-        private bool CreateCollection(IEnumerable<Panel> bhPanels)
-        {
-
-            foreach (Panel bhPanel in bhPanels)
-            {
-
-                rfModel.surface surface = bhPanel.ToRFEM6();
-                m_PanelIDdict.Add(bhPanel, bhPanel.GetRFEM6ID());
-
-
-                m_Model.set_surface(surface);
-
-            }
-
-            return true;
-        }
-
+        public GeometricalLineLoadTypesEnum geometrialLineLoadType { set; get; }
     }
+
+
+
 }

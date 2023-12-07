@@ -49,7 +49,7 @@ namespace BH.Adapter.RFEM6
         // It gets called once per each Type.
         protected override IEnumerable<IBHoMObject> IRead(Type type, IList ids, ActionConfig actionConfig = null)
         {
-            
+
             try
             {
                 if (type == typeof(Node))
@@ -84,16 +84,28 @@ namespace BH.Adapter.RFEM6
                     return ReadBarLoad(ids as dynamic);
                 else if (type == typeof(PointLoad))
                     return ReadPointLoad(ids as dynamic);
-                else if (type == typeof(ILoad)) {
+                else if (type == typeof(AreaUniformlyDistributedLoad))
+                    return ReadAreaLoad(ids as dynamic);
+                else if (type == typeof(GeometricalLineLoad))
+                {
+                    List<ILoad> loadList = new List<ILoad>();
+                    loadList.AddRange(ReadFreeLineLoad(ids as dynamic));
+                    loadList.AddRange(ReadLineLoad(ids as dynamic));
+
+                    return loadList;
+                }
+                else if (type == typeof(ILoad))
+                {
                     List<ILoad> loadList = new List<ILoad>();
                     loadList.AddRange(ReadPointLoad(ids as dynamic));
                     loadList.AddRange(ReadBarLoad(ids as dynamic));
+                    loadList.AddRange(ReadFreeLineLoad(ids as dynamic));
+                    loadList.AddRange(ReadLineLoad(ids as dynamic));
+                    loadList.AddRange(ReadAreaLoad(ids as dynamic));
                     return loadList;
-                        }
+                }
                 //else if (type == typeof(GeometricalLineLoad))
-                //    return ReadLineLoad(ids as dynamic);
-                //else if (type == typeof(AreaUniformlyDistributedLoad))
-                //    return ReadAreaLoad(ids as dynamic);
+                //return ReadLineLoad(ids as dynamic);
             }
             finally
             {

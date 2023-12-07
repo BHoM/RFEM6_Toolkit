@@ -19,42 +19,35 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+using BH.oM.Base;
 using BH.oM.Adapter;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
+using System.ComponentModel;
 using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Adapters.RFEM6;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
+using System.Collections;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Structure.Loads;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    [Description("Dependency module for fetching all Loadcase stored in a list of Loadcombinations.")]
+    public class GetPanelFreomAreaUniformlyDistributedLoadModule : IGetDependencyModule<AreaUniformlyDistributedLoad, Panel>
     {
-
-        private bool CreateCollection(IEnumerable<Panel> bhPanels)
+        public IEnumerable<Panel> GetDependencies(IEnumerable<AreaUniformlyDistributedLoad> objects)
         {
+            HashSet<Panel> panels = new HashSet<Panel>(new RFEMPanelComparer());
 
-            foreach (Panel bhPanel in bhPanels)
+            foreach (AreaUniformlyDistributedLoad areaLoad in objects)
             {
 
-                rfModel.surface surface = bhPanel.ToRFEM6();
-                m_PanelIDdict.Add(bhPanel, bhPanel.GetRFEM6ID());
-
-
-                m_Model.set_surface(surface);
+                areaLoad.Objects.Elements.ForEach(x => panels.Add(x as Panel));
 
             }
 
-            return true;
+            return panels;
         }
-
     }
 }

@@ -53,24 +53,25 @@ namespace BH.Adapter.RFEM6
 
             if (orientationVector.X != 0)
             {
-                loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
                 loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Length() : bhBarLoad.Moment.Length();
             }
             else if (orientationVector.Y != 0)
             {
-                loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
-                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? -1*bhBarLoad.Force.Length() : -1*bhBarLoad.Moment.Length();
+                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? -1 * bhBarLoad.Force.Length() : -1 * bhBarLoad.Moment.Length();
 
             }
             else
             {
-                loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
                 loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Length() : bhBarLoad.Moment.Length();
             }
 
             member_load rfLoadCase = new rfModel.member_load()
             {
                 no = id,
+                comment=bhBarLoad.Name,
                 members = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_distribution = member_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
@@ -101,7 +102,9 @@ namespace BH.Adapter.RFEM6
 
             nodal_load rfLoadCase = new rfModel.nodal_load()
             {
+
                 no = id,
+                comment=bhPointLoad.Name,
                 nodes = bhPointLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 //load_direction = loadDirecteion,
                 //load_directionSpecified = true,
@@ -131,64 +134,181 @@ namespace BH.Adapter.RFEM6
 
         }
 
-        //public static rfModel.line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, List<int> lineNoList)
-        //{
-
-        //    line_load rfLineLoad = new rfModel.line_load()
-        //    {
-        //        no = bhLineLoad.GetRFEM6ID(),
-        //        lines = lineNoList.ToArray(),
-        //        load_case=bhLineLoad.Loadcase.GetRFEM6ID(),
-        //        load_caseSpecified=true,
-        //        load_distribution = line_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
-        //        load_distributionSpecified = true,
-        //        magnitude = bhLineLoad.ForceA.Length(),
-        //        magnitudeSpecified = true,
-        //        reference_to_list_of_lines=false,
-        //        reference_to_list_of_linesSpecified=true,
-        //        is_generated=false,
-        //        is_generatedSpecified=true,
-        //        load_direction = line_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
-        //        load_directionSpecified = true,
-        //        load_is_over_total_length = true,
-        //        load_is_over_total_lengthSpecified = true,
-        //        load_type= line_load_load_type.LOAD_TYPE_FORCE,
-        //        load_typeSpecified=true,
-        //    };
+        public static rfModel.surface_load ToRFEM6(this AreaUniformlyDistributedLoad bhAreaLoad, int loadCaseSpecificLoadId)
+        {
 
 
-        //    return rfLineLoad;
-
-        //}
-
-        //public static rfModel.surface_load ToRFEM6(this AreaUniformlyDistributedLoad bhAreaLoad)
-        //{
-
-        //    surface_load rfSurfaceLoad = new rfModel.surface_load()
-        //    {
-        //        no = bhAreaLoad.GetRFEM6ID(),
-        //        surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
-        //        //surfaces = new int[] {1},
-        //        load_case = bhAreaLoad.Loadcase.GetRFEM6ID(),
-        //        load_caseSpecified = true,
-        //        load_distribution = surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
-        //        load_distributionSpecified = true,
-        //        magnitude_force_u = bhAreaLoad.Pressure.Length(),
-        //        magnitude_force_uSpecified = true,
-        //        uniform_magnitude = bhAreaLoad.Pressure.Length(),
-        //        uniform_magnitudeSpecified = true,
-        //        is_generated = false,
-        //        is_generatedSpecified = true,
-        //        load_direction = surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z,
-        //        load_directionSpecified = true,
-        //        load_type = surface_load_load_type.LOAD_TYPE_FORCE,
-        //        load_typeSpecified = true,
-        //    };
 
 
-        //    return rfSurfaceLoad;
+            surface_load_load_direction loadDirecteion;
+            Vector orientationVector = bhAreaLoad.Pressure;
+            if (orientationVector.X != 0)
+            {
+                loadDirecteion = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+            }
+            else if (orientationVector.Y != 0)
+            {
+                loadDirecteion = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+            }
+            else
+            {
+                loadDirecteion = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+            }
 
-        //}
+
+            surface_load rfSurfaceLoad = new rfModel.surface_load()
+            {
+                no = loadCaseSpecificLoadId,
+                comment=bhAreaLoad.Name,
+                surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
+                load_case = bhAreaLoad.Loadcase.GetRFEM6ID(),
+                load_caseSpecified = true,
+                load_distribution = surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
+                load_distributionSpecified = true,
+                magnitude_force_u = bhAreaLoad.Pressure.Length(),
+                magnitude_force_uSpecified = true,
+                uniform_magnitude = bhAreaLoad.Pressure.Length(),
+                uniform_magnitudeSpecified = true,
+                is_generated = false,
+                is_generatedSpecified = true,
+                load_direction = loadDirecteion,
+                load_directionSpecified = true,
+                load_type = surface_load_load_type.LOAD_TYPE_FORCE,
+                load_typeSpecified = true,
+            };
+
+
+            return rfSurfaceLoad;
+
+        }
+
+
+        public static rfModel.free_line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, int loadCaseSpecificID, int[] surfaceIds)
+        {
+
+
+
+            free_line_load rfLineLoad = new rfModel.free_line_load()
+            {
+                surfaces = surfaceIds,
+                surfaces_string = string.Join(" ", surfaceIds.Select(n => n.ToString())),
+
+                no = loadCaseSpecificID,
+                load_case = bhLineLoad.Loadcase.GetRFEM6ID(),
+                load_caseSpecified = true,
+                load_distribution = free_line_load_load_distribution.LOAD_DISTRIBUTION_LINEAR,
+                load_distributionSpecified = true,
+                magnitude_first = bhLineLoad.ForceA.Length(),
+                magnitude_firstSpecified = true,
+                magnitude_second = bhLineLoad.ForceB.Length(),
+                magnitude_secondSpecified = true,
+                is_generated = false,
+                is_generatedSpecified = true,
+                load_direction = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE,
+                load_directionSpecified = true,
+                load_location_first_x = bhLineLoad.Location.Start.X,
+                load_location_first_xSpecified = true,
+                load_location_first_y = bhLineLoad.Location.Start.Y,
+                load_location_first_ySpecified = true,
+                load_location_second_x = bhLineLoad.Location.End.X,
+                load_location_second_xSpecified = true,
+                load_location_second_y = bhLineLoad.Location.End.Y,
+                load_location_second_ySpecified = true,
+                comment= bhLineLoad.Name,
+
+            };
+
+
+            return rfLineLoad;
+
+        }
+
+        public static rfModel.line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, int id, int foundEdgeId, line_load_load_type rfLineLoadType)
+        {
+
+
+            //Checking for diretction of the GeometricalLineLoad. First discitguishing by Moment or force. 
+            //Additionally setting both Maginigutes.
+            line_load_load_direction rfLineLoadDirection;
+            double loadMagnitude1;
+            double loadMagnitude2;
+            if (rfLineLoadType.Equals(rfModel.line_load_load_type.LOAD_TYPE_MOMENT))
+            {
+                if (bhLineLoad.MomentA.X != 0||bhLineLoad.MomentB.X!=0)
+                {
+                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                    loadMagnitude1 = bhLineLoad.MomentA.X;
+                    loadMagnitude2 = bhLineLoad.MomentB.X;
+                }
+                else if (bhLineLoad.MomentA.Y != 0 || bhLineLoad.MomentB.Y != 0)
+                {
+                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+                    loadMagnitude1 = bhLineLoad.MomentA.Y;
+                    loadMagnitude2 = bhLineLoad.MomentB.Y;
+                }
+                else
+                {
+                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+                    loadMagnitude1 = bhLineLoad.MomentA.Z;
+                    loadMagnitude2 = bhLineLoad.MomentB.Z;
+                }
+            }
+            else
+            {
+                if (bhLineLoad.ForceA.X != 0|| bhLineLoad.ForceB.X != 0)
+                {
+                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                    loadMagnitude1 = bhLineLoad.ForceA.X;
+                    loadMagnitude2 = bhLineLoad.ForceB.X;
+                }
+                else if (bhLineLoad.ForceA.Y != 0 || bhLineLoad.ForceB.Y != 0)
+                {
+                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+                    loadMagnitude1 = bhLineLoad.ForceA.Y;
+                    loadMagnitude2 = bhLineLoad.ForceB.Y;
+                }
+                else
+                {
+                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+                    loadMagnitude1 = bhLineLoad.ForceA.Z;
+                    loadMagnitude2 = bhLineLoad.ForceB.Z;
+                }
+
+            }
+
+            line_load rfLineLoad = new rfModel.line_load()
+            {
+                no = id,
+                lines = new int[] { foundEdgeId },
+                load_case = bhLineLoad.Loadcase.GetRFEM6ID(),
+                load_caseSpecified = true,
+                load_distribution = line_load_load_distribution.LOAD_DISTRIBUTION_TRAPEZOIDAL,
+                load_distributionSpecified = true,
+                magnitude = bhLineLoad.ForceA.Length(),
+                magnitudeSpecified = true,
+                magnitude_1 = loadMagnitude1,
+                magnitude_1Specified = true,
+                magnitude_2 = loadMagnitude2,
+                magnitude_2Specified = true,
+                reference_to_list_of_lines = false,
+                reference_to_list_of_linesSpecified = true,
+                is_generated = false,
+                is_generatedSpecified = true,
+                load_direction = rfLineLoadDirection,
+                load_directionSpecified = true,
+                load_is_over_total_length = true,
+                load_is_over_total_lengthSpecified = true,
+                load_type = rfLineLoadType,
+                load_typeSpecified = true,
+                comment = bhLineLoad.Name,
+
+            };
+
+
+            return rfLineLoad;
+
+        }
+
 
 
     }
