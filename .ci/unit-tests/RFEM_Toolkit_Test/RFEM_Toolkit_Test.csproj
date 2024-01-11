@@ -82,6 +82,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="BHoMDataStructure\Loading\" />
     <Folder Include="IntermediateDataStructures\" />
   </ItemGroup>
 

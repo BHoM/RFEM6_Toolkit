@@ -41,11 +41,16 @@ namespace BH.Adapter.RFEM6
 
             foreach (ISectionProperty section in sectionProperties)
             {
-                //Loading materials numbers
+
+
+                // TODO: Check if this could be made more efficiently. By chance instead of searcihng for id use the one that has been assigned
+
+                //Loading material numbers from RFEM
                 rfModel.object_with_children[] materials = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
                 IEnumerable<int> materialNumbers = materials.ToList().Select(m => m.no);
                 int matNo = m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MATERIAL, 0);
 
+                //Find material number for section
                 foreach (int n in materialNumbers)
                 {
 
@@ -62,7 +67,9 @@ namespace BH.Adapter.RFEM6
 
                 rfModel.section rfSection;
 
-                if (section.Material is Glulam)
+                //creation of Section Split up into different if statements for different section types
+
+                if (section is GenericSection && (section.Material is Glulam|| section.Material is SawnTimber))
                 {
                     rfSection = section.ToRFEM6_TimberSections( section.Material.GetType().Name );
                 }

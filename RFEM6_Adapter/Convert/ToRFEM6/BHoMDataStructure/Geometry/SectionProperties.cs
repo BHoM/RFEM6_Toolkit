@@ -42,29 +42,66 @@ namespace BH.Adapter.RFEM6
     {
 
 
-        public static rfModel.section ToRFEM6_TimberSections(this ISectionProperty bhSection, string materialType) {
+        public static rfModel.section ToRFEM6_TimberSections(this ISectionProperty bhSection, string materialType)
+        {
 
             rfModel.section rfSection = null;
             // create section
             int secNo = bhSection.GetRFEM6ID();
+          
+
 
             rfSection = new rfModel.section
             {
                 no = secNo,
+                name = bhSection.getTimberSectionName(),
                 material = bhSection.Material.GetRFEM6ID(),
                 materialSpecified = true,
-                name = bhSection.Name,
                 typeSpecified = true,
-                type = rfModel.section_type.TYPE_STANDARDIZED_TIMBER,
-                b= ((bhSection as GenericSection).SectionProfile as RectangleProfile).Width,
-                bSpecified = true,
-                h = ((bhSection as GenericSection).SectionProfile as RectangleProfile).Height,
-                hSpecified = true,
+                type = rfModel.section_type.TYPE_PARAMETRIC_MASSIVE_I,
+                comment = $"GenericSection Name:{bhSection.Name}",
 
             };
 
             return rfSection;
         }
+
+        private static String getTimberSectionName(this ISectionProperty bhSection)
+        {
+
+            double width;
+            double height;
+            double flangeT;
+            double webT;
+            double radius; 
+
+            switch ((bhSection as GenericSection).SectionProfile.Shape)
+            {
+                case ShapeType.Rectangle:
+                    width = ((bhSection as GenericSection).SectionProfile as RectangleProfile).Width;
+                    height = ((bhSection as GenericSection).SectionProfile as RectangleProfile).Height;
+                    return $"R_M1 {width}/{height}";
+                case ShapeType.ISection:
+                    width = ((bhSection as GenericSection).SectionProfile as ISectionProfile).Width;
+                    height = ((bhSection as GenericSection).SectionProfile as ISectionProfile).Height;
+                    webT = ((bhSection as GenericSection).SectionProfile as ISectionProfile).WebThickness;
+                    flangeT = ((bhSection as GenericSection).SectionProfile as ISectionProfile).FlangeThickness;
+                    return $"ID_M1 {height}/{width}/{flangeT}/{webT}";
+                case ShapeType.Circle:
+                    radius = ((bhSection as GenericSection).SectionProfile as CircleProfile).Diameter;
+                    return $"CIRCLE_M1 {radius}";
+                case ShapeType.Tee:
+                    width = ((bhSection as GenericSection).SectionProfile as TSectionProfile).Width;
+                    height = ((bhSection as GenericSection).SectionProfile as TSectionProfile).Height;
+                    webT = ((bhSection as GenericSection).SectionProfile as TSectionProfile).WebThickness;
+                    flangeT = ((bhSection as GenericSection).SectionProfile as TSectionProfile).FlangeThickness;
+                    return $"T_M1 {height}/{width}/{flangeT}/{webT}";
+                default:
+                     return $"R_M1 0.1/0.1";
+            }
+
+        }
+
 
         public static rfModel.section ToRFEM6(this ISectionProperty bhSection, int matNo, string materialType)
         {
