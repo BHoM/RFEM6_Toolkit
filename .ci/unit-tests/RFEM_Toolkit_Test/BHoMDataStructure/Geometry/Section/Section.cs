@@ -48,7 +48,6 @@ namespace RFEM_Toolkit_Test.Elements
         Concrete Concrete0;
         Concrete Concrete1;
 
-
         RFEMSectionComparer comparer;
 
         [OneTimeSetUp]
@@ -61,7 +60,7 @@ namespace RFEM_Toolkit_Test.Elements
         [TearDown]
         public void TearDown()
         {
-            //adapter.Wipeout();
+            adapter.Wipeout();
         }
 
         [Test]
