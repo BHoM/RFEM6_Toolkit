@@ -33,11 +33,39 @@ using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using System.Text.RegularExpressions;
+using BH.oM.Spatial.ShapeProfiles;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
+
+
+        public static rfModel.section ToRFEM6_TimberSections(this ISectionProperty bhSection, string materialType) {
+
+            rfModel.section rfSection = null;
+            // create section
+            int secNo = bhSection.GetRFEM6ID();
+
+            rfSection = new rfModel.section
+            {
+                no = secNo,
+                material = bhSection.Material.GetRFEM6ID(),
+                materialSpecified = true,
+                name = bhSection.Name,
+                typeSpecified = true,
+                type = rfModel.section_type.TYPE_STANDARDIZED_TIMBER,
+                b= ((bhSection as GenericSection).SectionProfile as RectangleProfile).Width,
+                bSpecified = true,
+                h = ((bhSection as GenericSection).SectionProfile as RectangleProfile).Height,
+                hSpecified = true,
+
+            };
+
+            return rfSection;
+        }
+
         public static rfModel.section ToRFEM6(this ISectionProperty bhSection, int matNo, string materialType)
         {
 

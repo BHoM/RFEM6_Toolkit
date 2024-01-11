@@ -60,6 +60,13 @@ namespace BH.Adapter.RFEM6
 
             }
 
+            else if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_TIMBER))
+            {
+
+                bhMaterial = BH.Engine.Library.Query.Match("Glulam", rfMaterial.name.Split('|')[0], true, true) as IMaterialFragment;
+
+            }
+
 
             if (bhMaterial == null)
             {

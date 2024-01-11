@@ -74,6 +74,12 @@ namespace BH.Adapter.RFEM6
                 bhSection = BhConcreteFromRfSection_NonStandard(section, bhMaterial);
 
             }
+            else if (bhMaterial is Glulam)
+            {
+                var profile = Engine.Spatial.Create.RectangleProfile(section.h, section.b, 0);
+                bhSection = BH.Engine.Structure.Create.GenericSectionFromProfile(profile, bhMaterial,section.name);
+
+            }
 
 
             if (bhSection == null)

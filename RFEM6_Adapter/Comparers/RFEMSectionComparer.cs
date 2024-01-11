@@ -50,10 +50,10 @@ namespace BH.Adapter.RFEM6
             //Check whether any of the compared objects is null.
             if (Object.ReferenceEquals(section1, null) || Object.ReferenceEquals(section2, null))
                 return false;
-
-            Convert.AlterSectionName(section1);
-            Convert.AlterSectionName(section2);
-
+            if (!(section1 is GenericSection || section2 is GenericSection)) {
+                Convert.AlterSectionName(section1);
+                Convert.AlterSectionName(section2);
+            }
             if(section1.Name.Equals(section2.Name)&&section1.Material.Name.Equals(section2.Material.Name)) return true;
 
 
