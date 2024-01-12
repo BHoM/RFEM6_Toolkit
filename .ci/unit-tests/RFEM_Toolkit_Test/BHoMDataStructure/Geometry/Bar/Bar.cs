@@ -38,10 +38,10 @@ namespace RFEM_Toolkit_Test.Elements
 
         RFEM6Adapter adapter;
 
-        Line Line0;
-        Line Line1;
-        Line Line2;
-        Line Line3;
+        Line line0;
+        Line line1;
+        Line line2;
+        Line line3;
 
 
 
@@ -53,10 +53,10 @@ namespace RFEM_Toolkit_Test.Elements
         Concrete concrete;
         //IMaterialFragment steel;
 
-        ISectionProperty SteelSection;
-        ISectionProperty ConcreteSection;
-        ISectionProperty GenericSectionGLTimber;
-        ISectionProperty GenericSectionSawnTimber;
+        ISectionProperty steelSection;
+        ISectionProperty concreteSection;
+        ISectionProperty genericSectionGLTimber;
+        ISectionProperty genericSectionSawnTimber;
 
         Bar barSteelSection;
         Bar barConcreteSection;
@@ -83,22 +83,22 @@ namespace RFEM_Toolkit_Test.Elements
             concrete = BH.Engine.Library.Query.Match("Concrete", "C30/37", true, true).DeepClone() as Concrete;
 
             //Set Up Sections
-            SteelSection = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
-            ConcreteSection = BH.Engine.Structure.Create.ConcreteRectangleSection(0.5, 0.2, concrete, "");
-            GenericSectionGLTimber = BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.RectangleProfile(0.5, 0.2), glulam, "GLSec");
-            GenericSectionSawnTimber = BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.CircleProfile(0.5), timberC, "SawTimberSec");
+            steelSection = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
+            concreteSection = BH.Engine.Structure.Create.ConcreteRectangleSection(0.5, 0.2, concrete, "");
+            genericSectionGLTimber = BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.RectangleProfile(0.5, 0.2), glulam, "GLSec");
+            genericSectionSawnTimber = BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.CircleProfile(0.5), timberC, "SawTimberSec");
 
             //Line
-            Line0 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = 10, Y = 0, Z = 0 });
-            Line1 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = 0, Y = 10, Z = 0 });
-            Line2 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = -10, Y = 0, Z = 0 });
-            Line3 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = 0, Y = -10, Z = 0 });
+            line0 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = 10, Y = 0, Z = 0 });
+            line1 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = 0, Y = 10, Z = 0 });
+            line2 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = -10, Y = 0, Z = 0 });
+            line3 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = 0, Y = -10, Z = 0 });
 
             // Bar
-            barSteelSection = BH.Engine.Structure.Create.Bar(Line0, SteelSection, 0);
-            barConcreteSection = BH.Engine.Structure.Create.Bar(Line1, ConcreteSection, 0);
-            barGLTimber = BH.Engine.Structure.Create.Bar(Line2, GenericSectionGLTimber, 0);
-            barSawTimber = BH.Engine.Structure.Create.Bar(Line3, GenericSectionSawnTimber, 0);
+            barSteelSection = BH.Engine.Structure.Create.Bar(line0, steelSection, 0);
+            barConcreteSection = BH.Engine.Structure.Create.Bar(line1, concreteSection, 0);
+            barGLTimber = BH.Engine.Structure.Create.Bar(line2, genericSectionGLTimber, 0);
+            barSawTimber = BH.Engine.Structure.Create.Bar(line3, genericSectionSawnTimber, 0);
 
         }
 

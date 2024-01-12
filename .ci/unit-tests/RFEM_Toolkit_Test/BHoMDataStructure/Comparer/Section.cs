@@ -48,21 +48,21 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
     {
 
         RFEM6Adapter adapter;
-        ISectionProperty SteelSection1;
-        ISectionProperty SteelSection2;
-        ISectionProperty ConcreteSection0;
-        ISectionProperty ConcreteSection1;
-        ISectionProperty GenericSectionGLTimber;
-        ISectionProperty GenericSectionSawnTimber;
-        IProfile RectProfileGLTimber;
-        IProfile CircleProfileSawnTimber;
-        IProfile ConcreteProfile1;
-        IProfile ConcreteProfile2;
+        ISectionProperty steelSection1;
+        ISectionProperty steelSection2;
+        ISectionProperty concreteSection0;
+        ISectionProperty concreteSection1;
+        ISectionProperty genericSectionGLTimber;
+        ISectionProperty genericSectionSawnTimber;
+        IProfile rectProfileGLTimber;
+        IProfile circleProfileSawnTimber;
+        IProfile concreteProfile1;
+        IProfile concreteProfile2;
 
-        IMaterialFragment Glulam;
-        IMaterialFragment TimberC;
-        Concrete Concrete0;
-        Concrete Concrete1;
+        IMaterialFragment glulam;
+        IMaterialFragment timberC;
+        Concrete concrete0;
+        Concrete concrete1;
 
         RFEMSectionComparer comparer;
 
@@ -87,17 +87,17 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
             /***************************************************/
             /**** Test Preparation                          ****/
             /***************************************************/
-            Concrete0 = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true).DeepClone() as Concrete;
-            Concrete1 = BH.Engine.Library.Query.Match("Concrete", "C45/55", true, true).DeepClone() as Concrete;
+            concrete0 = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true).DeepClone() as Concrete;
+            concrete1 = BH.Engine.Library.Query.Match("Concrete", "C45/55", true, true).DeepClone() as Concrete;
 
 
-            ConcreteProfile1 = BH.Engine.Spatial.Create.CircleProfile(0.2);
-            ConcreteSection0 = BH.Engine.Structure.Create.GenericSectionFromProfile(ConcreteProfile1, Concrete0, "ConcreteSection1");
+            concreteProfile1 = BH.Engine.Spatial.Create.CircleProfile(0.2);
+            concreteSection0 = BH.Engine.Structure.Create.GenericSectionFromProfile(concreteProfile1, concrete0, "ConcreteSection1");
 
-            ConcreteProfile2 = BH.Engine.Spatial.Create.CircleProfile(0.5);
-            ConcreteSection1 = BH.Engine.Structure.Create.GenericSectionFromProfile(ConcreteProfile2, Concrete1, "ConcreteSection2");
+            concreteProfile2 = BH.Engine.Spatial.Create.CircleProfile(0.5);
+            concreteSection1 = BH.Engine.Structure.Create.GenericSectionFromProfile(concreteProfile2, concrete1, "ConcreteSection2");
 
-            adapter.Push(new List<ISectionProperty>() { ConcreteSection0});
+            adapter.Push(new List<ISectionProperty>() { concreteSection0});
 
             FilterRequest sectionFilter = new FilterRequest() { Type = typeof(ISectionProperty) };
             var sectionsPulled = adapter.Pull(sectionFilter).Select(s => (ConcreteSection)s).ToList().First();

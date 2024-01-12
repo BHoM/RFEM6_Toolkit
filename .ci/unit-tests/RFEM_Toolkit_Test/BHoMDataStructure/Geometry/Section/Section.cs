@@ -34,21 +34,21 @@ namespace RFEM_Toolkit_Test.Elements
     public class SectionTestClass
     {
         RFEM6Adapter adapter;
-        ISectionProperty SteelSection1;
-        ISectionProperty SteelSection2;
-        ISectionProperty ConcreteSection0;
-        ISectionProperty ConcreteSection1;
-        ISectionProperty GenericSectionGLTimber;
-        ISectionProperty GenericSectionSawnTimber;
-        IProfile RectProfileGLTimber;
-        IProfile CircleProfileSawnTimber;
-        IProfile ConcreteProfile1;
-        IProfile ConcreteProfile2;
+        ISectionProperty steelSection1;
+        ISectionProperty steelSection2;
+        ISectionProperty concreteSection0;
+        ISectionProperty concreteSection1;
+        ISectionProperty genericSectionGLTimber;
+        ISectionProperty genericSectionSawnTimber;
+        IProfile rectProfileGLTimber;
+        IProfile circleProfileSawnTimber;
+        IProfile concreteProfile1;
+        IProfile concreteProfile2;
 
-        IMaterialFragment Glulam;
-        IMaterialFragment TimberC;
-        Concrete Concrete0;
-        Concrete Concrete1;
+        IMaterialFragment glulam;
+        IMaterialFragment timberC;
+        Concrete concrete0;
+        Concrete concrete1;
 
         RFEMSectionComparer comparer;
 
@@ -72,14 +72,14 @@ namespace RFEM_Toolkit_Test.Elements
             /**** Test Preparation                          ****/
             /***************************************************/
 
-            SteelSection1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
-            SteelSection2 = BH.Engine.Library.Query.Match("EU_SteelSections", "HE 1000 M", true, true) as ISectionProperty;
+            steelSection1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
+            steelSection2 = BH.Engine.Library.Query.Match("EU_SteelSections", "HE 1000 M", true, true) as ISectionProperty;
 
             //Push it once
-            adapter.Push(new List<ISectionProperty>() { SteelSection1 });
-            adapter.Push(new List<ISectionProperty>() { SteelSection1 });
-            adapter.Push(new List<ISectionProperty>() { SteelSection2 });
-            adapter.Push(new List<ISectionProperty>() { SteelSection2 });
+            adapter.Push(new List<ISectionProperty>() { steelSection1 });
+            adapter.Push(new List<ISectionProperty>() { steelSection1 });
+            adapter.Push(new List<ISectionProperty>() { steelSection2 });
+            adapter.Push(new List<ISectionProperty>() { steelSection2 });
 
             ////Pull it   
             FilterRequest sectionFilter = new FilterRequest() { Type = typeof(ISectionProperty) };
@@ -96,8 +96,8 @@ namespace RFEM_Toolkit_Test.Elements
             Assert.IsNotNull(sectionsPulled);
 
             //Compares pushed to pulled material
-            Assert.IsTrue(sectionPulledSet.Contains(SteelSection1));
-            Assert.IsTrue(sectionPulledSet.Contains(SteelSection2));
+            Assert.IsTrue(sectionPulledSet.Contains(steelSection1));
+            Assert.IsTrue(sectionPulledSet.Contains(steelSection2));
 
 
             //Checks if only one material is pulled after double push
@@ -114,17 +114,17 @@ namespace RFEM_Toolkit_Test.Elements
             /**** Test Preparation                          ****/
             /***************************************************/
 
-            Concrete0 = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true).DeepClone() as Concrete;
-            Concrete1 = BH.Engine.Library.Query.Match("Concrete", "C45/55", true, true).DeepClone() as Concrete;
+            concrete0 = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true).DeepClone() as Concrete;
+            concrete1 = BH.Engine.Library.Query.Match("Concrete", "C45/55", true, true).DeepClone() as Concrete;
 
-            ConcreteSection0 = BH.Engine.Structure.Create.ConcreteCircularSection(0.5, Concrete0 as Concrete, "ConcreteSection0", null);
-            ConcreteSection1 = BH.Engine.Structure.Create.ConcreteRectangleSection(1, 0.5, Concrete1 as Concrete, "ConcreteSection1", null);
+            concreteSection0 = BH.Engine.Structure.Create.ConcreteCircularSection(0.5, concrete0 as Concrete, "ConcreteSection0", null);
+            concreteSection1 = BH.Engine.Structure.Create.ConcreteRectangleSection(1, 0.5, concrete1 as Concrete, "ConcreteSection1", null);
 
             //Push it once
-            adapter.Push(new List<ISectionProperty>() { ConcreteSection0 });
-            adapter.Push(new List<ISectionProperty>() { ConcreteSection0 });
-            adapter.Push(new List<ISectionProperty>() { ConcreteSection1 });
-            adapter.Push(new List<ISectionProperty>() { ConcreteSection1 });
+            adapter.Push(new List<ISectionProperty>() { concreteSection0 });
+            adapter.Push(new List<ISectionProperty>() { concreteSection0 });
+            adapter.Push(new List<ISectionProperty>() { concreteSection1 });
+            adapter.Push(new List<ISectionProperty>() { concreteSection1 });
 
             ////Pull it   
             FilterRequest sectionFilter = new FilterRequest() { Type = typeof(ISectionProperty) };
@@ -141,8 +141,8 @@ namespace RFEM_Toolkit_Test.Elements
             Assert.IsNotNull(sectionsPulled);
 
             //Compares pushed to pulled material
-            Assert.IsTrue(sectionPulledSet.Contains(ConcreteSection0));
-            Assert.IsTrue(sectionPulledSet.Contains(ConcreteSection1));
+            Assert.IsTrue(sectionPulledSet.Contains(concreteSection0));
+            Assert.IsTrue(sectionPulledSet.Contains(concreteSection1));
 
 
             //Checks if only one material is pulled after double push
@@ -159,23 +159,23 @@ namespace RFEM_Toolkit_Test.Elements
             /***************************************************/
 
             //TODO: Add a test for Glulam
-            Glulam = BH.Engine.Library.Query.Match("Glulam", "GL 20C", true, true).DeepClone() as IMaterialFragment;
-            TimberC = BH.Engine.Library.Query.Match("SawnTimber", "C24", true, true).DeepClone() as IMaterialFragment;
+            glulam = BH.Engine.Library.Query.Match("Glulam", "GL 20C", true, true).DeepClone() as IMaterialFragment;
+            timberC = BH.Engine.Library.Query.Match("SawnTimber", "C24", true, true).DeepClone() as IMaterialFragment;
 
 
-            RectProfileGLTimber = BH.Engine.Spatial.Create.RectangleProfile(0.5, 0.2);
-            GenericSectionGLTimber = BH.Engine.Structure.Create.GenericSectionFromProfile(RectProfileGLTimber, Glulam, "GLSec");
+            rectProfileGLTimber = BH.Engine.Spatial.Create.RectangleProfile(0.5, 0.2);
+            genericSectionGLTimber = BH.Engine.Structure.Create.GenericSectionFromProfile(rectProfileGLTimber, glulam, "GLSec");
 
-            CircleProfileSawnTimber = BH.Engine.Spatial.Create.CircleProfile(0.5);
-            GenericSectionSawnTimber = BH.Engine.Structure.Create.GenericSectionFromProfile(CircleProfileSawnTimber, TimberC, "SawTimberSec");
+            circleProfileSawnTimber = BH.Engine.Spatial.Create.CircleProfile(0.5);
+            genericSectionSawnTimber = BH.Engine.Structure.Create.GenericSectionFromProfile(circleProfileSawnTimber, timberC, "SawTimberSec");
 
 
             //Push it once
 
-            adapter.Push(new List<ISectionProperty>() { GenericSectionGLTimber });
-            adapter.Push(new List<ISectionProperty>() { GenericSectionGLTimber });
-            adapter.Push(new List<ISectionProperty>() { GenericSectionSawnTimber });
-            adapter.Push(new List<ISectionProperty>() { GenericSectionSawnTimber });
+            adapter.Push(new List<ISectionProperty>() { genericSectionGLTimber });
+            adapter.Push(new List<ISectionProperty>() { genericSectionGLTimber });
+            adapter.Push(new List<ISectionProperty>() { genericSectionSawnTimber });
+            adapter.Push(new List<ISectionProperty>() { genericSectionSawnTimber });
 
             ////Pull it   
             FilterRequest sectionFilter = new FilterRequest() { Type = typeof(ISectionProperty) };
@@ -193,8 +193,8 @@ namespace RFEM_Toolkit_Test.Elements
             Assert.IsNotNull(sectionsPulled);
 
             //Compares pushed to pulled material
-            Assert.IsTrue(sectionPulledSet.Contains(GenericSectionGLTimber));
-            Assert.IsTrue(sectionPulledSet.Contains(GenericSectionSawnTimber));
+            Assert.IsTrue(sectionPulledSet.Contains(genericSectionGLTimber));
+            Assert.IsTrue(sectionPulledSet.Contains(genericSectionSawnTimber));
 
 
             //Checks if only one material is pulled after double push
@@ -211,23 +211,23 @@ namespace RFEM_Toolkit_Test.Elements
             /***************************************************/
 
             //TODO: Add a test for Glulam
-            Concrete0 = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true).DeepClone() as Concrete;
-            Concrete1 = BH.Engine.Library.Query.Match("Concrete", "C45/55", true, true).DeepClone() as Concrete;
+            concrete0 = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true).DeepClone() as Concrete;
+            concrete1 = BH.Engine.Library.Query.Match("Concrete", "C45/55", true, true).DeepClone() as Concrete;
 
 
-            ConcreteProfile1 = BH.Engine.Spatial.Create.CircleProfile( 0.2);
-            ConcreteSection0 = BH.Engine.Structure.Create.GenericSectionFromProfile(ConcreteProfile1, Concrete0, "ConcreteSection1");
+            concreteProfile1 = BH.Engine.Spatial.Create.CircleProfile( 0.2);
+            concreteSection0 = BH.Engine.Structure.Create.GenericSectionFromProfile(concreteProfile1, concrete0, "ConcreteSection1");
 
-            ConcreteProfile2 = BH.Engine.Spatial.Create.CircleProfile(0.5);
-            ConcreteSection1 = BH.Engine.Structure.Create.GenericSectionFromProfile(ConcreteProfile2, Concrete1, "ConcreteSection2");
+            concreteProfile2 = BH.Engine.Spatial.Create.CircleProfile(0.5);
+            concreteSection1 = BH.Engine.Structure.Create.GenericSectionFromProfile(concreteProfile2, concrete1, "ConcreteSection2");
 
 
             //Push it once
 
-            adapter.Push(new List<ISectionProperty>() { ConcreteSection0 });
-            adapter.Push(new List<ISectionProperty>() { ConcreteSection0 });
-            adapter.Push(new List<ISectionProperty>() { ConcreteSection1 });
-            adapter.Push(new List<ISectionProperty>() { ConcreteSection1 });
+            adapter.Push(new List<ISectionProperty>() { concreteSection0 });
+            adapter.Push(new List<ISectionProperty>() { concreteSection0 });
+            adapter.Push(new List<ISectionProperty>() { concreteSection1 });
+            adapter.Push(new List<ISectionProperty>() { concreteSection1 });
 
             ////Pull it   
             FilterRequest sectionFilter = new FilterRequest() { Type = typeof(ISectionProperty) };
@@ -245,8 +245,8 @@ namespace RFEM_Toolkit_Test.Elements
             Assert.IsNotNull(sectionsPulled);
 
             //Compares pushed to pulled material
-            Assert.IsTrue(sectionPulledSet.Contains(ConcreteSection0));
-            Assert.IsTrue(sectionPulledSet.Contains(ConcreteSection1));
+            Assert.IsTrue(sectionPulledSet.Contains(concreteSection0));
+            Assert.IsTrue(sectionPulledSet.Contains(concreteSection1));
 
 
             //Checks if only one material is pulled after double push
