@@ -69,7 +69,7 @@ namespace BH.Adapter.RFEM6
 
                 //creation of Section Split up into different if statements for different section types
 
-                if (section is GenericSection && (section.Material is Glulam|| section.Material is SawnTimber))
+                if (section is GenericSection && (section.Material is Glulam|| section.Material is SawnTimber||section.Material is Concrete))
                 {
                     rfSection = section.ToRFEM6_TimberSections( section.Material.GetType().Name );
                 }

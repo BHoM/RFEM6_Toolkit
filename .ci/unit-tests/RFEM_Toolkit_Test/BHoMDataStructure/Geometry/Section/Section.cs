@@ -42,6 +42,8 @@ namespace RFEM_Toolkit_Test.Elements
         ISectionProperty GenericSectionSawnTimber;
         IProfile RectProfileGLTimber;
         IProfile CircleProfileSawnTimber;
+        IProfile ConcreteProfile1;
+        IProfile ConcreteProfile2;
 
         IMaterialFragment Glulam;
         IMaterialFragment TimberC;
@@ -60,7 +62,7 @@ namespace RFEM_Toolkit_Test.Elements
         [TearDown]
         public void TearDown()
         {
-            adapter.Wipeout();
+            //adapter.Wipeout();
         }
 
         [Test]
@@ -131,9 +133,9 @@ namespace RFEM_Toolkit_Test.Elements
             sectionPulledSet.UnionWith(sectionsPulled.ToHashSet());
 
             //sectionPulledSet.
-            ///***************************************************/
-            ///**** Assertions                                ****/
-            ///***************************************************/
+            /***************************************************/
+            /**** Assertions                                ****/
+            /***************************************************/
 
             ////Null Check
             Assert.IsNotNull(sectionsPulled);
@@ -199,6 +201,56 @@ namespace RFEM_Toolkit_Test.Elements
             Assert.AreEqual(2, sectionsPulled.Count);
 
 
+        }
+
+        [Test]
+        public void PushPullOfGenericConcreteSections()
+        {
+            /***************************************************/
+            /**** Test Preparation                          ****/
+            /***************************************************/
+
+            //TODO: Add a test for Glulam
+            Concrete0 = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true).DeepClone() as Concrete;
+            Concrete1 = BH.Engine.Library.Query.Match("Concrete", "C45/55", true, true).DeepClone() as Concrete;
+
+
+            ConcreteProfile1 = BH.Engine.Spatial.Create.CircleProfile( 0.2);
+            ConcreteSection0 = BH.Engine.Structure.Create.GenericSectionFromProfile(ConcreteProfile1, Concrete0, "ConcreteSection1");
+
+            ConcreteProfile2 = BH.Engine.Spatial.Create.CircleProfile(0.5);
+            ConcreteSection1 = BH.Engine.Structure.Create.GenericSectionFromProfile(ConcreteProfile2, Concrete1, "ConcreteSection2");
+
+
+            //Push it once
+
+            adapter.Push(new List<ISectionProperty>() { ConcreteSection0 });
+            adapter.Push(new List<ISectionProperty>() { ConcreteSection0 });
+            adapter.Push(new List<ISectionProperty>() { ConcreteSection1 });
+            adapter.Push(new List<ISectionProperty>() { ConcreteSection1 });
+
+            ////Pull it   
+            FilterRequest sectionFilter = new FilterRequest() { Type = typeof(ISectionProperty) };
+            var sectionsPulled = adapter.Pull(sectionFilter).Select(s => (ISectionProperty)s).ToList();
+            ISectionProperty mp = (ISectionProperty)sectionsPulled[0];
+            HashSet<ISectionProperty> sectionPulledSet = new HashSet<ISectionProperty>(comparer);
+            sectionPulledSet.UnionWith(sectionsPulled.ToHashSet());
+
+            //sectionPulledSet.
+            ///***************************************************/
+            ///**** Assertions                                ****/
+            ///***************************************************/
+
+            ////Null Check
+            Assert.IsNotNull(sectionsPulled);
+
+            //Compares pushed to pulled material
+            Assert.IsTrue(sectionPulledSet.Contains(ConcreteSection0));
+            Assert.IsTrue(sectionPulledSet.Contains(ConcreteSection1));
+
+
+            //Checks if only one material is pulled after double push
+            Assert.AreEqual(2, sectionsPulled.Count);
         }
 
         [Test]
