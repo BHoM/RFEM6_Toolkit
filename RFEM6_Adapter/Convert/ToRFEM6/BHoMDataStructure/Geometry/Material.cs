@@ -39,8 +39,8 @@ namespace BH.Adapter.RFEM6
     {
         public static rfModel.material ToRFEM6(this IMaterialFragment material)
         {
-            rfModel.material_material_type materialType = getMaterialType(material);
-            string materialName = getMaterialName(material);
+            rfModel.material_material_type materialType = GetMaterialType(material);
+            string materialName = GetMaterialName(material);
 
             rfModel.material rfMaterial = new rfModel.material
             {
@@ -57,7 +57,7 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private static rfModel.material_material_type getMaterialType(IMaterialFragment material) {
+        private static rfModel.material_material_type GetMaterialType(IMaterialFragment material) {
 
             switch (material.GetType().Name)
             {
@@ -74,7 +74,7 @@ namespace BH.Adapter.RFEM6
         
         }
         
-        private static String getMaterialName(IMaterialFragment material)
+        private static String GetMaterialName(IMaterialFragment material)
         {
             switch (material.GetType().Name)
             {

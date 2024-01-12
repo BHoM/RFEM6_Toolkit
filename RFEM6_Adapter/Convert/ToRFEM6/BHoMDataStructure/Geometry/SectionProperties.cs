@@ -54,7 +54,7 @@ namespace BH.Adapter.RFEM6
             rfSection = new rfModel.section
             {
                 no = secNo,
-                name = bhSection.getTimberSectionName(),
+                name = bhSection.GetTimberSectionName(),
                 material = bhSection.Material.GetRFEM6ID(),
                 materialSpecified = true,
                 typeSpecified = true,
@@ -66,7 +66,7 @@ namespace BH.Adapter.RFEM6
             return rfSection;
         }
 
-        private static String getTimberSectionName(this ISectionProperty bhSection)
+        private static String GetTimberSectionName(this ISectionProperty bhSection)
         {
 
             double width;
