@@ -93,7 +93,7 @@ namespace BH.Adapter.RFEM6
                     y_VectorArr = new double[] { y_Vector.X, y_Vector.Y, y_Vector.Z };
 
                     angle = arc.Angle();
-                    radius = arc.Radius();
+                    radius = arc.Radius;
 
                     rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] }, new Node { Position = pts[4] } } };
 
