@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -30,6 +30,7 @@
     </Reference>
     <Reference Include="Adapter_oM">
       <HintPath>$(ProgramData)\BHoM\Assemblies\Adapter_oM.dll</HintPath>
+	  <SpecificVersion>false</SpecificVersion>
     </Reference>
     <Reference Include="Analytical_Engine">
       <HintPath>$(ProgramData)\BHoM\Assemblies\Analytical_Engine.dll</HintPath>
