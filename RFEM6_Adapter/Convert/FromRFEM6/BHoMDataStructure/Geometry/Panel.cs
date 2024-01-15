@@ -74,7 +74,7 @@ namespace BH.Adapter.RFEM6
             else
             {
 
-                panel = Engine.Structure.Create.Panel(bhEdges, new List<ICurve>(), surfaceProperty[rfSurface.thickness], "");
+                panel = Engine.Structure.Create.Panel(bhEdges, property: surfaceProperty[rfSurface.thickness], name: "");
             }
 
             panel.SetRFEM6ID(rfSurface.no);
