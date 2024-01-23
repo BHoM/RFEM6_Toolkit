@@ -40,10 +40,10 @@ namespace BH.Adapter.RFEM6
             List<RFEMLine> lines = new List<RFEMLine>();
             foreach (Bar bar in objects)
             {
-                RFEMLine rfLine = new RFEMLine() { Nodes = new List<Node> { bar.StartNode, bar.EndNode } };
+                RFEMLine rfLine = new RFEMLine() { Nodes = new List<Node> { bar.Start, bar.End } };
                 bar.Fragments.Add(rfLine);
                 lines.Add(rfLine);
-                rfLine.Curve= new BH.oM.Geometry.Line() { Start = bar.StartNode.Position, End = bar.EndNode.Position };
+                rfLine.Curve= new BH.oM.Geometry.Line() { Start = bar.Start.Position, End = bar.End.Position };
             }
 
             return lines;
