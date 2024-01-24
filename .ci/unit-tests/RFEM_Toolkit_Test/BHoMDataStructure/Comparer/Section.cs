@@ -56,8 +56,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         ISectionProperty genericSectionSawnTimber;
         IProfile rectProfileGLTimber;
         IProfile circleProfileSawnTimber;
+        IProfile concreteProfile0;
         IProfile concreteProfile1;
-        IProfile concreteProfile2;
 
         IMaterialFragment glulam;
         IMaterialFragment timberC;
@@ -91,11 +91,11 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
             concrete1 = BH.Engine.Library.Query.Match("Concrete", "C45/55", true, true).DeepClone() as Concrete;
 
 
-            concreteProfile1 = BH.Engine.Spatial.Create.CircleProfile(0.2);
-            concreteSection0 = BH.Engine.Structure.Create.GenericSectionFromProfile(concreteProfile1, concrete0, "ConcreteSection1");
+            concreteProfile0 = BH.Engine.Spatial.Create.CircleProfile(0.2);
+            concreteSection0 = BH.Engine.Structure.Create.GenericSectionFromProfile(concreteProfile0, concrete0, "ConcreteSection1");
 
-            concreteProfile2 = BH.Engine.Spatial.Create.CircleProfile(0.5);
-            concreteSection1 = BH.Engine.Structure.Create.GenericSectionFromProfile(concreteProfile2, concrete1, "ConcreteSection2");
+            concreteProfile1 = BH.Engine.Spatial.Create.CircleProfile(0.5);
+            concreteSection1 = BH.Engine.Structure.Create.GenericSectionFromProfile(concreteProfile1, concrete1, "ConcreteSection2");
 
             adapter.Push(new List<ISectionProperty>() { concreteSection0});
 
