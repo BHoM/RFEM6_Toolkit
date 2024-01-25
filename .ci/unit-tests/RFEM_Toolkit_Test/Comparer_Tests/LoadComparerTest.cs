@@ -74,7 +74,7 @@ namespace RFEM_Toolkit_Test.Loading
             ISectionProperty section1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
             ISectionProperty section2 = BH.Engine.Library.Query.Match("EU_SteelSections", "HE 1000 M", true, true) as ISectionProperty;
 
-            bar = new Bar() { StartNode = n1, EndNode = n2, SectionProperty = section1 };
+            bar = new Bar() { Start = n1, End = n2, SectionProperty = section1 };
 
             //BH.oM.Base.BHoMGroup<Bar> group = new BH.oM.Base.BHoMGroup<Bar>() { Elements=new List<Bar> {bar } };
 

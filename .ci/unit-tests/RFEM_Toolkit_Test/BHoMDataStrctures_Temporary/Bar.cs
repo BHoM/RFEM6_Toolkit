@@ -81,8 +81,8 @@ namespace RFEM_Toolkit_Test.BHoMDataStrctures_Temporary
             ISectionProperty section1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
             ISectionProperty section2 = BH.Engine.Library.Query.Match("EU_SteelSections", "HE 1000 M", true, true) as ISectionProperty;
 
-            bar1In = new Bar() { StartNode = n1, EndNode = n2, SectionProperty = section1 };
-            bar2In = new Bar() { StartNode = n3, EndNode = n4, SectionProperty = section2 };
+            bar1In = new Bar() { Start = n1, End = n2, SectionProperty = section1 };
+            bar2In = new Bar() { Start = n3, End = n4, SectionProperty = section2 };
 
             adapter.Push(new List<IBHoMObject>() { bar1In, bar2In });
             adapter.Push(new List<IBHoMObject>() { bar1In, bar2In });
@@ -118,10 +118,10 @@ namespace RFEM_Toolkit_Test.BHoMDataStrctures_Temporary
             release3 = Create.BarReleasePinPin("");
             release4 = Create.BarReleasePinSlip("");
 
-            bar1In = new Bar() { StartNode = n1, EndNode = n2, SectionProperty = section1, Release = release1 };
-            bar2In = new Bar() { StartNode = n3, EndNode = n4, SectionProperty = section2, Release = release2 };
-            bar3In = new Bar() { StartNode = n1, EndNode = n2, SectionProperty = section1, Release = release3 };
-            bar4In = new Bar() { StartNode = n3, EndNode = n4, SectionProperty = section2, Release = release4 };
+            bar1In = new Bar() { Start = n1, End = n2, SectionProperty = section1, Release = release1 };
+            bar2In = new Bar() { Start = n3, End = n4, SectionProperty = section2, Release = release2 };
+            bar3In = new Bar() { Start = n1, End = n2, SectionProperty = section1, Release = release3 };
+            bar4In = new Bar() { Start = n3, End = n4, SectionProperty = section2, Release = release4 };
 
 
 
@@ -168,8 +168,8 @@ namespace RFEM_Toolkit_Test.BHoMDataStrctures_Temporary
             release3 = Create.BarReleasePinPin("");
             release4 = Create.BarReleasePinSlip("");
 
-            bar1In = new Bar() { StartNode = n3, EndNode = n4, SectionProperty = section2, Release = release2, FEAType = BarFEAType.Axial };
-            bar2In = new Bar() { StartNode = n1, EndNode = n2, SectionProperty = section1, Release = release3, FEAType = BarFEAType.TensionOnly };
+            bar1In = new Bar() { Start = n3, End = n4, SectionProperty = section2, Release = release2, FEAType = BarFEAType.Axial };
+            bar2In = new Bar() { Start = n1, End = n2, SectionProperty = section1, Release = release3, FEAType = BarFEAType.TensionOnly };
             adapter.Push(new List<IBHoMObject>() { bar1In, bar2In });
 
             FilterRequest barFilter = new FilterRequest() { Type = typeof(Bar) };
