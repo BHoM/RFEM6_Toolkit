@@ -88,6 +88,26 @@ namespace BH.Adapter.RFEM6
                     }
 
                 }
+                else if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_TIMBER))
+                {
+                    if (!materials.TryGetValue(section.material, out material))
+                    {
+                        material = m_Model.get_material(section.material).FromRFEM();
+                        materials[section.material] = material;
+                    }
+
+
+                    if (material != null)
+                    {
+
+                        bhSetion = section.FromRFEM(material);
+                        bhSetion.SetRFEM6ID(section.no);
+                        sectionList.Add(bhSetion);
+
+                    }
+
+
+                }
                 else { 
                 
 

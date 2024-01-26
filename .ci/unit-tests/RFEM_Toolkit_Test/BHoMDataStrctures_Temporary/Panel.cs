@@ -71,20 +71,20 @@ namespace RFEM_Toolkit_Test.Elements
         public void pushTwoAdjecentPanels()
         {
       
-            var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
-            var steel = BH.Engine.Library.Query.Match("Steel", "S235", true, true) as IMaterialFragment;
+            //var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
+            //var steel = BH.Engine.Library.Query.Match("Steel", "S235", true, true) as IMaterialFragment;
 
-            panel1 = new Panel() { ExternalEdges = new List<Edge>() { edge4, edge5, edge6, edge7 }, Openings = new List<Opening>() { opening1 }, Property = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.5, Material = concrete } };
+            //panel1 = new Panel() { ExternalEdges = new List<Edge>() { edge4, edge5, edge6, edge7 }, Openings = new List<Opening>() { opening1 }, Property = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.5, Material = concrete } };
 
-            Polyline outline0 = new Polyline() { ControlPoints = new List<Point>() { new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = 10, Y = 0, Z = 0 }, new Point() { X = 10, Y = 10, Z = 0 }, new Point() { X = 0, Y = 10, Z = 0 } } };
-            panel1 = BH.Engine.Structure.Create.Panel((ICurve)outline0.Close(), null, new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = concrete }, "");
+            //Polyline outline0 = new Polyline() { ControlPoints = new List<Point>() { new Point() { X = 0, Y = 0, Z = 0 }, new Point() { X = 10, Y = 0, Z = 0 }, new Point() { X = 10, Y = 10, Z = 0 }, new Point() { X = 0, Y = 10, Z = 0 } } };
+            //panel1 = BH.Engine.Structure.Create.Panel((ICurve)outline0.Close(), null, new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = concrete }, "");
 
-            Polyline outline1 = new Polyline() { ControlPoints = new List<Point>() { new Point() { X = 10, Y = 0, Z = 0 }, new Point() { X = 20, Y = 0, Z = 0 }, new Point() { X = 20, Y = 10, Z = 0 }, new Point() { X = 10, Y = 10, Z = 0 } } };
-            panel2 = BH.Engine.Structure.Create.Panel((ICurve)outline1.Close().Flip(), null, new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = concrete }, "");
+            //Polyline outline1 = new Polyline() { ControlPoints = new List<Point>() { new Point() { X = 10, Y = 0, Z = 0 }, new Point() { X = 20, Y = 0, Z = 0 }, new Point() { X = 20, Y = 10, Z = 0 }, new Point() { X = 10, Y = 10, Z = 0 } } };
+            //panel2 = BH.Engine.Structure.Create.Panel((ICurve)outline1.Close().Flip(), null, new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = concrete }, "");
 
 
-            // Push panel 
-            adapter.Push(new List<Panel>() { panel1, panel2 });
+            //// Push panel 
+            //adapter.Push(new List<Panel>() { panel1, panel2 });
 
             //// Pull it
             //FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };

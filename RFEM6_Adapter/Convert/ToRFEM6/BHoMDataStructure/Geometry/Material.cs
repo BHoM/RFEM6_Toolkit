@@ -39,22 +39,56 @@ namespace BH.Adapter.RFEM6
     {
         public static rfModel.material ToRFEM6(this IMaterialFragment material)
         {
-            //Object[] nameAndType = materialTypeAndNameTranslater(bhMateraial);
+            rfModel.material_material_type materialType = GetMaterialType(material);
+            string materialName = GetMaterialName(material);
 
             rfModel.material rfMaterial = new rfModel.material
             {
                 no = material.GetRFEM6ID(),
-                name = material.Name,
-                //name = "S235 (DIN EN 1993-1-1:2010-12)",
-                //material_type = rfModel.material_material_type.TYPE_STEEL,
+                name = materialName,
                 comment = "",
-                material_type = material.GetType().Name.Equals("Steel") ? rfModel.material_material_type.TYPE_STEEL : rfModel.material_material_type.TYPE_CONCRETE
+                material_type = materialType
             };
+
+            
 
             return rfMaterial;
 
         }
 
+
+        private static rfModel.material_material_type GetMaterialType(IMaterialFragment material) {
+
+            switch (material.GetType().Name)
+            {
+                case "Steel":
+                    return rfModel.material_material_type.TYPE_STEEL;
+                case "Concrete":
+                    return rfModel.material_material_type.TYPE_CONCRETE;
+                case "Timber":
+                case "Glulam":
+                    return rfModel.material_material_type.TYPE_TIMBER;
+                default:
+                    return rfModel.material_material_type.TYPE_STEEL;
+            }
+        
+        }
+        
+        private static String GetMaterialName(IMaterialFragment material)
+        {
+            switch (material.GetType().Name)
+            {
+                case "Steel":
+                case "Concrete":
+                    return material.Name;
+                case "Timber":
+                case "Glulam":
+                    return material.Name.Replace(" ", ""); ;
+                default:
+                    return material.Name;
+            }
+        }   
+    
     }
 }
 

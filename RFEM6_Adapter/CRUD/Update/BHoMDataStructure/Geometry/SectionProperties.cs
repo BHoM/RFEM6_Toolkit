@@ -30,6 +30,7 @@ using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.MaterialFragments;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using System.Text.RegularExpressions;
 
 namespace BH.Adapter.RFEM6
 {
@@ -51,7 +52,20 @@ namespace BH.Adapter.RFEM6
                 materials.TryGetValue(materialID, out material);
                 String materialName=material.GetType().Name;
 
-                m_Model.set_section(section.ToRFEM6(section.Material.GetRFEM6ID(), materialName));
+
+                rfModel.section rfSection = null;
+                if (section is GenericSection && (section.Material is Glulam || section.Material is SawnTimber))
+                {
+                    rfSection = section.ToRFEM6_TimberSections(section.Material.GetType().Name);
+                }
+                else
+                {
+                    rfSection = section.ToRFEM6(section.Material.GetRFEM6ID(), section.Material.GetType().Name);
+                }
+
+                m_Model.set_section(rfSection);
+                //m_Model.set_section(section.ToRFEM6(section.Material.GetRFEM6ID(), materialName));
+
             }
 
             return success;

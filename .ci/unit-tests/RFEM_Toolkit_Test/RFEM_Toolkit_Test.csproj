@@ -1,88 +1,109 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<AssemblyVersion>7.0.0.0</AssemblyVersion>
+		<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+		<FileVersion>7.1.0.0</FileVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
-    <PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
-    <PackageReference Include="coverlet.collector" Version="3.2.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+		<PackageReference Include="NUnit" Version="3.13.3" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
+		<PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
+		<PackageReference Include="coverlet.collector" Version="3.2.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\RFEM6_Adapter\RFEM6_Adapter.csproj" />
-    <ProjectReference Include="..\..\..\RFEM6_Engine\RFEM6_Engine.csproj" />
-    <ProjectReference Include="..\..\..\RFEM6_oM\RFEM6_oM.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\RFEM6_Adapter\RFEM6_Adapter.csproj" />
+		<ProjectReference Include="..\..\..\RFEM6_Engine\RFEM6_Engine.csproj" />
+		<ProjectReference Include="..\..\..\RFEM6_oM\RFEM6_oM.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Adapter_Engine">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="Adapter_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
-    </Reference>
-    <Reference Include="Analytical_Engine">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Analytical_Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="Analytical_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Analytical_oM.dll</HintPath>
-    </Reference>
-    <Reference Include="BHoM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
-    </Reference>
-    <Reference Include="BHoM_Adapter">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
-    </Reference>
-    <Reference Include="BHoM_Engine">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="Data_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Data_oM.dll</HintPath>
-    </Reference>
-    <Reference Include="Dimensional_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Dimensional_oM.dll</HintPath>
-    </Reference>
-    <Reference Include="Geometry_Engine">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Geometry_Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="Geometry_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Geometry_oM.dll</HintPath>
-    </Reference>
-    <Reference Include="Library_Engine">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Library_Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="Physical_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Physical_oM.dll</HintPath>
-    </Reference>
-    <Reference Include="Spatial_Engine">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Spatial_Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="Spatial_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Spatial_oM.dll</HintPath>
-    </Reference>
-    <Reference Include="Structure_AdapterModules">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Structure_AdapterModules.dll</HintPath>
-    </Reference>
-    <Reference Include="Structure_Engine">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Structure_Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="Structure_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Structure_oM.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="Adapter_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Adapter_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Adapter_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Analytical_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Analytical_Engine.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Analytical_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Analytical_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="BHoM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\BHoM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="BHoM_Adapter">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="BHoM_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Data_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Data_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Dimensional_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Dimensional_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Geometry_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_Engine.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Geometry_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Library_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Library_Engine.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Physical_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Physical_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Spatial_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Spatial_Engine.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Spatial_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Spatial_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Structure_AdapterModules">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Structure_AdapterModules.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Structure_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Structure_Engine.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Structure_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Structure_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="IntermediateDataStructures\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="BHoMDataStructure\Loading\" />
+		<Folder Include="IntermediateDataStructures\" />
+	</ItemGroup>
 
 </Project>
