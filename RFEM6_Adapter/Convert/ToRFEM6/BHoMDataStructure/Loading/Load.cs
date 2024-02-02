@@ -140,22 +140,22 @@ namespace BH.Adapter.RFEM6
 
 
 
-            surface_load_load_direction loadDirecteion;
+            surface_load_load_direction loadDirection;
             Vector orientationVector = bhAreaLoad.Pressure;
             double magnitude;
             if (orientationVector.X != 0)
             {
-                loadDirecteion = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                loadDirection = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
                 magnitude = bhAreaLoad.Pressure.X;
             }
             else if (orientationVector.Y != 0)
             {
-                loadDirecteion = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+                loadDirection = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
                     magnitude = bhAreaLoad.Pressure.Y;
             }
             else
             {
-                loadDirecteion = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+                loadDirection = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
                     magnitude = bhAreaLoad.Pressure.Z;
             }
 
@@ -175,7 +175,7 @@ namespace BH.Adapter.RFEM6
                 uniform_magnitudeSpecified = true,
                 is_generated = false,
                 is_generatedSpecified = true,
-                load_direction = loadDirecteion,
+                load_direction = loadDirection,
                 load_directionSpecified = true,
                 load_type = surface_load_load_type.LOAD_TYPE_FORCE,
                 load_typeSpecified = true,
@@ -189,27 +189,27 @@ namespace BH.Adapter.RFEM6
 
         public static rfModel.free_line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, int loadCaseSpecificID, int[] surfaceIds)
         {
-            free_line_load_load_direction loadDirecteion;
+            free_line_load_load_direction loadDirection;
             Vector orientationVector = bhLineLoad.ForceA;
             double magnitudeA;
             double magnitudeB;
 
             if (orientationVector.X != 0)
             {
-                loadDirecteion = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE;
+                loadDirection = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE;
                 magnitudeA = bhLineLoad.ForceA.X;
                 magnitudeB = bhLineLoad.ForceB.X;
 
             }
             else if (orientationVector.Y != 0)
             {
-                loadDirecteion = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE;
+                loadDirection = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE;
                 magnitudeA = bhLineLoad.ForceA.Y;
                 magnitudeB = bhLineLoad.ForceB.Y;
             }
             else
             {
-                loadDirecteion = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE;
+                loadDirection = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE;
                 magnitudeA = bhLineLoad.ForceA.Z;
                 magnitudeB = bhLineLoad.ForceB.Z;
             }
@@ -232,7 +232,7 @@ namespace BH.Adapter.RFEM6
                 magnitude_secondSpecified = true,
                 is_generated = false,
                 is_generatedSpecified = true,
-                load_direction = loadDirecteion,
+                load_direction = loadDirection,
                 //load_direction = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE,
                 load_directionSpecified = true,
                 load_location_first_x = bhLineLoad.Location.Start.X,
