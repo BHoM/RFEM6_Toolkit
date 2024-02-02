@@ -45,6 +45,9 @@ namespace BH.Adapter.RFEM6
             foreach (Bar bhBar in bhBars)
             {
 
+                if (bhBar.SectionProperty == null || bhBar.Start == null || bhBar.End == null)
+                    continue;
+
                 rfModel.member rfMember = bhBar.ToRFEM6();
 
                 if (bhBar.Release != null)
