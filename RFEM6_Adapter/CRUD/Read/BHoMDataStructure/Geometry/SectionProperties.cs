@@ -60,8 +60,16 @@ namespace BH.Adapter.RFEM6
                 if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_STEEL))
                 {
 
+                    //Checking differnt data sets for for sections
 
                     bhSetion = BH.Engine.Library.Query.Match("EU_SteelSections", sectionName, true, true).DeepClone() as SteelSection;
+                    if (bhSetion is null) {
+                        bhSetion = BH.Engine.Library.Query.Match("UK_SteelSections", sectionName, true, true).DeepClone() as SteelSection;
+                    }
+                    if(bhSetion is null) {
+                        bhSetion = BH.Engine.Library.Query.Match("US_SteelSections", sectionName, true, true).DeepClone() as SteelSection;
+                    }
+
                     bhSetion.SetRFEM6ID(section.no);
                     sectionList.Add(bhSetion);
 
