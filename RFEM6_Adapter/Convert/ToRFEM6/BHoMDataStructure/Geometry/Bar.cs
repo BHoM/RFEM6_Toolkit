@@ -48,7 +48,7 @@ namespace BH.Adapter.RFEM6
                 section_start = bar.SectionProperty.GetRFEM6ID(),
                 section_startSpecified = true,
                 section_endSpecified = true,
-                comment = "",
+                comment = "BHoMName:"+bar.Name
             };
 
             return rfMember;
