@@ -48,8 +48,7 @@ namespace BH.Adapter.RFEM6
             rfModel.section rfSection = null;
             // create section
             int secNo = bhSection.GetRFEM6ID();
-          
-
+            
 
             rfSection = new rfModel.section
             {
@@ -112,6 +111,8 @@ namespace BH.Adapter.RFEM6
             AlterSectionName(bhSection);
 
             int secNo = bhSection.GetRFEM6ID();
+            Object value = "";
+            bhSection.CustomData.TryGetValue("Comment", out value);
 
             if (materialType.Equals("Steel"))
             {
@@ -132,6 +133,7 @@ namespace BH.Adapter.RFEM6
                         manufacturing_typeSpecified = true,
                         thin_walled_model = true,
                         thin_walled_modelSpecified = true,
+                        comment = "BHoMName: " + (String)value,
                     };
 
                 }
@@ -152,6 +154,7 @@ namespace BH.Adapter.RFEM6
                         manufacturing_type = rfModel.section_manufacturing_type.MANUFACTURING_TYPE_WELDED,
                         manufacturing_typeSpecified = true,
                         name = bhSection.Name, // width as in RFEM
+                        comment = "BHoMName: " + (String)value,
 
                     };
 
@@ -171,6 +174,7 @@ namespace BH.Adapter.RFEM6
                     parametrization_type = GetParametrizationType(bhSection, materialType),
                     parametrization_typeSpecified = true,
                     name = bhSection.Name, // width/height as in RFEM, SI units
+                    comment = "BHoMName: " + (String)value,
                 };
 
             }
@@ -184,7 +188,6 @@ namespace BH.Adapter.RFEM6
 
 
             string materialType = bhSection.Material.GetType().Name;
-
             //Parametrs for dimensioning Cross Sections
             double v0, v1, v2, v3, v4, v5;
 

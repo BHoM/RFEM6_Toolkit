@@ -33,6 +33,7 @@ using BH.oM.Geometry;
 using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
+using Newtonsoft.Json.Linq;
 
 namespace BH.Adapter.RFEM6
 {
@@ -43,12 +44,15 @@ namespace BH.Adapter.RFEM6
         {
 
             List<int> edgeIdList = new List<int>();
+            Object value = "";
+            bhOpening.CustomData.TryGetValue("Comment", out value);
 
 
             rfModel.opening rfSurface = new opening
             {
                 no = bhOpening.GetRFEM6ID(),
                 boundary_lines = bhOpening.Edges.Select(b => b.GetRFEM6ID()).ToArray(),
+                comment = "BHoMName: " + (String)value,
 
             };
 

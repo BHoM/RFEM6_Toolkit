@@ -41,12 +41,14 @@ namespace BH.Adapter.RFEM6
         {
             rfModel.material_material_type materialType = GetMaterialType(material);
             string materialName = GetMaterialName(material);
+            Object value = "";
+            material.CustomData.TryGetValue("Comment", out value);
 
             rfModel.material rfMaterial = new rfModel.material
             {
                 no = material.GetRFEM6ID(),
                 name = materialName,
-                comment = "",
+                comment = "BHoMName: " + (String)value,
                 material_type = materialType
             };
 

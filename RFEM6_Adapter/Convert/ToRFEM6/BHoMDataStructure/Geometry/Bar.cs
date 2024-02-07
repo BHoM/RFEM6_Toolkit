@@ -38,6 +38,13 @@ namespace BH.Adapter.RFEM6
     {
         public static rfModel.member ToRFEM6(this Bar bar)
         {
+            Object value="";
+            bar.CustomData.TryGetValue("Comment", out value);
+           
+
+
+            
+
             rfModel.member rfMember = new rfModel.member()
             {
                 no = bar.GetRFEM6ID(),
@@ -48,7 +55,8 @@ namespace BH.Adapter.RFEM6
                 section_start = bar.SectionProperty.GetRFEM6ID(),
                 section_startSpecified = true,
                 section_endSpecified = true,
-                comment = "BHoMName:"+bar.Name
+                comment = "BHoMName: "+(String)value,
+               
             };
 
             return rfMember;

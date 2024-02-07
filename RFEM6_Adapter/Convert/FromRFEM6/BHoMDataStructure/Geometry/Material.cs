@@ -32,6 +32,7 @@ using BH.oM.Structure.MaterialFragments;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -50,6 +51,7 @@ namespace BH.Adapter.RFEM6
             {
 
                 bhMaterial = BH.Engine.Library.Query.Match("Steel", rfMaterial.name.Split('|')[0], true, true).DeepClone() as IMaterialFragment;
+
 
             }
 
@@ -80,6 +82,7 @@ namespace BH.Adapter.RFEM6
 
             }
             bhMaterial.SetRFEM6ID(rfMaterial.no);
+            BH.Engine.Base.Modify.SetPropertyValue(bhMaterial, "Comment", rfMaterial.comment);
             return bhMaterial;
         }
 

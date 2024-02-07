@@ -34,6 +34,7 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Spatial;
 using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -80,6 +81,7 @@ namespace BH.Adapter.RFEM6
             }
 
             panel.SetRFEM6ID(rfSurface.no);
+            BH.Engine.Base.Modify.SetPropertyValue(panel, "Comment", rfSurface.comment);
 
             return panel;
         }

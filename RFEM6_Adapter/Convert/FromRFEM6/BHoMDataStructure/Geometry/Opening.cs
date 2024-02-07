@@ -33,6 +33,7 @@ using BH.Engine.Adapter;
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Geometry;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -63,6 +64,7 @@ namespace BH.Adapter.RFEM6
             RFEMOpening rfemOpening = new RFEMOpening() { Opening = o, SurfaceIDs = surfaceIDs };
 
             rfemOpening.SetRFEM6ID(rfOpening.no);
+            BH.Engine.Base.Modify.SetPropertyValue(rfemOpening, "Comment", rfOpening.comment);
             return rfemOpening;
 
         }

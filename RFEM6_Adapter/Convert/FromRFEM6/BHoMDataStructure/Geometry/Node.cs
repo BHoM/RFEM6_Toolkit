@@ -30,6 +30,7 @@ using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -43,6 +44,7 @@ namespace BH.Adapter.RFEM6
 
             bhNode.Name = "Node Nr. " + node.no;
             bhNode.SetRFEM6ID(node.no);
+            BH.Engine.Base.Modify.SetPropertyValue(bhNode, "Comment", node.comment);
             return bhNode;
         }
 
