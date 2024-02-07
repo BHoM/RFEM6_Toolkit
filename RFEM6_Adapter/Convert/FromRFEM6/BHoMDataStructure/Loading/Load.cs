@@ -159,14 +159,17 @@ namespace BH.Adapter.RFEM6
             switch (surfaceload.load_direction)
             {
                 case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
+                case surface_load_load_direction.LOAD_DIRECTION_LOCAL_X:
                     forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
                     break;
 
                 case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
+                case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
                     forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
                     break;
 
                 case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
+                case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
                     forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
                     break;
 
