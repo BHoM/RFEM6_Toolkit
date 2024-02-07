@@ -29,6 +29,8 @@ using System.ComponentModel;
 using BH.oM.Structure.Elements;
 using System.Collections;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.Engine.Base;
+using BH.oM.Structure.SectionProperties;
 
 namespace BH.Adapter.RFEM6
 {
@@ -40,6 +42,14 @@ namespace BH.Adapter.RFEM6
             List<RFEMLine> lines = new List<RFEMLine>();
             foreach (Bar bar in objects)
             {
+
+                if (bar.SectionProperty == null)
+                {
+                    bar.SectionProperty = BH.Engine.Library.Query.Match("EU_SteelSections", "CHS 42.4x3.2", true, true).DeepClone() as SteelSection;
+                    BH.Engine.Base.Compute.RecordWarning($"Bar {bar} has no section property assinged. The section {bar.SectionProperty} has been set as default.");
+                }
+
+
                 RFEMLine rfLine = new RFEMLine() { Nodes = new List<Node> { bar.Start, bar.End } };
                 bar.Fragments.Add(rfLine);
                 lines.Add(rfLine);

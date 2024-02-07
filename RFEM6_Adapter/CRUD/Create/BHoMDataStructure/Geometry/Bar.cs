@@ -45,8 +45,17 @@ namespace BH.Adapter.RFEM6
             foreach (Bar bhBar in bhBars)
             {
 
-                if (bhBar.SectionProperty == null || bhBar.Start == null || bhBar.End == null)
+
+                //Checking if the bar has a start and end point
+                if (bhBar.Start == null || bhBar.End == null)
                     continue;
+
+                ////Checking if the bar has a section property, if not set default section property
+                //if (bhBar.SectionProperty == null)
+                //{
+                //    bhBar.SectionProperty = BH.Engine.Library.Query.Match("EU_SteelSections", "CHS 42.4x3.2", true, true).DeepClone() as SteelSection;
+                //    BH.Engine.Base.Compute.RecordWarning($"Bar {bhBar} has no section property assinged. The section {bhBar.SectionProperty} has been set as default.");
+                //}
 
                 rfModel.member rfMember = bhBar.ToRFEM6();
 
@@ -83,7 +92,7 @@ namespace BH.Adapter.RFEM6
                 return false;
             if (!Translate(rfMemberHinge.moment_release_mt).Equals(bhConstraint.RotationX))
                 return false;
-            if (!Translate(rfMemberHinge.moment_release_my).Equals(bhConstraint.RotationY)) 
+            if (!Translate(rfMemberHinge.moment_release_my).Equals(bhConstraint.RotationY))
                 return false;
             if (!Translate(rfMemberHinge.moment_release_mz).Equals(bhConstraint.RotationZ))
                 return false;
