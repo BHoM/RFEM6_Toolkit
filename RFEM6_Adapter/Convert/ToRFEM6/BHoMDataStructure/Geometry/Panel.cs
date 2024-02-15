@@ -44,8 +44,8 @@ namespace BH.Adapter.RFEM6
 
             List<int> edgeIdList = new List<int>();
             bhPanel.ExternalEdges.ForEach(e => edgeIdList.Add(e.GetRFEM6ID()));
-            Object value = "";
-            bhPanel.CustomData.TryGetValue("Comment", out value);
+            Object bhComment = "";
+            bhPanel.CustomData.TryGetValue("Comment", out bhComment);
 
             rfModel.surface rfSurface = new rfModel.surface
             {
@@ -56,7 +56,7 @@ namespace BH.Adapter.RFEM6
                 boundary_lines = edgeIdList.ToArray(),
                 type = surface_type.TYPE_STANDARD,
                 typeSpecified = true,
-                comment = "BHoMName: " + (String)value,
+                comment = (String)(bhComment==null ? "" : $"BHComment:{bhComment}"),
 
             };
 

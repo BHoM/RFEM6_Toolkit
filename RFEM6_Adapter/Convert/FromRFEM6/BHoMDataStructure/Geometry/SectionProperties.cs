@@ -88,7 +88,18 @@ namespace BH.Adapter.RFEM6
             }
 
             bhSection.SetRFEM6ID(section.no);
-            BH.Engine.Base.Modify.SetPropertyValue(bhSection, "Comment", section.comment);
+
+            if (section.comment.Contains("BHComment")) { 
+            
+                string sectionComment = "";
+                
+                sectionComment = section.comment.Split(';').ToList().Last();
+            
+                BH.Engine.Base.Modify.SetPropertyValue(bhSection, "Comment", sectionComment);
+            
+            }
+            
+            
 
             return bhSection;
         }

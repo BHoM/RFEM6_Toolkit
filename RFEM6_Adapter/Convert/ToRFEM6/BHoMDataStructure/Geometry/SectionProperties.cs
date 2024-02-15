@@ -48,7 +48,8 @@ namespace BH.Adapter.RFEM6
             rfModel.section rfSection = null;
             // create section
             int secNo = bhSection.GetRFEM6ID();
-            
+            Object bhComment = "";
+            bhSection.CustomData.TryGetValue("Comment", out bhComment);
 
             rfSection = new rfModel.section
             {
@@ -58,7 +59,7 @@ namespace BH.Adapter.RFEM6
                 materialSpecified = true,
                 typeSpecified = true,
                 type = rfModel.section_type.TYPE_PARAMETRIC_MASSIVE_I,
-                comment = $"GenericSection Name:{bhSection.Name}",
+                comment = $"GenericSection Name:{bhSection.Name}"+(bhComment==null?" ":$";BHComment:{bhComment}"),
 
             };
 
@@ -111,8 +112,8 @@ namespace BH.Adapter.RFEM6
             AlterSectionName(bhSection);
 
             int secNo = bhSection.GetRFEM6ID();
-            Object value = "";
-            bhSection.CustomData.TryGetValue("Comment", out value);
+            Object bhComment = "";
+            bhSection.CustomData.TryGetValue("Comment", out bhComment);
 
             if (materialType.Equals("Steel"))
             {
@@ -133,7 +134,7 @@ namespace BH.Adapter.RFEM6
                         manufacturing_typeSpecified = true,
                         thin_walled_model = true,
                         thin_walled_modelSpecified = true,
-                        comment = "BHoMName: " + (String)value,
+                        comment = (String)(bhComment==null ? "" : $"BHComment:{bhComment}"),    
                     };
 
                 }
@@ -154,7 +155,7 @@ namespace BH.Adapter.RFEM6
                         manufacturing_type = rfModel.section_manufacturing_type.MANUFACTURING_TYPE_WELDED,
                         manufacturing_typeSpecified = true,
                         name = bhSection.Name, // width as in RFEM
-                        comment = "BHoMName: " + (String)value,
+                        comment = (String)(bhComment == null ? "" : $"BHComment:{bhComment}"),
 
                     };
 
@@ -174,7 +175,7 @@ namespace BH.Adapter.RFEM6
                     parametrization_type = GetParametrizationType(bhSection, materialType),
                     parametrization_typeSpecified = true,
                     name = bhSection.Name, // width/height as in RFEM, SI units
-                    comment = "BHoMName: " + (String)value,
+                    comment = (String)(bhComment == null ? "" : $"BHComment:{bhComment}") 
                 };
 
             }
