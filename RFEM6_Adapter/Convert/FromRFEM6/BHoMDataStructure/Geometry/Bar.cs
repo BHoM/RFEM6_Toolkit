@@ -42,6 +42,7 @@ namespace BH.Adapter.RFEM6
 
 
             Bar bar = new Bar { Start = node0, End = node1, SectionProperty = section, Name = "member nr." + member.no, FEAType = member.type.FromRFEM() };
+            BH.Engine.Base.Modify.SetPropertyValue(bar, "Comment", member.comment);
             bar.SetRFEM6ID(member.no);
             return bar;
         }

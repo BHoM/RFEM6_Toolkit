@@ -39,6 +39,8 @@ namespace BH.Adapter.RFEM6
 
         public static rfModel.node ToRFEM6(this Node node)
         {
+            Object bhComment = "";
+            node.CustomData.TryGetValue("Comment", out bhComment);
 
             rfModel.node rfNode = new rfModel.node()
             {
@@ -46,7 +48,7 @@ namespace BH.Adapter.RFEM6
                 coordinates = new rfModel.vector_3d() { x = node.Position.X, y = node.Position.Y, z = node.Position.Z },
                 coordinate_system_type = rfModel.node_coordinate_system_type.COORDINATE_SYSTEM_CARTESIAN,
                 coordinate_system_typeSpecified = true,
-                comment = ""
+                comment = (String)(bhComment == null ? "" : $"BHComment:{bhComment}"),
             };
 
             return rfNode;
