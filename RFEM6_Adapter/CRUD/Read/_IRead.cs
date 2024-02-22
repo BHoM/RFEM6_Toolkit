@@ -36,6 +36,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Structure.Results;
 
 namespace BH.Adapter.RFEM6
 {
@@ -56,8 +57,8 @@ namespace BH.Adapter.RFEM6
                     return ReadNodes(ids as dynamic);
                 else if (type == typeof(RFEMNodalSupport))
                     return ReadRFEMNodalSupports(ids as dynamic);
-                else if (type == typeof(RFEMLineSupport))
-                    return ReadLineSupports(ids as dynamic);
+                else if (type == typeof(NodeReaction))
+                    return ReadNodeReaction(ids as dynamic);
                 else if (type == typeof(RFEMHinge))
                     return ReadRFEMHinges(ids as dynamic);
                 else if (type == typeof(ISectionProperty) || type.GetInterfaces().Contains(typeof(ISectionProperty)))

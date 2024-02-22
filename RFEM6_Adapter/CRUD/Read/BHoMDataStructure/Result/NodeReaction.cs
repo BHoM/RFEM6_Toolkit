@@ -19,56 +19,43 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using BH.Adapter.RFEM6;
-using BH.Engine.Base;
-using BH.oM.Adapters.RFEM6;
-using BH.oM.Data.Requests;
-using BH.oM.Geometry;
-using BH.oM.Structure.Constraints;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Data.Library;
-using BH.Engine.Library;
+using BH.oM.Structure.Constraints;
+
+using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.Loads;
 using Dlubal.WS.Rfem6.Model;
-using BH.oM.Physical.Materials;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.Results;
+using System.Xml.Linq;
 
-namespace RFEM_Toolkit_Test
+namespace BH.Adapter.RFEM6
 {
-
-
-    public class BarRelease_Test
+    public partial class RFEM6Adapter
     {
 
-        BH.Adapter.RFEM6.RFEM6Adapter adapter;
-
-        [SetUp]
-        public void Setup()
+        private String ReadNodeReaction(List<string> ids = null)
         {
-            //adapter.Wipeout();
+            //IEnumerable<rfModel.load_case> foundLoadCases = numbers.ToList().Select(n => m_Model.get_load_case(n.no));
+            rfModel.calculation_result result = m_Model.calculate_all(false);
+
+            var nodeSupport0 = m_Model.get_results_for_nodes_support_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, 1, 1);
+            var nodeSupport1 = m_Model.get_results_for_nodes_support_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, 1, 2);
+            var nodeSupport2 = m_Model.get_results_for_nodes_support_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, 1, 3);
+
+
+            bool succeded = result.succeeded;
+
+            rfModel.get_results_for_nodes_support_forcesResponse response;
+
+            return null;
         }
-
-        [OneTimeSetUp]
-        public void InitializeRFEM6Adapter()
-        {
-            adapter = new BH.Adapter.RFEM6.RFEM6Adapter(true);
-        }
-
-        [Test]
-        public void PullResults()
-        {
-
-            
-            FilterRequest resultFilter = new FilterRequest() { Type = typeof(NodeReaction) };
-
-            var materialPulled = adapter.Pull(resultFilter).ToList();
-
-        }
-
-
-
-
 
     }
 }
+
