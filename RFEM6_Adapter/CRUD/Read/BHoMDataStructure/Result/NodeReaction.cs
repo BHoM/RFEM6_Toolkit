@@ -37,6 +37,7 @@ using BH.Engine.Base;
 using BH.oM.Analytical.Results;
 using BH.oM.Structure.Requests;
 using BH.oM.Structure.Results;
+using System.Configuration;
 
 namespace BH.Adapter.RFEM6
 {
@@ -46,15 +47,16 @@ namespace BH.Adapter.RFEM6
         public IEnumerable<IResult> ReadResults(NodeResultRequest request, ActionConfig actionConfig)
         {
 
-            List<int> nodeIds=request.ObjectIds.Select(s=>(int)s).ToList();
-            List<int> loadCaseIds = request.Cases.Select(s => (int)s).ToList();
+            List<int> nodeIds = request.ObjectIds.Select(s => Int32.Parse((String)s)).ToList();
+            List<int> loadCaseIds = request.Cases.Select(s => Int32.Parse((String)s)).ToList();
 
             switch (request.ResultType)
             {
 
                 case NodeResultType.NodeReaction:
 
-                    return ExtractNodeReaction(nodeIds, loadCaseIds);
+                    var result = ExtractNodeReaction(nodeIds, loadCaseIds);
+                    return result;
 
                 default:
 
@@ -70,7 +72,7 @@ namespace BH.Adapter.RFEM6
         private IEnumerable<IResult> ExtractNodeReaction(List<int> nodeIds, List<int> loadCaseIds)
         {
 
-            IEnumerable <IResult> resultList= new List<IResult>();
+            List <IResult> resultList= new List<IResult>();
 
             foreach (int lc in loadCaseIds)
             {
@@ -90,7 +92,9 @@ namespace BH.Adapter.RFEM6
 
                     NodeReaction nodeReaction = new NodeReaction(n, 0,0,0,oM.Geometry.Basis.XY,fxValue,fyValue,fzValue,mxValue,myValue,mzValue);
 
-                    resultList.Append(nodeReaction);
+                    resultList.Add(nodeReaction);
+
+
 
                 }
 
