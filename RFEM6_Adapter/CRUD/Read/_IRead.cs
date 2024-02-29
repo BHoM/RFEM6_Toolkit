@@ -57,7 +57,7 @@ namespace BH.Adapter.RFEM6
                     return ReadNodes(ids as dynamic);
                 else if (type == typeof(RFEMNodalSupport))
                     return ReadRFEMNodalSupports(ids as dynamic);
-                else if (type == typeof(NodeReaction))
+                else if (type == typeof(RFEM6NodalSupportReaction))
                     return ReadNodeReaction(ids as dynamic);
                 else if (type == typeof(RFEMHinge))
                     return ReadRFEMHinges(ids as dynamic);

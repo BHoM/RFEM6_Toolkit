@@ -19,60 +19,23 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using BH.Adapter.RFEM6;
-using BH.Engine.Base;
-using BH.oM.Adapters.RFEM6;
-using BH.oM.Data.Requests;
-using BH.oM.Geometry;
-using BH.oM.Structure.Constraints;
-using BH.oM.Structure.Elements;
-using BH.oM.Data.Library;
-using BH.Engine.Library;
-using Dlubal.WS.Rfem6.Model;
-using BH.oM.Physical.Materials;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.Results;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BH.oM.Base;
 
-namespace RFEM_Toolkit_Test
+namespace BH.oM.Adapters.RFEM6
 {
-
-
-    public class BarRelease_Test
+    public class RFEM6NodalSupportReaction : BHoMObject
     {
 
-        BH.Adapter.RFEM6.RFEM6Adapter adapter;
+        public virtual BH.oM.Structure.Elements.Node Node { get; set; }
 
-        [SetUp]
-        public void Setup()
-        {
-            //adapter.Wipeout();
-        }
+        public virtual double[] Forces { get; set; }
 
-        [OneTimeSetUp]
-        public void InitializeRFEM6Adapter()
-        {
-            adapter = new BH.Adapter.RFEM6.RFEM6Adapter(true);
-        }
-
-        [Test]
-        public void PullResults()
-        {
-
-            //BH.Engine.Adapter.Query.
-
-            
-            //FilterRequest resultFilter = new FilterRequest() { Type = typeof(RFEM6NodalSupportReaction) };
-
-            //var materialPulled = adapter.Pull(resultFilter).ToList();
-
-
-
-
-        }
-
-
-
+        public virtual double[] Moments { get; set; }
 
 
     }

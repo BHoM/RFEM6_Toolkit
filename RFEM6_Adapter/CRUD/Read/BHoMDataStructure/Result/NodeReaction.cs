@@ -33,27 +33,71 @@ using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Loads;
 using Dlubal.WS.Rfem6.Model;
 using System.Xml.Linq;
+using BH.Engine.Base;
+using BH.oM.Analytical.Results;
+using BH.oM.Structure.Requests;
+using BH.oM.Structure.Results;
 
 namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter
     {
 
-        private String ReadNodeReaction(List<string> ids = null)
+        public IEnumerable<IResult> ReadResults(NodeResultRequest request, ActionConfig actionConfig)
         {
-            //IEnumerable<rfModel.load_case> foundLoadCases = numbers.ToList().Select(n => m_Model.get_load_case(n.no));
-            rfModel.calculation_result result = m_Model.calculate_all(false);
 
-            var nodeSupport0 = m_Model.get_results_for_nodes_support_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, 1, 1);
-            var nodeSupport1 = m_Model.get_results_for_nodes_support_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, 1, 2);
-            var nodeSupport2 = m_Model.get_results_for_nodes_support_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, 1, 3);
+            List<int> nodeIds=request.ObjectIds.Select(s=>(int)s).ToList();
+            List<int> loadCaseIds = request.Cases.Select(s => (int)s).ToList();
 
+            switch (request.ResultType)
+            {
 
-            bool succeded = result.succeeded;
+                case NodeResultType.NodeReaction:
 
-            rfModel.get_results_for_nodes_support_forcesResponse response;
+                    return ExtractNodeReaction(nodeIds, loadCaseIds);
+
+                default:
+
+                    BH.Engine.Base.Compute.RecordWarning("WOOOOPS....Seems like Extraction has only been implemented for Node Reactions!");
+
+                    break;
+
+            }
 
             return null;
+        }
+
+        private IEnumerable<IResult> ExtractNodeReaction(List<int> nodeIds, List<int> loadCaseIds)
+        {
+
+            IEnumerable <IResult> resultList= new List<IResult>();
+
+            foreach (int lc in loadCaseIds)
+            {
+
+                foreach (int n in nodeIds)
+                {
+
+                    nodes_support_forces_row[] nodes_support_forces_rows = m_Model.get_results_for_nodes_support_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, lc, n);
+
+                    var supportResultReaction = nodes_support_forces_rows.First().row;
+                    double fxValue = Double.Parse(supportResultReaction.support_force_p_x.value);
+                    double fyValue = Double.Parse(supportResultReaction.support_force_p_y.value);
+                    double fzValue = Double.Parse(supportResultReaction.support_force_p_z.value);
+                    double mxValue = Double.Parse(supportResultReaction.support_moment_m_x.value);
+                    double myValue = supportResultReaction.support_moment_m_y;
+                    double mzValue = supportResultReaction.support_moment_m_z;
+
+                    NodeReaction nodeReaction = new NodeReaction(n, 0,0,0,oM.Geometry.Basis.XY,fxValue,fyValue,fzValue,mxValue,myValue,mzValue);
+
+                    resultList.Append(nodeReaction);
+
+                }
+
+            }
+
+            return resultList;
+
         }
 
     }
