@@ -55,6 +55,7 @@ namespace BH.Adapter.RFEM6
 
                 case NodeResultType.NodeReaction:
 
+                    //m_Model.calculate_all(true);
                     var result = ExtractNodeReaction(nodeIds, loadCaseIds);
                     return result;
 
@@ -85,6 +86,10 @@ namespace BH.Adapter.RFEM6
                 BH.Engine.Base.Compute.RecordWarning("No Node Ids were provided for the extraction of Node Reactions, all supports were chosen istead.");
             }
 
+
+
+            m_Model.calculate_all(true);
+           
             foreach (int lc in loadCaseIds)
             {
 
