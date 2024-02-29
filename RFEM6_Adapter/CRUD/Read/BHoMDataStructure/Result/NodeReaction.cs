@@ -72,7 +72,18 @@ namespace BH.Adapter.RFEM6
         private IEnumerable<IResult> ExtractNodeReaction(List<int> nodeIds, List<int> loadCaseIds)
         {
 
-            List <IResult> resultList= new List<IResult>();
+            List<IResult> resultList = new List<IResult>();
+
+            //If no node ids are provided, then we will extract the results for all nodes
+            if (nodeIds.Count == 0)
+            {
+                HashSet<int> nodalSupportNodeIDs = new HashSet<int>();
+                rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
+                IEnumerable<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no));
+                foundSupports.ToList().ForEach(s => s.nodes.ToList().ForEach(n => nodalSupportNodeIDs.Add(n)));
+                nodeIds = nodalSupportNodeIDs.ToList();
+                BH.Engine.Base.Compute.RecordWarning("No Node Ids were provided for the extraction of Node Reactions, all supports were chosen istead.");
+            }
 
             foreach (int lc in loadCaseIds)
             {
@@ -90,7 +101,7 @@ namespace BH.Adapter.RFEM6
                     double myValue = supportResultReaction.support_moment_m_y;
                     double mzValue = supportResultReaction.support_moment_m_z;
 
-                    NodeReaction nodeReaction = new NodeReaction(n, 0,0,0,oM.Geometry.Basis.XY,fxValue,fyValue,fzValue,mxValue,myValue,mzValue);
+                    NodeReaction nodeReaction = new NodeReaction(n, lc, 0, 0, oM.Geometry.Basis.XY, fxValue, fyValue, fzValue, mxValue, myValue, mzValue);
 
                     resultList.Add(nodeReaction);
 
