@@ -21,58 +21,68 @@
  */
 using BH.Adapter.RFEM6;
 using BH.Engine.Base;
-using BH.oM.Adapters.RFEM6;
 using BH.oM.Data.Requests;
-using BH.oM.Geometry;
-using BH.oM.Structure.Constraints;
-using BH.oM.Structure.Elements;
-using BH.oM.Data.Library;
-using BH.Engine.Library;
-using Dlubal.WS.Rfem6.Model;
-using BH.oM.Physical.Materials;
 using BH.oM.Structure.MaterialFragments;
+using BH.Engine.Structure;
 using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.Results;
+using BH.oM.Geometry;
+using BH.oM.Structure.Elements;
 
-namespace RFEM_Toolkit_Test
+namespace RFEM_Toolkit_Test.Elements
 {
 
 
-    public class BarRelease_Test
+    public class NodalResultTestClass
+
     {
 
-        BH.Adapter.RFEM6.RFEM6Adapter adapter;
+        RFEM6Adapter adapter;
 
-        [SetUp]
-        public void Setup()
+        Line line0;
+        Line line1;
+        Line line2;
+        Line line3;
+
+
+
+        IMaterialFragment glulam;
+        IMaterialFragment timberC;
+        //IMaterialFragment timberT;
+        //IMaterialFragment timberD;
+
+        Concrete concrete;
+        //IMaterialFragment steel;
+
+        ISectionProperty steelSection;
+        ISectionProperty concreteSection;
+        ISectionProperty genericSectionGLTimber;
+        ISectionProperty genericSectionSawnTimber;
+
+        Bar barSteelSection;
+        Bar barConcreteSection;
+        Bar barGLTimber;
+        Bar barSawTimber;
+
+        BarEndNodesDistanceComparer comparer = new BarEndNodesDistanceComparer(3);
+
+        [TearDown]
+        public void TearDown()
         {
-            //adapter.Wipeout();
+            adapter.Wipeout();
         }
 
         [OneTimeSetUp]
         public void InitializeRFEM6Adapter()
         {
-            adapter = new BH.Adapter.RFEM6.RFEM6Adapter(true);
-        }
-
-        [Test]
-        public void PullResults()
-        {
-
-            //BH.Engine.Adapter.Query.
+            adapter = new RFEM6Adapter(true);
 
             
-            //FilterRequest resultFilter = new FilterRequest() { Type = typeof(RFEM6NodalSupportReaction) };
-
-            //var materialPulled = adapter.Pull(resultFilter).ToList();
-
-
-
+            
 
         }
 
 
-
+      
 
 
     }

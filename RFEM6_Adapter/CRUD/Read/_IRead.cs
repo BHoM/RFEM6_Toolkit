@@ -36,6 +36,9 @@ using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Structure.Results;
+using BH.oM.Analytical.Results;
+using BH.oM.Structure.Requests;
 
 namespace BH.Adapter.RFEM6
 {
@@ -56,8 +59,6 @@ namespace BH.Adapter.RFEM6
                     return ReadNodes(ids as dynamic);
                 else if (type == typeof(RFEMNodalSupport))
                     return ReadRFEMNodalSupports(ids as dynamic);
-                else if (type == typeof(RFEMLineSupport))
-                    return ReadLineSupports(ids as dynamic);
                 else if (type == typeof(RFEMHinge))
                     return ReadRFEMHinges(ids as dynamic);
                 else if (type == typeof(ISectionProperty) || type.GetInterfaces().Contains(typeof(ISectionProperty)))
@@ -104,8 +105,11 @@ namespace BH.Adapter.RFEM6
                     loadList.AddRange(ReadAreaLoad(ids as dynamic));
                     return loadList;
                 }
-                //else if (type == typeof(GeometricalLineLoad))
-                //return ReadLineLoad(ids as dynamic);
+                else if (type == typeof(NodeResultRequest))
+                {
+                    BH.Engine.Base.Compute.RecordError("Pull Of Results can not be filtered by type. Please use the 'NodeResultRequest' component instead.");
+                    return null;
+                }
             }
             finally
             {
