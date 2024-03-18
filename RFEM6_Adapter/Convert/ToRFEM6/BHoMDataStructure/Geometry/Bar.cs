@@ -39,11 +39,14 @@ namespace BH.Adapter.RFEM6
         public static rfModel.member ToRFEM6(this Bar bar)
         {
             Object bhComment="";
-            bar.CustomData.TryGetValue("Comment", out bhComment);
-           
+
+            if (bar.CustomData.Count != 0)
+            {
+                bar.CustomData.TryGetValue("Comment", out bhComment);
+            }
 
 
-            
+
 
             rfModel.member rfMember = new rfModel.member()
             {

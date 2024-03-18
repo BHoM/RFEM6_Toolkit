@@ -40,7 +40,11 @@ namespace BH.Adapter.RFEM6
         public static rfModel.node ToRFEM6(this Node node)
         {
             Object bhComment = "";
-            node.CustomData.TryGetValue("Comment", out bhComment);
+            if (node.CustomData.Count != 0)
+            {
+                node.CustomData.TryGetValue("Comment", out bhComment);
+            }
+
 
             rfModel.node rfNode = new rfModel.node()
             {
