@@ -62,7 +62,7 @@ namespace BH.Adapter.RFEM6
                 boundary_lines = edgeIdList.ToArray(),
                 type = surface_type.TYPE_STANDARD,
                 typeSpecified = true,
-                comment = (String)(bhComment==null ? "" : $"BHComment:{bhComment}"),
+                comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
 
             };
 

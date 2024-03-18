@@ -58,8 +58,8 @@ namespace BH.Adapter.RFEM6
                 section_start = bar.SectionProperty.GetRFEM6ID(),
                 section_startSpecified = true,
                 section_endSpecified = true,
-                comment = (String)(bhComment==null ? "" : $"BHComment:{bhComment}"),
-               
+                comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
+
             };
 
             return rfMember;

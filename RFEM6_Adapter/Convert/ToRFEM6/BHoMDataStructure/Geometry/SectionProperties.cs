@@ -144,7 +144,7 @@ namespace BH.Adapter.RFEM6
                         manufacturing_typeSpecified = true,
                         thin_walled_model = true,
                         thin_walled_modelSpecified = true,
-                        comment = (String)(bhComment==null ? "" : $"BHComment:{bhComment}"),    
+                        comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
                     };
 
                 }
@@ -165,7 +165,7 @@ namespace BH.Adapter.RFEM6
                         manufacturing_type = rfModel.section_manufacturing_type.MANUFACTURING_TYPE_WELDED,
                         manufacturing_typeSpecified = true,
                         name = bhSection.Name, // width as in RFEM
-                        comment = (String)(bhComment == null ? "" : $"BHComment:{bhComment}"),
+                        comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
 
                     };
 
@@ -185,7 +185,7 @@ namespace BH.Adapter.RFEM6
                     parametrization_type = GetParametrizationType(bhSection, materialType),
                     parametrization_typeSpecified = true,
                     name = bhSection.Name, // width/height as in RFEM, SI units
-                    comment = (String)(bhComment == null ? "" : $"BHComment:{bhComment}") 
+                    comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
                 };
 
             }

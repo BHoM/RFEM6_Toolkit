@@ -55,7 +55,7 @@ namespace BH.Adapter.RFEM6
             {
                 no = bhOpening.GetRFEM6ID(),
                 boundary_lines = bhOpening.Edges.Select(b => b.GetRFEM6ID()).ToArray(),
-                comment = (String)(bhComment == null ? bhComment : $"BHComment:{bhComment}"),
+                comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
             };
             return rfSurface;
         }

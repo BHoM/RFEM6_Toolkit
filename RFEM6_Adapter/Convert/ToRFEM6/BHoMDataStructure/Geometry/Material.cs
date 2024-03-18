@@ -55,7 +55,7 @@ namespace BH.Adapter.RFEM6
             {
                 no = material.GetRFEM6ID(),
                 name = materialName,
-                comment = (String)(bhComment==null ? "" : $"BHComment:{bhComment}"),
+                comment = (String)(bhComment==null||bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
                 material_type = materialType
             };
 
