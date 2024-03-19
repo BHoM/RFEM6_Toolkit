@@ -35,6 +35,7 @@ using BH.oM.Adapters.RFEM6;
 using rfModel = Dlubal.WS.Rfem6.Model;
 using System.Text.RegularExpressions;
 using BH.oM.Spatial.ShapeProfiles;
+using BH.oM.Analytical.Elements;
 
 namespace BH.Adapter.RFEM6
 {
@@ -49,7 +50,12 @@ namespace BH.Adapter.RFEM6
             // create section
             int secNo = bhSection.GetRFEM6ID();
             Object bhComment = "";
-            bhSection.CustomData.TryGetValue("Comment", out bhComment);
+            if (bhSection.CustomData.Count != 0)
+            {
+                bhSection.CustomData.TryGetValue("Comment", out bhComment);
+            }
+
+
 
             rfSection = new rfModel.section
             {
@@ -113,7 +119,11 @@ namespace BH.Adapter.RFEM6
 
             int secNo = bhSection.GetRFEM6ID();
             Object bhComment = "";
-            bhSection.CustomData.TryGetValue("Comment", out bhComment);
+
+            if (bhSection.CustomData.Count != 0)
+            {
+                bhSection.CustomData.TryGetValue("Comment", out bhComment);
+            }
 
             if (materialType.Equals("Steel"))
             {
@@ -134,7 +144,7 @@ namespace BH.Adapter.RFEM6
                         manufacturing_typeSpecified = true,
                         thin_walled_model = true,
                         thin_walled_modelSpecified = true,
-                        comment = (String)(bhComment==null ? "" : $"BHComment:{bhComment}"),    
+                        comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
                     };
 
                 }
@@ -155,7 +165,7 @@ namespace BH.Adapter.RFEM6
                         manufacturing_type = rfModel.section_manufacturing_type.MANUFACTURING_TYPE_WELDED,
                         manufacturing_typeSpecified = true,
                         name = bhSection.Name, // width as in RFEM
-                        comment = (String)(bhComment == null ? "" : $"BHComment:{bhComment}"),
+                        comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
 
                     };
 
@@ -175,7 +185,7 @@ namespace BH.Adapter.RFEM6
                     parametrization_type = GetParametrizationType(bhSection, materialType),
                     parametrization_typeSpecified = true,
                     name = bhSection.Name, // width/height as in RFEM, SI units
-                    comment = (String)(bhComment == null ? "" : $"BHComment:{bhComment}") 
+                    comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
                 };
 
             }

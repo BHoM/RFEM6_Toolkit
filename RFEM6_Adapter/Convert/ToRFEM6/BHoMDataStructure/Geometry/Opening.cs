@@ -46,14 +46,16 @@ namespace BH.Adapter.RFEM6
 
             List<int> edgeIdList = new List<int>();
             Object bhComment = "";
-            bhOpening.CustomData.TryGetValue("Comment", out bhComment);
-
+            if (bhOpening.CustomData.Count != 0)
+            {
+                bhOpening.CustomData.TryGetValue("Comment", out bhComment);
+            }
 
             rfModel.opening rfSurface = new opening
             {
                 no = bhOpening.GetRFEM6ID(),
                 boundary_lines = bhOpening.Edges.Select(b => b.GetRFEM6ID()).ToArray(),
-                comment = (String)(bhComment.Equals("") ? bhComment : $"BHComment:{bhComment}"),
+                comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
             };
             return rfSurface;
         }

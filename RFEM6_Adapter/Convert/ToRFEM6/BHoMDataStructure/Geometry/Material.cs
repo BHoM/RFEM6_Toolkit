@@ -32,6 +32,7 @@ using BH.oM.Structure.MaterialFragments;
 
 
 using rfModel = Dlubal.WS.Rfem6.Model;
+using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -41,14 +42,20 @@ namespace BH.Adapter.RFEM6
         {
             rfModel.material_material_type materialType = GetMaterialType(material);
             string materialName = GetMaterialName(material);
+
             Object bhComment = "";
-            material.CustomData.TryGetValue("Comment", out bhComment);
+            if (material.CustomData.Count != 0)
+            {
+                material.CustomData.TryGetValue("Comment", out bhComment);
+            }
+
+
 
             rfModel.material rfMaterial = new rfModel.material
             {
                 no = material.GetRFEM6ID(),
                 name = materialName,
-                comment = (String)(bhComment==null ? "" : $"BHComment:{bhComment}"),
+                comment = (String)(bhComment==null||bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
                 material_type = materialType
             };
 
