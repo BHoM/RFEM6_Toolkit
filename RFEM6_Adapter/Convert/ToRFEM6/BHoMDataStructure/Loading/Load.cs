@@ -42,30 +42,30 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static rfModel.member_load ToRFEM6(this BarUniformlyDistributedLoad bhBarLoad, member_load_load_type nodalLoadType, int id)
+        public static rfModel.member_load ToRFEM6(this BarUniformlyDistributedLoad bhBarLoad, member_load_load_type loadType, int id)
         {
 
             var i = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToList();
 
             double loadMagintude;
             member_load_load_direction loadDirecteion;
-            Vector orientationVector = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
+            Vector orientationVector = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
 
             if (orientationVector.X != 0)
             {
                 loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
-                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Length() : bhBarLoad.Moment.Length();
+                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.X : bhBarLoad.Moment.X;
             }
             else if (orientationVector.Y != 0)
             {
                 loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
-                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? -1 * bhBarLoad.Force.Length() : -1 * bhBarLoad.Moment.Length();
+                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Y :  bhBarLoad.Moment.Y;
 
             }
             else
             {
                 loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
-                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Length() : bhBarLoad.Moment.Length();
+                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Z : bhBarLoad.Moment.Z;
             }
 
             member_load rfLoadCase = new rfModel.member_load()
@@ -75,7 +75,7 @@ namespace BH.Adapter.RFEM6
                 members = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_distribution = member_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
-                load_type = nodalLoadType,
+                load_type = loadType,
                 load_typeSpecified = true,
                 load_direction = loadDirecteion,
                 load_directionSpecified = true,

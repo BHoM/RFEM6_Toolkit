@@ -35,6 +35,7 @@ using BH.oM.Adapters.RFEM6.Fragments.Enums;
 using BH.Engine.Spatial;
 using BH.Engine.Base;
 using BH.oM.Analytical.Elements;
+using BH.Engine.Geometry;
 
 namespace RFEM_Toolkit_Test.Loading
 {
@@ -49,6 +50,10 @@ namespace RFEM_Toolkit_Test.Loading
         Node n2;
         Node n3;
         Node n4;
+        Node n5;
+        Node n6;
+        Node n7;
+        Node n8;
         IMaterialFragment inputSection2;
         IMaterialFragment inputSection1;
         BarEndNodesDistanceComparer comparer;
@@ -57,6 +62,12 @@ namespace RFEM_Toolkit_Test.Loading
         BarRelease release3;
         BarRelease release4;
         Bar bar;
+        Bar bar0;
+        Bar bar1;
+        Bar bar2;
+        Bar bar3;
+        Bar bar4;
+        Bar bar5;
 
 
 
@@ -177,16 +188,7 @@ namespace RFEM_Toolkit_Test.Loading
         [Test]
         public void PullSurfaceLoad()
         {
-            //FilterRequest loadFilter = new FilterRequest() { Type = typeof(AreaUniformlyDistributedLoad) };
-            //var areaLoadRead = adapter.Pull(loadFilter).ToList();
-            //AreaUniformlyDistributedLoad l0 = (AreaUniformlyDistributedLoad) areaLoadRead[0];
-
-
-            //FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
-            //var panelReader = adapter.Pull(panelFilter).ToList();
-            //Panel p0 = (Panel)panelReader[0];
-            //Panel p1 = (Panel)panelReader[1];
-            ////Panel p2 = (Panel)panelReader[2];
+        
 
             n1 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 10 } };
             n2 = new Node() { Position = new Point() { X = 10, Y = 0, Z = 10 } };
@@ -252,6 +254,11 @@ namespace RFEM_Toolkit_Test.Loading
             FilterRequest loadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
             var loads = adapter.Pull(loadFilter).ToList();
             var l0 = (BarUniformlyDistributedLoad)loads[0];
+
+
+
+
+
 
         }
 
@@ -403,26 +410,85 @@ namespace RFEM_Toolkit_Test.Loading
         [Test]
         public void PushPullBarLoad()
         {
-            n1 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
-            n2 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
+            n1= new Node() { Position = new Point() { X = 0, Y = 0, Z = 0 }};
+            n2 = new Node() { Position = new Point() { X = -10, Y = 0 , Z = 0 }};
+            n3 = new Node() { Position = new Point() { X = 10, Y = 0, Z = 0 } };
+            n4 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 10 } };
+
+            n5 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 0 } };
+            n6 = new Node() { Position = new Point() { X = -10, Y = 10, Z = 0 } };
+            n7 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 } };
+            n8 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 10 } };
+
 
             ISectionProperty section1 = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
+            bar0 = new Bar() { Start = n1, End = n2, SectionProperty = section1 };
+            bar1 = new Bar() { Start = n1, End = n3, SectionProperty = section1 };
+            bar2 = new Bar() { Start = n1, End = n4, SectionProperty = section1 };
 
-            bar = new Bar() { Start = n1, End = n2, SectionProperty = section1 };
+            bar3 = new Bar() { Start = n5, End = n6, SectionProperty = section1 };
+            bar4 = new Bar() { Start = n5, End = n7, SectionProperty = section1 };
+            bar5 = new Bar() { Start = n5, End = n8, SectionProperty = section1 };
+
 
 
             //LoadCases
             Loadcase loadcaseDL = new Loadcase() { Name = "DeadLoad", Nature = LoadNature.Dead, Number = 1 };
 
-            var barGroup = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar } };
+            var barGroup = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar0 } };
+            var barGroup0 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar1 } };
+            var barGroup1 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar2 } };
+            var barGroup2 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar3 } };
+            var barGroup3 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar4 } };
+            var barGroup4 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { bar5 } };
+
             var barLoad0 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = barGroup, Loadcase = loadcaseDL, Force = new Vector() { X = 1000, Y = 0, Z = 0 } };
+            var barLoad1 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = barGroup0, Loadcase = loadcaseDL, Force = new Vector() { X = 0, Y = 1000, Z = 0 } };
+            var barLoad2 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = barGroup1, Loadcase = loadcaseDL, Force = new Vector() { X = 0, Y = 0, Z = 1000 } };
 
-            HashSet<ILoad> barloads = new HashSet<ILoad>() { barLoad0 };
+            var barLoad3 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = barGroup2, Loadcase = loadcaseDL, Force = new Vector() { X = -1000, Y = 0, Z = 0 } };
+            var barLoad4 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = barGroup3, Loadcase = loadcaseDL, Force = new Vector() { X = 0, Y = -1000, Z = 0 } };
+            var barLoad5 = new BH.oM.Structure.Loads.BarUniformlyDistributedLoad() { Objects = barGroup4, Loadcase = loadcaseDL, Force = new Vector() { X = 0, Y = 0, Z = -1000 } };
+
+            HashSet<ILoad> barloads = new HashSet<ILoad>() { barLoad0,barLoad1,barLoad2,barLoad3,barLoad4,barLoad5};
 
             adapter.Push(barloads.ToList());
-            adapter.Push(barloads.ToList());
+            
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
+            var readBarLoad = adapter.Pull(loadFilter).ToList();
+
+            Assert.AreEqual(barloads.Count(), readBarLoad.Count());
+
+            BarUniformlyDistributedLoad readBarLoad0 = (BarUniformlyDistributedLoad)readBarLoad[0];
+            Assert.AreEqual(barLoad0.Force.X, readBarLoad0.Force.X);
+            Assert.AreEqual(barLoad0.Force.Y, readBarLoad0.Force.Y);
+            Assert.AreEqual(barLoad0.Force.Z, readBarLoad0.Force.Z);
 
 
+            BarUniformlyDistributedLoad readBarLoad1 = (BarUniformlyDistributedLoad)readBarLoad[1];
+            Assert.AreEqual(barLoad1.Force.X, readBarLoad1.Force.X);
+            Assert.AreEqual(barLoad1.Force.Y, readBarLoad1.Force.Y);
+            Assert.AreEqual(barLoad1.Force.Z, readBarLoad1.Force.Z);
+
+            BarUniformlyDistributedLoad readBarLoad2 = (BarUniformlyDistributedLoad)readBarLoad[2];
+            Assert.AreEqual(barLoad2.Force.X, readBarLoad2.Force.X);
+            Assert.AreEqual(barLoad2.Force.Y, readBarLoad2.Force.Y);
+            Assert.AreEqual(barLoad2.Force.Z, readBarLoad2.Force.Z);
+
+            BarUniformlyDistributedLoad readBarLoad3 = (BarUniformlyDistributedLoad)readBarLoad[3];
+            Assert.AreEqual(barLoad3.Force.X, readBarLoad3.Force.X);
+            Assert.AreEqual(barLoad3.Force.Y, readBarLoad3.Force.Y);
+            Assert.AreEqual(barLoad3.Force.Z, readBarLoad3.Force.Z);
+
+            BarUniformlyDistributedLoad readBarLoad4 = (BarUniformlyDistributedLoad)readBarLoad[4];
+            Assert.AreEqual(barLoad4.Force.X, readBarLoad4.Force.X);
+            Assert.AreEqual(barLoad4.Force.Y, readBarLoad4.Force.Y);
+            Assert.AreEqual(barLoad4.Force.Z, readBarLoad4.Force.Z);
+
+            BarUniformlyDistributedLoad readBarLoad5 = (BarUniformlyDistributedLoad)readBarLoad[5];
+            Assert.AreEqual(barLoad5.Force.X, readBarLoad5.Force.X);
+            Assert.AreEqual(barLoad5.Force.Y, readBarLoad5.Force.Y);
+            Assert.AreEqual(barLoad5.Force.Z, readBarLoad5.Force.Z);
 
 
         }

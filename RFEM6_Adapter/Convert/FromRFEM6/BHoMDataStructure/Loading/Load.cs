@@ -55,8 +55,8 @@ namespace BH.Adapter.RFEM6
             }
             else if (rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_LOCAL_Y)
             {
-                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? -1 * (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
-                forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? -1 * (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
+                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
+                forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
             }
             else
             {
