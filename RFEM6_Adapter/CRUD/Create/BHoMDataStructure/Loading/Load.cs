@@ -48,7 +48,7 @@ namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter
     {
-
+        
         private bool CreateCollection(IEnumerable<ILoad> bhLoads)
         {
             //Container for Potential Surface IDs. Surface IDs are onle relevant when using Free Line Loads
@@ -60,8 +60,11 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is AreaUniformlyDistributedLoad)
                 {
-
+                    // Updating the load dictionary
                     UpdateLoadIdDictionary(bhLoad);
+
+                    //Call Panel Load Methond to update the Panel ID Dictionary
+                    this.GetCachedOrReadAsDictionary<int, Panel>();
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     surface_load rfemAreaLoad = (bhLoad as AreaUniformlyDistributedLoad).ToRFEM6(id);
                     var currrSurfaceIds = (bhLoad as AreaUniformlyDistributedLoad).Objects.Elements.ToList().Select(e => m_PanelIDdict[e as Panel]).ToArray();
