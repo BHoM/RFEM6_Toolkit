@@ -55,6 +55,7 @@ namespace BH.Adapter.RFEM6
             IEnumerable<rfModel.member_load> foundLoadCases = numbers.SelectMany(n => n.children.ToList().Select(child => m_Model.get_member_load(child, n.no)));
 
             List<ILoad> loadCases = new List<ILoad>();
+            foundLoadCases=foundLoadCases.OrderBy(n => n.load_case).ThenBy(t=>t.no);
             foreach (rfModel.member_load memberLoad in foundLoadCases)
             {
 

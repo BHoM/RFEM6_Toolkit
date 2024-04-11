@@ -64,14 +64,29 @@ namespace BH.Adapter.RFEM6
                 forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? new Vector() { X = 0, Y = 0, Z = rfMemberLoad.magnitude } : new Vector() { X = 0, Y = 0, Z = 0 };
             }
 
+            LoadAxis axis = LoadAxis.Global;
+            bool isProjected = false;   
+            if (rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_X) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Y) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Z)) {
+                axis = LoadAxis.Local;            
+
+            }
+            else if (rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED))
+            {
+                isProjected = true;
+            }   
+
+
+
             BarUniformlyDistributedLoad bhLoad = new BarUniformlyDistributedLoad
             {
-                Name=rfMemberLoad.comment,
+                Name = rfMemberLoad.comment,
                 Objects = new BH.oM.Base.BHoMGroup<Bar>() { Elements = bhBars },
                 Loadcase = bhLoadCase,
                 Force = forceVector,
-                Moment = momentVector
-                
+                Moment = momentVector,
+                Axis = axis,
+                Projected = isProjected
+
             };
 
             return bhLoad;
@@ -110,7 +125,7 @@ namespace BH.Adapter.RFEM6
                 Loadcase = bhLoadCase,
                 Force = BH.Engine.Geometry.Create.Vector(force[0], force[1], force[2]),
                 Moment = BH.Engine.Geometry.Create.Vector(moment[0], moment[1], moment[2]),
-                Name= nodeLoad.comment
+                Name = nodeLoad.comment
             };
 
 
@@ -194,7 +209,7 @@ namespace BH.Adapter.RFEM6
             }
 
 
-            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels,LoadAxis.Global,isProjected,surfaceload.comment);
+            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels, LoadAxis.Global, isProjected, surfaceload.comment);
 
             return bhAreaload;
         }
@@ -208,7 +223,7 @@ namespace BH.Adapter.RFEM6
 
             GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
             {
-                Name=rfLineload.comment,
+                Name = rfLineload.comment,
                 Loadcase = loadcase,
                 Location = line,
                 ForceA = BH.Engine.Geometry.Create.Vector(0, 0, rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform),
@@ -257,7 +272,7 @@ namespace BH.Adapter.RFEM6
 
             GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
             {
-                Name=rfLineload.comment,
+                Name = rfLineload.comment,
                 Loadcase = loadcase,
                 Location = line,
                 ForceA = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_FORCE ? impactA : new Vector(),
@@ -272,7 +287,7 @@ namespace BH.Adapter.RFEM6
             return bhLineLoad;
         }
 
-        
+
 
     }
 }

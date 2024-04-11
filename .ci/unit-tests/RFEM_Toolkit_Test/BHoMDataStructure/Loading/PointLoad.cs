@@ -92,47 +92,90 @@ namespace RFEM_Toolkit_Test.Elements
             pointLoad4 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, Vector.YAxis);
             pointLoad5 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, Vector.ZAxis);
 
-            pointLoad6 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, Vector.XAxis, null);
-            pointLoad7 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, Vector.YAxis, null);
-            pointLoad8 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, Vector.ZAxis, null);
-            pointLoad9 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, Vector.XAxis);
-            pointLoad10 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, Vector.YAxis);
-            pointLoad11 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, Vector.ZAxis);
+            //pointLoad6 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, BH.Engine.Geometry.Modify.Reverse(Vector.XAxis), null);
+            //pointLoad7 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, BH.Engine.Geometry.Modify.Reverse(Vector.YAxis), null);
+            //pointLoad8 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, BH.Engine.Geometry.Modify.Reverse(Vector.ZAxis), null);
+            //pointLoad9 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, BH.Engine.Geometry.Modify.Reverse(Vector.XAxis));
+            //pointLoad10 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, BH.Engine.Geometry.Modify.Reverse(Vector.YAxis));
+            //pointLoad11 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, BH.Engine.Geometry.Modify.Reverse(Vector.ZAxis));
 
+            pointLoad6 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, new Vector() { X = -1, Y = 0, Z = 0 }, null);
+            pointLoad7 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, new Vector() { X = 0, Y = -1, Z = 0 }, null);
+            pointLoad8 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, new Vector() { X = 0, Y = 0, Z = -1 }, null);
+            pointLoad9 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, new Vector() { X = -1, Y = 0, Z = 0 });
+            pointLoad10 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, new Vector() { X = 0, Y = -1, Z = 0 });
+            pointLoad11 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, null, new Vector() { X = 0, Y = 0, Z = -1 });
 
+            BH.Engine.Geometry.Modify.Reverse(Vector.XAxis);
 
         }
 
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //    adapter.Wipeout();
-        //}
-        [Test]
-        public void PushPullGroups()
+        [TearDown]
+        public void TearDown()
         {
-            //adapter.Push(new List<IBHoMObject>() { pointLoad0, pointLoad1, pointLoad2, pointLoad3, pointLoad4, pointLoad5 });
-
-
-
+            adapter.Wipeout();
         }
 
+
         [Test]
-        public void PushPullOrientationTest()
+        public void PushPullOrientationTest_AxisParallel()
         {
             adapter.Push(new List<IBHoMObject>() { pointLoad0, pointLoad1, pointLoad2, pointLoad3, pointLoad4, pointLoad5 });
             FilterRequest pointLoadFilter = new FilterRequest() { Type = typeof(PointLoad) };
-            var x = adapter.Pull(pointLoadFilter);
-            //List<PointLoad> pulledPointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p=>(PointLoad)p).ToList();
+            List<PointLoad> pointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p => (PointLoad)p).ToList();
 
-            //Assert.IsTrue(((PointLoad)pulledPointLoad[0]).Force.X==pointLoad0.Force.X);
-            Assert.IsTrue(((PointLoad)x.First()).Force.X == (pointLoad0.Force.X));
-            Assert.IsTrue(((PointLoad)x.First()).Force.Y == (pointLoad0.Force.Y));
-            Assert.IsTrue(((PointLoad)x.First()).Force.Z == (pointLoad0.Force.Z));
+            Assert.IsTrue((pointLoad[0]).Force == (pointLoad0.Force));
+            Assert.IsTrue((pointLoad[0]).Moment == (pointLoad0.Moment));
 
+            Assert.IsTrue((pointLoad[1]).Force == (pointLoad1.Force));
+            Assert.IsTrue((pointLoad[1]).Moment == (pointLoad1.Moment));
+
+            Assert.IsTrue((pointLoad[2]).Force == (pointLoad2.Force));
+            Assert.IsTrue((pointLoad[2]).Moment == (pointLoad2.Moment));
+
+            Assert.IsTrue((pointLoad[3]).Force == (pointLoad3.Force));
+            Assert.IsTrue((pointLoad[3]).Moment == (pointLoad3.Moment));
+
+            Assert.IsTrue((pointLoad[4]).Force == (pointLoad4.Force));
+            Assert.IsTrue((pointLoad[4]).Moment == (pointLoad4.Moment));
+
+            Assert.IsTrue((pointLoad[5]).Force == (pointLoad5.Force));
+            Assert.IsTrue((pointLoad[5]).Moment == (pointLoad5.Moment));
 
 
         }
+
+
+        [Test]
+        public void PushPullOrientationTest_AntiAxisParallel()
+        {
+            adapter.Push(new List<IBHoMObject>() { pointLoad6, pointLoad7, pointLoad8, pointLoad9, pointLoad10, pointLoad11 });
+            FilterRequest pointLoadFilter = new FilterRequest() { Type = typeof(PointLoad) };
+            List<PointLoad> pointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p => (PointLoad)p).ToList();
+
+            Assert.IsTrue((pointLoad[0]).Force == (pointLoad6.Force));
+            Assert.IsTrue((pointLoad[0]).Moment == (pointLoad6.Moment));
+
+
+            Assert.IsTrue((pointLoad[1]).Force == (pointLoad7.Force));
+            Assert.IsTrue((pointLoad[1]).Moment == (pointLoad7.Moment));
+
+
+            Assert.IsTrue((pointLoad[2]).Force == (pointLoad8.Force));
+            Assert.IsTrue((pointLoad[2]).Moment == (pointLoad8.Moment));
+
+            Assert.IsTrue((pointLoad[3]).Force == (pointLoad9.Force));
+            Assert.IsTrue((pointLoad[3]).Moment == (pointLoad9.Moment));
+
+            Assert.IsTrue((pointLoad[4]).Force == (pointLoad10.Force));
+            Assert.IsTrue((pointLoad[4]).Moment == (pointLoad10.Moment));
+
+            Assert.IsTrue((pointLoad[5]).Force == (pointLoad11.Force));
+            Assert.IsTrue((pointLoad[5]).Moment == (pointLoad11.Moment));
+
+
+        }
+
 
         //[Test]
         //public void DoublePushPullOfOpenings()

@@ -50,28 +50,64 @@ namespace BH.Adapter.RFEM6
             double loadMagintude;
             member_load_load_direction loadDirecteion;
             Vector orientationVector = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
-
+            // Checkinf if Load is Orientied in X directin
             if (orientationVector.X != 0)
             {
-                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                // If the load Axis in slocal the load direction is local x
+                if (bhBarLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                }
+                else if (bhBarLoad.Projected&&loadType.Equals(member_load_load_type.LOAD_TYPE_FORCE))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED;
+                }
+                else
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                }
                 loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.X : bhBarLoad.Moment.X;
+
+
             }
             else if (orientationVector.Y != 0)
             {
-                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
-                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Y :  bhBarLoad.Moment.Y;
+                if (bhBarLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                }
+                else if (bhBarLoad.Projected && loadType.Equals(member_load_load_type.LOAD_TYPE_FORCE))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED;
+                }
+                else
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+                }
+                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Y : bhBarLoad.Moment.Y;
 
             }
             else
             {
-                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                if (bhBarLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                }
+                else if (bhBarLoad.Projected && loadType.Equals(member_load_load_type.LOAD_TYPE_FORCE))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED;
+                }
+                else
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+                }
                 loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Z : bhBarLoad.Moment.Z;
             }
 
             member_load rfLoadCase = new rfModel.member_load()
             {
                 no = id,
-                comment=bhBarLoad.Name,
+                comment = bhBarLoad.Name,
                 members = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_distribution = member_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
@@ -104,7 +140,7 @@ namespace BH.Adapter.RFEM6
             {
 
                 no = id,
-                comment=bhPointLoad.Name,
+                comment = bhPointLoad.Name,
                 nodes = bhPointLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 //load_direction = loadDirecteion,
                 //load_directionSpecified = true,
@@ -151,19 +187,19 @@ namespace BH.Adapter.RFEM6
             else if (orientationVector.Y != 0)
             {
                 loadDirection = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
-                    magnitude = bhAreaLoad.Pressure.Y;
+                magnitude = bhAreaLoad.Pressure.Y;
             }
             else
             {
                 loadDirection = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
-                    magnitude = bhAreaLoad.Pressure.Z;
+                magnitude = bhAreaLoad.Pressure.Z;
             }
 
 
             surface_load rfSurfaceLoad = new rfModel.surface_load()
             {
                 no = loadCaseSpecificLoadId,
-                comment=bhAreaLoad.Name,
+                comment = bhAreaLoad.Name,
                 surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
                 load_case = bhAreaLoad.Loadcase.GetRFEM6ID(),
                 load_caseSpecified = true,
@@ -243,7 +279,7 @@ namespace BH.Adapter.RFEM6
                 load_location_second_xSpecified = true,
                 load_location_second_y = bhLineLoad.Location.End.Y,
                 load_location_second_ySpecified = true,
-                comment= bhLineLoad.Name,
+                comment = bhLineLoad.Name,
 
             };
 
@@ -263,7 +299,7 @@ namespace BH.Adapter.RFEM6
             double loadMagnitude2;
             if (rfLineLoadType.Equals(rfModel.line_load_load_type.LOAD_TYPE_MOMENT))
             {
-                if (bhLineLoad.MomentA.X != 0||bhLineLoad.MomentB.X!=0)
+                if (bhLineLoad.MomentA.X != 0 || bhLineLoad.MomentB.X != 0)
                 {
                     rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
                     loadMagnitude1 = bhLineLoad.MomentA.X;
@@ -284,7 +320,7 @@ namespace BH.Adapter.RFEM6
             }
             else
             {
-                if (bhLineLoad.ForceA.X != 0|| bhLineLoad.ForceB.X != 0)
+                if (bhLineLoad.ForceA.X != 0 || bhLineLoad.ForceB.X != 0)
                 {
                     rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
                     loadMagnitude1 = bhLineLoad.ForceA.X;

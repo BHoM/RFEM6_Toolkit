@@ -21,125 +21,405 @@
  */
 using BH.Adapter.RFEM6;
 using BH.Engine.Base;
-using BH.oM.Analytical.Elements;
 using BH.oM.Data.Requests;
+using BH.oM.Structure.MaterialFragments;
+using BH.Engine.Structure;
+using BH.oM.Structure.SectionProperties;
 using BH.oM.Geometry;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.Loads;
+using Dlubal.WS.Rfem6.Model;
+using BH.Engine.Geometry;
+using System.Security.Permissions;
 
 namespace RFEM_Toolkit_Test.Elements
 {
 
 
-    public class BarLoad
-    {
-        RFEM6Adapter adapter;
-        RFEMPanelComparer comparer;
-        Opening opening1;
-        Opening opening2;
-        Panel panel1;
-        Panel panel2;
-        Edge edge1;
-        Edge edge2;
-        Edge edge3;
-        Edge edge4;
-        Edge edge5;
-        Edge edge6;
-        Edge edge7;
-        Edge edge8;
-        Edge edge9;
-        Edge edge10;
-        Edge edge11;
-        Edge edge12;
+    public class BarLoad_Test
 
+    {
+
+        RFEM6Adapter adapter;
+
+        Line line0;
+        Line line1;
+        Line line2;
+        Line line3;
+
+        ISectionProperty steelSection;
+
+        Loadcase loadCase;
+
+        Bar barSteelSection0;
+        Bar barSteelSection1;
+        Bar barSteelSection2;
+        Bar barSteelSection3;
+
+        BH.oM.Base.BHoMGroup<Bar> barGroup0;
+        BH.oM.Base.BHoMGroup<Bar> barGroup1;
+        BH.oM.Base.BHoMGroup<Bar> barGroup2;
+        BH.oM.Base.BHoMGroup<Bar> barGroup3;
+        BH.oM.Base.BHoMGroup<Bar> barGroup4;
+        BH.oM.Base.BHoMGroup<Bar> barGroup5;
+
+        BarUniformlyDistributedLoad barLoad0;
+        BarUniformlyDistributedLoad barLoad1;
+        BarUniformlyDistributedLoad barLoad2;
+        BarUniformlyDistributedLoad barLoad3;
+        BarUniformlyDistributedLoad barLoad4;
+        BarUniformlyDistributedLoad barLoad5;
+        BarUniformlyDistributedLoad barLoad6;
+        BarUniformlyDistributedLoad barLoad7;
+        BarUniformlyDistributedLoad barLoad8;
+
+        BarUniformlyDistributedLoad barLoad9;
+        BarUniformlyDistributedLoad barLoad10;
+        BarUniformlyDistributedLoad barLoad11;
+        BarUniformlyDistributedLoad barLoad12;
+        BarUniformlyDistributedLoad barLoad13;
+        BarUniformlyDistributedLoad barLoad14;
+        BarUniformlyDistributedLoad barLoad15;
+        BarUniformlyDistributedLoad barLoad16;
+        BarUniformlyDistributedLoad barLoad17;
+
+
+        BarUniformlyDistributedLoad barLoad18;
+        BarUniformlyDistributedLoad barLoad19;
+        BarUniformlyDistributedLoad barLoad20;
+        BarUniformlyDistributedLoad barLoad21;
+        BarUniformlyDistributedLoad barLoad22;
+        BarUniformlyDistributedLoad barLoad23;
+        BarUniformlyDistributedLoad barLoad24;
+        BarUniformlyDistributedLoad barLoad25;
+        BarUniformlyDistributedLoad barLoad26;
+
+        BarUniformlyDistributedLoad barLoad27;
+        BarUniformlyDistributedLoad barLoad28;
+        BarUniformlyDistributedLoad barLoad29;
+        BarUniformlyDistributedLoad barLoad30;
+        BarUniformlyDistributedLoad barLoad31;
+        BarUniformlyDistributedLoad barLoad32;
+        BarUniformlyDistributedLoad barLoad33;
+        BarUniformlyDistributedLoad barLoad34;
+        BarUniformlyDistributedLoad barLoad35;
+
+        List<BarUniformlyDistributedLoad> axisAlForces = new List<BarUniformlyDistributedLoad>();
+        List<BarUniformlyDistributedLoad> axisAlMoments = new List<BarUniformlyDistributedLoad>();
+        List<BarUniformlyDistributedLoad> revAxisAlForces = new List<BarUniformlyDistributedLoad>();
+        List<BarUniformlyDistributedLoad> revAxisAlMoments = new List<BarUniformlyDistributedLoad>();
+
+
+
+        //[TearDown]
+        //public void TearDown()
+        //{
+        //    adapter.Wipeout();
+        //}
+
+        [SetUp]
+        public void EveryTimeSetUp()
+        {
+            //adapter = new RFEM6Adapter(true);
+            adapter.Push(new List<Bar>() { barSteelSection0, barSteelSection1, barSteelSection2 });
+        }
 
         [OneTimeSetUp]
-        public void InitializeOpenings()
+        public void SetUpScenario()
         {
             adapter = new RFEM6Adapter(true);
-        }
 
-        [TearDown]
-        public void TearDown()
-        {
-            adapter.Wipeout();
+            //Set Up Sections
+            steelSection = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
+
+            //Line
+            line0 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 5 }, new Point() { X = 10, Y = 0, Z = 0 });
+            line1 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 5 }, new Point() { X = 0, Y = 10, Z = 0 });
+            line2 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 5 }, new Point() { X = -10, Y = 0, Z = 0 });
+            line3 = BH.Engine.Geometry.Create.Line(new Point() { X = 0, Y = 0, Z = 5 }, new Point() { X = 0, Y = -10, Z = 0 });
+
+            // Bar
+            barSteelSection0 = BH.Engine.Structure.Create.Bar(line0, steelSection, 0);
+            barSteelSection1 = BH.Engine.Structure.Create.Bar(line1, steelSection, 0);
+            barSteelSection2 = BH.Engine.Structure.Create.Bar(line2, steelSection, 0);
+            barSteelSection3 = BH.Engine.Structure.Create.Bar(line3, steelSection, 0);
+
+            // Push Bars to RFEM
+            //adapter.Push(new List<Bar>() { barSteelSection0, barSteelSection1, barSteelSection2, barSteelSection3 });
+
+            // Defining Loadcase
+            loadCase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead };
+
+            // Defining group
+            barGroup0 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { barSteelSection0 } };
+            barGroup1 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { barSteelSection1 } };
+            barGroup2 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { barSteelSection2 } };
+            barGroup3 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { barSteelSection3 } };
+
+            //Defining Loads
+            // Forces
+            barLoad0 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, Vector.XAxis * 100, null, LoadAxis.Global, false);
+            barLoad1 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, Vector.XAxis * 100, null, LoadAxis.Global, true);
+            barLoad2 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, Vector.XAxis * 100, null, LoadAxis.Local, false);
+            barLoad3 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, Vector.YAxis * 100, null, LoadAxis.Global, false);
+            barLoad4 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, Vector.YAxis * 100, null, LoadAxis.Global, true);
+            barLoad5 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, Vector.YAxis * 100, null, LoadAxis.Local, false);
+            barLoad6 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, Vector.ZAxis * 100, null, LoadAxis.Global, false);
+            barLoad7 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, Vector.ZAxis * 100, null, LoadAxis.Global, true);
+            barLoad8 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, Vector.ZAxis * 100, null, LoadAxis.Local, false);
+
+            axisAlForces = new List<BarUniformlyDistributedLoad>() { barLoad0, barLoad1, barLoad2, barLoad3, barLoad4, barLoad5, barLoad6, barLoad7, barLoad8 };
+
+            // Moments
+            barLoad9 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis * 100, LoadAxis.Global, false);
+            barLoad10 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis * 100, LoadAxis.Global, true);
+            barLoad11 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis * 100, LoadAxis.Local, false);
+            barLoad12 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis * 100, LoadAxis.Global, false);
+            barLoad13 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis * 100, LoadAxis.Global, true);
+            barLoad14 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis * 100, LoadAxis.Local, false);
+            barLoad15 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis * 100, LoadAxis.Global, false);
+            barLoad16 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis * 100, LoadAxis.Global, true);
+            barLoad17 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis * 100, LoadAxis.Local, false);
+            axisAlMoments = new List<BarUniformlyDistributedLoad>() { barLoad9, barLoad10, barLoad11, barLoad12, barLoad13, barLoad14, barLoad15, barLoad16, barLoad17 };
+
+            //// Reversed - Forces
+            // Forces
+            barLoad18 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, Vector.XAxis.Reverse() * 100, null, LoadAxis.Global, false);
+            barLoad19 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, Vector.XAxis.Reverse() * 100, null, LoadAxis.Global, true);
+            barLoad20 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, Vector.XAxis.Reverse() * 100, null, LoadAxis.Local, false);
+            barLoad21 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, Vector.YAxis.Reverse() * 100, null, LoadAxis.Global, false);
+            barLoad22 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, Vector.YAxis.Reverse() * 100, null, LoadAxis.Global, true);
+            barLoad23 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, Vector.YAxis.Reverse() * 100, null, LoadAxis.Local, false);
+            barLoad24 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, Vector.ZAxis.Reverse() * 100, null, LoadAxis.Global, false);
+            barLoad25 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, Vector.ZAxis.Reverse() * 100, null, LoadAxis.Global, true);
+            barLoad26 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, Vector.ZAxis.Reverse() * 100, null, LoadAxis.Local, false);
+
+            revAxisAlForces = new List<BarUniformlyDistributedLoad>() { barLoad18, barLoad19, barLoad20, barLoad21, barLoad22, barLoad23, barLoad24, barLoad25, barLoad26 };
+
+            //// Reversed - Moments
+            barLoad27 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis * 100, LoadAxis.Global, false);
+            barLoad28 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis * 100, LoadAxis.Global, true);
+            barLoad29 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis * 100, LoadAxis.Local, false);
+            barLoad30 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis * 100, LoadAxis.Global, false);
+            barLoad31 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis * 100, LoadAxis.Global, true);
+            barLoad32 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis * 100, LoadAxis.Local, false);
+            barLoad33 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis * 100, LoadAxis.Global, false);
+            barLoad34 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis * 100, LoadAxis.Global, true);
+            barLoad35 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis * 100, LoadAxis.Local, false);
+            revAxisAlMoments = new List<BarUniformlyDistributedLoad>() { barLoad27, barLoad28, barLoad29, barLoad30, barLoad31, barLoad32, barLoad33, barLoad34, barLoad35 };
         }
 
         [Test]
-        public void SinglePushPullOfOpening()
+        public void PushPullOrientationTestAxisParallelForces()
         {
-            comparer = new RFEMPanelComparer();
-            // Create Panel 1
-            edge1 = new Edge() { Curve = new Line() { Start = new Point() { X = 10, Y = 10, Z = 0 }, End = new Point() { X = 10, Y = 20, Z = 0 } } };
-            edge2 = new Edge() { Curve = new Line() { Start = new Point() { X = 5, Y = 10, Z = 0 }, End = new Point() { X = 10, Y = 10, Z = 0 } } };
-            edge3 = new Edge() { Curve = new Line() { Start = new Point() { X = 10, Y = 20, Z = 0 }, End = new Point() { X = 5, Y = 10, Z = 0 } } };
-            opening1 = new Opening() { Edges = new List<Edge>() { edge1, edge2, edge3 } };
-            edge4 = new Edge() { Curve = new Line() { Start = new Point() { X = 2, Y = 5, Z = 0 }, End = new Point() { X = 12, Y = 5, Z = 0 } } };
-            edge5 = new Edge() { Curve = new Line() { Start = new Point() { X = 12, Y = 5, Z = 0 }, End = new Point() { X = 12, Y = 25, Z = 0 } } };
-            edge6 = new Edge() { Curve = new Line() { Start = new Point() { X = 12, Y = 25, Z = 0 }, End = new Point() { X = 2, Y = 25, Z = 0 } } };
-            edge7 = new Edge() { Curve = new Line() { Start = new Point() { X = 2, Y = 25, Z = 0 }, End = new Point() { X = 2, Y = 5, Z = 0 } } };
-            var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
-            var steel = BH.Engine.Library.Query.Match("Steel", "S235", true, true) as IMaterialFragment;
-            panel1 = new Panel() { ExternalEdges = new List<Edge>() { edge4, edge5, edge6, edge7 }, Openings = new List<Opening>() { opening1 },Property=new BH.oM.Structure.SurfaceProperties.ConstantThickness() {Thickness=0.1,Material=concrete } };
+            //Act
+            adapter.Push(axisAlForces);
+
+            FilterRequest pointLoadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
+            List<BarUniformlyDistributedLoad> pointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p => (BarUniformlyDistributedLoad)p).ToList();
+
+            //Assert
+            int i = 0;
+            Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 1;
+            Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 2;
+            Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 3;
+            Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 4;
+            Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 5;
+            Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 6;
+            Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 7;
+            Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 8;
+            Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
 
 
-            // Push panel 
-            adapter.Push(new List<Panel>() { panel1 });
 
-            // Pull it
-            FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
-            var panelPulled = adapter.Pull(panelFilter).ToList();
-            Panel pp = (Panel)panelPulled[0];
-
-            // Check
-            Assert.IsNotNull(pp);
-            Assert.IsTrue(comparer.Equals(pp, panel1));
         }
 
         [Test]
-        public void DoublePushPullOfOpenings()
+        public void PushPullOrientationTestAxisParallelMoments()
         {
-            comparer = new RFEMPanelComparer();
-            var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
-            var steel = BH.Engine.Library.Query.Match("Steel", "S235", true, true) as IMaterialFragment;
-            // Create Panel 1
-            edge1 = new Edge() { Curve = new Line() { Start = new Point() { X = 10, Y = 10, Z = 0 }, End = new Point() { X = 10, Y = 20, Z = 0 } } };
-            edge2 = new Edge() { Curve = new Line() { Start = new Point() { X = 5, Y = 10, Z = 0 }, End = new Point() { X = 10, Y = 10, Z = 0 } } };
-            edge3 = new Edge() { Curve = new Line() { Start = new Point() { X = 10, Y = 20, Z = 0 }, End = new Point() { X = 5, Y = 10, Z = 0 } } };
-            opening1 = new Opening() { Edges = new List<Edge>() { edge1, edge2, edge3 } };
-            edge4 = new Edge() { Curve = new Line() { Start = new Point() { X = 2, Y = 5, Z = 0 }, End = new Point() { X = 12, Y = 5, Z = 0 } } };
-            edge5 = new Edge() { Curve = new Line() { Start = new Point() { X = 12, Y = 5, Z = 0 }, End = new Point() { X = 12, Y = 25, Z = 0 } } };
-            edge6 = new Edge() { Curve = new Line() { Start = new Point() { X = 12, Y = 25, Z = 0 }, End = new Point() { X = 2, Y = 25, Z = 0 } } };
-            edge7 = new Edge() { Curve = new Line() { Start = new Point() { X = 2, Y = 25, Z = 0 }, End = new Point() { X = 2, Y = 5, Z = 0 } } };
-            panel1 = new Panel() { ExternalEdges = new List<Edge>() { edge4, edge5, edge6, edge7 }, Openings = new List<Opening>() { opening1 }, Property = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = concrete } };
-            // Create Panel 2
-            edge8 = new Edge() { Curve = new Circle() { Centre = new Point() { X = 0, Y = 0, Z = 5 }, Radius = 1 } };
-            opening2 = new Opening() { Edges = new List<Edge>() { edge4 } };
-            edge9 = new Edge() { Curve = new Line() { Start = new Point() { X = 2, Y = 2, Z = 5 }, End = new Point() { X = -2, Y = 2, Z = 5 } } };
-            edge10 = new Edge() { Curve = new Line() { Start = new Point() { X = -2, Y = 2, Z = 5 }, End = new Point() { X = -2, Y = -2, Z = 5 } } };
-            edge11 = new Edge() { Curve = new Line() { Start = new Point() { X = -2, Y = -2, Z = 5 }, End = new Point() { X = 2, Y = -2, Z = 5 } } };
-            edge12 = new Edge() { Curve = new Line() { Start = new Point() { X = 2, Y = -2, Z = 5 }, End = new Point() { X = 2, Y = 2, Z = 5 } } };
-            panel2 = new Panel() { ExternalEdges = new List<Edge>() { edge9, edge10, edge11, edge12 }, Openings = new List<Opening>() { opening2 }, Property = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = steel } };
-            adapter.Push(new List<Panel>() { panel1 });
+            //Act
+            adapter.Push(axisAlMoments);
 
-            adapter.Push(new List<Panel>() { panel1, panel2 });
+            FilterRequest pointLoadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
+            List<BarUniformlyDistributedLoad> pointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p => (BarUniformlyDistributedLoad)p).ToList();
 
+            //Assert
+            int i = 0;
+            Assert.True(axisAlMoments[i].Moment.Equals(pointLoad[i].Moment));
+            Assert.True(axisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
 
-            // Pull it
-            FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
-            var panelsPulled = adapter.Pull(panelFilter).ToList();
-            Panel pp1 = (Panel)panelsPulled[0];
-            Panel pp2 = (Panel)panelsPulled[1];
+            i = 1;
+            Assert.True(axisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
 
-            // Check
-            Assert.IsNotNull(pp1);
-            Assert.IsNotNull(pp2);
-            Assert.IsTrue(comparer.Equals(pp1, panel1));
-            Assert.IsTrue(comparer.Equals(pp2, panel2));
-            Assert.AreEqual(panelsPulled.Count, 2);
+            i = 2;
+            Assert.True(axisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 3;
+            Assert.True(axisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 4;
+            Assert.True(axisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 5;
+            Assert.True(axisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 6;
+            Assert.True(axisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 7;
+            Assert.True(axisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 8;
+            Assert.True(axisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(axisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
         }
+
+
+        [Test]
+        public void PushPullOrientationTestAntiAxisParallelForces()
+        {
+
+            //Act
+            adapter.Push(revAxisAlForces);
+
+            FilterRequest pointLoadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
+            List<BarUniformlyDistributedLoad> pointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p => (BarUniformlyDistributedLoad)p).ToList();
+
+            //Assert
+            int i = 0;
+            Assert.True(revAxisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(revAxisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 1;
+            Assert.True(revAxisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(revAxisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 2;
+            Assert.True(revAxisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 3;
+            Assert.True(revAxisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(revAxisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 4;
+            Assert.True(revAxisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(revAxisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 5;
+            Assert.True(revAxisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 6;
+            Assert.True(revAxisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(revAxisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 7;
+            Assert.True(revAxisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+            Assert.True(revAxisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+
+            i = 8;
+            Assert.True(revAxisAlForces[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlForces[i].Axis.Equals(pointLoad[i].Axis));
+
+
+        }
+
+        [Test]
+        public void PushPullOrientationTestAntiAxisParallelMoments()
+        {
+
+            //Act
+            adapter.Push(revAxisAlMoments);
+
+            FilterRequest pointLoadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
+            List<BarUniformlyDistributedLoad> pointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p => (BarUniformlyDistributedLoad)p).ToList();
+
+            //Assert
+            int i = 0;
+            Assert.True(revAxisAlMoments[i].Moment.Equals(pointLoad[i].Moment));
+            Assert.True(revAxisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 1;
+            Assert.True(revAxisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 2;
+            Assert.True(revAxisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 3;
+            Assert.True(revAxisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 4;
+            Assert.True(revAxisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 5;
+            Assert.True(revAxisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 6;
+            Assert.True(revAxisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 7;
+            Assert.True(revAxisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+            i = 8;
+            Assert.True(revAxisAlMoments[i].Force.Equals(pointLoad[i].Force));
+            Assert.True(revAxisAlMoments[i].Axis.Equals(pointLoad[i].Axis));
+
+
+        }
+
+
     }
-
-
 }
