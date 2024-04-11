@@ -197,15 +197,15 @@ namespace RFEM_Toolkit_Test.Elements
             revAxisAlForces = new List<BarUniformlyDistributedLoad>() { barLoad18, barLoad19, barLoad20, barLoad21, barLoad22, barLoad23, barLoad24, barLoad25, barLoad26 };
 
             //// Reversed - Moments
-            barLoad27 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis * 100, LoadAxis.Global, false);
-            barLoad28 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis * 100, LoadAxis.Global, true);
-            barLoad29 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis * 100, LoadAxis.Local, false);
-            barLoad30 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis * 100, LoadAxis.Global, false);
-            barLoad31 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis * 100, LoadAxis.Global, true);
-            barLoad32 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis * 100, LoadAxis.Local, false);
-            barLoad33 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis * 100, LoadAxis.Global, false);
-            barLoad34 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis * 100, LoadAxis.Global, true);
-            barLoad35 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis * 100, LoadAxis.Local, false);
+            barLoad27 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis.Reverse() * 100, LoadAxis.Global, false);
+            barLoad28 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis.Reverse() * 100, LoadAxis.Global, true);
+            barLoad29 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, Vector.XAxis.Reverse() * 100, LoadAxis.Local, false);
+            barLoad30 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis.Reverse() * 100, LoadAxis.Global, false);
+            barLoad31 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis.Reverse() * 100, LoadAxis.Global, true);
+            barLoad32 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup1, null, Vector.YAxis.Reverse() * 100, LoadAxis.Local, false);
+            barLoad33 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis.Reverse() * 100, LoadAxis.Global, false);
+            barLoad34 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis.Reverse() * 100, LoadAxis.Global, true);
+            barLoad35 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis.Reverse() * 100, LoadAxis.Local, false);
             revAxisAlMoments = new List<BarUniformlyDistributedLoad>() { barLoad27, barLoad28, barLoad29, barLoad30, barLoad31, barLoad32, barLoad33, barLoad34, barLoad35 };
         }
 
