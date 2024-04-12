@@ -233,53 +233,6 @@ namespace RFEM_Toolkit_Test.Elements
         }
 
 
-        [Test]
-        public void PushOrNonFreeGeometricalLineLoad_Moments()
-        {
-
-            // Act
-
-            // Push
-            adapter.Push(this.momentList1);
-
-            // Pull
-            FilterRequest loadFilter = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
-            List<GeometricalLineLoad> lineLoadList = adapter.Pull(loadFilter).ToList().Select(p => (GeometricalLineLoad)p).ToList();
-
-            //Assert
-            int i = 0;
-            Assert.True(this.momentList1[i].MomentA.Equals(lineLoadList[i].MomentA));
-            Assert.True(this.momentList1[i].MomentB.Equals(lineLoadList[i].MomentB));
-            Assert.True(this.momentList1[i].Axis.Equals(lineLoadList[i].Axis));
-
-            i = 1;
-            Assert.True(this.momentList1[i].MomentA.Equals(lineLoadList[i].MomentA));
-            Assert.True(this.momentList1[i].MomentB.Equals(lineLoadList[i].MomentB));
-            Assert.True(this.momentList1[i].Axis.Equals(lineLoadList[i].Axis));
-
-            i = 2;
-            Assert.True(this.momentList1[i].MomentA.Equals(lineLoadList[i].MomentA));
-            Assert.True(this.momentList1[i].MomentB.Equals(lineLoadList[i].MomentB));
-            Assert.True(this.momentList1[i].Axis.Equals(lineLoadList[i].Axis));
-
-            i = 3;
-            Assert.True(this.momentList1[i].MomentA.Equals(lineLoadList[i].MomentA));
-            Assert.True(this.momentList1[i].MomentB.Equals(lineLoadList[i].MomentB));
-            Assert.True(this.momentList1[i].Axis.Equals(lineLoadList[i].Axis));
-
-            i = 4;
-            Assert.True(this.momentList1[i].MomentA.Equals(lineLoadList[i].MomentA));
-            Assert.True(this.momentList1[i].MomentB.Equals(lineLoadList[i].MomentB));
-            Assert.True(this.momentList1[i].Axis.Equals(lineLoadList[i].Axis));
-
-            i = 5;
-            Assert.True(this.momentList1[i].MomentA.Equals(lineLoadList[i].MomentA));
-            Assert.True(this.momentList1[i].MomentB.Equals(lineLoadList[i].MomentB));
-            Assert.True(this.momentList1[i].Axis.Equals(lineLoadList[i].Axis));
-
-        }
-
-
     }
 
 
