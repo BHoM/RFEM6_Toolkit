@@ -36,6 +36,9 @@ using BH.Engine.Spatial;
 using Dlubal.WS.Rfem6.Model;
 using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
 using BH.oM.Adapters.RFEM6.Fragments.Enums;
+using System.Linq.Expressions;
+using System.Diagnostics;
+using BH.oM.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -65,15 +68,16 @@ namespace BH.Adapter.RFEM6
             }
 
             LoadAxis axis = LoadAxis.Global;
-            bool isProjected = false;   
-            if (rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_X) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Y) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Z)) {
-                axis = LoadAxis.Local;            
+            bool isProjected = false;
+            if (rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_X) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Y) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Z))
+            {
+                axis = LoadAxis.Local;
 
             }
             else if (rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED))
             {
                 isProjected = true;
-            }   
+            }
 
 
 
@@ -137,7 +141,7 @@ namespace BH.Adapter.RFEM6
 
             Vector forceDirection;
             bool isProjected = false;
-            LoadAxis axis= LoadAxis.Global;
+            LoadAxis axis = LoadAxis.Global;
 
             switch (surfaceload.load_direction)
             {
@@ -196,16 +200,76 @@ namespace BH.Adapter.RFEM6
         {
 
 
-            Line line = new BH.oM.Geometry.Line() { Start = new Point() { X = rfLineload.load_location_first_x, Y = rfLineload.load_location_first_y, Z = 0 }, End = new Point() { X = rfLineload.load_location_second_x, Y = rfLineload.load_location_second_y, Z = 0 } };
+            Line loadLocationLine = new BH.oM.Geometry.Line() { Start = new Point() { X = rfLineload.load_location_first_x, Y = rfLineload.load_location_first_y, Z = 0 }, End = new Point() { X = rfLineload.load_location_second_x, Y = rfLineload.load_location_second_y, Z = 0 } };
+            LoadAxis axis = LoadAxis.Global;
+            bool isProjected = false;
+            Vector impactA = new Vector();
+            Vector impactB = new Vector();
+         
+            switch (rfLineload.load_direction)
+            {
+                case free_line_load_load_direction.LOAD_DIRECTION_LOCAL_X:
+                    impactA.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
+                    impactB.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
+                    axis = LoadAxis.Local;
+                    break;
+                case free_line_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
+                    impactA.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
+                    impactB.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
+                    axis = LoadAxis.Local;
+                    break;
+                case free_line_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
+                    impactA.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
+                    impactB.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
+                    axis = LoadAxis.Local;
+                    break;
+                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE:
+                    impactA.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
+                    impactB.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
+                    break;
+                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE:
+                    impactA.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
+                    impactB.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
+                    break;
+                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE:
+                    impactA.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
+                    impactB.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
+                    break;
+                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_PROJECTED:
+                    impactA.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
+                    impactB.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
+                    isProjected = true;
+                    break;
+                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_PROJECTED:
+                    impactA.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
+                    impactB.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
+                    isProjected = true;
+                    break;
+                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED:
+                    impactA.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
+                    impactB.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
+                    isProjected = true;
+                    break;
+                default:
+                    break;
+
+            }
+
+
+            BHoMGroup<IAreaElement> relatedPanels= new BHoMGroup<IAreaElement>() {Elements=panels.Select(p=>(IAreaElement)p).ToList()};
+
 
             GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
             {
                 Name = rfLineload.comment,
                 Loadcase = loadcase,
-                Location = line,
-                ForceA = BH.Engine.Geometry.Create.Vector(0, 0, rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform),
-                ForceB = BH.Engine.Geometry.Create.Vector(0, 0, rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform),
-
+                Location = loadLocationLine,
+                ForceA = impactA,
+                ForceB = impactB,
+                Axis = axis,
+                Projected = isProjected,
+                Objects= relatedPanels
+                
             };
 
             bhLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(bhLineLoad, (new RFEM6GeometricalLineLoadTypes() { geometrialLineLoadType = GeometricalLineLoadTypesEnum.FreeLineLoad }));
@@ -215,37 +279,69 @@ namespace BH.Adapter.RFEM6
             return bhLineLoad;
         }
 
-        // convert  Line Loads into Geometrical Line Loads
+        // convert NON Free Line Loads into Geometrical Line Loads
         public static GeometricalLineLoad FromRFEM(this rfModel.line_load rfLineload, Loadcase loadcase, Line line)
         {
             Vector impactA = new Vector();
             Vector impactB = new Vector();
             double impactMagnitudeA = rfLineload.load_distribution == line_load_load_distribution.LOAD_DISTRIBUTION_TRAPEZOIDAL ? rfLineload.magnitude_1 : rfLineload.magnitude;
             double impactMagnitudeB = rfLineload.load_distribution == line_load_load_distribution.LOAD_DISTRIBUTION_TRAPEZOIDAL ? rfLineload.magnitude_2 : rfLineload.magnitude;
+            bool projected = false;
+            LoadAxis axis = LoadAxis.Global;
 
-            if (rfLineload.load_direction == line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE)
+
+            switch (rfLineload.load_direction)
             {
-
-                impactA.X = impactMagnitudeA;
-                impactB.X = impactMagnitudeB;
-
+                case line_load_load_direction.LOAD_DIRECTION_LOCAL_X:
+                    axis = LoadAxis.Local;
+                    impactA.X = impactMagnitudeA;
+                    impactB.X = impactMagnitudeB;
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
+                    impactA.Y = impactMagnitudeA;
+                    impactB.Y = impactMagnitudeB;
+                    axis = LoadAxis.Local;
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
+                    impactA.Z = impactMagnitudeA;
+                    impactB.Z = impactMagnitudeB;
+                    axis = LoadAxis.Local;
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
+                    impactA.X = impactMagnitudeA;
+                    impactB.X = impactMagnitudeB;
+                    projected = false;
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
+                    impactA.X = impactMagnitudeA;
+                    impactB.X = impactMagnitudeB;
+                    projected = true;
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
+                    impactA.Y = impactMagnitudeA;
+                    impactB.Y = impactMagnitudeB;
+                    projected = false;
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
+                    impactA.Y = impactMagnitudeA;
+                    impactB.Y = impactMagnitudeB;
+                    projected = true;
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
+                    impactA.Z = impactMagnitudeA;
+                    impactB.Z = impactMagnitudeB;
+                    projected = false;
+                    break;
+                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
+                    impactA.Z = impactMagnitudeA;
+                    impactB.Z = impactMagnitudeB;
+                    projected = true;
+                    break;
+                default:
+                    BH.Engine.Base.Compute.RecordError($"The Load {rfLineload} within RFEM6 is has not direction that is Parallel to the X,Y or Z axist. The Load direction will be set to a null-vector!");
+                    break;
             }
-            else if (rfLineload.load_direction == line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE)
-            {
-                impactA.Y = impactMagnitudeA;
-                impactB.Y = impactMagnitudeB;
-            }
-            else if (rfLineload.load_direction == line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE)
-            {
-                impactA.Z = impactMagnitudeA;
-                impactB.Z = impactMagnitudeB;
-            }
-            else
-            {
-                BH.Engine.Base.Compute.RecordError($"The Load {rfLineload} within RFEM6 is has not direction that is Parallel to the X,Y or Z axist. The Load direction will be set to a null-vector!");
 
-
-            }
 
             GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
             {
@@ -256,6 +352,8 @@ namespace BH.Adapter.RFEM6
                 ForceB = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_FORCE ? impactB : new Vector(),
                 MomentA = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_MOMENT ? impactA : new Vector(),
                 MomentB = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_MOMENT ? impactB : new Vector(),
+                Axis = axis,
+                Projected = projected
 
             };
 
