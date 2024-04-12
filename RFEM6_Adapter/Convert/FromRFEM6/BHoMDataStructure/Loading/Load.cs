@@ -137,55 +137,32 @@ namespace BH.Adapter.RFEM6
 
             Vector forceDirection;
             bool isProjected = false;
-
-
-            //if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE)
-            //{
-            //    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
-            //}
-            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE)
-            //{
-            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
-            //}
-            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE)
-            //{
-            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
-            //}
-            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED)
-            //{
-            //    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
-            //    isProjected = true;
-            //}
-            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED)
-            //{
-            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
-            //    isProjected = true;
-            //}
-            //else if (surfaceload.load_direction == surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED)
-            //{
-            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
-            //    isProjected = true;
-            //}
-            //else
-            //{
-            //    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
-            //}
+            LoadAxis axis= LoadAxis.Global;
 
             switch (surfaceload.load_direction)
             {
                 case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
+                    break;
                 case surface_load_load_direction.LOAD_DIRECTION_LOCAL_X:
                     forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
+                    axis = LoadAxis.Local;
                     break;
 
                 case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
+                    break;
                 case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
                     forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
+                    axis = LoadAxis.Local;
                     break;
 
                 case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+                    break;
                 case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
                     forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
+                    axis = LoadAxis.Local;
                     break;
 
                 case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
@@ -209,7 +186,7 @@ namespace BH.Adapter.RFEM6
             }
 
 
-            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels, LoadAxis.Global, isProjected, surfaceload.comment);
+            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels, axis, isProjected, surfaceload.comment);
 
             return bhAreaload;
         }
