@@ -338,7 +338,7 @@ namespace BH.Adapter.RFEM6
                     projected = true;
                     break;
                 default:
-                    BH.Engine.Base.Compute.RecordError($"The Load {rfLineload} within RFEM6 is has not direction that is Parallel to the X,Y or Z axist. The Load direction will be set to a null-vector!");
+                    BH.Engine.Base.Compute.RecordWarning($"The Load {rfLineload} within RFEM6 is has not direction that is Parallel to the X,Y or Z axist. The Load direction will be set to a null-vector!");
                     break;
             }
 

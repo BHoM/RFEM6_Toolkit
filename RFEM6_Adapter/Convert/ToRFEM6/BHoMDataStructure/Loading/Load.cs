@@ -50,6 +50,12 @@ namespace BH.Adapter.RFEM6
             double loadMagintude;
             member_load_load_direction loadDirecteion;
             Vector orientationVector = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
+
+            if (bhBarLoad.Projected && bhBarLoad.Axis == LoadAxis.Local)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Projected BarUniformlyDistributedLoad is not supported for Local Axis. The Load will be projected to the Global Axis");
+            }
+
             // Checkinf if Load is Orientied in X directin
             if (orientationVector.X != 0)
             {
@@ -135,6 +141,7 @@ namespace BH.Adapter.RFEM6
             else if (orientationVector.Y != 0) { loadDirecteion = nodal_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V; }
             else { loadDirecteion = nodal_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W; }
 
+            BH.Engine.Base.Compute.RecordWarning("PointLoad push has at the moment only been implemented for Axis=LoadAxis.Global. Axis will be set to LoadAxis.Global!");
 
             nodal_load rfLoadCase = new rfModel.nodal_load()
             {
@@ -170,6 +177,12 @@ namespace BH.Adapter.RFEM6
             double loadMagintude;
             surface_load_load_direction loadDirection;
             Vector orientationVector = bhAreaLoad.Pressure;
+
+            if (bhAreaLoad.Projected && bhAreaLoad.Axis == LoadAxis.Local)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Projected Area Load is not supported for Local Axis. The Load will be projected to the Global Axis");
+            }
+
             // Checkinf if Load is Orientied in X directin
             if (orientationVector.X != 0)
             {
@@ -257,6 +270,11 @@ namespace BH.Adapter.RFEM6
             Vector orientationVector = bhLineLoad.ForceA;
             double magnitudeA;
             double magnitudeB;
+
+            if (bhLineLoad.Projected && bhLineLoad.Axis == LoadAxis.Local)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Projected Free Line Load is not supported for Local Axis. The Load will be projected to the Global Axis");
+            }
 
             if (orientationVector.X != 0)
             {
@@ -359,11 +377,16 @@ namespace BH.Adapter.RFEM6
         {
 
 
-            //Checking for diretction of the GeometricalLineLoad. First discitguishing by Moment or force. 
-            //Additionally setting both Maginigutes.
+            //Checking for direction of the GeometricalLineLoad. First distinguishing by Moment or force. 
+            //Additionally setting both magnitudes.
             line_load_load_direction rfLineLoadDirection;
             double loadMagnitude1;
             double loadMagnitude2;
+
+            if (bhLineLoad.Projected && bhLineLoad.Axis == LoadAxis.Local)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Projected Non-Free Line Load is not supported for Local Axis. The Load will be projected to the Global Axis");
+            }
 
             //Lineload is a Moment
             if (rfLineLoadType.Equals(rfModel.line_load_load_type.LOAD_TYPE_MOMENT))
