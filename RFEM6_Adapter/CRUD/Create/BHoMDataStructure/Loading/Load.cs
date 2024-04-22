@@ -191,6 +191,7 @@ namespace BH.Adapter.RFEM6
                         if (!((bhLoad as GeometricalLineLoad).Objects is null) && (bhLoad as GeometricalLineLoad).Objects.Elements.Count() != 0 && !((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
                         {
                             //currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
+                            List<Panel> panelCachList = GetCachedOrRead<Panel>();
                             currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e =>m_PanelIDdict[e as Panel]).ToArray();
 
 
