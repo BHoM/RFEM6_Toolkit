@@ -55,6 +55,7 @@ namespace BH.Adapter.RFEM6
             IEnumerable<rfModel.member_load> foundLoadCases = numbers.SelectMany(n => n.children.ToList().Select(child => m_Model.get_member_load(child, n.no)));
 
             List<ILoad> loadCases = new List<ILoad>();
+            foundLoadCases=foundLoadCases.OrderBy(n => n.load_case).ThenBy(t=>t.no);
             foreach (rfModel.member_load memberLoad in foundLoadCases)
             {
 
@@ -110,7 +111,7 @@ namespace BH.Adapter.RFEM6
             //IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.ToList().Select(n => m_Model.get_surface_load(n.children[0], n.no));
             IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.SelectMany(n => n.children.Select(child => m_Model.get_surface_load(child, n.no)));
 
-
+            foundSurfaceLoad = foundSurfaceLoad.OrderBy(n => n.load_case).ThenBy(t => t.no);
             foreach (rfModel.surface_load surfaceLoad in foundSurfaceLoad)
             {
                 List<Panel> panels = surfaceLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();

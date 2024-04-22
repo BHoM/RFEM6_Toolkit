@@ -42,40 +42,82 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static rfModel.member_load ToRFEM6(this BarUniformlyDistributedLoad bhBarLoad, member_load_load_type nodalLoadType, int id)
+        public static rfModel.member_load ToRFEM6(this BarUniformlyDistributedLoad bhBarLoad, member_load_load_type loadType, int id)
         {
 
-            var i = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToList();
+            //var i = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToList();
 
             double loadMagintude;
             member_load_load_direction loadDirecteion;
-            Vector orientationVector = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
+            Vector orientationVector = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
 
+            if (bhBarLoad.Projected && bhBarLoad.Axis == LoadAxis.Local)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Projected BarUniformlyDistributedLoad is not supported for Local Axis. The Load will be projected to the Global Axis");
+            }
+
+            // Checkinf if Load is Orientied in X directin
             if (orientationVector.X != 0)
             {
-                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
-                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Length() : bhBarLoad.Moment.Length();
+                // If the load Axis in slocal the load direction is local x
+                if (bhBarLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                }
+                else if (bhBarLoad.Projected && loadType.Equals(member_load_load_type.LOAD_TYPE_FORCE))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED;
+                }
+                else
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                }
+                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.X : bhBarLoad.Moment.X;
+
+
             }
             else if (orientationVector.Y != 0)
             {
-                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
-                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? -1 * bhBarLoad.Force.Length() : -1 * bhBarLoad.Moment.Length();
+                if (bhBarLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                }
+                else if (bhBarLoad.Projected && loadType.Equals(member_load_load_type.LOAD_TYPE_FORCE))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED;
+                }
+                else
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+                }
+                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Y : bhBarLoad.Moment.Y;
 
             }
             else
             {
-                loadDirecteion = bhBarLoad.Projected ? member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : member_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
-                loadMagintude = nodalLoadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Length() : bhBarLoad.Moment.Length();
+                if (bhBarLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                }
+                else if (bhBarLoad.Projected && loadType.Equals(member_load_load_type.LOAD_TYPE_FORCE))
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED;
+                }
+                else
+                {
+                    loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+                }
+                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Z : bhBarLoad.Moment.Z;
             }
 
             member_load rfLoadCase = new rfModel.member_load()
             {
                 no = id,
-                comment=bhBarLoad.Name,
+                comment = bhBarLoad.Name,
                 members = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_distribution = member_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
-                load_type = nodalLoadType,
+                load_type = loadType,
                 load_typeSpecified = true,
                 load_direction = loadDirecteion,
                 load_directionSpecified = true,
@@ -99,20 +141,14 @@ namespace BH.Adapter.RFEM6
             else if (orientationVector.Y != 0) { loadDirecteion = nodal_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V; }
             else { loadDirecteion = nodal_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W; }
 
+            BH.Engine.Base.Compute.RecordWarning("PointLoad push has at the moment only been implemented for Axis=LoadAxis.Global. Axis will be set to LoadAxis.Global!");
 
             nodal_load rfLoadCase = new rfModel.nodal_load()
             {
 
                 no = id,
-                comment=bhPointLoad.Name,
+                comment = bhPointLoad.Name,
                 nodes = bhPointLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
-                //load_direction = loadDirecteion,
-                //load_directionSpecified = true,
-                //force_magnitude = bhPointLoad.Force.Length(),
-                //force_magnitudeSpecified = true,
-                //moment_magnitude = bhPointLoad.Moment.Length(),
-                //moment_magnitudeSpecified = true,
-                //load_type = nodalLoadType,
                 components_force_x = bhPointLoad.Force.X,
                 components_force_xSpecified = true,
                 components_force_y = bhPointLoad.Force.Y,
@@ -138,40 +174,81 @@ namespace BH.Adapter.RFEM6
         {
 
 
-
-
+            double loadMagintude;
             surface_load_load_direction loadDirection;
             Vector orientationVector = bhAreaLoad.Pressure;
-            double magnitude;
+
+            if (bhAreaLoad.Projected && bhAreaLoad.Axis == LoadAxis.Local)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Projected Area Load is not supported for Local Axis. The Load will be projected to the Global Axis");
+            }
+
+            // Checkinf if Load is Orientied in X directin
             if (orientationVector.X != 0)
             {
-                loadDirection = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
-                magnitude = bhAreaLoad.Pressure.X;
+                // If the load Axis in slocal the load direction is local x
+                if (bhAreaLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirection = surface_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                }
+                else if (bhAreaLoad.Projected)
+                {
+                    loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED;
+                }
+                else
+                {
+                    loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                }
+                loadMagintude = orientationVector.X;
+
             }
             else if (orientationVector.Y != 0)
             {
-                loadDirection = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
-                    magnitude = bhAreaLoad.Pressure.Y;
+                if (bhAreaLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirection = surface_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                }
+                else if (bhAreaLoad.Projected)
+                {
+                    loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED;
+                }
+                else
+                {
+                    loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+                }
+                loadMagintude = orientationVector.Y;
+
             }
             else
             {
-                loadDirection = bhAreaLoad.Projected ? surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED : surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
-                    magnitude = bhAreaLoad.Pressure.Z;
+                if (bhAreaLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirection = surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                }
+                else if (bhAreaLoad.Projected)
+                {
+                    loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED;
+                }
+                else
+                {
+                    loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+                }
+                loadMagintude = orientationVector.Z;
             }
 
 
             surface_load rfSurfaceLoad = new rfModel.surface_load()
             {
                 no = loadCaseSpecificLoadId,
-                comment=bhAreaLoad.Name,
+                comment = bhAreaLoad.Name,
                 surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
                 load_case = bhAreaLoad.Loadcase.GetRFEM6ID(),
                 load_caseSpecified = true,
                 load_distribution = surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
-                magnitude_force_u = magnitude,
+                magnitude_force_u = loadMagintude,
                 magnitude_force_uSpecified = true,
-                uniform_magnitude = magnitude,
+                uniform_magnitude = loadMagintude,
                 uniform_magnitudeSpecified = true,
                 is_generated = false,
                 is_generatedSpecified = true,
@@ -189,32 +266,75 @@ namespace BH.Adapter.RFEM6
 
         public static rfModel.free_line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, int loadCaseSpecificID, int[] surfaceIds)
         {
-            free_line_load_load_direction loadDirection;
+            free_line_load_load_direction rfLineLoadDirection;
             Vector orientationVector = bhLineLoad.ForceA;
             double magnitudeA;
             double magnitudeB;
 
+            if (bhLineLoad.Projected && bhLineLoad.Axis == LoadAxis.Local)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Projected Free Line Load is not supported for Local Axis. The Load will be projected to the Global Axis");
+            }
+
             if (orientationVector.X != 0)
             {
-                loadDirection = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE;
+                rfLineLoadDirection = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE;
+
+                if (bhLineLoad.Projected)
+                {
+                    rfLineLoadDirection = free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_PROJECTED;
+                }
+                else if (bhLineLoad.Axis.Equals(LoadAxis.Global))
+                {
+                    rfLineLoadDirection = free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE;
+                }
+                else
+                {
+                    rfLineLoadDirection = free_line_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                }
+
                 magnitudeA = bhLineLoad.ForceA.X;
                 magnitudeB = bhLineLoad.ForceB.X;
+
 
             }
             else if (orientationVector.Y != 0)
             {
-                loadDirection = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE;
+
+                if (bhLineLoad.Projected)
+                {
+                    rfLineLoadDirection = free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_PROJECTED;
+                }
+                else if (bhLineLoad.Axis.Equals(LoadAxis.Global))
+                {
+                    rfLineLoadDirection = free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE;
+                }
+                else
+                {
+                    rfLineLoadDirection = free_line_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                }
+
                 magnitudeA = bhLineLoad.ForceA.Y;
                 magnitudeB = bhLineLoad.ForceB.Y;
             }
             else
             {
-                loadDirection = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE;
+                if (bhLineLoad.Projected)
+                {
+                    rfLineLoadDirection = free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED;
+                }
+                else if (bhLineLoad.Axis.Equals(LoadAxis.Global))
+                {
+                    rfLineLoadDirection = free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE;
+                }
+                else
+                {
+                    rfLineLoadDirection = free_line_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                }
+
                 magnitudeA = bhLineLoad.ForceA.Z;
                 magnitudeB = bhLineLoad.ForceB.Z;
             }
-
-
 
             free_line_load rfLineLoad = new rfModel.free_line_load()
             {
@@ -232,7 +352,7 @@ namespace BH.Adapter.RFEM6
                 magnitude_secondSpecified = true,
                 is_generated = false,
                 is_generatedSpecified = true,
-                load_direction = loadDirection,
+                load_direction = rfLineLoadDirection,
                 //load_direction = bhLineLoad.Projected ? free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED : free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE,
                 load_directionSpecified = true,
                 load_location_first_x = bhLineLoad.Location.Start.X,
@@ -243,7 +363,7 @@ namespace BH.Adapter.RFEM6
                 load_location_second_xSpecified = true,
                 load_location_second_y = bhLineLoad.Location.End.Y,
                 load_location_second_ySpecified = true,
-                comment= bhLineLoad.Name,
+                comment = bhLineLoad.Name,
 
             };
 
@@ -252,53 +372,130 @@ namespace BH.Adapter.RFEM6
 
         }
 
+        //Non Free Line Load
         public static rfModel.line_load ToRFEM6(this GeometricalLineLoad bhLineLoad, int id, int foundEdgeId, line_load_load_type rfLineLoadType)
         {
 
 
-            //Checking for diretction of the GeometricalLineLoad. First discitguishing by Moment or force. 
-            //Additionally setting both Maginigutes.
+            //Checking for direction of the GeometricalLineLoad. First distinguishing by Moment or force. 
+            //Additionally setting both magnitudes.
             line_load_load_direction rfLineLoadDirection;
             double loadMagnitude1;
             double loadMagnitude2;
+
+            if (bhLineLoad.Projected && bhLineLoad.Axis == LoadAxis.Local)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Projected Non-Free Line Load is not supported for Local Axis. The Load will be projected to the Global Axis");
+            }
+
+            //Lineload is a Moment
             if (rfLineLoadType.Equals(rfModel.line_load_load_type.LOAD_TYPE_MOMENT))
             {
-                if (bhLineLoad.MomentA.X != 0||bhLineLoad.MomentB.X!=0)
+                if (bhLineLoad.MomentA.X != 0 || bhLineLoad.MomentB.X != 0)
                 {
-                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+
+                    if (bhLineLoad.Axis.Equals(LoadAxis.Global))
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                    }
+                    else
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                    }
+
                     loadMagnitude1 = bhLineLoad.MomentA.X;
                     loadMagnitude2 = bhLineLoad.MomentB.X;
                 }
                 else if (bhLineLoad.MomentA.Y != 0 || bhLineLoad.MomentB.Y != 0)
                 {
-                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+
+                    if (bhLineLoad.Axis.Equals(LoadAxis.Global))
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+                    }
+                    else
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                    }
+
                     loadMagnitude1 = bhLineLoad.MomentA.Y;
                     loadMagnitude2 = bhLineLoad.MomentB.Y;
                 }
                 else
                 {
-                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+
+
+                    if (bhLineLoad.Axis.Equals(LoadAxis.Global))
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+                    }
+                    else
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                    }
+
                     loadMagnitude1 = bhLineLoad.MomentA.Z;
                     loadMagnitude2 = bhLineLoad.MomentB.Z;
                 }
             }
+            // Lineload is a Force
             else
             {
-                if (bhLineLoad.ForceA.X != 0|| bhLineLoad.ForceB.X != 0)
+                if (bhLineLoad.ForceA.X != 0 || bhLineLoad.ForceB.X != 0)
                 {
-                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+
+                    if (bhLineLoad.Projected)
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED;
+                    }
+                    else if (bhLineLoad.Axis.Equals(LoadAxis.Global))
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
+                    }
+                    else
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                    }
+
                     loadMagnitude1 = bhLineLoad.ForceA.X;
                     loadMagnitude2 = bhLineLoad.ForceB.X;
                 }
                 else if (bhLineLoad.ForceA.Y != 0 || bhLineLoad.ForceB.Y != 0)
                 {
-                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+
+
+                    if (bhLineLoad.Projected)
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED;
+                    }
+                    else if (bhLineLoad.Axis.Equals(LoadAxis.Global))
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
+                    }
+                    else
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                    }
+
                     loadMagnitude1 = bhLineLoad.ForceA.Y;
                     loadMagnitude2 = bhLineLoad.ForceB.Y;
                 }
                 else
                 {
-                    rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+
+                    if (bhLineLoad.Projected)
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED;
+                    }
+                    else if (bhLineLoad.Axis.Equals(LoadAxis.Global))
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
+                    }
+                    else
+                    {
+                        rfLineLoadDirection = line_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                    }
+
                     loadMagnitude1 = bhLineLoad.ForceA.Z;
                     loadMagnitude2 = bhLineLoad.ForceB.Z;
                 }

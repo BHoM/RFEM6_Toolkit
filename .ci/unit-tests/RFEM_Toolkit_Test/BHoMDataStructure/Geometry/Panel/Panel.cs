@@ -27,12 +27,14 @@ using BH.oM.Geometry;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
+using BH.oM.Structure.Loads;
+
 
 namespace RFEM_Toolkit_Test.Elements
 {
 
 
-    public class PushPullPanels
+    public class Panel_Test
     {
         RFEM6Adapter adapter;
         RFEMPanelComparer comparer;
@@ -53,24 +55,32 @@ namespace RFEM_Toolkit_Test.Elements
         Edge edge11;
         Edge edge12;
 
+        Loadcase loadcase;
+
+        List<IAreaElement> panelGroup1;
+        List<IAreaElement> panelGroup2;
+        List<IAreaElement> panelGroup3;
+
+        AreaUniformlyDistributedLoad areaLoad1;
+        AreaUniformlyDistributedLoad areaLoad2;
+        AreaUniformlyDistributedLoad areaLoad3;
+        AreaUniformlyDistributedLoad areaLoad4;
+
+
 
         [OneTimeSetUp]
         public void InitializeOpenings()
         {
+
+            //Arange
+
+
+
             adapter = new RFEM6Adapter(true);
-        }
 
-        [TearDown]
-        public void TearDown()
-        {
-            adapter.Wipeout();
-        }
-
-        [Test]
-        public void SinglePushPullOfOpening()
-        {
             comparer = new RFEMPanelComparer();
-            // Create Panel 1
+
+            // Panel/Opening definition
             edge1 = new Edge() { Curve = new Line() { Start = new Point() { X = 10, Y = 10, Z = 0 }, End = new Point() { X = 10, Y = 20, Z = 0 } } };
             edge2 = new Edge() { Curve = new Line() { Start = new Point() { X = 5, Y = 10, Z = 0 }, End = new Point() { X = 10, Y = 10, Z = 0 } } };
             edge3 = new Edge() { Curve = new Line() { Start = new Point() { X = 10, Y = 20, Z = 0 }, End = new Point() { X = 5, Y = 10, Z = 0 } } };
@@ -81,11 +91,32 @@ namespace RFEM_Toolkit_Test.Elements
             edge7 = new Edge() { Curve = new Line() { Start = new Point() { X = 2, Y = 25, Z = 0 }, End = new Point() { X = 2, Y = 5, Z = 0 } } };
             var concrete = BH.Engine.Library.Query.Match("Concrete", "C25/30", true, true) as IMaterialFragment;
             var steel = BH.Engine.Library.Query.Match("Steel", "S235", true, true) as IMaterialFragment;
-            panel1 = new Panel() { ExternalEdges = new List<Edge>() { edge4, edge5, edge6, edge7 }, Openings = new List<Opening>() { opening1 },Property=new BH.oM.Structure.SurfaceProperties.ConstantThickness() {Thickness=0.1,Material=concrete } };
+            panel1 = new Panel() { ExternalEdges = new List<Edge>() { edge4, edge5, edge6, edge7 }, Openings = new List<Opening>() { opening1 }, Property = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = concrete } };
+
+            panelGroup1 = new List<IAreaElement>() { panel1 };
 
 
-            // Push panel 
-            adapter.Push(new List<Panel>() { panel1 });
+
+            // Definition of UniformlyDistributedAreaLoad
+            areaLoad1 = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, Vector.XAxis * 100, panelGroup1, LoadAxis.Global, false);
+
+
+
+        }
+
+    
+
+        //[TearDown]
+        //public void TearDown()
+        //{
+        //    adapter.Wipeout();
+        //}
+
+        [Test]
+        public void SinglePushPullOfOpening()
+        {
+
+
 
             // Pull it
             FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
