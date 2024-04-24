@@ -83,7 +83,7 @@ namespace BH.Adapter.RFEM6
             foreach (Loadcase loadCase in bhLoadCase)
             {
                 // If Load case number has not been set use the next free number
-                if (loadCase.Number==0) { 
+                if (loadCase.Number<1) { 
                 
                    int n= m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE, 0);
                    loadCase.Number = n;
