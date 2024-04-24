@@ -214,6 +214,7 @@ namespace BH.Adapter.RFEM6
             return true;
         }
 
+        //Metho checks if ILoad is either a Moment or a Force Load
         private object MomentOfForceLoad(ILoad bhLoad)
         {
 

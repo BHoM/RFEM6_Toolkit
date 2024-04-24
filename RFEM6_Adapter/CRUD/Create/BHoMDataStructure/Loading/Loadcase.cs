@@ -43,6 +43,8 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<Loadcase> bhLoadCase)
         {
 
+            // Taking Care of Analysis Settings
+
             //Check if Analysis Setting does exist already
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_STATIC_ANALYSIS_SETTINGS);
             List<rfModel.static_analysis_settings> foundAnalysisSettings = numbers.ToList().Select(n => m_Model.get_static_analysis_settings(n.no)).ToList();
@@ -70,13 +72,37 @@ namespace BH.Adapter.RFEM6
             m_Model.set_static_analysis_settings(analysis);
 
 
+            // Taking care of Load Cases
+
+            //Placing Load Cases with numbers smaller than 1 at the end
+            var smallerThanOne = bhLoadCase.Where(l => l.Number < 1).ToList();
+            var greaterThanOrEqualToOne = bhLoadCase.Where(l => l.Number >= 1).ToList();
+            bhLoadCase=greaterThanOrEqualToOne.Concat(smallerThanOne).ToList();
+
             //Create Load Cases
             foreach (Loadcase loadCase in bhLoadCase)
             {
+                // If Load case number has not been set use the next free number
+                if (loadCase.Number==0) { 
+                
+                   int n= m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE, 0);
+                   loadCase.Number = n;
 
-                load_case selfWeightLC = loadCase.ToRFEM6(analysis.no);
+                }
+                //Check if Load Case Number is 1 and not Dead Load
+                if (loadCase.Nature!=LoadNature.Dead&&loadCase.Number==1) { 
+                
+                    BH.Engine.Base.Compute.RecordWarning($"Load Case {loadCase} has number 1 but is not Dead Load, this might cause issues in RFEM6. The Nature of will be changed to {LoadNature.Dead}.");
+                    loadCase.Nature = LoadNature.Dead;
 
-                m_Model.set_load_case(selfWeightLC);
+                }
+
+
+                //Convert Load Case to RFEM6
+                load_case rfLoadCase = loadCase.ToRFEM6(analysis.no);
+
+                //Set Load Case
+                m_Model.set_load_case(rfLoadCase);
             }
 
 
