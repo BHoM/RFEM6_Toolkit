@@ -33,59 +33,80 @@ using BH.oM.Structure.MaterialFragments;
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
 using Dlubal.WS.Rfem6.Model;
+using BH.oM.Base;
+using BH.oM.Structure.SectionProperties;
+using System.Text.RegularExpressions;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
 
-        public static IMaterialFragment FromRFEM(this rfModel.material rfMaterial)
+        public static IMaterialFragment FromRFEM(this rfModel.material rfMaterial, List<IMaterialFragment> matLibrary)
         {
+            string matName = Regex.Replace(rfMaterial.name.Split('|')[0].ToString(), @"[^a-zA-Z0-9]", "");
 
-            string s = rfMaterial.generating_object_info;
-            IMaterialFragment bhMaterial = null;
+            Dictionary<int, HashSet<IBHoMObject>> scorsDict_test = new Dictionary<int, HashSet<IBHoMObject>>();
+            //bhSections.ForEach(z => scorsDict_test[BH.Engine.Search.Compute.MatchScore(sectionName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", "")], )));
 
-            String[] matParaArray = rfMaterial.comment.Split('|');
-
-            if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_STEEL) || rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_REINFORCING_STEEL))
+            foreach (var z in matLibrary)
             {
 
-                bhMaterial = BH.Engine.Library.Query.Match("Steel", rfMaterial.name.Split('|')[0], true, true).DeepClone() as IMaterialFragment;
+                HashSet<IBHoMObject> value;
+                int key = BH.Engine.Search.Compute.MatchScore(matName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", ""));
+                if (scorsDict_test.TryGetValue(key, out value))
+                {
+                    scorsDict_test[key].Add((IBHoMObject)z);
+
+                }
+                else
+                {
+
+                    scorsDict_test[key] = new HashSet<IBHoMObject>() { z };
+                }
+
+
+            }
+            var sortedSectNames_test = scorsDict_test.OrderByDescending(z => z.Key).ToDictionary(z => z.Key, z => z.Value);
+
+            var result = sortedSectNames_test.Values.First().ToList()[0];
+
+            if (sortedSectNames_test.Values.First().Count > 1)
+            {
+                result = sortedSectNames_test.Values.First().ToList()[0];
+
+                foreach (var i in sortedSectNames_test.Values.First())
+                {
+
+                    string mod_name = Regex.Replace(i.Name, @"[^a-zA-Z0-9]", "");
+                    string mod_sectionName = Regex.Replace(matName, @"[^a-zA-Z0-9]", "");
+
+                    if (RFEM6Adapter.IsAnagramUsingSort(mod_name, mod_sectionName))
+                    {
+
+                        result = i;
+
+                        break;
+                    }
+
+
+                }
 
 
             }
 
-            else if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_CONCRETE))
-            {
+            result.SetRFEM6ID(rfMaterial.no);
 
-                bhMaterial = BH.Engine.Library.Query.Match("Concrete", rfMaterial.name.Split('|')[0], true, true).DeepClone() as IMaterialFragment;
-
-            }
-
-            else if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_TIMBER))
-            {
-
-                
-                // Check for "Timber" Dataset to check for material
-                String timberType = rfMaterial.name.Substring(0, 2).ToLower()=="gl"? "Glulam": "SawnTimber";
-
-                
-                bhMaterial = BH.Engine.Library.Query.Match(timberType, rfMaterial.name.Split('|')[0], true, true) as IMaterialFragment;
-
-            }
-
-
-            if (bhMaterial == null)
-            {
-                BH.Engine.Base.Compute.RecordWarning($"Material {rfMaterial.name} could not be read and will be generated as GenericIsotropicMaterial with all parameters set to 0!");
-                bhMaterial = new BH.oM.Structure.MaterialFragments.GenericIsotropicMaterial { Name = rfMaterial.name, Density = 0, DampingRatio = 0, PoissonsRatio = 0, ThermalExpansionCoeff = 0, YoungsModulus = 0 };
-
-            }
-            bhMaterial.SetRFEM6ID(rfMaterial.no);
-            BH.Engine.Base.Modify.SetPropertyValue(bhMaterial, "Comment", rfMaterial.comment);
-            return bhMaterial;
+            return (IMaterialFragment)result.DeepClone();
         }
+
+
+
+
+
+
+
+
 
     }
 }
-

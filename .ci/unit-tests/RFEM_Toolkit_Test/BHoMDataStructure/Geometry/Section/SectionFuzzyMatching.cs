@@ -106,7 +106,7 @@ namespace RFEM_Toolkit_Test.Elements
             sectionList.AddRange(uk_Steel_Section);
             sectionList.AddRange(us_Steel_Section);
 
-            var sec = RFEM6Adapter.ReadStandardSteelSections(weirdStringName, sectionList);
+            //var sec = RFEM6Adapter.ReadStandardSteelSections(weirdStringName, sectionList);
 
         }
 

@@ -38,6 +38,8 @@ namespace BH.Adapter.RFEM6
         private List<IMaterialFragment> ReadMaterial(List<string> ids = null)
         {
 
+            //var steelMaterialLibrary = BH.Engine.Library.Query.Library("Structure\\Materials");
+            List<IMaterialFragment> libraryMaterials = BH.Engine.Library.Query.Library("Structure\\Materials").Select(m => (IMaterialFragment)m).ToList();
             //Read all materials from RFEM
             List<IMaterialFragment> materialList = new List<IMaterialFragment>();
             rfModel.object_with_children[] materialsNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
@@ -50,8 +52,8 @@ namespace BH.Adapter.RFEM6
                 foreach (var rfMaterial in allMaterials)
                 {
                     //Conversion of material to BHoM material
-                    IMaterialFragment material = rfMaterial.FromRFEM();
-                    
+                    IMaterialFragment material = rfMaterial.FromRFEM(libraryMaterials);
+
                     if (material != null)
                     {
                         materialList.Add(material);
@@ -64,6 +66,7 @@ namespace BH.Adapter.RFEM6
 
             return materialList;
         }
+
 
     }
 }
