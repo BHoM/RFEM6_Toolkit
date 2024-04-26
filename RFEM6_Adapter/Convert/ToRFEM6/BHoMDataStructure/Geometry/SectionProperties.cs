@@ -56,7 +56,6 @@ namespace BH.Adapter.RFEM6
             }
 
 
-
             rfSection = new rfModel.section
             {
                 no = secNo,
@@ -120,6 +119,7 @@ namespace BH.Adapter.RFEM6
             int secNo = bhSection.GetRFEM6ID();
             Object bhComment = "";
 
+            // Check if Comment has been added to the section
             if (bhSection.CustomData.Count != 0)
             {
                 bhSection.CustomData.TryGetValue("Comment", out bhComment);
