@@ -79,6 +79,12 @@
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Physical_oM.dll</HintPath>
 			<SpecificVersion>false</SpecificVersion>
 		</Reference>
+		<Reference Include="Search_Engine">
+		  <HintPath>..\..\..\..\..\ProgramData\BHoM\Assemblies\Search_Engine.dll</HintPath>
+		</Reference>
+		<Reference Include="Search_oM">
+		  <HintPath>..\..\..\..\..\ProgramData\BHoM\Assemblies\Search_oM.dll</HintPath>
+		</Reference>
 		<Reference Include="Spatial_Engine">
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Spatial_Engine.dll</HintPath>
 			<SpecificVersion>false</SpecificVersion>
