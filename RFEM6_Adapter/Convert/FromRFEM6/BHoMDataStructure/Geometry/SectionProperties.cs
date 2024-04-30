@@ -36,6 +36,7 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
 using BH.oM.Physical.Materials;
 using static System.Collections.Specialized.BitVector32;
+using System.Security.Permissions;
 
 namespace BH.Adapter.RFEM6
 {
@@ -63,7 +64,7 @@ namespace BH.Adapter.RFEM6
 
             }
 
-            else if (bhMaterial is Concrete||bhMaterial is Glulam || bhMaterial is SawnTimber)
+            else if (bhMaterial is Concrete || bhMaterial is Glulam || bhMaterial is SawnTimber)
             {
 
                 bhSection = TranslateMassiveISectionToBHoM(section, bhMaterial);
@@ -89,17 +90,18 @@ namespace BH.Adapter.RFEM6
 
             bhSection.SetRFEM6ID(section.no);
 
-            if (section.comment.Contains("BHComment")) { 
-            
+            if (section.comment.Contains("BHComment"))
+            {
+
                 string sectionComment = "";
-                
+
                 sectionComment = section.comment.Split(';').ToList().Last();
-            
+
                 BH.Engine.Base.Modify.SetPropertyValue(bhSection, "Comment", sectionComment);
-            
+
             }
-            
-            
+
+
 
             return bhSection;
         }
@@ -215,7 +217,7 @@ namespace BH.Adapter.RFEM6
 
 
                     bhSection = bhMaterial is Concrete ?
-                    BH.Engine.Structure.Create.ConcreteRectangleSection(height, width, bhConcrete, sectionName,null) as ISectionProperty :
+                    BH.Engine.Structure.Create.ConcreteRectangleSection(height, width, bhConcrete, sectionName, null) as ISectionProperty :
                     BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.RectangleProfile(height, width), bhMaterial, sectionName);
 
                     break;
@@ -258,7 +260,7 @@ namespace BH.Adapter.RFEM6
                     thickness1 = Double.Parse(secParameters[3]);//Web
 
                     BH.oM.Spatial.ShapeProfiles.ISectionProfile bhProfile2 = BH.Engine.Spatial.Create.ISectionProfile(height, width, thickness1, thickness0, 0, 0);
-             
+
                     bhSection = bhMaterial is Concrete ?
                     BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile2, bhConcrete, null) as ISectionProperty :
                     BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.ISectionProfile(height, width, thickness1, thickness0, 0, 0), bhMaterial, sectionName);
@@ -409,6 +411,94 @@ namespace BH.Adapter.RFEM6
             bhSection.Name = rfSection.name;
 
             return bhSection;
+        }
+
+
+        public static ISectionProperty FromRFEM_MassivI(this rfModel.section rfSection, IMaterialFragment sectionMaterials)
+        {
+
+            section_parametrization_type parametrization_type = rfSection.parametrization_type;
+
+            ISectionProperty resultSection = new ExplicitSection() { };
+
+            switch (parametrization_type)
+            {
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_RECTANGLE__R_M1:
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_SQUARE__SQ_M1:
+                    resultSection = BH.Engine.Structure.Create.ConcreteRectangleSection(rfSection.h, rfSection.b, sectionMaterials as Concrete, rfSection.name, null);
+                    break;
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_ROUND_CORNER_RECTANGLE__RR_M1:
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.RectangleProfile(rfSection.d, rfSection.t, rfSection.r_o), sectionMaterials, rfSection.name);
+                    break;
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_T_SECTION__T_M1:
+                    resultSection = BH.Engine.Structure.Create.ConcreteTSection(rfSection.h, rfSection.b_w_M, rfSection.b, rfSection.h_f_M, sectionMaterials as Concrete, rfSection.name);
+                    break;
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_HOLLOW_CIRCLE__HCIRCLE_M1:
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.TubeProfile(rfSection.d, rfSection.t), sectionMaterials, rfSection.name);
+                    break;
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_CIRCLE__CIRCLE_M1:
+                    resultSection = BH.Engine.Structure.Create.ConcreteCircularSection(rfSection.d, sectionMaterials as Concrete, rfSection.name, null);
+                    break;
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_RECTANGLE_WITH_RECTANGULAR_OPENING__RRO_M1
+:
+                    var h0 = rfSection.h_f_b_M;
+                    var h1 = rfSection.h_f_t_M;
+                    var b0 = rfSection.b_w_i_M;
+                    var b1 = rfSection.b_w_r_M;
+
+                    if (!(h0 == h1 && b0 == b1 && h0 == b1))
+                    {
+                        BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} can't be read as wall thickness of the Box need to constant. A Explicit section will be read instead!");
+                        break;
+                    }
+
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.BoxProfile(rfSection.h, rfSection.b, rfSection.h_f_b_M), sectionMaterials, rfSection.name);
+
+                    break;
+
+                default:
+
+                    BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
+                    resultSection = new ExplicitSection() { Name = rfSection.name };
+                    break;
+            }
+
+            return resultSection;
+
+        }
+
+
+        public static ISectionProperty FromRFEM_Standardized(this rfModel.section rfSection, IMaterialFragment sectionMaterials)
+        {
+
+
+            return null;
+
+        }
+
+        public static ISectionProperty FromRFEM_ThinWalled(this rfModel.section rfSection, IMaterialFragment sectionMaterials)
+        {
+            section_parametrization_type parametrization_type = rfSection.parametrization_type;
+
+            var s = parametrization_type;
+
+            switch (parametrization_type)
+            {
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__I_SECTION__I:
+
+                    //BHoM ISection
+
+                    return null;
+                default:
+                    break;
+            }
+
+
+
+            return null;
+
+
+
         }
 
     }
