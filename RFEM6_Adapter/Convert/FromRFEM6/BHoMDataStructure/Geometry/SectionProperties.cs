@@ -480,24 +480,80 @@ namespace BH.Adapter.RFEM6
         {
             section_parametrization_type parametrization_type = rfSection.parametrization_type;
 
-            var s = parametrization_type;
+            ISectionProperty resultSection = new ExplicitSection() { };
 
             switch (parametrization_type)
             {
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__SQUARE_HOLLOW_SECTION__SHS:
+
+                    if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
+                    {
+                        //welded
+                        resultSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.t, 0, sectionMaterials as Steel, rfSection.name);
+                    }
+                    else
+                    {
+                        //cold formed or hot rolled
+                        resultSection = BH.Engine.Structure.Create.SteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.r_i, rfSection.r_o, sectionMaterials as Steel, rfSection.name);
+                    }
+
+                    break;
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__RECTANGULAR_HOLLOW_SECTION__RHS:
+
+                    if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
+                    {
+                        //welded
+                        resultSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.t, 0, sectionMaterials as Steel, rfSection.name);
+                    }
+                    else
+                    {
+                        //cold formed or hot rolled
+                        resultSection = BH.Engine.Structure.Create.SteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.r_i, rfSection.r_o, sectionMaterials as Steel, rfSection.name);
+                    }
+
+                    break;
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__CIRCULAR_HOLLOW_SECTION__CHS:
+
+
+                    //cold formed or hot rolled
+                    resultSection = BH.Engine.Structure.Create.SteelTubeSection(rfSection.d, rfSection.t, sectionMaterials as Steel, rfSection.name);
+
+                    break;
                 case section_parametrization_type.PARAMETRIC_THIN_WALLED__I_SECTION__I:
 
-                    //BHoM ISection
+                    if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
+                    {
+                        //welded 
+                        resultSection = BH.Engine.Structure.Create.SteelFabricatedISection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.b, rfSection.t_f, rfSection.a_weld, sectionMaterials as Steel, rfSection.name);
+                    }
+                    else
+                    {
+                        //Hot rolled
+                        resultSection = BH.Engine.Structure.Create.SteelISection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.r_1, rfSection.r_2, sectionMaterials as Steel, rfSection.name);
+                    }
 
-                    return null;
+                    break;
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__T_SECTION__T:
+
+                    // welded
+                    if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
+                    {
+                        BH.Engine.Base.Compute.RecordWarning($"BHoM does not support welded T section. {rfSection.name} will be read as Hot Rolled.");
+                    }
+                    //Hot rolled
+                    resultSection = BH.Engine.Structure.Create.SteelTSection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.r_1, rfSection.r_2, sectionMaterials as Steel, rfSection.name);
+
+
+                    break;
                 default:
+
+                    BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
+                    resultSection = new ExplicitSection() { Name = rfSection.name };
                     break;
             }
 
 
-
-            return null;
-
-
+            return resultSection;
 
         }
 
