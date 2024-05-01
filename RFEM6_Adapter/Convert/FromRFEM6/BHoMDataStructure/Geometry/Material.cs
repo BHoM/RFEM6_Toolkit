@@ -44,60 +44,63 @@ namespace BH.Adapter.RFEM6
 
         public static IMaterialFragment FromRFEM(this rfModel.material rfMaterial, List<IMaterialFragment> matLibrary)
         {
+
+            // Picking section of material and make it alpha numberic only
             string matName = Regex.Replace(rfMaterial.name.Split('|')[0].ToString(), @"[^a-zA-Z0-9]", "");
 
-            Dictionary<int, HashSet<IBHoMObject>> scorsDict_test = new Dictionary<int, HashSet<IBHoMObject>>();
-            //bhSections.ForEach(z => scorsDict_test[BH.Engine.Search.Compute.MatchScore(sectionName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", "")], )));
+            Dictionary<int, HashSet<IBHoMObject>> matchingScoreDict = new Dictionary<int, HashSet<IBHoMObject>>();
 
+            // Filling the dictionary with matching scores
             foreach (var z in matLibrary)
             {
-
                 HashSet<IBHoMObject> value;
                 int key = BH.Engine.Search.Compute.MatchScore(matName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", ""));
-                if (scorsDict_test.TryGetValue(key, out value))
+                if (matchingScoreDict.TryGetValue(key, out value))
                 {
-                    scorsDict_test[key].Add((IBHoMObject)z);
-
+                    matchingScoreDict[key].Add((IBHoMObject)z);
                 }
                 else
                 {
-
-                    scorsDict_test[key] = new HashSet<IBHoMObject>() { z };
+                    matchingScoreDict[key] = new HashSet<IBHoMObject>() { z };
                 }
 
-
             }
-            var sortedSectNames_test = scorsDict_test.OrderByDescending(z => z.Key).ToDictionary(z => z.Key, z => z.Value);
 
-            var result = sortedSectNames_test.Values.First().ToList()[0];
+            // Pick all elements with the highes score
+            var sortedMatchingScoreDict = matchingScoreDict.OrderByDescending(z => z.Key).ToDictionary(z => z.Key, z => z.Value);
+            var result = sortedMatchingScoreDict.Values.First().ToList()[0];
 
-            if (sortedSectNames_test.Values.First().Count > 1)
+
+
+            // If there are more than one element with the highest score, check for anagrams
+            if (sortedMatchingScoreDict.Values.First().Count > 1)
             {
-                result = sortedSectNames_test.Values.First().ToList()[0];
+                result = sortedMatchingScoreDict.Values.First().ToList()[0];
 
-                foreach (var i in sortedSectNames_test.Values.First())
+                foreach (var i in sortedMatchingScoreDict.Values.First())
                 {
-
+                    // Remove all special characters from the name
                     string mod_name = Regex.Replace(i.Name, @"[^a-zA-Z0-9]", "");
                     string mod_sectionName = Regex.Replace(matName, @"[^a-zA-Z0-9]", "");
 
-                    if (RFEM6Adapter.IsAnagramUsingSort(mod_name, mod_sectionName))
+                    if (Convert.IsAnagramUsingSort(mod_name, mod_sectionName))
                     {
-
                         result = i;
-
                         break;
                     }
-
-
                 }
-
-
             }
 
             result.SetRFEM6ID(rfMaterial.no);
 
-            return (IMaterialFragment)result.DeepClone();
+            // If Material match is below 80 the assumption is that the is no matchi in libaray and default material will begreated
+            if (sortedMatchingScoreDict.Keys.First() < 80)
+            {
+
+                BH.Engine.Base.Compute.RecordWarning($"It is likely that the RFEM6 material {rfMaterial} has not corresponding element in the BHoM data set. It will be set to {result} instead when reading it, as this is the best guess.");
+            }
+
+            return (IMaterialFragment)result;
         }
 
 

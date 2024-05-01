@@ -41,81 +41,13 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        // Method to read all section properties from RFEM6
-        private static ISectionProperty ReadStandardSteelSections(string sectionName, List<IBHoMObject> bhSections)
-        {
-
-            //sectionName = sectionName.Replace(" ", "");
-            sectionName = Regex.Replace(sectionName, @"[^a-zA-Z0-9]", "");
-
-            Dictionary<ISectionProperty, int> scorsDict = new Dictionary<ISectionProperty, int>();
-            bhSections.ForEach(z => scorsDict.Add((ISectionProperty)z, BH.Engine.Search.Compute.MatchScore(sectionName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", ""))));
-
-            Dictionary<int, HashSet<IBHoMObject>> scorsDict_test = new Dictionary<int, HashSet<IBHoMObject>>();
-            //bhSections.ForEach(z => scorsDict_test[BH.Engine.Search.Compute.MatchScore(sectionName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", "")], )));
-
-
-            foreach (var z in bhSections)
-            {
-
-                HashSet<IBHoMObject> value;
-                int key = BH.Engine.Search.Compute.MatchScore(sectionName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", ""));
-                if (scorsDict_test.TryGetValue(key, out value))
-                {
-                    scorsDict_test[key].Add((ISectionProperty)z);
-
-                }
-                else
-                {
-
-                    scorsDict_test[key] = new HashSet<IBHoMObject>() { z };
-                }
-
-
-            }
-            var sortedSectNames_test = scorsDict_test.OrderByDescending(z => z.Key).ToDictionary(z => z.Key, z => z.Value);
-
-            var result = sortedSectNames_test.Values.First().ToList()[0];
-
-            if (sortedSectNames_test.Values.First().Count > 1)
-            {
-                result = sortedSectNames_test.Values.First().ToList()[0];
-
-                foreach (var i in sortedSectNames_test.Values.First())
-                {
-
-                    string mod_name = Regex.Replace(i.Name, @"[^a-zA-Z0-9]", "");
-                    string mod_sectionName = Regex.Replace(sectionName, @"[^a-zA-Z0-9]", "");
-
-                    if (IsAnagramUsingSort(mod_name, mod_sectionName))
-                    {
-
-                        result = i;
-
-                        break;
-                    }
-
-                }
-
-            }
-
-            return (ISectionProperty)result;
-
-
-        }
-
-
-
-        private List<ISectionProperty> ReadSectionProperties_refactor(List<string> ids = null)
+        private List<ISectionProperty> ReadSectionProperties(List<string> ids = null)
         {
             List<ISectionProperty> sectionList = new List<ISectionProperty>();
 
             //Read Standard BHoM Steel Libraries
             List<IBHoMObject> sectionListLib = new List<IBHoMObject>();
-            //List<IMaterialFragment> matListLib = new List<IMaterialFragment>();
-
             sectionListLib = BH.Engine.Library.Query.Library("Structure\\SectionProperties");
-            //matListLib = BH.Engine.Library.Query.Library("Structure\\Materials").Select(m => (IMaterialFragment)m).ToList();
 
             // Read RFEM Material Fragments From Caching System
             Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
@@ -124,8 +56,6 @@ namespace BH.Adapter.RFEM6
             // Read RFEM Sections from Model
             var sectionNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
             var allSections = sectionNumbers.ToList().Select(n => m_Model.get_section(n.no));
-
-
 
             foreach (var section in allSections)
             {
@@ -139,8 +69,7 @@ namespace BH.Adapter.RFEM6
                 {
 
                     // Brows Through the BHoM Library and find the best match
-                    bhSection = ReadStandardSteelSections(sectionName, sectionListLib);
-
+                    bhSection = Convert.FromRFEM_Standardized_Steel(sectionName, sectionListLib);
                     bhSection.SetRFEM6ID(section.no);
                     sectionList.Add(bhSection);
 
@@ -153,12 +82,9 @@ namespace BH.Adapter.RFEM6
                     {
                         continue;
                     }
-
-                    //bhSection = section.FromRFEM(sectionMaterials);
                     bhSection = section.FromRFEM_MassivI(sectionMaterials);
                     bhSection.SetRFEM6ID(section.no);
                     sectionList.Add(bhSection);
-
                 }
                 // Standardized Timber Section
                 else if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_TIMBER))
@@ -169,49 +95,27 @@ namespace BH.Adapter.RFEM6
                         continue;
                     }
 
-
                     if (sectionMaterials != null)
                     {
-
-                        bhSection = section.FromRFEM(sectionMaterials);
+                        bhSection = Convert.FromRFEM_Standardized_Timber(section, sectionMaterials);
                         bhSection.SetRFEM6ID(section.no);
                         sectionList.Add(bhSection);
-
                     }
-
                 }
-
+                // Parametric Thin Walled Section
                 else if (section.type.Equals(rfModel.section_type.TYPE_PARAMETRIC_THIN_WALLED))
                 {
-
                     if (!materials.TryGetValue(section.material, out sectionMaterials))
                     {
-
                         continue;
                     }
                     bhSection = section.FromRFEM_ThinWalled(sectionMaterials);
                     bhSection.SetRFEM6ID(section.no);
                     sectionList.Add(bhSection);
                 }
-
-
             }
 
             return sectionList;
-        }
-
-        public static bool IsAnagramUsingSort(string str1, string str2)
-        {
-            if (str1.Length != str2.Length)
-                return false;
-
-            char[] sorted1 = str1.ToCharArray();
-            char[] sorted2 = str2.ToCharArray();
-
-            Array.Sort(sorted1);
-            Array.Sort(sorted2);
-
-            return sorted1.SequenceEqual(sorted2);
         }
     }
 }
