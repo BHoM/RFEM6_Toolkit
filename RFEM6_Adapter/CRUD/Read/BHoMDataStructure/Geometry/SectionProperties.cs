@@ -61,15 +61,19 @@ namespace BH.Adapter.RFEM6
             {
 
                 // Preprocessing RFEM6 Section Name to match with BHoM Library
-                String sectionName = new String((section.name.Where(c => !char.IsWhiteSpace(c)).ToArray())).Split()[0];
-                sectionName = sectionName.Split('|')[0];
+                //String sectionName = new String((section.name.Where(c => !char.IsWhiteSpace(c)).ToArray())).Split()[0];
+                //sectionName = sectionName.Split('|')[0];
                 ISectionProperty bhSection;
                 //Standard steel sections
                 if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_STEEL))
                 {
+                    if (!materials.TryGetValue(section.material, out sectionMaterials))
+                    {
+                        continue;
+                    }
 
                     // Brows Through the BHoM Library and find the best match
-                    bhSection = Convert.FromRFEM_Standardized_Steel(sectionName, sectionListLib);
+                    bhSection = section.FromRFEM_Standardized_Steel(sectionListLib, sectionMaterials);
                     bhSection.SetRFEM6ID(section.no);
                     sectionList.Add(bhSection);
 
@@ -97,7 +101,9 @@ namespace BH.Adapter.RFEM6
 
                     if (sectionMaterials != null)
                     {
-                        bhSection = Convert.FromRFEM_Standardized_Timber(section, sectionMaterials);
+                        //bhSection = Convert.FromRFEM_Standardized_Timber(section, sectionMaterials);
+                        bhSection = section.FromRFEM_Standardized_Timber(sectionMaterials);
+
                         bhSection.SetRFEM6ID(section.no);
                         sectionList.Add(bhSection);
                     }
@@ -113,7 +119,25 @@ namespace BH.Adapter.RFEM6
                     bhSection.SetRFEM6ID(section.no);
                     sectionList.Add(bhSection);
                 }
+                else {
+
+                    BH.Engine.Base.Compute.RecordWarning($"The section {section.name} is not supported by the RFEM6 Adapter and will be read as ExplicitSection.");
+
+                    if (!materials.TryGetValue(section.material, out sectionMaterials))
+                    {
+                        continue;
+                    }
+
+                    bhSection =new ExplicitSection() { Name=section.name,Material= sectionMaterials };
+                    bhSection.SetRFEM6ID(section.no);                   
+                    sectionList.Add(bhSection);
+                
+                }
             }
+
+            //Sort sections by RFEM6 ID
+            sectionList = sectionList.OrderBy(x => x.GetRFEM6ID()).ToList();
+
 
             return sectionList;
         }

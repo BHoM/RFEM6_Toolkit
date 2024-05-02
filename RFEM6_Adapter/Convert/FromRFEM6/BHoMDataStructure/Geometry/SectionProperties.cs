@@ -50,7 +50,7 @@ namespace BH.Adapter.RFEM6
 
             section_parametrization_type parametrization_type = rfSection.parametrization_type;
 
-            ISectionProperty resultSection = new ExplicitSection() { };
+            ISectionProperty resultSection = new ExplicitSection() { Name = rfSection.name, Material = sectionMaterials };
 
             switch (parametrization_type)
             {
@@ -59,7 +59,8 @@ namespace BH.Adapter.RFEM6
                     resultSection = BH.Engine.Structure.Create.ConcreteRectangleSection(rfSection.h, rfSection.b, sectionMaterials as Concrete, rfSection.name, null);
                     break;
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_ROUND_CORNER_RECTANGLE__RR_M1:
-                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.RectangleProfile(rfSection.d, rfSection.t, rfSection.r_o), sectionMaterials, rfSection.name);
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_ROUND_CORNER_SQUARE__SQR_M1:
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.RectangleProfile(rfSection.h, rfSection.b, rfSection.r_o), sectionMaterials, rfSection.name);
                     break;
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_T_SECTION__T_M1:
                     resultSection = BH.Engine.Structure.Create.ConcreteTSection(rfSection.h, rfSection.b_w_M, rfSection.b, rfSection.h_f_M, sectionMaterials as Concrete, rfSection.name);
@@ -74,7 +75,7 @@ namespace BH.Adapter.RFEM6
 :
                     var h0 = rfSection.h_f_b_M;
                     var h1 = rfSection.h_f_t_M;
-                    var b0 = rfSection.b_w_i_M;
+                    var b0 = rfSection.b_w_l_M;
                     var b1 = rfSection.b_w_r_M;
 
                     if (!(h0 == h1 && b0 == b1 && h0 == b1))
@@ -92,6 +93,12 @@ namespace BH.Adapter.RFEM6
                     BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
                     resultSection = new ExplicitSection() { Name = rfSection.name };
                     break;
+            }
+
+            if (resultSection == null)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
+                resultSection = new ExplicitSection() { Name = rfSection.name, Material = sectionMaterials };
             }
 
             return resultSection;
@@ -184,14 +191,18 @@ namespace BH.Adapter.RFEM6
 
             }
 
+
             return resultSection;
 
         }
 
 
-        public static ISectionProperty FromRFEM_Standardized_Steel(string sectionName, List<IBHoMObject> bhSections)
+        public static ISectionProperty FromRFEM_Standardized_Steel(this rfModel.section rfSection, List<IBHoMObject> bhSections, IMaterialFragment sectionMaterials)
         {
 
+
+            String sectionName = new String((rfSection.name.Where(c => !char.IsWhiteSpace(c)).ToArray())).Split()[0];
+            sectionName = sectionName.Split('|')[0];
             //sectionName = sectionName.Replace(" ", "");
             sectionName = Regex.Replace(sectionName, @"[^a-zA-Z0-9]", "");
 
@@ -224,6 +235,14 @@ namespace BH.Adapter.RFEM6
 
             var result = sortedSectNames_test.Values.First().ToList()[0];
 
+            if (sortedSectNames_test.Keys.First() < 85)
+            {
+
+                string noMatchSecName = rfSection.name.Split('|')[0];
+                BH.Engine.Base.Compute.RecordWarning($"The Standard section {noMatchSecName} has no corresponding object within the BHoM dataset. It will be read as ExpliciteSection with an appropriate name and material");
+                return new ExplicitSection() { Name = noMatchSecName, Material = sectionMaterials };
+            }
+
             if (sortedSectNames_test.Values.First().Count > 1)
             {
                 result = sortedSectNames_test.Values.First().ToList()[0];
@@ -245,6 +264,9 @@ namespace BH.Adapter.RFEM6
                 }
 
             }
+
+            // Set Correct Materials
+            ((ISectionProperty)result).Material = sectionMaterials;
 
             return (ISectionProperty)result;
 
