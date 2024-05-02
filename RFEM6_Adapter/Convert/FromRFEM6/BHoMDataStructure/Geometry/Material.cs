@@ -102,9 +102,9 @@ namespace BH.Adapter.RFEM6
                     (new BH.oM.Structure.MaterialFragments.GenericIsotropicMaterial()) :
                         (IBHoMObject)new BH.oM.Structure.MaterialFragments.GenericOrthotropicMaterial()));
 
-                //result = (rfMaterial.material_type.Equals(material_material_type.TYPE_TIMBER))? (new BH.oM.Structure.MaterialFragments.GenericIsotropicMaterial()): (new BH.oM.Structure.MaterialFragments.GenericOrthotropicMaterial());
-                result.Name = rfMaterial.name;
-                BH.Engine.Base.Compute.RecordWarning($"It is likely that the RFEM6 material {rfMaterial.name.Split('|')[0]} has not corresponding element in the BHoM data set. It will be set to {result} instead when reading it, as this is the best guess.");
+
+                result.Name = rfMaterial.name.Split('|')[0];
+                BH.Engine.Base.Compute.RecordWarning($"It is likely that the RFEM6 material {result.Name} has not corresponding element in the BHoM data set. It will be set to {result} instead when reading it, as this is the best guess.");
             }
 
             return (IMaterialFragment)result;
