@@ -318,8 +318,8 @@ namespace BH.Adapter.RFEM6
                             v4 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TSectionProfile).RootRadius;
                             v5 = ((bhSection as SteelSection).SectionProfile as BH.oM.Spatial.ShapeProfiles.TSectionProfile).ToeRadius;
 
-                            //rfSectionTypeName = "T " + v0 + "/" + v1 + "/" + v2 + "/" + v3 + "/" + v4 + "/" + v5 + "/H";
-                            rfSectionTypeName = $"T {v0}/{v1}/{v2}/{v3}/{v4}/{v5}/H";
+                            rfSectionTypeName = "T " + v0 + "/" + v1 + "/" + v2 + "/" + v3 + "/" + v4 + "/" + v5 + "/H";
+                            //rfSectionTypeName = $"T {v0}/{v1}/{v2}/{v3}/{v4}/{v5}/H";
 
 
                             break;
