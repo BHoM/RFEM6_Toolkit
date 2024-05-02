@@ -47,29 +47,30 @@ namespace BH.Adapter.RFEM6
         // Conversion of RFEM6 section of type Massiv I to BHoM Section
         public static ISectionProperty FromRFEM_MassivI(this rfModel.section rfSection, IMaterialFragment sectionMaterials)
         {
+            string sectionName = rfSection.name.Split('|')[0];
 
             section_parametrization_type parametrization_type = rfSection.parametrization_type;
 
-            ISectionProperty resultSection = new ExplicitSection() { Name = rfSection.name, Material = sectionMaterials };
+            ISectionProperty resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
 
             switch (parametrization_type)
             {
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_RECTANGLE__R_M1:
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_SQUARE__SQ_M1:
-                    resultSection = BH.Engine.Structure.Create.ConcreteRectangleSection(rfSection.h, rfSection.b, sectionMaterials as Concrete, rfSection.name, null);
+                    resultSection = BH.Engine.Structure.Create.ConcreteRectangleSection(rfSection.h, rfSection.b, sectionMaterials as Concrete, sectionName, null);
                     break;
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_ROUND_CORNER_RECTANGLE__RR_M1:
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_ROUND_CORNER_SQUARE__SQR_M1:
-                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.RectangleProfile(rfSection.h, rfSection.b, rfSection.r_o), sectionMaterials, rfSection.name);
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.RectangleProfile(rfSection.h, rfSection.b, rfSection.r_o), sectionMaterials, sectionName);
                     break;
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_T_SECTION__T_M1:
-                    resultSection = BH.Engine.Structure.Create.ConcreteTSection(rfSection.h, rfSection.b_w_M, rfSection.b, rfSection.h_f_M, sectionMaterials as Concrete, rfSection.name);
+                    resultSection = BH.Engine.Structure.Create.ConcreteTSection(rfSection.h, rfSection.b_w_M, rfSection.b, rfSection.h_f_M, sectionMaterials as Concrete, sectionName);
                     break;
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_HOLLOW_CIRCLE__HCIRCLE_M1:
-                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.TubeProfile(rfSection.d, rfSection.t), sectionMaterials, rfSection.name);
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.TubeProfile(rfSection.d, rfSection.t), sectionMaterials, sectionName);
                     break;
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_CIRCLE__CIRCLE_M1:
-                    resultSection = BH.Engine.Structure.Create.ConcreteCircularSection(rfSection.d, sectionMaterials as Concrete, rfSection.name, null);
+                    resultSection = BH.Engine.Structure.Create.ConcreteCircularSection(rfSection.d, sectionMaterials as Concrete, sectionName, null);
                     break;
                 case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_RECTANGLE_WITH_RECTANGULAR_OPENING__RRO_M1
 :
@@ -84,21 +85,21 @@ namespace BH.Adapter.RFEM6
                         break;
                     }
 
-                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.BoxProfile(rfSection.h, rfSection.b, rfSection.h_f_b_M), sectionMaterials, rfSection.name);
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.BoxProfile(rfSection.h, rfSection.b, rfSection.h_f_b_M), sectionMaterials, sectionName);
 
                     break;
 
                 default:
 
                     BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
-                    resultSection = new ExplicitSection() { Name = rfSection.name };
+                    resultSection = new ExplicitSection() { Name = sectionName };
                     break;
             }
 
             if (resultSection == null)
             {
                 BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
-                resultSection = new ExplicitSection() { Name = rfSection.name, Material = sectionMaterials };
+                resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
             }
 
             return resultSection;
@@ -108,6 +109,8 @@ namespace BH.Adapter.RFEM6
         // Conversion of RFEM6 section of type Thin Walled to BHoM Section
         public static ISectionProperty FromRFEM_ThinWalled(this rfModel.section rfSection, IMaterialFragment sectionMaterials)
         {
+            string sectionName = rfSection.name.Split('|')[0];
+
             section_parametrization_type parametrization_type = rfSection.parametrization_type;
 
             ISectionProperty resultSection = new ExplicitSection() { };
@@ -119,12 +122,12 @@ namespace BH.Adapter.RFEM6
                     if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
                     {
                         //welded
-                        resultSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.t, 0, sectionMaterials as Steel, rfSection.name);
+                        resultSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.t, 0, sectionMaterials as Steel, sectionName);
                     }
                     else
                     {
                         //cold formed or hot rolled
-                        resultSection = BH.Engine.Structure.Create.SteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.r_i, rfSection.r_o, sectionMaterials as Steel, rfSection.name);
+                        resultSection = BH.Engine.Structure.Create.SteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.r_i, rfSection.r_o, sectionMaterials as Steel, sectionName);
                     }
 
                     break;
@@ -133,12 +136,12 @@ namespace BH.Adapter.RFEM6
                     if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
                     {
                         //welded
-                        resultSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.t, 0, sectionMaterials as Steel, rfSection.name);
+                        resultSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.t, 0, sectionMaterials as Steel, sectionName);
                     }
                     else
                     {
                         //cold formed or hot rolled
-                        resultSection = BH.Engine.Structure.Create.SteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.r_i, rfSection.r_o, sectionMaterials as Steel, rfSection.name);
+                        resultSection = BH.Engine.Structure.Create.SteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.r_i, rfSection.r_o, sectionMaterials as Steel, sectionName);
                     }
 
                     break;
@@ -146,7 +149,7 @@ namespace BH.Adapter.RFEM6
 
 
                     //cold formed or hot rolled
-                    resultSection = BH.Engine.Structure.Create.SteelTubeSection(rfSection.d, rfSection.t, sectionMaterials as Steel, rfSection.name);
+                    resultSection = BH.Engine.Structure.Create.SteelTubeSection(rfSection.d, rfSection.t, sectionMaterials as Steel, sectionName);
 
                     break;
                 case section_parametrization_type.PARAMETRIC_THIN_WALLED__I_SECTION__I:
@@ -154,12 +157,12 @@ namespace BH.Adapter.RFEM6
                     if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
                     {
                         //welded 
-                        resultSection = BH.Engine.Structure.Create.SteelFabricatedISection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.b, rfSection.t_f, rfSection.a_weld, sectionMaterials as Steel, rfSection.name);
+                        resultSection = BH.Engine.Structure.Create.SteelFabricatedISection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.b, rfSection.t_f, rfSection.a_weld, sectionMaterials as Steel, sectionName);
                     }
                     else
                     {
                         //Hot rolled
-                        resultSection = BH.Engine.Structure.Create.SteelISection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.r_1, rfSection.r_2, sectionMaterials as Steel, rfSection.name);
+                        resultSection = BH.Engine.Structure.Create.SteelISection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.r_1, rfSection.r_2, sectionMaterials as Steel, sectionName);
                     }
 
                     break;
@@ -171,7 +174,7 @@ namespace BH.Adapter.RFEM6
                         BH.Engine.Base.Compute.RecordWarning($"BHoM does not support welded T section. {rfSection.name} will be read as Hot Rolled.");
                     }
                     //Hot rolled
-                    resultSection = BH.Engine.Structure.Create.SteelTSection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.r_1, rfSection.r_2, sectionMaterials as Steel, rfSection.name);
+                    resultSection = BH.Engine.Structure.Create.SteelTSection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.r_1, rfSection.r_2, sectionMaterials as Steel, sectionName);
 
 
                     break;
@@ -179,7 +182,7 @@ namespace BH.Adapter.RFEM6
 
                     //If section has not been implemented yet
                     BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
-                    resultSection = new ExplicitSection() { Name = rfSection.name, Material = sectionMaterials };
+                    resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
                     break;
             }
 
@@ -187,7 +190,7 @@ namespace BH.Adapter.RFEM6
             if (resultSection == null)
             {
                 BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
-                resultSection = new ExplicitSection() { Name = rfSection.name, Material = sectionMaterials };
+                resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
 
             }
 
@@ -196,7 +199,7 @@ namespace BH.Adapter.RFEM6
 
         }
 
-
+        // Conversion of RFEM6 section of type Standardized Steel to BHoM Section
         public static ISectionProperty FromRFEM_Standardized_Steel(this rfModel.section rfSection, List<IBHoMObject> bhSections, IMaterialFragment sectionMaterials)
         {
 
@@ -276,6 +279,8 @@ namespace BH.Adapter.RFEM6
         // Conversion of RFEM6 section of type Standardized Timber to BHoM Section
         public static ISectionProperty FromRFEM_Standardized_Timber(this rfModel.section rfSection, IMaterialFragment sectionMaterials)
         {
+            string sectionName = rfSection.name.Split('|')[0];
+
             section_type parametrization_type = rfSection.type;
 
             ISectionProperty resultSection = new ExplicitSection() { };
@@ -283,12 +288,12 @@ namespace BH.Adapter.RFEM6
             switch (parametrization_type)
             {
                 case section_type.TYPE_STANDARDIZED_TIMBER:
-                    resultSection = BH.Engine.Structure.Create.TimberRectangleSection(rfSection.h, rfSection.b, 0, sectionMaterials as ITimber, rfSection.name);
+                    resultSection = BH.Engine.Structure.Create.TimberRectangleSection(rfSection.h, rfSection.b, 0, sectionMaterials as ITimber, sectionName);
                     break;
 
                 default:
                     BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicit parameters set to 0!");
-                    resultSection = new ExplicitSection() { Name = rfSection.name, Material = sectionMaterials };
+                    resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
                     break;
 
             }
@@ -297,7 +302,7 @@ namespace BH.Adapter.RFEM6
             if (resultSection == null)
             {
                 BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicit parameters set to 0!");
-                resultSection = new ExplicitSection() { Name = rfSection.name, Material = sectionMaterials };
+                resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
 
             }
 

@@ -36,6 +36,7 @@ using Dlubal.WS.Rfem6.Model;
 using BH.oM.Base;
 using BH.oM.Structure.SectionProperties;
 using System.Text.RegularExpressions;
+using BH.oM.Physical.Materials;
 
 namespace BH.Adapter.RFEM6
 {
@@ -96,8 +97,14 @@ namespace BH.Adapter.RFEM6
             // If Material match is below 80 the assumption is that the is no matchi in libaray and default material will begreated
             if (sortedMatchingScoreDict.Keys.First() < 80)
             {
+                // If the material is timber or glass, it is assumed to be isotropic, otherwise orthotropic
+                result = ((rfMaterial.material_type.Equals(material_material_type.TYPE_TIMBER) || (rfMaterial.material_type.Equals(material_material_type.TYPE_GLASS)) ?
+                    (new BH.oM.Structure.MaterialFragments.GenericIsotropicMaterial()) :
+                        (IBHoMObject)new BH.oM.Structure.MaterialFragments.GenericOrthotropicMaterial()));
 
-                BH.Engine.Base.Compute.RecordWarning($"It is likely that the RFEM6 material {rfMaterial} has not corresponding element in the BHoM data set. It will be set to {result} instead when reading it, as this is the best guess.");
+                //result = (rfMaterial.material_type.Equals(material_material_type.TYPE_TIMBER))? (new BH.oM.Structure.MaterialFragments.GenericIsotropicMaterial()): (new BH.oM.Structure.MaterialFragments.GenericOrthotropicMaterial());
+                result.Name = rfMaterial.name;
+                BH.Engine.Base.Compute.RecordWarning($"It is likely that the RFEM6 material {rfMaterial.name.Split('|')[0]} has not corresponding element in the BHoM data set. It will be set to {result} instead when reading it, as this is the best guess.");
             }
 
             return (IMaterialFragment)result;
