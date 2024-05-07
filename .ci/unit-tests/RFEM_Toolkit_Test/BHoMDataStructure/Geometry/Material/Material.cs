@@ -42,12 +42,29 @@ namespace RFEM_Toolkit_Test.Elements
         IMaterialFragment concrete;
         IMaterialFragment steel;
 
-        NameOrDescriptionComparer comparer = new NameOrDescriptionComparer();
+        NameOrDescriptionComparer comparer; 
+
+
 
         [OneTimeSetUp]
-        public void InitializeRFEM6Adapter()
+        public void SetUpScenario()
         {
+
+            /***************************************************/
+            /**** Arrange                                   ****/
+            /***************************************************/
             adapter = new RFEM6Adapter(true);
+
+            comparer = new NameOrDescriptionComparer();
+
+            glulam = BH.Engine.Library.Query.Match("Glulam", "GL 20C", true, true) as IMaterialFragment;
+            steel = BH.Engine.Library.Query.Match("Steel", "S450", true, true) as IMaterialFragment;
+            concrete = BH.Engine.Library.Query.Match("Concrete", "C30/37", true, true) as Concrete;
+
+            timberC = BH.Engine.Library.Query.Match("SawnTimber", "C14", true, true) as IMaterialFragment;
+            timberT = BH.Engine.Library.Query.Match("SawnTimber", "T8", true, true) as IMaterialFragment;
+            timberD = BH.Engine.Library.Query.Match("SawnTimber", "D18", true, true) as IMaterialFragment;
+
         }
 
         [TearDown]
@@ -59,14 +76,70 @@ namespace RFEM_Toolkit_Test.Elements
         [Test]
         public void PushPullOFSteel()
         {
-            //TODO: Add a test for steel
+
+            /***************************************************/
+            /**** Act                                    ****/
+            /***************************************************/
+
+            //Push it once
+            adapter.Push(new List<IMaterialFragment>() { steel });
+            adapter.Push(new List<IMaterialFragment>() { steel.DeepClone() });
+
+
+            //Pull it   
+            FilterRequest materialFilter = new FilterRequest() { Type = typeof(IMaterialFragment) };
+            var materialPulled = adapter.Pull(materialFilter).ToList();
+            IMaterialFragment mp = (IMaterialFragment)materialPulled[0];
+
+
+            /***************************************************/
+            /**** Assertions                                ****/
+            /***************************************************/
+
+            //Null Check
+            Assert.IsNotNull(mp);
+
+            //Compares pushed to pulled material
+            Assert.IsTrue(comparer.Equals(steel, mp));
+
+            //Checks if only one material is pulled after double push
+            Assert.AreEqual(1, materialPulled.Count);
+
         }
 
 
         [Test]
         public void PushPullOFConcrete()
         {
-            //TODO: Add a test for concrete
+            /***************************************************/
+            /**** Act                                       ****/
+            /***************************************************/
+
+            //Push it once
+            adapter.Push(new List<IMaterialFragment>() { concrete });
+            adapter.Push(new List<IMaterialFragment>() { concrete.DeepClone() });
+
+
+            //Pull it   
+            FilterRequest materialFilter = new FilterRequest() { Type = typeof(IMaterialFragment) };
+            var materialPulled = adapter.Pull(materialFilter).ToList();
+            IMaterialFragment mp = (IMaterialFragment)materialPulled[0];
+
+
+
+            /***************************************************/
+            /**** Assertions                                ****/
+            /***************************************************/
+
+            //Null Check
+            Assert.IsNotNull(mp);
+
+            //Compares pushed to pulled material
+            Assert.IsTrue(comparer.Equals(concrete, mp));
+
+            //Checks if only one material is pulled after double push
+            Assert.AreEqual(1, materialPulled.Count);
+
 
         }
 
@@ -76,16 +149,15 @@ namespace RFEM_Toolkit_Test.Elements
         {
 
             /***************************************************/
-            /**** Test Preparation                          ****/
+            /**** Act                                       ****/
             /***************************************************/
 
-            //TODO: Add a test for Glulam
-            glulam = BH.Engine.Library.Query.Match("Glulam", "GL 20C", true, true).DeepClone() as IMaterialFragment;
 
-            //Push it once
-
+            //adapter.Push(new List<IMaterialFragment>() { steel });
+            //adapter.Push(new List<IMaterialFragment>() { concrete });
             adapter.Push(new List<IMaterialFragment>() { glulam });
-            adapter.Push(new List<IMaterialFragment>() { glulam.DeepClone()});
+            adapter.Push(new List<IMaterialFragment>() { glulam.DeepClone() });
+
 
             //Pull it   
             FilterRequest materialFilter = new FilterRequest() { Type = typeof(IMaterialFragment) };
@@ -103,7 +175,7 @@ namespace RFEM_Toolkit_Test.Elements
 
             //Compares pushed to pulled material
             Assert.IsTrue(comparer.Equals(glulam, mp));
-            
+
             //Checks if only one material is pulled after double push
             Assert.AreEqual(1, materialPulled.Count);
 
@@ -115,14 +187,8 @@ namespace RFEM_Toolkit_Test.Elements
         public void PushPullOFTimber()
         {
             /***************************************************/
-            /**** Test Preparation                          ****/
+            /**** Act                                       ****/
             /***************************************************/
-
-            //TODO: Add a test for Glulam
-            timberC = BH.Engine.Library.Query.Match("SawnTimber", "C14", true, true).DeepClone() as IMaterialFragment;
-            timberT = BH.Engine.Library.Query.Match("SawnTimber", "T8", true, true).DeepClone() as IMaterialFragment;
-            timberD = BH.Engine.Library.Query.Match("SawnTimber", "D18", true, true).DeepClone() as IMaterialFragment;
-
 
             //Push it once
 
@@ -136,7 +202,7 @@ namespace RFEM_Toolkit_Test.Elements
 
             //Pull it   
             FilterRequest materialFilter = new FilterRequest() { Type = typeof(IMaterialFragment) };
-            List<IMaterialFragment> materialPulled = adapter.Pull(materialFilter).ToList().Select(m=>(IMaterialFragment)m).ToList();
+            List<IMaterialFragment> materialPulled = adapter.Pull(materialFilter).ToList().Select(m => (IMaterialFragment)m).ToList();
             HashSet<IMaterialFragment> materialPulledSet = new HashSet<IMaterialFragment>(comparer);
             materialPulledSet.UnionWith(materialPulled);
 

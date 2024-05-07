@@ -55,7 +55,7 @@ namespace BH.Adapter.RFEM6
 
             List<Edge> edges = new List<Edge>();
             rfOpening.boundary_lines.ToList().ForEach(l => edges.Add(edgeDict[l]));
-            Opening o = new Opening() {Edges=edges};
+            Opening o = new Opening() { Edges = edges };
 
             opening.SetRFEM6ID(rfOpening.no);
             o.SetRFEM6ID(rfOpening.no);
@@ -64,7 +64,11 @@ namespace BH.Adapter.RFEM6
             RFEMOpening rfemOpening = new RFEMOpening() { Opening = o, SurfaceIDs = surfaceIDs };
 
             rfemOpening.SetRFEM6ID(rfOpening.no);
-            BH.Engine.Base.Modify.SetPropertyValue(rfemOpening, "Comment", rfOpening.comment);
+
+            if (rfOpening.comment.Count() != 0)
+            {
+                BH.Engine.Base.Modify.SetPropertyValue(rfemOpening, "Comment", rfOpening.comment);
+            }
             return rfemOpening;
 
         }

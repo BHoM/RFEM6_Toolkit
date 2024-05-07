@@ -44,7 +44,11 @@ namespace BH.Adapter.RFEM6
 
             bhNode.Name = "Node Nr. " + node.no;
             bhNode.SetRFEM6ID(node.no);
-            BH.Engine.Base.Modify.SetPropertyValue(bhNode, "Comment", node.comment);
+
+            if (node.comment.Count() != 0)
+            {
+                BH.Engine.Base.Modify.SetPropertyValue(bhNode, "Comment", node.comment);
+            }
             return bhNode;
         }
 

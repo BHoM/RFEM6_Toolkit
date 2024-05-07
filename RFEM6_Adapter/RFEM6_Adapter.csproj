@@ -1,19 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net48</TargetFrameworks>
-	<AssemblyVersion>7.0.0.0</AssemblyVersion>
-	<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
-    <AssemblyName>RFEM6_Adapter</AssemblyName>
-    <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
-	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-	<FileVersion>7.2.0.0</FileVersion>
-	<BaseOutputPath>..\Build\</BaseOutputPath>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net48</TargetFrameworks>
+		<AssemblyVersion>7.0.0.0</AssemblyVersion>
+		<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
+		<AssemblyName>RFEM6_Adapter</AssemblyName>
+		<RootNamespace>BH.Adapter.RFEM6</RootNamespace>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<FileVersion>7.2.0.0</FileVersion>
+		<BaseOutputPath>..\Build\</BaseOutputPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="CRUD\Update\Node - Copy.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="CRUD\Update\Node - Copy.cs" />
+	</ItemGroup>
 
 
 	<ItemGroup>
@@ -93,6 +93,16 @@
 		<Reference Include="RFEMWebServiceLibrary">
 			<HintPath>..\packages\BHoM.Interop.RFEM6\RFEMWebServiceLibrary.dll</HintPath>
 		</Reference>
+		<Reference Include="Search_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Search_Engine.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Search_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Search_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+			<Private>false</Private>
+		</Reference>
 		<Reference Include="Spatial_Engine">
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Spatial_Engine.dll</HintPath>
 			<SpecificVersion>false</SpecificVersion>
@@ -121,11 +131,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Convert\ToRFEM6\BHoMDataStructure\Constraints\" />
+		<Folder Include="Convert\ToRFEM6\BHoMDataStructure\Constraints\" />
 	</ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
-  </Target>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
+	</Target>
 
 </Project>
