@@ -56,6 +56,7 @@ namespace BH.Adapter.RFEM6
 
                     if (material != null)
                     {
+                        material.SetRFEM6ID(rfMaterial.no);
                         materialList.Add(material);
 
                     }

@@ -269,6 +269,7 @@ namespace BH.Adapter.RFEM6
             }
 
             // Set Correct Materials
+            result=result.DeepClone();
             ((ISectionProperty)result).Material = sectionMaterials;
 
             return (ISectionProperty)result;
