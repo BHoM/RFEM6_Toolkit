@@ -92,7 +92,6 @@ namespace BH.Adapter.RFEM6
                 }
             }
 
-            result.SetRFEM6ID(rfMaterial.no);
 
             // If Material match is below 80 the assumption is that the is no matchi in libaray and default material will begreated
             if (sortedMatchingScoreDict.Keys.First() < 80)
@@ -107,6 +106,9 @@ namespace BH.Adapter.RFEM6
                 BH.Engine.Base.Compute.RecordWarning($"It is likely that the RFEM6 material {result.Name} has not corresponding element in the BHoM data set. It will be set to {result} instead when reading it, as this is the best guess.");
             }
 
+            result=result.DeepClone();
+            result.SetRFEM6ID(rfMaterial.no);
+            
             return (IMaterialFragment)result;
         }
 
