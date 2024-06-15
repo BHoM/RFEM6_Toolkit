@@ -242,7 +242,7 @@ namespace BH.Adapter.RFEM6
                 no = loadCaseSpecificLoadId,
                 comment = bhAreaLoad.Name,
                 surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
-                load_case = bhAreaLoad.Loadcase.GetRFEM6ID(),
+                load_case = bhAreaLoad.Loadcase.Number,
                 load_caseSpecified = true,
                 load_distribution = surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
@@ -342,7 +342,7 @@ namespace BH.Adapter.RFEM6
                 surfaces_string = string.Join(" ", surfaceIds.Select(n => n.ToString())),
 
                 no = loadCaseSpecificID,
-                load_case = bhLineLoad.Loadcase.GetRFEM6ID(),
+                load_case = bhLineLoad.Loadcase.Number,
                 load_caseSpecified = true,
                 load_distribution = free_line_load_load_distribution.LOAD_DISTRIBUTION_LINEAR,
                 load_distributionSpecified = true,
@@ -506,7 +506,7 @@ namespace BH.Adapter.RFEM6
             {
                 no = id,
                 lines = new int[] { foundEdgeId },
-                load_case = bhLineLoad.Loadcase.GetRFEM6ID(),
+                load_case = bhLineLoad.Loadcase.Number,
                 load_caseSpecified = true,
                 load_distribution = line_load_load_distribution.LOAD_DISTRIBUTION_TRAPEZOIDAL,
                 load_distributionSpecified = true,

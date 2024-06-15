@@ -198,9 +198,6 @@ namespace BH.Adapter.RFEM6
         private void UpdateLoadIdDictionary(ILoad load)
         {
 
-
-
-
             //Determin LoadType. Lineloads are handled differently as there is the need to discriminate between free and non-free line loads
             var rfLoadType = load.GetType().ToRFEM6().Value;
             bool lineLoadhasFragments = false;
@@ -238,7 +235,7 @@ namespace BH.Adapter.RFEM6
                 }
                 else
                 {
-                    int k = m_Model.get_first_free_number(rfLoadType, load.Loadcase.GetRFEM6ID());
+                    int k = m_Model.get_first_free_number(rfLoadType, load.Loadcase.Number);
                     loadIdDict.Add(type, k);
                 }
             }
@@ -251,13 +248,13 @@ namespace BH.Adapter.RFEM6
                     //type += "_" + geoLineLoad.Name;
                     type += "_" + (!isFreeLineLoad ? "NonFreeLineLoad" : "FreeLineLoad");
                     //var rfLoadType = geoLineLoad.Name == "Free" ? rfModel.object_types.E_OBJECT_TYPE_FREE_LINE_LOAD : rfModel.object_types.E_OBJECT_TYPE_LINE_LOAD;
-                    d.Add(type, m_Model.get_first_free_number(rfLoadType, load.Loadcase.GetRFEM6ID()));
+                    d.Add(type, m_Model.get_first_free_number(rfLoadType, load.Loadcase.Number));
                     m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
 
                 }
                 else
                 {
-                    d.Add(type, m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.GetRFEM6ID()));
+                    d.Add(type, m_Model.get_first_free_number(load.GetType().ToRFEM6().Value, load.Loadcase.Number));
                     m_LoadcaseLoadIdDict.Add(load.Loadcase, d);
                 }
 

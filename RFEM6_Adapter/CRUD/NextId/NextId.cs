@@ -62,10 +62,10 @@ namespace BH.Adapter.RFEM6
 
                 int id = 0;
 
-                if (objectType.Name.Equals("PointLoad")|| objectType.Name.Equals("BarUniformlyDistributedLoad")|| objectType.Name.Equals("GeometricalLineLoad")|| objectType.Name.Equals("AreaUniformlyDistributedLoad"))
+                if (objectType.Name.Equals("PointLoad") || objectType.Name.Equals("BarUniformlyDistributedLoad") || objectType.Name.Equals("GeometricalLineLoad") || objectType.Name.Equals("AreaUniformlyDistributedLoad"))
                 {
-
-                   id = m_Model.get_first_free_number(rfType.Value, 1);
+                        
+                    id = 0;
 
                 }
                 else

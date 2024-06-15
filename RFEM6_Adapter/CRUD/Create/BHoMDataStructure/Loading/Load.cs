@@ -70,7 +70,7 @@ namespace BH.Adapter.RFEM6
                     var currrSurfaceIds = (bhLoad as AreaUniformlyDistributedLoad).Objects.Elements.ToList().Select(e => m_PanelIDdict[e as Panel]).ToArray();
                     rfemAreaLoad.surfaces = currrSurfaceIds;
                     //rfemAreaLoad. = currrSurfaceIds;
-                    m_Model.set_surface_load(bhLoad.Loadcase.GetRFEM6ID(), rfemAreaLoad);
+                    m_Model.set_surface_load(bhLoad.Loadcase.Number, rfemAreaLoad);
 
                     continue;
                 }
@@ -106,7 +106,7 @@ namespace BH.Adapter.RFEM6
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     member_load member_load = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6((member_load_load_type)nodalLoadType, id);
                     var rfMemberLoad = member_load;
-                    m_Model.set_member_load(bhLoad.Loadcase.GetRFEM6ID(), rfMemberLoad);
+                    m_Model.set_member_load(bhLoad.Loadcase.Number, rfMemberLoad);
                     continue;
                 }
 
@@ -116,7 +116,7 @@ namespace BH.Adapter.RFEM6
                     UpdateLoadIdDictionary(bhLoad);
                     int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
                     nodal_load rfPointLoad = (bhLoad as PointLoad).ToRFEM6((nodal_load_load_type)nodalLoadType, id);
-                    m_Model.set_nodal_load(bhLoad.Loadcase.GetRFEM6ID(), rfPointLoad);
+                    m_Model.set_nodal_load(bhLoad.Loadcase.Number, rfPointLoad);
                     continue;
 
                 }
@@ -156,7 +156,7 @@ namespace BH.Adapter.RFEM6
                             int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name + "_NonFreeLineLoad"];
                             var locatedEdte = edgeProsepectSet.Where(e => (edgeComparer).Equals(e, new Edge() { Curve = (bhLoad as GeometricalLineLoad).Location })).FirstOrDefault();
                             line_load rfLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, locatedEdte.GetRFEM6ID(), (line_load_load_type)MomentOfForceLoad(bhLoad));
-                            m_Model.set_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfLineLoad);
+                            m_Model.set_line_load(bhLoad.Loadcase.Number, rfLineLoad);
                             continue;
                         }
                         else
@@ -203,7 +203,7 @@ namespace BH.Adapter.RFEM6
                         // 
                         int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name + "_FreeLineLoad"];
                         free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, currrSurfaceIds);
-                        m_Model.set_free_line_load(bhLoad.Loadcase.GetRFEM6ID(), rfFreeLineLoad);
+                        m_Model.set_free_line_load(bhLoad.Loadcase.Number, rfFreeLineLoad);
                         continue;
                     }
 
