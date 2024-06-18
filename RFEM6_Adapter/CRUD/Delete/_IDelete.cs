@@ -43,6 +43,10 @@ namespace BH.Adapter.RFEM6
 
             if (!rfemType.HasValue)
             {
+                //Avoind warking when type is edge
+                if (type.Name == "Edge") { return 0; }
+
+                // Log a warning if the type is not supported
                 BH.Engine.Base.Compute.RecordWarning($"Delete not implemented for obejcts of type {type.Name}.");
                 return 0;
             }

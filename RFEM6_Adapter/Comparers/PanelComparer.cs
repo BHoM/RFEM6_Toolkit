@@ -19,73 +19,56 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Numerics;
-
-using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
-using BH.oM.Structure.Loads;
+using BH.Engine.Structure;
+using System.Linq;
+using BH.oM.Analytical.Elements;
+using BH.oM.Geometry;
+using BH.Engine.Geometry;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.Engine.Spatial;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public class PanelComparer : IEqualityComparer<Panel>
     {
         /***************************************************/
-        /**** Private Methods                           ****/
+        /**** Constructors                              ****/
         /***************************************************/
 
-        protected override object NextFreeId(Type objectType, bool refresh = false)
+        public PanelComparer()
         {
 
-            int index = 1;
-
-            if (!refresh && m_FreeIds.TryGetValue(objectType, out index))
-            {
-                index++;
-                m_FreeIds[objectType] = index;
-                return index;
-            }
-            else
-            {
-                rfModel.object_types? rfType = objectType.ToRFEM6();
-
-                if (!rfType.HasValue)
-                {
-                    return null;
-                }
-
-                int id = 0;
-
-                if (objectType.Name.Equals("PointLoad") || objectType.Name.Equals("BarUniformlyDistributedLoad") || objectType.Name.Equals("GeometricalLineLoad") || objectType.Name.Equals("AreaUniformlyDistributedLoad"))
-                {
-                        
-                    id = 0;
-
-                }
-                else
-                {
-                    id = m_Model.get_first_free_number(rfType.Value, 0);
-                }
-
-                //id=rfType.Equals(rfModel.object_types.E_OBJECT_TYPE_NODE)?id-1:id;
-                m_FreeIds[objectType] = id;
-                return id;
-            }
         }
 
         /***************************************************/
-        /**** Private Fields                            ****/
+        /**** Public Methods                            ****/
         /***************************************************/
 
-        Dictionary<Type, int> m_FreeIds = new Dictionary<Type, int>();
+        public bool Equals(Panel panel0, Panel panel1)
+        {
+         
+            if(panel0.Centroid().Distance(panel1.Centroid())<0.001) return true;
+
+            return false;
+        }
+
+        /***************************************************/
+
+        public int GetHashCode(Panel panel)
+        {
+            //Check whether the object is null
+            return 0; 
+        }
 
         /***************************************************/
     }
 }
+
+
+
+
 
