@@ -39,22 +39,26 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private bool CreateCollection(IEnumerable<Panel> bhPanels)
-        {
+		private bool CreateCollection(IEnumerable<Panel> bhPanels)
+		{
+			foreach (Panel bhPanel in bhPanels)
+			{
+				rfModel.surface surface = bhPanel.ToRFEM6();
 
-            foreach (Panel bhPanel in bhPanels)
-            {
+				if (m_PanelIDdict.ContainsKey(bhPanel))
+				{
+					m_PanelIDdict[bhPanel] = bhPanel.GetRFEM6ID();
+				}
+				else
+				{
+					m_PanelIDdict.Add(bhPanel, bhPanel.GetRFEM6ID());
+				}
 
-                rfModel.surface surface = bhPanel.ToRFEM6();
-                m_PanelIDdict.Add(bhPanel, bhPanel.GetRFEM6ID());
+				m_Model.set_surface(surface);
+			}
 
-
-                m_Model.set_surface(surface);
-
-            }
-
-            return true;
-        }
+			return true;
+		}
 
     }
 }

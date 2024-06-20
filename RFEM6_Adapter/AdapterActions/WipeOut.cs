@@ -41,6 +41,7 @@ namespace BH.Adapter.RFEM6
                 this.Connect();
 
                 m_Model.delete_all();
+                m_Model.delete_all_history();
             }
             finally
             {

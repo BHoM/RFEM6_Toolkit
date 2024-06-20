@@ -21,12 +21,9 @@
  */
 using BH.Adapter.RFEM6;
 using BH.Engine.Base;
-using BH.Engine.Geometry;
-using BH.Engine.Structure;
-using BH.oM.Analytical.Elements;
+using BH.oM.Base;
 using BH.oM.Data.Requests;
-using BH.oM.Geometry;
-using BH.oM.Structure.Elements;
+using BH.oM.Spatial.ShapeProfiles;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
 
@@ -34,54 +31,54 @@ namespace RFEM_Toolkit_Test.Elements
 {
 
 
-    public class PushPullPanels0
+    public class Section_Refactored_Test
     {
         RFEM6Adapter adapter;
-        RFEMPanelComparer comparer;
-        Opening opening1;
-        Opening opening2;
-        Panel panel1;
-        Panel panel2;
-        Edge edge1;
-        Edge edge2;
-        Edge edge3;
-        Edge edge4;
-        Edge edge5;
-        Edge edge6;
-        Edge edge7;
-        Edge edge8;
-        Edge edge9;
-        Edge edge10;
-        Edge edge11;
-        Edge edge12;
+        ISectionProperty steelSection1;
+        ISectionProperty steelSection2;
+        ISectionProperty concreteSection0;
+        ISectionProperty concreteSection1;
+        ISectionProperty genericSectionGLTimber;
+        ISectionProperty genericSectionSawnTimber;
+        IProfile rectProfileGLTimber;
+        IProfile circleProfileSawnTimber;
+        IProfile concreteProfile1;
+        IProfile concreteProfile2;
 
+        IMaterialFragment glulam;
+        IMaterialFragment timberC;
+        Concrete concrete0;
+        Concrete concrete1;
+
+        RFEMSectionComparer comparer;
 
         [OneTimeSetUp]
-        public void InitializeOpenings()
+        public void InitializeRFEM6Adapter()
         {
             adapter = new RFEM6Adapter(true);
+            comparer = new RFEMSectionComparer();
         }
 
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //    adapter.Wipeout();
-        //}
+        [TearDown]
+        public void TearDown()
+        {
+            //adapter.Wipeout();
+        }
 
         [Test]
-        public void PullOfMaterial()
+        public void PullOfSection()
         {
+            /***************************************************/
+            /**** Test Preparation                          ****/
+            /***************************************************/
 
-
-            //Pull it
-            FilterRequest materialFilter = new FilterRequest() { Type = typeof(ISectionProperty) };
-            var materialPulled = adapter.Pull(materialFilter).ToList();
-            ISectionProperty mp = (ISectionProperty)materialPulled[0];
+           
+            FilterRequest sectionFilter = new FilterRequest() { Type = typeof(ISectionProperty) };
+            var sectionsPulled = adapter.Pull(sectionFilter).Select(s => (ISectionProperty)s).ToList();
+            //HashSet<ISectionProperty> sectionPulledSet = new HashSet<ISectionProperty>(comparer);
+            //sectionPulledSet.UnionWith(sectionsPulled.ToHashSet());
 
         }
 
     }
 }
-
-
-

@@ -36,379 +36,293 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
 using BH.oM.Physical.Materials;
 using static System.Collections.Specialized.BitVector32;
+using System.Security.Permissions;
+using BH.oM.Base;
+using System.Text.RegularExpressions;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-
-        public static ISectionProperty FromRFEM(this rfModel.section section, IMaterialFragment bhMaterial)
+        // Conversion of RFEM6 section of type Massiv I to BHoM Section
+        public static ISectionProperty FromRFEM_MassivI(this rfModel.section rfSection, IMaterialFragment sectionMaterials)
         {
-            ISectionProperty bhSection = null;
+            string sectionName = rfSection.name.Split('|')[0];
 
-            if (bhMaterial is Steel)
+            section_parametrization_type parametrization_type = rfSection.parametrization_type;
+
+            ISectionProperty resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
+
+            switch (parametrization_type)
             {
-
-                if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_STEEL))
-                {
-
-                    bhSection = TranslateStandardizedSteelSectionToBHOM(section);
-
-                }
-                else
-                {
-
-                    bhSection = TranslateThinWalledSectionToBHoM(section, bhMaterial);
-                }
-
-            }
-
-            else if (bhMaterial is Concrete||bhMaterial is Glulam || bhMaterial is SawnTimber)
-            {
-
-                bhSection = TranslateMassiveISectionToBHoM(section, bhMaterial);
-
-            }
-            //else if (bhMaterial is Glulam || bhMaterial is SawnTimber)
-            //{
-            //    var profile = Engine.Spatial.Create.RectangleProfile(section.h, section.b, 0);
-            //    bhSection = BH.Engine.Structure.Create.GenericSectionFromProfile(profile, bhMaterial, section.name);
-            //    bhSection = TranslateMassiveISectionToBHoM(section, bhMaterial);
-
-
-            //}
-
-            // if not section has been found, create a default section
-            if (bhSection == null)
-
-            {
-                BH.Engine.Base.Compute.RecordWarning($"Section {section.name} could not be read and will be set to Explicite parameters set to 0!");
-                bhSection = new BH.oM.Structure.SectionProperties.ExplicitSection { Name = section.name };
-
-            }
-
-            bhSection.SetRFEM6ID(section.no);
-
-            if (section.comment.Contains("BHComment")) { 
-            
-                string sectionComment = "";
-                
-                sectionComment = section.comment.Split(';').ToList().Last();
-            
-                BH.Engine.Base.Modify.SetPropertyValue(bhSection, "Comment", sectionComment);
-            
-            }
-            
-            
-
-            return bhSection;
-        }
-
-        //Translates Standard Steel Sections From RFEM int BHoM
-        private static ISectionProperty TranslateStandardizedSteelSectionToBHOM(rfModel.section section)
-        {
-
-            BH.oM.Structure.SectionProperties.ISectionProperty bhSec = null;
-            string rfSecName_simplified = section.name.Split('|')[0].Replace(" ", "").ToUpper();
-
-            if (section.name.Split(' ')[0].Equals("L"))
-            {
-
-                bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
-
-                if (bhSec is null)
-                {
-                    rfSecName_simplified += ".0";
-                    bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
-
-                }
-
-                return bhSec.DeepClone();
-            }
-            else if (section.name.Split(' ')[0].Equals("RHSU"))
-            {
-                string[] signature = section.name.Split(' ')[1].Split('/');
-                int height = (int)(Double.Parse(signature[0]) * 1000);
-                int width = (int)(Double.Parse(signature[1]) * 1000);
-                double thickness = (Double.Parse(signature[2]) * 1000);
-
-                if (height.Equals(width))
-                {
-
-                    rfSecName_simplified = "SHS" + height + "X" + width + "X" + thickness;
-                }
-                else
-                {
-
-                    rfSecName_simplified = "RHS" + height + "X" + width + "X" + thickness;
-                }
-
-            }
-
-            else if (section.name.Split(' ')[0].Equals("1/2"))
-            {
-
-                string[] signature = section.name.Split(' ')[2].Split('x');
-
-                int height = (int)(Double.Parse(signature[0]));
-                int width = (int)(Double.Parse(signature[1]));
-                double thickness = (Double.Parse(signature[2]));
-
-
-                rfSecName_simplified = section.name.Split(' ')[1].Equals("UB") ? "TUB " : "TUC ";
-
-                rfSecName_simplified += height + "X" + width + "X" + thickness;
-
-                bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
-                if (bhSec is null)
-                {
-
-                    rfSecName_simplified = section.name.Split(' ')[1].Equals("UB") ? "1/2 UB " : "1/2 UC ";
-
-                    rfSecName_simplified += height + "X" + width + "X" + thickness;
-
-                    bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
-                }
-
-            }
-            else
-            {
-                bhSec = (BH.oM.Structure.SectionProperties.ISectionProperty)BH.Engine.Library.Query.Match("SectionProperties", rfSecName_simplified, true, true).DeepClone();
-            }
-            return bhSec;
-        }
-
-
-        //Translates Massive I Section to BHoM. Massive I is usually used for Concrete of Glulam or Sawn Timber
-        private static ISectionProperty TranslateMassiveISectionToBHoM(section rfSection, IMaterialFragment bhMaterial)
-        {
-            string[] sectionSignature = rfSection.name.Split(' ');
-            string sectionCatName = rfSection.name.Split(' ')[0].ToString();
-            String[] secParameters = new string[1];
-            Concrete bhConcrete = bhMaterial as Concrete;
-            String sectionName = bhMaterial is Concrete ? sectionCatName : rfSection.comment.Split(':')[1];
-
-            double width, height, diameter, thickness0, thickness1, thickness2, thickness3, radiusToe, radiusRoot;
-
-            ISectionProperty bhSection = null;
-
-
-            switch (sectionCatName)
-            {
-
-                case "CIRCLE_M1":
-
-                    diameter = Double.Parse(sectionSignature[1]);
-                    var d = rfSection.d;
-
-                    bhSection = bhMaterial is Concrete ?
-                    BH.Engine.Structure.Create.ConcreteCircularSection(diameter, bhConcrete, sectionName, null) as ISectionProperty :
-                    BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.CircleProfile(diameter), bhMaterial, sectionName);
-
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_RECTANGLE__R_M1:
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_SQUARE__SQ_M1:
+                    resultSection = BH.Engine.Structure.Create.ConcreteRectangleSection(rfSection.h, rfSection.b, sectionMaterials as Concrete, sectionName, null);
                     break;
-
-                case "R_M1":
-
-                    secParameters = sectionSignature[1].Split('/');
-                    width = Double.Parse(secParameters[0]);
-                    height = Double.Parse(secParameters[1]);
-
-
-                    bhSection = bhMaterial is Concrete ?
-                    BH.Engine.Structure.Create.ConcreteRectangleSection(height, width, bhConcrete, sectionName,null) as ISectionProperty :
-                    BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.RectangleProfile(height, width), bhMaterial, sectionName);
-
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_ROUND_CORNER_RECTANGLE__RR_M1:
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_ROUND_CORNER_SQUARE__SQR_M1:
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.RectangleProfile(rfSection.h, rfSection.b, rfSection.r_o), sectionMaterials, sectionName);
                     break;
-
-                case "HCIRCLE_M1":
-
-                    secParameters = sectionSignature[1].Split('/');
-                    diameter = Double.Parse(secParameters[0]);
-                    thickness0 = Double.Parse(secParameters[1]);
-
-                    var bhProfile0 = BH.Engine.Spatial.Create.TubeProfile(diameter, thickness0);
-
-                    bhSection = bhMaterial is Concrete ?
-                    BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile0, bhConcrete, null) as ISectionProperty :
-                    BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.TubeProfile(diameter, thickness0), bhMaterial, sectionName);
-
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_T_SECTION__T_M1:
+                    resultSection = BH.Engine.Structure.Create.ConcreteTSection(rfSection.h, rfSection.b_w_M, rfSection.b, rfSection.h_f_M, sectionMaterials as Concrete, sectionName);
                     break;
-
-                case "PRO_M1":
-
-                    secParameters = sectionSignature[1].Split('/');
-                    height = Double.Parse(secParameters[0]);
-                    width = Double.Parse(secParameters[1]);
-                    thickness0 = Double.Parse(secParameters[2]);
-
-                    BH.oM.Spatial.ShapeProfiles.BoxProfile bhProfile1 = BH.Engine.Spatial.Create.BoxProfile(height, width, thickness0);
-
-                    bhSection = bhMaterial is Concrete ?
-                    BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile1, bhConcrete, null) as ISectionProperty :
-                    BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.BoxProfile(height, width, thickness0), bhMaterial, sectionName);
-
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_HOLLOW_CIRCLE__HCIRCLE_M1:
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.TubeProfile(rfSection.d, rfSection.t), sectionMaterials, sectionName);
                     break;
-
-                case "ID_M1":
-
-                    secParameters = sectionSignature[1].Split('/');
-                    height = Double.Parse(secParameters[0]);
-                    width = Double.Parse(secParameters[1]);
-                    thickness0 = Double.Parse(secParameters[2]);//Flange
-                    thickness1 = Double.Parse(secParameters[3]);//Web
-
-                    BH.oM.Spatial.ShapeProfiles.ISectionProfile bhProfile2 = BH.Engine.Spatial.Create.ISectionProfile(height, width, thickness1, thickness0, 0, 0);
-             
-                    bhSection = bhMaterial is Concrete ?
-                    BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile2, bhConcrete, null) as ISectionProperty :
-                    BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.ISectionProfile(height, width, thickness1, thickness0, 0, 0), bhMaterial, sectionName);
-
-
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_CIRCLE__CIRCLE_M1:
+                    resultSection = BH.Engine.Structure.Create.ConcreteCircularSection(rfSection.d, sectionMaterials as Concrete, sectionName, null);
                     break;
+                case section_parametrization_type.PARAMETRIC_MASSIVE_I__MASSIVE_RECTANGLE_WITH_RECTANGULAR_OPENING__RRO_M1
+:
+                    var h0 = rfSection.h_f_b_M;
+                    var h1 = rfSection.h_f_t_M;
+                    var b0 = rfSection.b_w_l_M;
+                    var b1 = rfSection.b_w_r_M;
 
-                case "T_M1":
+                    if (!(h0 == h1 && b0 == b1 && h0 == b1))
+                    {
+                        BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} can't be read as wall thickness of the Box need to constant. A Explicit section will be read instead!");
+                        break;
+                    }
 
-                    secParameters = sectionSignature[1].Split('/');
-                    height = Double.Parse(secParameters[0]);
-                    width = Double.Parse(secParameters[1]);
-                    thickness0 = Double.Parse(secParameters[2]);//Flange
-                    thickness1 = Double.Parse(secParameters[3]);//Web
-
-                    BH.oM.Spatial.ShapeProfiles.TSectionProfile bhProfile3 = BH.Engine.Spatial.Create.TSectionProfile(height, width, thickness1, thickness0, 0, 0);
-
-                    bhSection = bhMaterial is Concrete ?
-                    BH.Engine.Structure.Create.ConcreteSectionFromProfile(bhProfile3, bhConcrete, null) as ISectionProperty :
-                    BH.Engine.Structure.Create.GenericSectionFromProfile(BH.Engine.Spatial.Create.TSectionProfile(height, width, thickness1, thickness0, 0, 0), bhMaterial, sectionName);
-
+                    resultSection = BH.Engine.Structure.Create.SectionPropertyFromProfile(BH.Engine.Spatial.Create.BoxProfile(rfSection.h, rfSection.b, rfSection.h_f_b_M), sectionMaterials, sectionName);
 
                     break;
 
                 default:
 
-                    bhSection = BH.Engine.Structure.Create.ConcreteCircularSection(1, bhConcrete, null);
+                    BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
+                    resultSection = new ExplicitSection() { Name = sectionName };
+                    break;
+            }
+
+            if (resultSection == null)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
+                resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
+            }
+
+            return resultSection;
+
+        }
+
+        // Conversion of RFEM6 section of type Thin Walled to BHoM Section
+        public static ISectionProperty FromRFEM_ThinWalled(this rfModel.section rfSection, IMaterialFragment sectionMaterials)
+        {
+            string sectionName = rfSection.name.Split('|')[0];
+
+            section_parametrization_type parametrization_type = rfSection.parametrization_type;
+
+            ISectionProperty resultSection = new ExplicitSection() { };
+
+            switch (parametrization_type)
+            {
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__SQUARE_HOLLOW_SECTION__SHS:
+
+                    if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
+                    {
+                        //welded
+                        resultSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.t, 0, sectionMaterials as Steel, sectionName);
+                    }
+                    else
+                    {
+                        //cold formed or hot rolled
+                        resultSection = BH.Engine.Structure.Create.SteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.r_i, rfSection.r_o, sectionMaterials as Steel, sectionName);
+                    }
 
                     break;
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__RECTANGULAR_HOLLOW_SECTION__RHS:
+
+                    if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
+                    {
+                        //welded
+                        resultSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.t, 0, sectionMaterials as Steel, sectionName);
+                    }
+                    else
+                    {
+                        //cold formed or hot rolled
+                        resultSection = BH.Engine.Structure.Create.SteelBoxSection(rfSection.h, rfSection.b, rfSection.t, rfSection.r_i, rfSection.r_o, sectionMaterials as Steel, sectionName);
+                    }
+
+                    break;
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__CIRCULAR_HOLLOW_SECTION__CHS:
+
+
+                    //cold formed or hot rolled
+                    resultSection = BH.Engine.Structure.Create.SteelTubeSection(rfSection.d, rfSection.t, sectionMaterials as Steel, sectionName);
+
+                    break;
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__I_SECTION__I:
+
+                    if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
+                    {
+                        //welded 
+                        resultSection = BH.Engine.Structure.Create.SteelFabricatedISection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.b, rfSection.t_f, rfSection.a_weld, sectionMaterials as Steel, sectionName);
+                    }
+                    else
+                    {
+                        //Hot rolled
+                        resultSection = BH.Engine.Structure.Create.SteelISection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.r_1, rfSection.r_2, sectionMaterials as Steel, sectionName);
+                    }
+
+                    break;
+                case section_parametrization_type.PARAMETRIC_THIN_WALLED__T_SECTION__T:
+
+                    // welded
+                    if (rfSection.manufacturing_type.Equals(section_manufacturing_type.MANUFACTURING_TYPE_WELDED))
+                    {
+                        BH.Engine.Base.Compute.RecordWarning($"BHoM does not support welded T section. {rfSection.name} will be read as Hot Rolled.");
+                    }
+                    //Hot rolled
+                    resultSection = BH.Engine.Structure.Create.SteelTSection(rfSection.h, rfSection.t_w, rfSection.b, rfSection.t_f, rfSection.r_1, rfSection.r_2, sectionMaterials as Steel, sectionName);
+
+
+                    break;
+                default:
+
+                    //If section has not been implemented yet
+                    BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
+                    resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
+                    break;
+            }
+
+            // creation of BHoM Section has failed
+            if (resultSection == null)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicite parameters set to 0!");
+                resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
 
             }
 
-            return bhSection;
+
+            return resultSection;
+
         }
 
-        // Translates Thin Walled Section to BHoM. Thin Walled Sections are usually used for Steel
-        private static ISectionProperty TranslateThinWalledSectionToBHoM(section rfSection, IMaterialFragment bhMaterial)
+        // Conversion of RFEM6 section of type Standardized Steel to BHoM Section
+        public static ISectionProperty FromRFEM_Standardized_Steel(this rfModel.section rfSection, List<IBHoMObject> bhSections, IMaterialFragment sectionMaterials)
         {
-            string[] sectionSignature = rfSection.name.Split(' ');
-            string sectionCatName = sectionSignature[0];
-            String[] secParameters = new string[1];
-            Steel bhSteel = bhMaterial as Steel;
 
-            double width, height, diameter, thickness0, thickness1, thickness2, thickness3, radiusToe, radiusRoot0, radiusRoot1, flangeWidthTop, flangeWidthBot;
 
-            ISectionProperty bhSection = null;
+            String sectionName = new String((rfSection.name.Where(c => !char.IsWhiteSpace(c)).ToArray())).Split()[0];
+            sectionName = sectionName.Split('|')[0];
+            //sectionName = sectionName.Replace(" ", "");
+            sectionName = Regex.Replace(sectionName, @"[^a-zA-Z0-9]", "");
 
-            switch (sectionCatName)
+            Dictionary<ISectionProperty, int> scorsDict = new Dictionary<ISectionProperty, int>();
+            bhSections.ForEach(z => scorsDict.Add((ISectionProperty)z, BH.Engine.Search.Compute.MatchScore(sectionName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", ""))));
+
+            Dictionary<int, HashSet<IBHoMObject>> scorsDict_test = new Dictionary<int, HashSet<IBHoMObject>>();
+            //bhSections.ForEach(z => scorsDict_test[BH.Engine.Search.Compute.MatchScore(sectionName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", "")], )));
+
+
+            foreach (var z in bhSections)
             {
 
-                case "ROUND":
+                HashSet<IBHoMObject> value;
+                int key = BH.Engine.Search.Compute.MatchScore(sectionName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", ""));
+                if (scorsDict_test.TryGetValue(key, out value))
+                {
+                    scorsDict_test[key].Add((ISectionProperty)z);
 
-                    secParameters = sectionSignature[1].Split('/');
-                    diameter = Double.Parse(secParameters[0]);
-                    bhSection = BH.Engine.Structure.Create.SteelCircularSection(diameter, bhSteel, rfSection.name);
+                }
+                else
+                {
 
-                    break;
+                    scorsDict_test[key] = new HashSet<IBHoMObject>() { z };
+                }
 
-                case "RHSU":
 
-                    secParameters = sectionSignature[1].Split('/');
-                    width = Double.Parse(secParameters[1]);
-                    height = Double.Parse(secParameters[0]);
-                    thickness0 = Double.Parse(secParameters[2]);//web1
-                    thickness1 = Double.Parse(secParameters[3]);//web2
-                    thickness2 = Double.Parse(secParameters[4]);//flange1
-                    thickness3 = Double.Parse(secParameters[5]);//flange2
+            }
+            var sortedSectNames_test = scorsDict_test.OrderByDescending(z => z.Key).ToDictionary(z => z.Key, z => z.Value);
 
-                    bhSection = BH.Engine.Structure.Create.FabricatedSteelBoxSection(height, width, thickness0, thickness2, 0, bhSteel, rfSection.name);
+            var result = sortedSectNames_test.Values.First().ToList()[0];
 
-                    break;
+            if (sortedSectNames_test.Keys.First() < 85)
+            {
 
-                case "IS":
+                string noMatchSecName = rfSection.name.Split('|')[0];
+                BH.Engine.Base.Compute.RecordWarning($"The Standard section {noMatchSecName} has no corresponding object within the BHoM dataset. It will be read as ExpliciteSection with an appropriate name and material");
+                return new ExplicitSection() { Name = noMatchSecName, Material = sectionMaterials };
+            }
 
-                    secParameters = sectionSignature[1].Split('/');
+            if (sortedSectNames_test.Values.First().Count > 1)
+            {
+                result = sortedSectNames_test.Values.First().ToList()[0];
 
-                    height = Double.Parse(secParameters[0]);
-                    flangeWidthTop = Double.Parse(secParameters[1]);
-                    flangeWidthBot = Double.Parse(secParameters[2]);
-                    thickness0 = Double.Parse(secParameters[3]);//web
-                    thickness1 = Double.Parse(secParameters[4]);//FlangeTop
-                    thickness2 = Double.Parse(secParameters[5]);//FlangeBot
-                    radiusRoot0 = Double.Parse(secParameters[6]);//RootRadTop
-                    radiusRoot1 = Double.Parse(secParameters[7]);//RootRadBot
+                foreach (var i in sortedSectNames_test.Values.First())
+                {
 
-                    bhSection = BH.Engine.Structure.Create.SteelFabricatedISection(height, thickness0, flangeWidthTop, thickness1, flangeWidthBot, thickness2, 0, bhSteel, rfSection.name);
+                    string mod_name = Regex.Replace(i.Name, @"[^a-zA-Z0-9]", "");
+                    string mod_sectionName = Regex.Replace(sectionName, @"[^a-zA-Z0-9]", "");
 
-                    break;
+                    if (IsAnagramUsingSort(mod_name, mod_sectionName))
+                    {
 
-                case "I":
+                        result = i;
 
-                    secParameters = sectionSignature[1].Split('/');
+                        break;
+                    }
 
-                    height = Double.Parse(secParameters[0]);
-                    width = Double.Parse(secParameters[1]);
-                    thickness0 = Double.Parse(secParameters[2]);//thickWeb
-                    thickness1 = Double.Parse(secParameters[3]);//thickFlange
-                    radiusRoot0 = Double.Parse(secParameters[4]);//RootRadTop
-                    radiusToe = Double.Parse(secParameters[5]);//ToeRad
+                }
 
-                    bhSection = BH.Engine.Structure.Create.SteelISection(height, thickness0, width, thickness1, radiusRoot0, radiusToe, bhSteel, rfSection.name);
+            }
 
-                    break;
+            // Set Correct Materials
+            result=result.DeepClone();
+            ((ISectionProperty)result).Material = sectionMaterials;
 
-                case "FLAT":
+            return (ISectionProperty)result;
 
-                    secParameters = sectionSignature[1].Split('/');
-                    height = Double.Parse(secParameters[0]);
-                    width = Double.Parse(secParameters[1]);
 
-                    bhSection = BH.Engine.Structure.Create.SteelRectangleSection(height, width, 0, bhSteel, rfSection.name);
+        }
 
-                    break;
+        // Conversion of RFEM6 section of type Standardized Timber to BHoM Section
+        public static ISectionProperty FromRFEM_Standardized_Timber(this rfModel.section rfSection, IMaterialFragment sectionMaterials)
+        {
+            string sectionName = rfSection.name.Split('|')[0];
 
-                case "T":
+            section_type parametrization_type = rfSection.type;
 
-                    secParameters = sectionSignature[1].Split('/');
-                    height = Double.Parse(secParameters[0]);
-                    width = Double.Parse(secParameters[1]);
-                    thickness0 = Double.Parse(secParameters[2]);//thickWeb
-                    thickness1 = Double.Parse(secParameters[3]);//thickFlange
-                    radiusRoot0 = Double.Parse(secParameters[4]);//RootRadTop
-                    radiusToe = Double.Parse(secParameters[5]);//ToeRad
+            ISectionProperty resultSection = new ExplicitSection() { };
 
-                    bhSection = BH.Engine.Structure.Create.SteelTSection(height, thickness0, width, thickness1, radiusRoot0, radiusToe, bhSteel, rfSection.name);
-
-                    break;
-
-                case "CHS":
-
-                    secParameters = sectionSignature[1].Split('/');
-                    diameter = Double.Parse(secParameters[0]);
-                    thickness0 = Double.Parse(secParameters[1]);
-                    bhSection = BH.Engine.Structure.Create.SteelTubeSection(diameter, thickness0, bhSteel, rfSection.name);
-
+            switch (parametrization_type)
+            {
+                case section_type.TYPE_STANDARDIZED_TIMBER:
+                    resultSection = BH.Engine.Structure.Create.TimberRectangleSection(rfSection.h, rfSection.b, 0, sectionMaterials as ITimber, sectionName);
                     break;
 
                 default:
-
-                    secParameters = sectionSignature[1].Split('/');
-                    diameter = Double.Parse(secParameters[0]);
-                    bhSection = BH.Engine.Structure.Create.SteelCircularSection(1, bhSteel, "Default Round Beam D=1m");
-
+                    BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicit parameters set to 0!");
+                    resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
                     break;
 
             }
 
-            bhSection.Name = rfSection.name;
+            // creation of BHoM Section has failed
+            if (resultSection == null)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Section {rfSection.name} could not be read and will be set to Explicit parameters set to 0!");
+                resultSection = new ExplicitSection() { Name = sectionName, Material = sectionMaterials };
 
-            return bhSection;
+            }
+
+            return resultSection;
+        }
+
+        // Function to check if two strings are anagrams
+        public static bool IsAnagramUsingSort(string str1, string str2)
+        {
+            if (str1.Length != str2.Length)
+                return false;
+
+            char[] sorted1 = str1.ToCharArray();
+            char[] sorted2 = str2.ToCharArray();
+
+            Array.Sort(sorted1);
+            Array.Sort(sorted2);
+
+            return sorted1.SequenceEqual(sorted2);
         }
 
     }

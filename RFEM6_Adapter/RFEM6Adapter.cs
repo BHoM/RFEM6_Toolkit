@@ -123,7 +123,7 @@ namespace BH.Adapter.RFEM6
         {
             get
             {
-                BasicHttpBinding binding = new BasicHttpBinding { SendTimeout = new TimeSpan(0, 0, 180), UseDefaultWebProxy = true, };
+                BasicHttpBinding binding = new BasicHttpBinding { SendTimeout = new TimeSpan(0, 0, 180), UseDefaultWebProxy = true,MaxReceivedMessageSize= 2147483647 };
                 return binding;
             }
         }

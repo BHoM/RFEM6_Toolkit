@@ -55,7 +55,7 @@ namespace BH.Adapter.RFEM6
             Panel panel = new Panel();
 
 
-            if (openingIDs.Count>0)
+            if (openingIDs.Count > 0)
             {
 
                 List<Opening> openingins = new List<Opening>();
@@ -81,8 +81,11 @@ namespace BH.Adapter.RFEM6
             }
 
             panel.SetRFEM6ID(rfSurface.no);
-            BH.Engine.Base.Modify.SetPropertyValue(panel, "Comment", rfSurface.comment);
 
+            if (rfSurface.comment.Count() != 0)
+            {
+                BH.Engine.Base.Modify.SetPropertyValue(panel, "Comment", rfSurface.comment);
+            }
             return panel;
         }
 

@@ -74,18 +74,14 @@ namespace BH.Adapter.RFEM6
                 {typeof(BarUniformlyDistributedLoad), new List<Type> { typeof(Bar),typeof(Loadcase)} },
                 {typeof(PointLoad), new List<Type> { typeof(Node), typeof(Loadcase) } },
                 {typeof(AreaUniformlyDistributedLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } },
-                {typeof(GeometricalLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase), /*typeof(RFEMNonFreeLineLoad)*/ } },
-                //{typeof(RFEMNonFreeLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase), typeof(GeometricalLineLoad) } }
+                {typeof(GeometricalLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase)} },
 
             };
 
-            
-                //{ typeof(IElementLoad<Node>), new List<Type> { typeof(Node) } }
         }
 
         private void AddAdapterModules()
         {
-
 
             BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
             this.AdapterModules.Add(new GetRFEMNodalSupportModule());
@@ -94,14 +90,11 @@ namespace BH.Adapter.RFEM6
             this.AdapterModules.Add(new GetLineFromBarModule());
             this.AdapterModules.Add(new GetLineFromEdgeModule());
             this.AdapterModules.Add(new GetOpeningFromOpeningModule());
-            //this.AdapterModules.Add(new GetNonFreeLineLoadsModule());
-
 
         }
 
         private Dictionary<Type, object> GenerateAdapterComparersSettings()
         {
-
 
             return new Dictionary<Type, object>
             {
@@ -117,13 +110,9 @@ namespace BH.Adapter.RFEM6
                 {typeof(Edge), new EdgeComparer()},
                 {typeof(RFEMLineSupport), new RFEMLineSupportComparer() },
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
-                {typeof(Panel), new RFEMPanelComparer() },
-                {typeof(Loadcase), new LoadCaseComparer() },
-                //{typeof(BarUniformlyDistributedLoad), new NameOrDescriptionComparer()},
-                //{typeof(ILoad), new RFEMLoadComparer()  },
-
-
-
+                //{typeof(Panel), new RFEMPanelComparer() },
+				{typeof(Panel), new PanelComparer() },
+				{typeof(Loadcase), new LoadCaseComparer() },
             };
              
            

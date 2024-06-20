@@ -39,19 +39,24 @@ namespace BH.Adapter.RFEM6
 
         private List<Loadcase> ReadLoadCase(List<string> ids = null)
         {
-
+            // Get all Loadcases from RFEM6
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LOAD_CASE);
             IEnumerable<rfModel.load_case> foundLoadCases = numbers.ToList().Select(n => m_Model.get_load_case(n.no));
 
             List<Loadcase> loadCases = new List<Loadcase>();
+           
+            // Convert the RFEM Loadcases to BHoM Loadcases
             foreach (rfModel.load_case loadCase in foundLoadCases)
             {
 
-                //lcName.Add(loadCase.action_category);
-                //Console.WriteLine(loadCase.action_category);
                 loadCases.Add(loadCase.FromRFEM());
 
             }
+
+
+
+            // Sort the Loadcases by Number
+            loadCases.Sort((x, y) => x.Number.CompareTo(y.Number));
 
             return loadCases;
         }

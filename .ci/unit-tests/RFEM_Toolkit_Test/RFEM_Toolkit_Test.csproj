@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -9,7 +9,7 @@
 
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
-		<FileVersion>7.1.0.0</FileVersion>
+		<FileVersion>7.2.0.0</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -79,6 +79,14 @@
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Physical_oM.dll</HintPath>
 			<SpecificVersion>false</SpecificVersion>
 		</Reference>
+		<Reference Include="Search_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Search_Engine.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
+		<Reference Include="Search_oM">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\Search_oM.dll</HintPath>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
 		<Reference Include="Spatial_Engine">
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Spatial_Engine.dll</HintPath>
 			<SpecificVersion>false</SpecificVersion>
@@ -102,7 +110,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="BHoMDataStructure\Loading\" />
 		<Folder Include="IntermediateDataStructures\" />
 	</ItemGroup>
 

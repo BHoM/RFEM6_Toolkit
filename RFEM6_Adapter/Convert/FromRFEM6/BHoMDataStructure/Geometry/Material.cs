@@ -33,59 +33,92 @@ using BH.oM.Structure.MaterialFragments;
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
 using Dlubal.WS.Rfem6.Model;
+using BH.oM.Base;
+using BH.oM.Structure.SectionProperties;
+using System.Text.RegularExpressions;
+using BH.oM.Physical.Materials;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
 
-        public static IMaterialFragment FromRFEM(this rfModel.material rfMaterial)
+        public static IMaterialFragment FromRFEM(this rfModel.material rfMaterial, List<IMaterialFragment> matLibrary)
         {
 
-            string s = rfMaterial.generating_object_info;
-            IMaterialFragment bhMaterial = null;
+            // Picking section of material and make it alpha numberic only
+            string matName = Regex.Replace(rfMaterial.name.Split('|')[0].ToString(), @"[^a-zA-Z0-9]", "");
 
-            String[] matParaArray = rfMaterial.comment.Split('|');
+            Dictionary<int, HashSet<IBHoMObject>> matchingScoreDict = new Dictionary<int, HashSet<IBHoMObject>>();
 
-            if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_STEEL) || rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_REINFORCING_STEEL))
+            // Filling the dictionary with matching scores
+            foreach (var z in matLibrary)
             {
-
-                bhMaterial = BH.Engine.Library.Query.Match("Steel", rfMaterial.name.Split('|')[0], true, true).DeepClone() as IMaterialFragment;
-
+                HashSet<IBHoMObject> value;
+                int key = BH.Engine.Search.Compute.MatchScore(matName, Regex.Replace(z.Name, @"[^a-zA-Z0-9]", ""));
+                if (matchingScoreDict.TryGetValue(key, out value))
+                {
+                    matchingScoreDict[key].Add((IBHoMObject)z);
+                }
+                else
+                {
+                    matchingScoreDict[key] = new HashSet<IBHoMObject>() { z };
+                }
 
             }
 
-            else if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_CONCRETE))
+            // Pick all elements with the highes score
+            var sortedMatchingScoreDict = matchingScoreDict.OrderByDescending(z => z.Key).ToDictionary(z => z.Key, z => z.Value);
+            var result = sortedMatchingScoreDict.Values.First().ToList()[0];
+
+
+
+            // If there are more than one element with the highest score, check for anagrams
+            if (sortedMatchingScoreDict.Values.First().Count > 1)
             {
+                result = sortedMatchingScoreDict.Values.First().ToList()[0];
 
-                bhMaterial = BH.Engine.Library.Query.Match("Concrete", rfMaterial.name.Split('|')[0], true, true).DeepClone() as IMaterialFragment;
+                foreach (var i in sortedMatchingScoreDict.Values.First())
+                {
+                    // Remove all special characters from the name
+                    string mod_name = Regex.Replace(i.Name, @"[^a-zA-Z0-9]", "");
+                    string mod_sectionName = Regex.Replace(matName, @"[^a-zA-Z0-9]", "");
 
+                    if (Convert.IsAnagramUsingSort(mod_name, mod_sectionName))
+                    {
+                        result = i;
+                        break;
+                    }
+                }
             }
 
-            else if (rfMaterial.material_type.Equals(rfModel.material_material_type.TYPE_TIMBER))
+
+            // If Material match is below 80 the assumption is that the is no matchi in libaray and default material will begreated
+            if (sortedMatchingScoreDict.Keys.First() < 80)
             {
+                // If the material is timber or glass, it is assumed to be isotropic, otherwise orthotropic
+                result = ((rfMaterial.material_type.Equals(material_material_type.TYPE_TIMBER) || (rfMaterial.material_type.Equals(material_material_type.TYPE_GLASS)) ?
+                    (new BH.oM.Structure.MaterialFragments.GenericIsotropicMaterial()) :
+                        (IBHoMObject)new BH.oM.Structure.MaterialFragments.GenericOrthotropicMaterial()));
 
-                
-                // Check for "Timber" Dataset to check for material
-                String timberType = rfMaterial.name.Substring(0, 2).ToLower()=="gl"? "Glulam": "SawnTimber";
 
-                
-                bhMaterial = BH.Engine.Library.Query.Match(timberType, rfMaterial.name.Split('|')[0], true, true) as IMaterialFragment;
-
+                result.Name = rfMaterial.name.Split('|')[0];
+                BH.Engine.Base.Compute.RecordWarning($"It is likely that the RFEM6 material {result.Name} has not corresponding element in the BHoM data set. It will be set to {result} instead when reading it, as this is the best guess.");
             }
 
-
-            if (bhMaterial == null)
-            {
-                BH.Engine.Base.Compute.RecordWarning($"Material {rfMaterial.name} could not be read and will be generated as GenericIsotropicMaterial with all parameters set to 0!");
-                bhMaterial = new BH.oM.Structure.MaterialFragments.GenericIsotropicMaterial { Name = rfMaterial.name, Density = 0, DampingRatio = 0, PoissonsRatio = 0, ThermalExpansionCoeff = 0, YoungsModulus = 0 };
-
-            }
-            bhMaterial.SetRFEM6ID(rfMaterial.no);
-            BH.Engine.Base.Modify.SetPropertyValue(bhMaterial, "Comment", rfMaterial.comment);
-            return bhMaterial;
+            result=result.DeepClone();
+            result.SetRFEM6ID(rfMaterial.no);
+            
+            return (IMaterialFragment)result;
         }
+
+
+
+
+
+
+
+
 
     }
 }
-

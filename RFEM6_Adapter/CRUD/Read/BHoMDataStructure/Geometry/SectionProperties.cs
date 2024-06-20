@@ -32,6 +32,9 @@ using BH.oM.Spatial.ShapeProfiles;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
+using BH.oM.Base;
+using System.Text.RegularExpressions;
+using System.Security.RightsManagement;
 
 namespace BH.Adapter.RFEM6
 {
@@ -40,97 +43,104 @@ namespace BH.Adapter.RFEM6
 
         private List<ISectionProperty> ReadSectionProperties(List<string> ids = null)
         {
-
             List<ISectionProperty> sectionList = new List<ISectionProperty>();
 
+            //Read Standard BHoM Steel Libraries
+            List<IBHoMObject> sectionListLib = new List<IBHoMObject>();
+            sectionListLib = BH.Engine.Library.Query.Library("Structure\\SectionProperties");
+
+            // Read RFEM Material Fragments From Caching System
+            Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
+            IMaterialFragment sectionMaterials;
+
+            // Read RFEM Sections from Model
             var sectionNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
             var allSections = sectionNumbers.ToList().Select(n => m_Model.get_section(n.no));
-
-            Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
-            IMaterialFragment material;
 
             foreach (var section in allSections)
             {
 
-                //String sectionName = (new string(section.name.Where(c => !char.IsWhiteSpace(c)).ToArray())).Split()[0];
-                String sectionName = new String((section.name.Where(c => !char.IsWhiteSpace(c)).ToArray())).Split()[0];
-                sectionName=sectionName.Split('|')[0];
-                ISectionProperty bhSetion;
+                // Preprocessing RFEM6 Section Name to match with BHoM Library
+                //String sectionName = new String((section.name.Where(c => !char.IsWhiteSpace(c)).ToArray())).Split()[0];
+                //sectionName = sectionName.Split('|')[0];
+                ISectionProperty bhSection;
                 //Standard steel sections
                 if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_STEEL))
                 {
-
-                    //Checking differnt data sets for for sections
-
-                    bhSetion = BH.Engine.Library.Query.Match("EU_SteelSections", sectionName, true, true).DeepClone() as SteelSection;
-                    if (bhSetion is null) {
-                        bhSetion = BH.Engine.Library.Query.Match("UK_SteelSections", sectionName, true, true).DeepClone() as SteelSection;
-                    }
-                    if(bhSetion is null) {
-                        bhSetion = BH.Engine.Library.Query.Match("US_SteelSections", sectionName, true, true).DeepClone() as SteelSection;
+                    if (!materials.TryGetValue(section.material, out sectionMaterials))
+                    {
+                        continue;
                     }
 
-                    bhSetion.SetRFEM6ID(section.no);
-                    sectionList.Add(bhSetion);
-
+                    // Brows Through the BHoM Library and find the best match
+                    bhSection = section.FromRFEM_Standardized_Steel(sectionListLib, sectionMaterials);
+                    bhSection.SetRFEM6ID(section.no);
+                    sectionList.Add(bhSection);
 
                 }
-                //Concrete Section Parametric Massive I
+                // Concrete Section Parametric Massive I
                 else if (section.type.Equals(rfModel.section_type.TYPE_PARAMETRIC_MASSIVE_I))
                 {
 
-                    if (!materials.TryGetValue(section.material, out material))
+                    if (!materials.TryGetValue(section.material, out sectionMaterials))
                     {
-                        material = m_Model.get_material(section.material).FromRFEM();
-                        materials[section.material] = material;
+                        continue;
                     }
-
-
-                    if (material != null)
-                    {
-
-                        bhSetion = section.FromRFEM(material);
-                        bhSetion.SetRFEM6ID(section.no);
-                        sectionList.Add(bhSetion);
-
-                    }
-
+                    bhSection = section.FromRFEM_MassivI(sectionMaterials);
+                    bhSection.SetRFEM6ID(section.no);
+                    sectionList.Add(bhSection);
                 }
+                // Standardized Timber Section
                 else if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_TIMBER))
                 {
-                    if (!materials.TryGetValue(section.material, out material))
-                    {
-                        material = m_Model.get_material(section.material).FromRFEM();
-                        materials[section.material] = material;
-                    }
-
-
-                    if (material != null)
+                    if (!materials.TryGetValue(section.material, out sectionMaterials))
                     {
 
-                        bhSetion = section.FromRFEM(material);
-                        bhSetion.SetRFEM6ID(section.no);
-                        sectionList.Add(bhSetion);
-
+                        continue;
                     }
 
+                    if (sectionMaterials != null)
+                    {
+                        //bhSection = Convert.FromRFEM_Standardized_Timber(section, sectionMaterials);
+                        bhSection = section.FromRFEM_Standardized_Timber(sectionMaterials);
 
+                        bhSection.SetRFEM6ID(section.no);
+                        sectionList.Add(bhSection);
+                    }
                 }
-                else { 
-                
-
-
+                // Parametric Thin Walled Section
+                else if (section.type.Equals(rfModel.section_type.TYPE_PARAMETRIC_THIN_WALLED))
+                {
+                    if (!materials.TryGetValue(section.material, out sectionMaterials))
+                    {
+                        continue;
+                    }
+                    bhSection = section.FromRFEM_ThinWalled(sectionMaterials);
+                    bhSection.SetRFEM6ID(section.no);
+                    sectionList.Add(bhSection);
                 }
+                else {
 
+                    BH.Engine.Base.Compute.RecordWarning($"The section {section.name} is not supported by the RFEM6 Adapter and will be read as ExplicitSection.");
 
+                    if (!materials.TryGetValue(section.material, out sectionMaterials))
+                    {
+                        continue;
+                    }
+
+                    bhSection =new ExplicitSection() { Name=section.name,Material= sectionMaterials };
+                    bhSection.SetRFEM6ID(section.no);                   
+                    sectionList.Add(bhSection);
                 
-                //IMaterialFragment material;
-                
+                }
             }
+
+            //Sort sections by RFEM6 ID
+            sectionList = sectionList.OrderBy(x => x.GetRFEM6ID()).ToList();
+
 
             return sectionList;
         }
-
     }
 }
 
