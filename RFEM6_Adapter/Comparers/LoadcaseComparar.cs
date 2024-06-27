@@ -60,13 +60,7 @@ namespace BH.Adapter.RFEM6
                 return false;
             
             }
-
-
-            //if (!(loadcase0.Name == null && loadcase1.Name == null))
-            //{
-            //    //if (!loadcase0.Name?.Equals(loadcase1.Name) ?? loadcase1.Name == null) { return false; }
-            //    if (!loadcase0.Name.Equals(loadcase1.Name)) { return false; }
-            //}
+            if(!loadcase0.Number.Equals(loadcase1.Number)) return false;
 
 
             if (!loadcase0.Nature.Equals(loadcase1.Nature)) { return false; }
