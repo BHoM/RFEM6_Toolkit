@@ -49,25 +49,9 @@ namespace BH.Adapter.RFEM6
         public bool Equals(Loadcase loadcase0, Loadcase loadcase1)
         {
 
-            //Checks if one Name is equals to Null and one is not
-            if ((loadcase0.Name == null && loadcase1.Name != null)|| (loadcase0.Name != null && loadcase1.Name == null))
-            {
-                return false;
-            }
+            if(!string.Equals(loadcase0.Name,loadcase1.Name)) return false;
 
-            //Checks if both Names are equal and not null or both are null
-            if (!(loadcase0.Name?.Equals(loadcase1.Name) ?? loadcase1.Name==null)) {
-                return false;
-            
-            }
-
-
-            //if (!(loadcase0.Name == null && loadcase1.Name == null))
-            //{
-            //    //if (!loadcase0.Name?.Equals(loadcase1.Name) ?? loadcase1.Name == null) { return false; }
-            //    if (!loadcase0.Name.Equals(loadcase1.Name)) { return false; }
-            //}
-
+            if(!loadcase0.Number.Equals(loadcase1.Number)) return false;
 
             if (!loadcase0.Nature.Equals(loadcase1.Nature)) { return false; }
 
