@@ -98,17 +98,24 @@ namespace BH.Adapter.RFEM6
                 foreach (int n in nodeIds)
                 {
 
-                    nodes_support_forces_row[] nodes_support_forces_rows = m_Model.get_results_for_nodes_support_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, lc, n);
+                    //nodes_support_forces_row[] nodes_support_forces_rows = m_Model.get_results_for_nodes_support_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, lc, n);
 
-                    var supportResultReaction = nodes_support_forces_rows.First().row;
-                    double fxValue = Double.Parse(supportResultReaction.support_force_p_x.value);
-                    double fyValue = Double.Parse(supportResultReaction.support_force_p_y.value);
-                    double fzValue = Double.Parse(supportResultReaction.support_force_p_z.value);
-                    double mxValue = Double.Parse(supportResultReaction.support_moment_m_x.value);
-                    double myValue = supportResultReaction.support_moment_m_y;
-                    double mzValue = supportResultReaction.support_moment_m_z;
+                    //var supportResultReaction = nodes_support_forces_rows.First().row;
+                    //double fxValue = Double.Parse(supportResultReaction.support_force_p_x.value);
+                    //double fyValue = Double.Parse(supportResultReaction.support_force_p_y.value);
+                    //double fzValue = Double.Parse(supportResultReaction.support_force_p_z.value);
+                    //double mxValue = Double.Parse(supportResultReaction.support_moment_m_x.value);
+                    //double myValue = supportResultReaction.support_moment_m_y;
+                    //double mzValue = supportResultReaction.support_moment_m_z;
 
-                    NodeReaction nodeReaction = new NodeReaction(n, lc, 0, 0, oM.Geometry.Basis.XY, fxValue, fyValue, fzValue, mxValue, myValue, mzValue);
+                    double fxValue = 0;
+					double fyValue = 0;
+					double fzValue = 0;
+					double mxValue = 0;
+					double myValue = 0;
+					double mzValue = 0;
+
+					NodeReaction nodeReaction = new NodeReaction(n, lc, 0, 0, oM.Geometry.Basis.XY, fxValue, fyValue, fzValue, mxValue, myValue, mzValue);
 
                     resultList.Add(nodeReaction);
 
