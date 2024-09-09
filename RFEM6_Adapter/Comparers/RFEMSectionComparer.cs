@@ -56,10 +56,10 @@ namespace BH.Adapter.RFEM6
                 Convert.AlterSectionName(section2);
             }
 
-            bool sectionTypeDoesMatch = String.Equals(section1.Name, section2.Name);
+            bool sectionNameDoesMatch = String.Equals(section1.Name, section2.Name);
             bool materialDoesMatch = String.Equals(section1.Material.Name, section2.Material.Name);
 
-            return false;
+            return sectionNameDoesMatch && materialDoesMatch;
 
         }
 
