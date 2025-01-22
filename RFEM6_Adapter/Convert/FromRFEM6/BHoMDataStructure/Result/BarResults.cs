@@ -45,22 +45,22 @@ using BH.oM.Structure.Requests;
 
 namespace BH.Adapter.RFEM6
 {
-    public static partial class Convert
-    {
+	public static partial class Convert
+	{
 
-        public static IResult FromRFEM(this members_internal_forces_row memberInternalForces, int lc ,DivisionType divisionType)
-        {
+		public static IResult FromRFEM(this members_internal_forces_row memberInternalForces, int lc, double memberLength)
+		{
 
-            var f = memberInternalForces.row;
-            
-			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, memberInternalForces.no, 10, f.internal_force_v, f.internal_force_vy, f.internal_force_vz,f.internal_force_mt, f.internal_force_my, f.internal_force_mz);
+			var f = memberInternalForces.row;
+
+			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 2), 10, f.internal_force_v, f.internal_force_vy, f.internal_force_vz, f.internal_force_mt, f.internal_force_my, f.internal_force_mz);
 
 			return barForce;
-        }
+		}
 
-     
 
-    }
+
+	}
 }
 
 
