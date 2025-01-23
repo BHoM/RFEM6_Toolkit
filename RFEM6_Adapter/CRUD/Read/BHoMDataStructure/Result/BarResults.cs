@@ -60,16 +60,18 @@ namespace BH.Adapter.RFEM6
 			// Definition of Object Locations for Members
 			object_location[] filters = memberIds.Select(n => new object_location() { type = object_types.E_OBJECT_TYPE_MEMBER, no = n, parent_no = 0 }).ToArray();
 
+			//ResultList
+			List<IResult> resultList = new List<IResult>();
 
-			List<IResult> allInternalForces = new List<IResult>();
+
 			foreach (int c in loadCaseIds)
 			{
-				//Get Results bar forces for specific LC
-				members_internal_forces_row[] resultForMemberInternalForces = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, filters, axes_type.MEMBER_AXES);
+				////Get Results bar forces for specific LC
+				//members_internal_forces_row[] resultForMemberInternalForces = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, filters, axes_type.MEMBER_AXES);
 
-				///////////////////////////////////////////playground
 
-				INotifyPropertyChanged[] barResults = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, filters, axes_type.MEMBER_AXES);
+				//INotifyPropertyChanged[] barResults = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, filters, axes_type.MEMBER_AXES);
+				INotifyPropertyChanged[] barResults = new INotifyPropertyChanged[1];
 
 				switch (request.ResultType)
 				{
@@ -90,7 +92,6 @@ namespace BH.Adapter.RFEM6
 
 						BH.Engine.Base.Compute.RecordError("The Pull of Bar Stresses has not been developed Yet");
 						return null;
-						break;
 
 					default:
 						barResults = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, filters, axes_type.MEMBER_AXES);
@@ -99,29 +100,61 @@ namespace BH.Adapter.RFEM6
 				}
 
 				//Grouping of Internal Forces grouped by Member No
-				var memberInternalForceGroup = resultForMemberInternalForces.GroupBy(r => r.row.member_no);
+				var memberInternalForceGroup = barResults.GroupBy(r =>Int32.Parse(r.PropertyValue("row.member_no").ToString()));
 
-				foreach (IGrouping<int, members_internal_forces_row> member in memberInternalForceGroup)
+				foreach (IGrouping<int, INotifyPropertyChanged> member in memberInternalForceGroup)
 				{
 					//Ignore Results that do now have a valied ID
 					if (member.Key == 0) continue;
 
 					//Determine Member length
-					String lengthAsString = member.First().row.specification.Split(new[] { "L : ", " m" }, StringSplitOptions.None)[1];
+					String lengthAsString = member.ToList()[0].PropertyValue("row.specification").ToString().Split(new[] { "L : ", " m" }, StringSplitOptions.None)[1];
 					double memberLength = double.Parse(lengthAsString, CultureInfo.InvariantCulture);// Member Length in SI unit m;
 
 
-					//If 
+					//If we are looking for exterme Values
 					if (request.DivisionType == DivisionType.ExtremeValues)
 					{
 
-						List<members_internal_forces_row> extremeValues = getExtremesForBarForces(member.ToList());
 
-						foreach (var e in extremeValues)
+						if (member.First() is members_internal_forces_row)
 						{
-							//e.FromRFEM(c,memberLength).
-							allInternalForces.Add(e.FromRFEM(c, memberLength));
+							List<members_internal_forces_row> extremeValues = getExtremesForBarForces(member.Cast<members_internal_forces_row>().ToList());
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
 						}
+
+						else if (member.First() is members_local_deformations)
+						{
+							List<members_local_deformations_row> extremeValues = getExtremesLocalDeformation(member.Cast<members_local_deformations_row>().ToList());
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
+
+						}
+						else if (member.First() is members_global_deformations)
+						{
+							List<members_global_deformations_row> extremeValues = getExtremeGlobalDeformation(member.Cast<members_global_deformations_row>().ToList());
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
+
+						}
+						else if (member.First() is members_strains)
+						{
+							List<members_strains_row> extremeValues = getExtremeStrain(member.Cast<members_strains_row>().ToList());
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
+
+						}
+						else
+						{
+							List<members_internal_forces_row> extremeValues = getExtremesForBarForces(member.Cast<members_internal_forces_row>().ToList());
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
+
+						}
+
+						//List<members_internal_forces_row> extremeValues = getExtremesForBarForces(member.ToList());
+
+						//foreach (var e in extremeValues)
+						//{
+						//	//e.FromRFEM(c,memberLength).
+						//	allInternalForces.Add(e.FromRFEM(c, memberLength));
+						//}
 
 
 						continue;
@@ -131,20 +164,52 @@ namespace BH.Adapter.RFEM6
 					else
 					{
 
-						foreach (var memberSegment in member)
-						{
-							//Ignoring Rows after Extremes
-							if (memberSegment.description.Contains("Extremes")) { break; }
+						//foreach (var memberSegment in member)
+						//{
 
-							allInternalForces.Add(memberSegment.FromRFEM(c, memberLength));
+						//Ignoring Rows after Extremes
+						//if (memberSegment.PropertyValue("description").ToString().Contains("Extremes")) { break; }
+						var memberList = member.ToList();
+						memberList = member.TakeWhile(m => !m.PropertyValue("description").ToString().Contains("Extremes")).ToList();
+
+						if (memberList.First() is members_internal_forces_row)
+						{
+							List<members_internal_forces_row> extremeValues = memberList.Cast<members_internal_forces_row>().ToList();
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
+						}
+
+						else if (memberList.First() is members_local_deformations_row)
+						{
+							List<members_local_deformations_row> extremeValues = memberList.Cast<members_local_deformations_row>().ToList();
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
 
 						}
+						else if (memberList.First() is members_global_deformations_row)
+						{
+							List<members_global_deformations_row> extremeValues = memberList.Cast<members_global_deformations_row>().ToList();
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
+
+						}
+						else if (memberList.First() is members_strains_row)
+						{
+							List<members_strains_row> extremeValues = memberList.Cast<members_strains_row>().ToList();
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
+
+						}
+						else
+						{
+							List<members_internal_forces_row> extremeValues = memberList.Cast<members_internal_forces_row>().ToList();
+							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
+
+						}
+
+						//}
 					}
 				}
 
 			}
 
-			return allInternalForces;
+			return resultList;
 
 		}
 
@@ -196,7 +261,7 @@ namespace BH.Adapter.RFEM6
 			return resultList;
 
 		}
-		private List<members_local_deformations_row> getExtremesForBarForces(List<members_local_deformations_row> membersLocalDeformation)
+		private List<members_local_deformations_row> getExtremesLocalDeformation(List<members_local_deformations_row> membersLocalDeformation)
 		{
 
 			var extremes_ = membersLocalDeformation.ToList().TakeWhile(v => !v.description.Contains("Extreme")).Aggregate(
@@ -245,6 +310,109 @@ namespace BH.Adapter.RFEM6
 			return resultList;
 
 		}
+
+		private List<members_global_deformations_row> getExtremeGlobalDeformation(List<members_global_deformations_row> membersLocalDeformation)
+		{
+
+			var extremes_ = membersLocalDeformation.ToList().TakeWhile(v => !v.description.Contains("Extreme")).Aggregate(
+			   new
+			   {
+				   dXMax = membersLocalDeformation.First(),
+				   dXMin = membersLocalDeformation.First(),
+				   dyMax = membersLocalDeformation.First(),
+				   dyMin = membersLocalDeformation.First(),
+				   dzMax = membersLocalDeformation.First(),
+				   dzMin = membersLocalDeformation.First(),
+				   rotXMax = membersLocalDeformation.First(),
+				   rotXMin = membersLocalDeformation.First(),
+				   rotYMax = membersLocalDeformation.First(),
+				   rotYMin = membersLocalDeformation.First(),
+				   rotZMax = membersLocalDeformation.First(),
+				   rotZMin = membersLocalDeformation.First(),
+
+			   },
+(acc, m) => new
+{
+	dXMax = m.row.displacement_x > acc.dXMax.row.displacement_x ? m : acc.dXMax,
+	dXMin = m.row.displacement_x < acc.dXMin.row.displacement_x ? m : acc.dXMin,
+	dyMax = m.row.displacement_y > acc.dyMax.row.displacement_y ? m : acc.dyMax,
+	dyMin = m.row.displacement_y < acc.dyMin.row.displacement_y ? m : acc.dyMin,
+	dzMax = m.row.displacement_z > acc.dzMax.row.displacement_z ? m : acc.dzMax,
+	dzMin = m.row.displacement_z < acc.dzMin.row.displacement_z ? m : acc.dzMin,
+	rotXMax = m.row.rotation_x > acc.rotXMax.row.rotation_x ? m : acc.rotXMax,
+	rotXMin = m.row.rotation_x < acc.rotXMin.row.rotation_x ? m : acc.rotXMin,
+	rotYMax = m.row.rotation_y > acc.rotYMax.row.rotation_y ? m : acc.rotYMax,
+	rotYMin = m.row.rotation_y < acc.rotYMin.row.rotation_y ? m : acc.rotYMin,
+	rotZMax = m.row.rotation_z > acc.rotZMax.row.rotation_z ? m : acc.rotZMax,
+	rotZMin = m.row.rotation_z < acc.rotZMin.row.rotation_z ? m : acc.rotZMin
+}
+			);
+
+			List<members_global_deformations_row> resultList = new List<members_global_deformations_row>() {
+	extremes_.dXMax, extremes_.dXMin,
+	extremes_.dyMax, extremes_.dyMin,
+	extremes_.dzMax, extremes_.dzMin,
+	extremes_.rotXMax, extremes_.rotXMin,
+	extremes_.rotYMax, extremes_.rotYMin,
+	extremes_.rotZMax, extremes_.rotZMin
+};
+
+			return resultList;
+
+		}
+
+
+		private List<members_strains_row> getExtremeStrain(List<members_strains_row> membersLocalDeformation)
+		{
+
+			var extremes_ = membersLocalDeformation.ToList().TakeWhile(v => !v.description.Contains("Extreme")).Aggregate(
+			   new
+			   {
+				   exMax = membersLocalDeformation.First(),
+				   exMin = membersLocalDeformation.First(),
+				   yxyMax = membersLocalDeformation.First(),
+				   yxyMin = membersLocalDeformation.First(),
+				   yxzMax = membersLocalDeformation.First(),
+				   yxzMin = membersLocalDeformation.First(),
+				   kxMax = membersLocalDeformation.First(),
+				   kxMin = membersLocalDeformation.First(),
+				   kyMax = membersLocalDeformation.First(),
+				   kyMin = membersLocalDeformation.First(),
+				   kzMax = membersLocalDeformation.First(),
+				   kzMin = membersLocalDeformation.First()
+
+
+			   },
+(acc, m) => new
+{
+	exMax = m.row.strain_eps_x > acc.exMax.row.strain_eps_x ? m : acc.exMax,
+	exMin = m.row.strain_eps_x < acc.exMin.row.strain_eps_x ? m : acc.exMin,
+	yxyMax = m.row.strain_gamma_xy > acc.yxyMax.row.strain_gamma_xy ? m : acc.yxyMax,
+	yxyMin = m.row.strain_gamma_xy < acc.yxyMin.row.strain_gamma_xy ? m : acc.yxyMin,
+	yxzMax = m.row.strain_gamma_xz > acc.yxzMax.row.strain_gamma_xz ? m : acc.yxzMax,
+	yxzMin = m.row.strain_gamma_xz < acc.yxzMin.row.strain_gamma_xz ? m : acc.yxzMin,
+	kxMax = m.row.strain_kappa_x > acc.kxMax.row.strain_kappa_x ? m : acc.kxMax,
+	kxMin = m.row.strain_kappa_x < acc.kxMin.row.strain_kappa_x ? m : acc.kxMin,
+	kyMax = m.row.strain_kappa_y > acc.kyMax.row.strain_kappa_y ? m : acc.kyMax,
+	kyMin = m.row.strain_kappa_y < acc.kyMin.row.strain_kappa_y ? m : acc.kyMin,
+	kzMax = m.row.strain_kappa_z > acc.kzMax.row.strain_kappa_z ? m : acc.kzMax,
+	kzMin = m.row.strain_kappa_z < acc.kzMin.row.strain_kappa_z ? m : acc.kzMin
+}
+			);
+
+			List<members_strains_row> resultList = new List<members_strains_row>() {
+   extremes_.exMax, extremes_.exMin,
+   extremes_.yxyMax, extremes_.yxyMin,
+   extremes_.yxzMax, extremes_.yxzMin,
+   extremes_.kxMax, extremes_.kxMin,
+   extremes_.kyMax, extremes_.kyMin,
+   extremes_.kzMax, extremes_.kzMin
+};
+
+			return resultList;
+
+		}
+
 
 	}
 }

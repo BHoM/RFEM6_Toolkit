@@ -58,6 +58,35 @@ namespace BH.Adapter.RFEM6
 			return barForce;
 		}
 
+		public static IResult FromRFEM(this members_local_deformations_row memberInternalForces, int lc, double memberLength)
+		{
+
+			var f = memberInternalForces.row;
+
+			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 2), 10, f.displacement_x, f.displacement_y, f.displacement_z, f.displacement_x, f.displacement_y, f.displacement_z);
+
+			return barForce;
+		}
+
+		public static IResult FromRFEM(this members_global_deformations_row memberInternalForces, int lc, double memberLength)
+		{
+
+			var f = memberInternalForces.row;
+
+			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 2), 10, f.displacement_x, f.displacement_y, f.displacement_z, f.displacement_x, f.displacement_y, f.displacement_z);
+
+			return barForce;
+		}
+
+		public static IResult FromRFEM(this members_strains_row memberInternalForces, int lc, double memberLength)
+		{
+
+			var f = memberInternalForces.row;
+
+			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 2), 10, f.strain_eps_x, f.strain_gamma_xy, f.strain_gamma_xz, f.strain_kappa_x, f.strain_kappa_y, f.strain_kappa_y);
+
+			return barForce;
+		}
 
 
 	}
