@@ -79,133 +79,51 @@ namespace BH.Adapter.RFEM6
 					String lengthAsString = member.First().row.specification.Split(new[] { "L : ", " m" }, StringSplitOptions.None)[1];
 					double memberLength = double.Parse(lengthAsString, CultureInfo.InvariantCulture);// Member Length in SI unit m;
 
+
+					//If 
 					if (request.DivisionType == DivisionType.ExtremeValues)
 					{
 
-
-						var extremes = new Dictionary<string, (double value, members_internal_forces_row row)>();
-
-						foreach (var memberSegment in member)
-						{
-
-							if (memberSegment.description.Contains("Extremes")) break;
-
-						//	//local method updating dictinary
-						//	void UpdateExtreme(string key, double value, members_internal_forces_row row, Boolean isNegative)
-						//	{
-
-						//		//bool valueGetsUpdated = (!extremes.ContainsKey(key) || isNegative )? value < extremes[key].value : value > extremes[key].value;
-						//		bool valueGetsUpdated = !extremes.ContainsKey(key) || (isNegative ? value < extremes[key].value : value > extremes[key].value);
-
-						//		if ((!extremes.ContainsKey(key) || valueGetsUpdated) & !isNegative)
-						//		{
-						//			extremes[key] = (value, row);
-						//		}
-
-						//	}
-
-						//	UpdateExtreme("FX_Pos", memberSegment.row.internal_force_n, memberSegment, false);
-						//	UpdateExtreme("FY_Pos", memberSegment.row.internal_force_vy, memberSegment, false);
-						//	UpdateExtreme("FZ_Pos", memberSegment.row.internal_force_vz, memberSegment, false);
-						//	UpdateExtreme("MX_Pos", memberSegment.row.internal_force_mt, memberSegment, false);
-						//	UpdateExtreme("MY_Pos", memberSegment.row.internal_force_my, memberSegment, false);
-						//	UpdateExtreme("MZ_Pos", memberSegment.row.internal_force_mz, memberSegment, false);
-						//	UpdateExtreme("FX_Neg", memberSegment.row.internal_force_n, memberSegment, false);
-						//	UpdateExtreme("FY_Neg", memberSegment.row.internal_force_vy, memberSegment, false);
-						//	UpdateExtreme("FZ_Neg", memberSegment.row.internal_force_vz, memberSegment, false);
-						//	UpdateExtreme("MX_Neg", memberSegment.row.internal_force_mt, memberSegment, false);
-						//	UpdateExtreme("MY_Neg", memberSegment.row.internal_force_my, memberSegment, false);
-						//	UpdateExtreme("MZ_Neg", memberSegment.row.internal_force_mz, memberSegment, false);
-						//}
-
-
-						//var extremeValues = new List<members_internal_forces_row>
-						//						{
-						//							extremes["FX_Pos"].row,
-						//							extremes["FX_Pos"].row,
-						//							extremes["FZ_Pos"].row,
-						//							extremes["MX_Pos"].row,
-						//							extremes["MY_Pos"].row,
-						//							extremes["MZ_Pos"].row,
-						//							extremes["FX_Neg"].row,
-						//							extremes["FX_Neg"].row,
-						//							extremes["FZ_Neg"].row,
-						//							extremes["MX_Neg"].row,
-						//							extremes["MY_Neg"].row,
-						//							extremes["MZ_Neg"].row
-						//						};
-
-						//foreach (var e in extremeValues)
-						//{
-						//	//e.FromRFEM(c,memberLength).
-						//	allInternalForces.Add(e.FromRFEM(c, memberLength));
-						//}
-
-
-						var extremes_ = member.ToList().TakeWhile(v=>v.description.Contains("Extreme")).Aggregate(
+						var extremes_ = member.ToList().TakeWhile(v => !v.description.Contains("Extreme")).Aggregate(
 			   new
 			   {
-				   NMax = double.MinValue,
-				   NMaxSection = member.ToList()[0],
-				   NMin = double.MaxValue,
-				   NMinSection = member.ToList()[0],
-				   ZMax = double.MinValue,
-				   ZMaxSection = member.ToList()[0],
-				   ZMin = double.MaxValue,
-				   ZMinSection = member.ToList()[0],
-				   YMax = double.MinValue,
-				   YMaxSection = member.ToList()[0],
-				   YMin = double.MaxValue,
-				   YMinSection = member.ToList()[0],
-				   MXMax = double.MinValue,
-				   MXMaxSection = member.ToList()[0],
-				   MXMin = double.MaxValue,
-				   MXMinSection = member.ToList()[0],
-				   MYMax = double.MinValue,
-				   MYMaxSection = member.ToList()[0],
-				   MYMin = double.MaxValue,
-				   MYMinSection = member.ToList()[0],
-				   MZMax = double.MinValue,
-				   MZMaxSection = member.ToList()[0],
-				   MZMin = double.MaxValue,
-				   MZMinSection = member.ToList()[0]
+				   NMaxSection = member.First(),
+				   NMinSection = member.First(),
+				   ZMaxSection = member.First(),
+				   ZMinSection = member.First(),
+				   YMaxSection = member.First(),
+				   YMinSection = member.First(),
+				   MXMaxSection = member.First(),
+				   MXMinSection = member.First(),
+				   MYMaxSection = member.First(),
+				   MYMinSection = member.First(),
+				   MZMaxSection = member.First(),
+				   MZMinSection = member.First()
 			   },
 		(acc, m) => new
 		{
-			NMax = Math.Max(acc.NMax, m.row.internal_force_n),
-			NMaxSection = m.row.internal_force_n > acc.NMax ? m : acc.NMaxSection,
-			NMin = Math.Min(acc.NMin, m.row.internal_force_n),
-			NMinSection = m.row.internal_force_n < acc.NMin ? m : acc.NMinSection,
-			ZMax = Math.Max(acc.ZMax, m.row.internal_force_vz),
-			ZMaxSection = m.row.internal_force_vz > acc.ZMax ? m : acc.ZMaxSection,
-			ZMin = Math.Min(acc.ZMin, m.row.internal_force_vz),
-			ZMinSection = m.row.internal_force_vz < acc.ZMin ? m : acc.ZMinSection,
-			YMax = Math.Max(acc.YMax, m.row.internal_force_vy),
-			YMaxSection = m.row.internal_force_vy > acc.YMax ? m : acc.YMaxSection,
-			YMin = Math.Min(acc.YMin, m.row.internal_force_vy),
-			YMinSection = m.row.internal_force_vy < acc.YMin ? m : acc.YMinSection,
-			MXMax = Math.Max(acc.MXMax, m.row.internal_force_mt),
-			MXMaxSection = m.row.internal_force_mt > acc.MXMax ? m : acc.MXMaxSection,
-			MXMin = Math.Min(acc.MXMin, m.row.internal_force_mt),
-			MXMinSection = m.row.internal_force_mt < acc.MXMin ? m : acc.MXMinSection,
-			MYMax = Math.Max(acc.MYMax, m.row.internal_force_my),
-			MYMaxSection = m.row.internal_force_my > acc.MYMax ? m : acc.MYMaxSection,
-			MYMin = Math.Min(acc.MYMin, m.row.internal_force_my),
-			MYMinSection = m.row.internal_force_my < acc.MYMin ? m : acc.MYMinSection,
-			MZMax = Math.Max(acc.MZMax, m.row.internal_force_mz),
-			MZMaxSection = m.row.internal_force_mz > acc.MZMax ? m : acc.MZMaxSection,
-			MZMin = Math.Min(acc.MZMin, m.row.internal_force_mz),
-			MZMinSection = m.row.internal_force_mz < acc.MZMin ? m : acc.MZMinSection
+			NMaxSection = m.row.internal_force_n > acc.NMaxSection.row.internal_force_n ? m : acc.NMaxSection,
+			NMinSection = m.row.internal_force_n < acc.NMinSection.row.internal_force_n ? m : acc.NMinSection,
+			ZMaxSection = m.row.internal_force_vz > acc.ZMaxSection.row.internal_force_vz ? m : acc.ZMaxSection,
+			ZMinSection = m.row.internal_force_vz < acc.ZMinSection.row.internal_force_vz ? m : acc.ZMinSection,
+			YMaxSection = m.row.internal_force_vy > acc.YMaxSection.row.internal_force_vy ? m : acc.YMaxSection,
+			YMinSection = m.row.internal_force_vy < acc.YMinSection.row.internal_force_vy ? m : acc.YMinSection,
+			MXMaxSection = m.row.internal_force_mt > acc.MXMaxSection.row.internal_force_mt ? m : acc.MXMaxSection,
+			MXMinSection = m.row.internal_force_mt < acc.MXMinSection.row.internal_force_mt ? m : acc.MXMinSection,
+			MYMaxSection = m.row.internal_force_my > acc.MYMaxSection.row.internal_force_my ? m : acc.MYMaxSection,
+			MYMinSection = m.row.internal_force_my < acc.MYMinSection.row.internal_force_my ? m : acc.MYMinSection,
+			MZMaxSection = m.row.internal_force_mz > acc.MZMaxSection.row.internal_force_mz ? m : acc.MZMaxSection,
+			MZMinSection = m.row.internal_force_mz < acc.MZMinSection.row.internal_force_mz ? m : acc.MZMinSection
 		}
 			);
 
-						extremeValues = new List<members_internal_forces_row>() {
-   extremes_.MXMaxSection, extremes_.NMinSection,
-   extremes_.ZMaxSection, extremes_.ZMinSection,
-   extremes_.YMaxSection, extremes_.YMinSection,
-   extremes_.MXMaxSection, extremes_.MXMinSection,
-   extremes_.MYMaxSection, extremes_.MYMinSection,
-   extremes_.MZMaxSection, extremes_.MZMinSection
+						List<members_internal_forces_row> extremeValues = new List<members_internal_forces_row>() {
+	extremes_.NMaxSection, extremes_.NMinSection,
+	extremes_.ZMaxSection, extremes_.ZMinSection,
+	extremes_.YMaxSection, extremes_.YMinSection,
+	extremes_.MXMaxSection, extremes_.MXMinSection,
+	extremes_.MYMaxSection, extremes_.MYMinSection,
+	extremes_.MZMaxSection, extremes_.MZMinSection
 };
 						foreach (var e in extremeValues)
 						{
@@ -216,6 +134,7 @@ namespace BH.Adapter.RFEM6
 
 						continue;
 					}
+					//}
 
 					else
 					{
