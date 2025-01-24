@@ -66,11 +66,7 @@ namespace BH.Adapter.RFEM6
 
 			foreach (int c in loadCaseIds)
 			{
-				////Get Results bar forces for specific LC
-				//members_internal_forces_row[] resultForMemberInternalForces = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, filters, axes_type.MEMBER_AXES);
 
-
-				//INotifyPropertyChanged[] barResults = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, filters, axes_type.MEMBER_AXES);
 				INotifyPropertyChanged[] barResults = new INotifyPropertyChanged[1];
 
 				switch (request.ResultType)
@@ -100,7 +96,7 @@ namespace BH.Adapter.RFEM6
 				}
 
 				//Grouping of Internal Forces grouped by Member No
-				var memberInternalForceGroup = barResults.GroupBy(r =>Int32.Parse(r.PropertyValue("row.member_no").ToString()));
+				var memberInternalForceGroup = barResults.GroupBy(r => Int32.Parse(r.PropertyValue("row.member_no").ToString()));
 
 				foreach (IGrouping<int, INotifyPropertyChanged> member in memberInternalForceGroup)
 				{
@@ -123,19 +119,19 @@ namespace BH.Adapter.RFEM6
 							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
 						}
 
-						else if (member.First() is members_local_deformations)
+						else if (member.First() is members_local_deformations_row)
 						{
 							List<members_local_deformations_row> extremeValues = getExtremesLocalDeformation(member.Cast<members_local_deformations_row>().ToList());
 							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
 
 						}
-						else if (member.First() is members_global_deformations)
+						else if (member.First() is members_global_deformations_row)
 						{
 							List<members_global_deformations_row> extremeValues = getExtremeGlobalDeformation(member.Cast<members_global_deformations_row>().ToList());
 							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
 
 						}
-						else if (member.First() is members_strains)
+						else if (member.First() is members_strains_row)
 						{
 							List<members_strains_row> extremeValues = getExtremeStrain(member.Cast<members_strains_row>().ToList());
 							resultList.AddRange(extremeValues.Select(e => e.FromRFEM(c, memberLength)));
@@ -148,27 +144,15 @@ namespace BH.Adapter.RFEM6
 
 						}
 
-						//List<members_internal_forces_row> extremeValues = getExtremesForBarForces(member.ToList());
 
-						//foreach (var e in extremeValues)
-						//{
-						//	//e.FromRFEM(c,memberLength).
-						//	allInternalForces.Add(e.FromRFEM(c, memberLength));
-						//}
 
 
 						continue;
 					}
-					//}
 
 					else
 					{
 
-						//foreach (var memberSegment in member)
-						//{
-
-						//Ignoring Rows after Extremes
-						//if (memberSegment.PropertyValue("description").ToString().Contains("Extremes")) { break; }
 						var memberList = member.ToList();
 						memberList = member.TakeWhile(m => !m.PropertyValue("description").ToString().Contains("Extremes")).ToList();
 

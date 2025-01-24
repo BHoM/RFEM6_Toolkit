@@ -53,7 +53,7 @@ namespace BH.Adapter.RFEM6
 
 			var f = memberInternalForces.row;
 
-			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 2), 10, f.internal_force_v, f.internal_force_vy, f.internal_force_vz, f.internal_force_mt, f.internal_force_my, f.internal_force_mz);
+			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 4), 10, f.internal_force_v, f.internal_force_vy, f.internal_force_vz, f.internal_force_mt, f.internal_force_my, f.internal_force_mz);
 
 			return barForce;
 		}
@@ -63,7 +63,7 @@ namespace BH.Adapter.RFEM6
 
 			var f = memberInternalForces.row;
 
-			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 2), 10, f.displacement_x, f.displacement_y, f.displacement_z, f.displacement_x, f.displacement_y, f.displacement_z);
+			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 4), 10, f.displacement_x, f.displacement_y, f.displacement_z, f.rotation_x, f.rotation_y, f.rotation_z);
 
 			return barForce;
 		}
@@ -73,7 +73,7 @@ namespace BH.Adapter.RFEM6
 
 			var f = memberInternalForces.row;
 
-			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 2), 10, f.displacement_x, f.displacement_y, f.displacement_z, f.displacement_x, f.displacement_y, f.displacement_z);
+			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 4), 10, f.displacement_x, f.displacement_y, f.displacement_z, f.rotation_x, f.rotation_y, f.rotation_z);
 
 			return barForce;
 		}
@@ -83,7 +83,7 @@ namespace BH.Adapter.RFEM6
 
 			var f = memberInternalForces.row;
 
-			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 2), 10, f.strain_eps_x, f.strain_gamma_xy, f.strain_gamma_xz, f.strain_kappa_x, f.strain_kappa_y, f.strain_kappa_y);
+			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 4), 10, f.strain_eps_x, f.strain_gamma_xy, f.strain_gamma_xz, f.strain_kappa_x, f.strain_kappa_y, f.strain_kappa_y);
 
 			return barForce;
 		}
