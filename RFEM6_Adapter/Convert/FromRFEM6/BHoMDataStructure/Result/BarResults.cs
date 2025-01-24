@@ -88,6 +88,22 @@ namespace BH.Adapter.RFEM6
 			return barForce;
 		}
 
+		public static IResult FromRFEM(this List<double> val, int lc, double memberLength, double location, int memberNumber )
+		{
+
+			//var f = memberInternalForces.row;
+
+			BarForce barForce = new BarForce(memberNumber, lc, -1, -1, Math.Round((double)location / memberLength, 4), 10, val[0], val[1], val[2], val[3], val[4], val[5]);
+
+			return barForce;
+		}
+
+		public static IResult FromRFEM(double x, double y, double z, double rx, double ry, double rz, int lc, double memberLength, double location, int memberNumber)
+		{
+			BarForce barForce = new BarForce(memberNumber, lc, -1, -1, Math.Round(location / memberLength, 4), 10, x, y, z, rx, ry, rz);
+			return barForce;
+		}
+
 
 	}
 }

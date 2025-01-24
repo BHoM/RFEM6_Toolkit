@@ -60,7 +60,7 @@ namespace RFEM_Toolkit_Test.Elements
 
 			BarResultRequest request = new BarResultRequest();
 
-			request.ResultType = BarResultType.BarDeformation;
+			request.ResultType = BarResultType.BarStrain;
 			request.DivisionType = DivisionType.ExtremeValues;
 			request.Divisions = 3;
 			request.Cases = new List<Object> { 1 };
