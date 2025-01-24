@@ -138,8 +138,8 @@ namespace BH.Adapter.RFEM6
 					}
 
 					int corrective = 2; // important do to enable processing of Deformations due to the |u|
-					if (request.ResultType == BarResultType.BarDisplacement || request.ResultType == BarResultType.BarDeformation)
-					//if (memberSegmentValues?.First()?.PropertyValue("row.deformation_label")?.ToString()?.Contains("|u|") ?? false)
+										//if (request.ResultType == BarResultType.BarDisplacement)
+					if (memberSegmentValues?.First()?.PropertyValue("row.deformation_label")?.ToString()?.Contains("|u|") ?? false)
 					{
 						memberSegmentValues = memberSegmentValues.Skip(2).ToList();
 						corrective = 0;
