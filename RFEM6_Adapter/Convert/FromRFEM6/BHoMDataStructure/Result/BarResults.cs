@@ -47,63 +47,13 @@ namespace BH.Adapter.RFEM6
 {
 	public static partial class Convert
 	{
-
-		public static IResult FromRFEM(this members_internal_forces_row memberInternalForces, int lc, double memberLength)
+		public static IResult FromRFEM(this List<double> val, int lc, double memberLength, double location, int memberNumber)
 		{
-
-			var f = memberInternalForces.row;
-
-			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 4), 10, f.internal_force_v, f.internal_force_vy, f.internal_force_vz, f.internal_force_mt, f.internal_force_my, f.internal_force_mz);
-
-			return barForce;
-		}
-
-		public static IResult FromRFEM(this members_local_deformations_row memberInternalForces, int lc, double memberLength)
-		{
-
-			var f = memberInternalForces.row;
-
-			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 4), 10, f.displacement_x, f.displacement_y, f.displacement_z, f.rotation_x, f.rotation_y, f.rotation_z);
-
-			return barForce;
-		}
-
-		public static IResult FromRFEM(this members_global_deformations_row memberInternalForces, int lc, double memberLength)
-		{
-
-			var f = memberInternalForces.row;
-
-			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 4), 10, f.displacement_x, f.displacement_y, f.displacement_z, f.rotation_x, f.rotation_y, f.rotation_z);
-
-			return barForce;
-		}
-
-		public static IResult FromRFEM(this members_strains_row memberInternalForces, int lc, double memberLength)
-		{
-
-			var f = memberInternalForces.row;
-
-			BarForce barForce = new BarForce(memberInternalForces.row.member_no, lc, -1, -1, Math.Round((double)memberInternalForces.row.location / memberLength, 4), 10, f.strain_eps_x, f.strain_gamma_xy, f.strain_gamma_xz, f.strain_kappa_x, f.strain_kappa_y, f.strain_kappa_y);
-
-			return barForce;
-		}
-
-		public static IResult FromRFEM(this List<double> val, int lc, double memberLength, double location, int memberNumber )
-		{
-
-			//var f = memberInternalForces.row;
 
 			BarForce barForce = new BarForce(memberNumber, lc, -1, -1, Math.Round((double)location / memberLength, 4), 10, val[0], val[1], val[2], val[3], val[4], val[5]);
 
 			return barForce;
 		}
-
-		public static IResult FromRFEM(double x, double y, double z, double rx, double ry, double rz, int lc, double memberLength, double location, int memberNumber)
-		{
-			BarForce barForce = new BarForce(memberNumber, lc, -1, -1, Math.Round(location / memberLength, 4), 10, x, y, z, rx, ry, rz);
-			return barForce;
-		}
-
 
 	}
 }
