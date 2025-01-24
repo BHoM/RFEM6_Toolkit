@@ -50,7 +50,18 @@ namespace BH.Adapter.RFEM6
 		public IEnumerable<IResult> ReadResults(BarResultRequest request, ActionConfig actionConfig)
 		{
 
+
+			//Warnings 
 			BH.Engine.Base.Compute.RecordWarning($"Divisions are set to {request.Divisions}. Division functionality has not been implemented yet in RFEM6_Toolkit. Currently, the number of divisions depends solely on what RFEM6 provides and can vary significantly based on the load type on the corresponding Bar/Member and the DivisionType.");
+
+			if (request.ResultType == BarResultType.BarDisplacement)
+				BH.Engine.Base.Compute.RecordWarning("You are pulling displacement components. FX/FY/FZ will contain linear displacements (ux/uy/uz) and MX/MY/MZ will contain rotational displacements (rx/ry/rz), not forces/moments.");
+
+			if (request.ResultType == BarResultType.BarDeformation)
+				BH.Engine.Base.Compute.RecordWarning("You are pulling bar deformation components. FX/FY/FZ will contain relative displacements (dx/dy/dz) and MX/MY/MZ will contain relative rotations (rx/ry/rz), not forces/moments.");
+
+			else if (request.ResultType == BarResultType.BarStrain)
+				BH.Engine.Base.Compute.RecordWarning("You are pulling strain components. FX/FY/FZ will contain normal/shear strains (ex/vxy/vxz) and MX/MY/MZ will contain curvatures (kx/ky/kz), not forces/moments.");
 
 			//RFEM Specific Stuff
 			m_Model.use_detailed_member_results(true);
@@ -72,6 +83,7 @@ namespace BH.Adapter.RFEM6
 				//Loading resulst from RFEM
 				INotifyPropertyChanged[] barResults = new INotifyPropertyChanged[1];
 
+
 				switch (request.ResultType)
 				{
 
@@ -87,14 +99,9 @@ namespace BH.Adapter.RFEM6
 					case BarResultType.BarStrain:
 						barResults = m_Model.get_results_for_members_strains(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons, axes_type.MEMBER_AXES);
 						break;
-					case BarResultType.BarStress:
-
-						BH.Engine.Base.Compute.RecordError("The Pull of Bar Stresses has not been developed Yet");
-						return null;
-
 					default:
-						barResults = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons, axes_type.MEMBER_AXES);
-						break;
+						BH.Engine.Base.Compute.RecordError($"The pull result types of type {request.ResultType} has not been developed Yet");
+						return null;
 
 				}
 
@@ -123,7 +130,7 @@ namespace BH.Adapter.RFEM6
 						memberSegmentValues = memberSegmentValues.TakeWhile(m => !m.PropertyValue("description").ToString().Contains("Total")).ToList();
 
 					}
-					
+
 					else
 					{
 						memberSegmentValues = memberSegmentValues.TakeWhile(m => !m.PropertyValue("description").ToString().Contains("Extremes")).ToList();
@@ -131,7 +138,8 @@ namespace BH.Adapter.RFEM6
 					}
 
 					int corrective = 2; // important do to enable processing of Deformations due to the |u|
-					if (memberSegmentValues?.First()?.PropertyValue("row.deformation_label")?.ToString()?.Contains("|u|") ?? false)
+					if (request.ResultType == BarResultType.BarDisplacement || request.ResultType == BarResultType.BarDeformation)
+					//if (memberSegmentValues?.First()?.PropertyValue("row.deformation_label")?.ToString()?.Contains("|u|") ?? false)
 					{
 						memberSegmentValues = memberSegmentValues.Skip(2).ToList();
 						corrective = 0;
