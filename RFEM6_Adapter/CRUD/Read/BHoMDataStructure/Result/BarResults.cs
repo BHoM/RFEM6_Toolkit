@@ -137,21 +137,24 @@ namespace BH.Adapter.RFEM6
 
 					}
 
-					int corrective = 2; // important do to enable processing of Deformations due to the |u|
-										//if (request.ResultType == BarResultType.BarDisplacement)
+					int corrective = (request.ResultType == BarResultType.BarDisplacement || request.ResultType == BarResultType.BarDeformation) ? 0 : 2; 
+					// important do to enable processing of Deformations due to the |u|
 					if (memberSegmentValues?.First()?.PropertyValue("row.deformation_label")?.ToString()?.Contains("|u|") ?? false)
 					{
 						memberSegmentValues = memberSegmentValues.Skip(2).ToList();
-						corrective = 0;
+						//corrective = 0;
 					}
 
 					//Conversion for every segment of member
 					foreach (var e in memberSegmentValues)
 					{
 
+
 						var location = Double.Parse(e.PropertyValue("row.location").ToString());
 						var memberNumber = Int32.Parse(e.PropertyValue("row.member_no").ToString());
 						var props = e.PropertyValue("row").GetType().GetProperties();
+						List<int> accesList = new List<int>() { 10 - corrective, 12 - corrective, 14 - corrective, 16 - corrective, 18 - corrective, 20 - corrective };
+						var accessedlist = accesList.Select(a => props.ToList()[a]);
 						Dictionary<string, double> val = new[] {
 							(10-corrective, "x"), (12-corrective, "y"), (14-corrective, "z"),
 							(16-corrective, "rx"), (18-corrective, "ry"), (20-corrective, "rz")

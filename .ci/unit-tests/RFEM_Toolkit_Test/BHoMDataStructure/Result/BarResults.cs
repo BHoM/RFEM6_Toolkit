@@ -60,7 +60,7 @@ namespace RFEM_Toolkit_Test.Elements
 
 			BarResultRequest request = new BarResultRequest();
 
-			request.ResultType = BarResultType.BarDisplacement;
+			request.ResultType = BarResultType.BarForce;
 			request.DivisionType = DivisionType.EvenlyDistributed;
 			request.Divisions = 3;
 			request.Cases = new List<Object> { 1 };
