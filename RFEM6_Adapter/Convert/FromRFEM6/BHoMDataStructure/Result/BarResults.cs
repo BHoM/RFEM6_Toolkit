@@ -50,7 +50,6 @@ namespace BH.Adapter.RFEM6
 		public static IResult FromRFEM(this List<double> val, int lc, double memberLength, double location, int memberNumber, BarResultType resultType)
 		{
 
-			BarForce barForce = new BarForce(memberNumber, lc, -1, -1, Math.Round((double)location / memberLength, 4), 10, val[0], val[1], val[2], val[3], val[4], val[5]);
 
 			IResult result;
 
@@ -79,7 +78,7 @@ namespace BH.Adapter.RFEM6
 			}
 
 
-			return barForce;
+			return result;
 		}
 
 	}
