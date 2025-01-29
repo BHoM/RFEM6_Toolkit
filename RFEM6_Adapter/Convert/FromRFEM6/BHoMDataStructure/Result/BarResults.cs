@@ -47,10 +47,37 @@ namespace BH.Adapter.RFEM6
 {
 	public static partial class Convert
 	{
-		public static IResult FromRFEM(this List<double> val, int lc, double memberLength, double location, int memberNumber)
+		public static IResult FromRFEM(this List<double> val, int lc, double memberLength, double location, int memberNumber, BarResultType resultType)
 		{
 
 			BarForce barForce = new BarForce(memberNumber, lc, -1, -1, Math.Round((double)location / memberLength, 4), 10, val[0], val[1], val[2], val[3], val[4], val[5]);
+
+			IResult result;
+
+			switch (resultType)
+			{
+				case BarResultType.BarForce:
+					result = new BarForce(memberNumber, lc, -1, -1, Math.Round((double)location / memberLength, 4), 10, val[0], val[1], val[2], val[3], val[4], val[5]);
+					break;
+				case BarResultType.BarDisplacement:
+					result = new BarDisplacement(memberNumber, lc, -1, -1, Math.Round((double)location / memberLength, 4), 10, val[0], val[1], val[2], val[3], val[4], val[5]);
+					break;
+
+				case BarResultType.BarDeformation:
+					result = new BarDeformation(memberNumber, lc, -1, -1, Math.Round((double)location / memberLength, 4), 10, val[0], val[1], val[2], val[3], val[4], val[5]);
+					break;
+
+				case BarResultType.BarStrain:
+					//result = new BarStrain(memberNumber, lc, -1, -1, Math.Round((double)location / memberLength, 4), 10, val[0], val[1], val[2], val[3], val[4], val[5]);
+					result = new BarStrain(memberNumber, lc, -1, -1, Math.Round((double)location / memberLength, 4), 10, val[0], val[1], val[2], 0,0,0,0,0,0);
+					BH.Engine.Base.Compute.RecordWarning($"For BarResultType {resultType}, no bending around Y or Z axis or combined axis bending has been determined.");
+					break;
+
+				default:
+					BH.Engine.Base.Compute.RecordError($"No conversion method for BarResultType {resultType} has been implemented.");
+					throw new ArgumentException($"Unsupported result type: {resultType}");
+			}
+
 
 			return barForce;
 		}
