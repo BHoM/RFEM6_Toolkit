@@ -54,15 +54,6 @@ namespace BH.Adapter.RFEM6
 			//Warnings 
 			BH.Engine.Base.Compute.RecordWarning($"Divisions are set to {request.Divisions}. Division functionality has not been implemented yet in RFEM6_Toolkit. Currently, the number of divisions depends solely on what RFEM6 provides and can vary significantly based on the load type on the corresponding Bar/Member and the DivisionType.");
 
-			//if (request.ResultType == BarResultType.BarDisplacement)
-			//	BH.Engine.Base.Compute.RecordWarning("You are pulling displacement components. FX/FY/FZ will contain linear displacements (ux/uy/uz) and MX/MY/MZ will contain rotational displacements (rx/ry/rz), not forces/moments.");
-
-			//if (request.ResultType == BarResultType.BarDeformation)
-			//	BH.Engine.Base.Compute.RecordWarning("You are pulling bar deformation components. FX/FY/FZ will contain relative displacements (dx/dy/dz) and MX/MY/MZ will contain relative rotations (rx/ry/rz), not forces/moments.");
-
-			//else if (request.ResultType == BarResultType.BarStrain)
-			//	BH.Engine.Base.Compute.RecordWarning("You are pulling strain components. FX/FY/FZ will contain normal/shear strains (ex/vxy/vxz) and MX/MY/MZ will contain curvatures (kx/ky/kz), not forces/moments.");
-
 			//RFEM Specific Stuff
 			m_Model.use_detailed_member_results(true);
 
@@ -91,10 +82,10 @@ namespace BH.Adapter.RFEM6
 						barResults = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons, axes_type.MEMBER_AXES);
 						break;
 					case BarResultType.BarDisplacement:
-						barResults = m_Model.get_results_for_members_local_deformations(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons, axes_type.MEMBER_AXES);
+						barResults = m_Model.get_results_for_members_global_deformations(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons);
 						break;
 					case BarResultType.BarDeformation:
-						barResults = m_Model.get_results_for_members_global_deformations(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons);
+						barResults = m_Model.get_results_for_members_local_deformations(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons, axes_type.MEMBER_AXES);
 						break;
 					case BarResultType.BarStrain:
 						barResults = m_Model.get_results_for_members_strains(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons, axes_type.MEMBER_AXES);
