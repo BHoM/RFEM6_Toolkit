@@ -30,6 +30,7 @@ using BH.oM.Structure.Elements;
 using BH.oM.Analytical.Elements;
 using BH.oM.Base;
 using BH.oM.Structure.Requests;
+using BH.oM.Structure.Loads;
 
 namespace RFEM_Toolkit_Test.Elements
 {
@@ -58,12 +59,15 @@ namespace RFEM_Toolkit_Test.Elements
 		public void ReadResult()
 		{
 
+			Loadcase loadcase1 = new Loadcase() { Name = "LC1", Nature = LoadNature.Dead, Number = 1 };
+			LoadCombination loadCombination = new LoadCombination { Name = "LoadCombination1", Number = 1 };
+
 			BarResultRequest request = new BarResultRequest();
 
 			request.ResultType = BarResultType.BarForce;
 			request.DivisionType = DivisionType.EvenlyDistributed;
 			request.Divisions = 3;
-			request.Cases = new List<Object> { 1 };
+			request.Cases = new List<Object> { loadCombination };
 			request.Modes = new List<string>();
 			request.ObjectIds = new List<object> {1};
 			//request.ObjectIds = new List<object> {1,2,3,4};
