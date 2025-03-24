@@ -61,7 +61,6 @@ namespace BH.Adapter.RFEM6
 
 			// Loading of Member And LoadCase Ids
 			List<int> memberIds = request.ObjectIds.Select(s => Int32.Parse(s.ToString())).ToList();
-			//List<int> loadCaseIds = request.Cases.Select(s => Int32.Parse(s.ToString())).ToList();
 
 			// Definition of Object Locations for Members
 			object_location[] objectLocations = memberIds.Select(n => new object_location() { type = object_types.E_OBJECT_TYPE_MEMBER, no = n, parent_no = 0 }).ToArray();
