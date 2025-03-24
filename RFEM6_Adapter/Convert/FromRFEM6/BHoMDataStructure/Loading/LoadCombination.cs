@@ -19,68 +19,43 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using BH.Adapter.RFEM6;
-using BH.Engine.Base;
-using BH.oM.Data.Requests;
-using BH.oM.Structure.MaterialFragments;
-using BH.Engine.Structure;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Geometry;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Analytical.Elements;
-using BH.oM.Base;
-using BH.oM.Structure.Requests;
+using BH.Engine.Adapter;
+using BH.oM.Adapters.RFEM6;
+
+using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.oM.Structure.Loads;
+using Dlubal.WS.Rfem6.Model;
 
-namespace RFEM_Toolkit_Test.Elements
+namespace BH.Adapter.RFEM6
 {
-
-
-	public class BarResultTestClass
-
+	public static partial class Convert
 	{
 
-		RFEM6Adapter adapter;
-
-		//[TearDown]
-		//public void TearDown()
-		//{
-		//	adapter.Wipeout();
-		//}
-
-		[OneTimeSetUp]
-		public void InitializeRFEM6Adapter()
+		public static LoadCombination FromRFEM(this rfModel.load_combination rfLoadCombination, Dictionary<int, Loadcase> loadCaseDict)
 		{
-			adapter = new RFEM6Adapter(true);
 
+			var factors = rfLoadCombination.individual_factors_of_selected_objects_table;
+
+			double[] factorsArray = rfLoadCombination.items.Select(i => i.row.factor).ToArray();
+			Loadcase[] loadCaseArray = rfLoadCombination.items.Select(i => i.no).Select(s => loadCaseDict[s]).ToArray();
+
+			List<Tuple<double, ICase>> tupelList = factorsArray.Zip(loadCaseArray, (f, l) => Tuple.Create(f, l as ICase)).ToList();
+
+			LoadCombination bhLoadCombination = new LoadCombination() { Name = rfLoadCombination.name, LoadCases = tupelList, Number = rfLoadCombination.no };
+
+			bhLoadCombination.SetRFEM6ID(rfLoadCombination.no);
+
+			return bhLoadCombination;
 		}
-
-		[Test]
-		public void ReadResult()
-		{
-			List<LoadCombination?> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l=> l as LoadCombination).ToList();
-
-			Loadcase loadcase1 = new Loadcase() { Name = "LC1", Nature = LoadNature.Dead, Number = 1 };
-			LoadCombination loadCombination = new LoadCombination { Name = "LoadCombination1", Number = 1 };
-
-			BarResultRequest request = new BarResultRequest();
-
-			request.ResultType = BarResultType.BarForce;
-			request.DivisionType = DivisionType.EvenlyDistributed;
-			request.Divisions = 3;
-			request.Cases = new List<Object> { loadCombList.First() };
-			request.Modes = new List<string>();
-			request.ObjectIds = new List<object> {1};
-			//request.ObjectIds = new List<object> {1,2,3,4};
-
-			var obj = adapter.Pull(request);
-
-			obj.First();
-
-		}
-
-
 
 	}
 }
+
 
