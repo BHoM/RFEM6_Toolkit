@@ -7,7 +7,7 @@
 		<AssemblyName>RFEM6_Adapter</AssemblyName>
 		<RootNamespace>BH.Adapter.RFEM6</RootNamespace>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<FileVersion>8.0.0.0</FileVersion>
+		<FileVersion>8.1.0.0</FileVersion>
 		<BaseOutputPath>..\Build\</BaseOutputPath>
 	</PropertyGroup>
 
@@ -17,7 +17,7 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.7.6" />
+		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.2" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Private.ServiceModel" Version="4.10.0" />

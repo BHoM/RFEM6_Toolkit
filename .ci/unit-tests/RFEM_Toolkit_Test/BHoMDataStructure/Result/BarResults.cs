@@ -18,38 +18,64 @@
  *                                                                            
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
- */using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using BH.oM.Adapter;
+ */
+using BH.Adapter.RFEM6;
+using BH.Engine.Base;
+using BH.oM.Data.Requests;
+using BH.oM.Structure.MaterialFragments;
+using BH.Engine.Structure;
+using BH.oM.Structure.SectionProperties;
+using BH.oM.Geometry;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
+using BH.oM.Analytical.Elements;
+using BH.oM.Base;
+using BH.oM.Structure.Requests;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
-
-namespace BH.Adapter.RFEM6
+namespace RFEM_Toolkit_Test.Elements
 {
-    public static partial class Convert
-    {
-
-        public static rfModel.nodal_support ToRFEM6(this RFEMNodalSupport bhNodalSupport)
-        {
-            rfModel.nodal_support rfNodelSupport = new rfModel.nodal_support()
-            {
-                no = bhNodalSupport.GetRFEM6ID(),
-                name = bhNodalSupport.Constraint.Name,
-                spring = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.TranslationX), y = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.TranslationY), z = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.TranslationZ) },
-                rotational_restraint = new rfModel.vector_3d() { x = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.RotationX), y = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.RotationY), z = StiffnessTranslationBHToRF("" + bhNodalSupport.Constraint.RotationZ) },
-            };
-            return rfNodelSupport;
-        }
 
 
-    }
+	public class BarResultTestClass
+
+	{
+
+		RFEM6Adapter adapter;
+
+		//[TearDown]
+		//public void TearDown()
+		//{
+		//	adapter.Wipeout();
+		//}
+
+		[OneTimeSetUp]
+		public void InitializeRFEM6Adapter()
+		{
+			adapter = new RFEM6Adapter(true);
+
+		}
+
+		[Test]
+		public void ReadResult()
+		{
+
+			BarResultRequest request = new BarResultRequest();
+
+			request.ResultType = BarResultType.BarForce;
+			request.DivisionType = DivisionType.EvenlyDistributed;
+			request.Divisions = 3;
+			request.Cases = new List<Object> { 1 };
+			request.Modes = new List<string>();
+			request.ObjectIds = new List<object> {1};
+			//request.ObjectIds = new List<object> {1,2,3,4};
+
+			var obj = adapter.Pull(request);
+
+			obj.First();
+
+		}
+
+
+
+	}
 }
-
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -78,11 +78,6 @@ namespace BH.Adapter.RFEM6
 			List<IResult> resultList = new List<IResult>();
 			object_location[] filter = null;
 
-			//If no node ids are provided, then we will extract the results for all nodes
-
-			//get all Nodal Supports
-			//List<Node> nodeList = new List<Node>();
-
 			rfModel.object_with_children[] nodalSupportObjWitheChildern = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
 			nodalSupportObjWitheChildern = nodalSupportObjWitheChildern.ToList().Where(n => n.no != 0).ToArray();
 			IEnumerable<rfModel.nodal_support> nodalSupport = nodalSupportObjWitheChildern.Length >= 1 ? nodalSupportObjWitheChildern.ToList().Select(n => m_Model.get_nodal_support(n.no)) : new List<rfModel.nodal_support>();
@@ -128,8 +123,6 @@ namespace BH.Adapter.RFEM6
 
 					var r = res_all.First(k => k.row.node_no.Equals(nodeIds[i]));
 
-					//var r = res_all[i];
-
 					double fxValue = r.row.support_force_p_x;
 					double fyValue = r.row.support_force_p_y;
 					double fzValue = r.row.support_force_p_z;
@@ -150,4 +143,5 @@ namespace BH.Adapter.RFEM6
 
 	}
 }
+
 
