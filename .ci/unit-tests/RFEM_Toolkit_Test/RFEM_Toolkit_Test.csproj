@@ -9,7 +9,7 @@
 
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
-		<FileVersion>8.1.0.0</FileVersion>
+		<FileVersion>8.2.0.0</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
