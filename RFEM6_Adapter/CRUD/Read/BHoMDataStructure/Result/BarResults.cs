@@ -138,7 +138,6 @@ namespace BH.Adapter.RFEM6
 					if (request.DivisionType == DivisionType.ExtremeValues)
 					{
 
-
 						memberSegmentValues = member.SkipWhile(m => !m.PropertyValue("description").ToString().Contains("Extremes")).ToList();
 						memberSegmentValues = memberSegmentValues.TakeWhile(m => !m.PropertyValue("description").ToString().Contains("Total")).ToList();
 
@@ -161,7 +160,6 @@ namespace BH.Adapter.RFEM6
 					//Conversion for every segment of member
 					foreach (var e in memberSegmentValues)
 					{
-
 
 						var location = Double.Parse(e.PropertyValue("row.location").ToString());
 						var memberNumber = Int32.Parse(e.PropertyValue("row.member_no").ToString());

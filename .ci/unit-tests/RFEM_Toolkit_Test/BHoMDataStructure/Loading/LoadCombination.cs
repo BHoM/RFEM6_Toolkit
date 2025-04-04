@@ -57,12 +57,25 @@ namespace RFEM_Toolkit_Test.Elements
 
         }
 
+  //      [Test]
+  //      public void PullLoadCombination()
+  //      {
+
+           
+  //         var res= adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) });
+
+  //         var a =  res.ToArray().Count();
+
+		//}   
+        
         [Test]
-        public void PullCoadCombination()
+        public void PushLoadCombination()
         {
 
-            
-           adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) });
+			LoadCombination lc = new LoadCombination();
+
+			var res= adapter.Push(new List<Object>() { lc });
+
 
 		}
 
