@@ -96,7 +96,6 @@ namespace BH.Adapter.RFEM6
 				INotifyPropertyChanged[] barResults = new INotifyPropertyChanged[1];
 
 				var loadingType = c is LoadCombination ? case_object_types.E_OBJECT_TYPE_LOAD_COMBINATION : case_object_types.E_OBJECT_TYPE_LOAD_CASE;
-
 				switch (request.ResultType)
 				{
 

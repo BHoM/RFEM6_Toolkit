@@ -69,6 +69,7 @@ namespace RFEM_Toolkit_Test.Elements
 			request.DivisionType = DivisionType.EvenlyDistributed;
 			request.Divisions = 3;
 			request.Cases = new List<Object> { loadCombList.First() };
+			//request.Cases = new List<Object> {1};
 			request.Modes = new List<string>();
 			request.ObjectIds = new List<object> {1};
 			//request.ObjectIds = new List<object> {1,2,3,4};
