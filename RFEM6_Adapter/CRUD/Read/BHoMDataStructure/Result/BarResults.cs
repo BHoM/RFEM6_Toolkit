@@ -54,41 +54,62 @@ namespace BH.Adapter.RFEM6
 			//Warnings 
 			BH.Engine.Base.Compute.RecordWarning($"Divisions are set to {request.Divisions}. Division functionality has not been implemented yet in RFEM6_Toolkit. Currently, the number of divisions depends solely on what RFEM6 provides and can vary significantly based on the load type on the corresponding Bar/Member and the DivisionType.");
 
+			if (request.Cases.Where(c=> c is string).ToList().Count>0) { BH.Engine.Base.Compute.RecordWarning("At least one instance of the Case input is neither of type LoadCase nor LoadCombination. The set CaseIds will be assumed to be LoadCase IDs for now."); };
+
 			//RFEM Specific Stuff
 			m_Model.use_detailed_member_results(true);
 
 			// Loading of Member And LoadCase Ids
 			List<int> memberIds = request.ObjectIds.Select(s => Int32.Parse(s.ToString())).ToList();
-			List<int> loadCaseIds = request.Cases.Select(s => Int32.Parse(s.ToString())).ToList();
 
 			// Definition of Object Locations for Members
-			object_location[] objectLocatioons = memberIds.Select(n => new object_location() { type = object_types.E_OBJECT_TYPE_MEMBER, no = n, parent_no = 0 }).ToArray();
+			object_location[] objectLocations = memberIds.Select(n => new object_location() { type = object_types.E_OBJECT_TYPE_MEMBER, no = n, parent_no = 0 }).ToArray();
 
 			//ResultList
 			List<IResult> resultList = new List<IResult>();
 
 
-			foreach (int c in loadCaseIds)
+			foreach (var c in request.Cases)
 			{
+				int cId = 0;
+
+				if (c is Loadcase)
+				{
+					cId = (c as Loadcase).Number;
+
+				}
+				else if (c is LoadCombination)
+				{
+
+					cId = (c as LoadCombination).Number;
+
+				}
+				else
+				{
+
+					cId = Int32.Parse(c.ToString());
+				}
+
+
 
 				//Loading resulst from RFEM
 				INotifyPropertyChanged[] barResults = new INotifyPropertyChanged[1];
 
-
+				var loadingType = c is LoadCombination ? case_object_types.E_OBJECT_TYPE_LOAD_COMBINATION : case_object_types.E_OBJECT_TYPE_LOAD_CASE;
 				switch (request.ResultType)
 				{
 
 					case BarResultType.BarForce:
-						barResults = m_Model.get_results_for_members_internal_forces(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons, axes_type.MEMBER_AXES);
+						barResults = m_Model.get_results_for_members_internal_forces(loadingType, cId, objectLocations, axes_type.MEMBER_AXES);
 						break;
 					case BarResultType.BarDisplacement:
-						barResults = m_Model.get_results_for_members_global_deformations(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons);
+						barResults = m_Model.get_results_for_members_global_deformations(loadingType, cId, objectLocations);
 						break;
 					case BarResultType.BarDeformation:
-						barResults = m_Model.get_results_for_members_local_deformations(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons, axes_type.MEMBER_AXES);
+						barResults = m_Model.get_results_for_members_local_deformations(loadingType, cId, objectLocations, axes_type.MEMBER_AXES);
 						break;
 					case BarResultType.BarStrain:
-						barResults = m_Model.get_results_for_members_strains(case_object_types.E_OBJECT_TYPE_LOAD_CASE, c, objectLocatioons, axes_type.MEMBER_AXES);
+						barResults = m_Model.get_results_for_members_strains(loadingType, cId, objectLocations, axes_type.MEMBER_AXES);
 						break;
 					default:
 						BH.Engine.Base.Compute.RecordError($"The pull result types of type {request.ResultType} has not been developed Yet");
@@ -116,7 +137,6 @@ namespace BH.Adapter.RFEM6
 					if (request.DivisionType == DivisionType.ExtremeValues)
 					{
 
-
 						memberSegmentValues = member.SkipWhile(m => !m.PropertyValue("description").ToString().Contains("Extremes")).ToList();
 						memberSegmentValues = memberSegmentValues.TakeWhile(m => !m.PropertyValue("description").ToString().Contains("Total")).ToList();
 
@@ -128,7 +148,7 @@ namespace BH.Adapter.RFEM6
 
 					}
 
-					int corrective = (request.ResultType == BarResultType.BarDisplacement || request.ResultType == BarResultType.BarDeformation) ? 0 : 2; 
+					int corrective = (request.ResultType == BarResultType.BarDisplacement || request.ResultType == BarResultType.BarDeformation) ? 0 : 2;
 					// important do to enable processing of Deformations due to the |u|
 					if (memberSegmentValues?.First()?.PropertyValue("row.deformation_label")?.ToString()?.Contains("|u|") ?? false)
 					{
@@ -139,7 +159,6 @@ namespace BH.Adapter.RFEM6
 					//Conversion for every segment of member
 					foreach (var e in memberSegmentValues)
 					{
-
 
 						var location = Double.Parse(e.PropertyValue("row.location").ToString());
 						var memberNumber = Int32.Parse(e.PropertyValue("row.member_no").ToString());
@@ -153,7 +172,7 @@ namespace BH.Adapter.RFEM6
 							e.PropertyValue($"row.{props[p.Item1].Name}").ToString()
 						));
 
-						var result = val.Values.ToList().FromRFEM(c, memberLength, location, memberNumber,request.ResultType);
+						var result = val.Values.ToList().FromRFEM(cId, memberLength, location, memberNumber, request.ResultType);
 						resultList.Add(result);
 					}
 

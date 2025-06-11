@@ -19,69 +19,49 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using BH.Adapter.RFEM6;
-using BH.Engine.Base;
-using BH.oM.Data.Requests;
-using BH.oM.Structure.MaterialFragments;
-using BH.Engine.Structure;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Geometry;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Analytical.Elements;
-using BH.oM.Base;
-using BH.oM.Structure.Requests;
+using BH.oM.Structure.Constraints;
+
+using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Loads;
 
-namespace RFEM_Toolkit_Test.Elements
+namespace BH.Adapter.RFEM6
 {
+    public partial class RFEM6Adapter
+    {
 
+        private List<LoadCombination> ReadLoadCombination(List<string> ids = null)
+        {
+            // Get all Loadcases from RFEM6
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LOAD_COMBINATION);
+			IEnumerable<rfModel.load_combination> foundLoadCombinations = numbers.ToList().Select(n => m_Model.get_load_combination(n.no));
+			Dictionary<int, Loadcase> LoadCombinationsDict = this.GetCachedOrReadAsDictionary<int, Loadcase>();
 
-	public class BarResultTestClass
+			List<LoadCombination> loadCases = new List<LoadCombination>();
+           
+            // Convert the RFEM Loadcases to BHoM Loadcases
+            foreach (rfModel.load_combination loadCombination in foundLoadCombinations)
+            {
+                //var b= loadCombination.individual_factors_of_selected_objects_table;
+                loadCases.Add(loadCombination.FromRFEM(LoadCombinationsDict));
+                
 
-	{
+            }
 
-		RFEM6Adapter adapter;
+            // Sort the Loadcases by Number
+            loadCases.Sort((x, y) => x.Number.CompareTo(y.Number));
 
-		//[TearDown]
-		//public void TearDown()
-		//{
-		//	adapter.Wipeout();
-		//}
+            return loadCases;
+        }
 
-		[OneTimeSetUp]
-		public void InitializeRFEM6Adapter()
-		{
-			adapter = new RFEM6Adapter(true);
-
-		}
-
-		[Test]
-		public void ReadResult()
-		{
-			List<LoadCombination?> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l=> l as LoadCombination).ToList();
-
-			Loadcase loadcase1 = new Loadcase() { Name = "LC1", Nature = LoadNature.Dead, Number = 1 };
-			LoadCombination loadCombination = new LoadCombination { Name = "LoadCombination1", Number = 1 };
-
-			BarResultRequest request = new BarResultRequest();
-
-			request.ResultType = BarResultType.BarForce;
-			request.DivisionType = DivisionType.EvenlyDistributed;
-			request.Divisions = 3;
-			request.Cases = new List<Object> { loadCombList.First() };
-			//request.Cases = new List<Object> {1};
-			request.Modes = new List<string>();
-			request.ObjectIds = new List<object> {1};
-			//request.ObjectIds = new List<object> {1,2,3,4};
-
-			var obj = adapter.Pull(request);
-
-			obj.First();
-
-		}
-
-
-
-	}
+    }
 }
+
 

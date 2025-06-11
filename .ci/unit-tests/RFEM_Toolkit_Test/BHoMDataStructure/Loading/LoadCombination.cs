@@ -27,61 +27,60 @@ using BH.Engine.Structure;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Geometry;
 using BH.oM.Structure.Elements;
-using BH.oM.Analytical.Elements;
-using BH.oM.Base;
-using BH.oM.Structure.Requests;
 using BH.oM.Structure.Loads;
+using Dlubal.WS.Rfem6.Model;
+using BH.Engine.Geometry;
+using System.Security.Permissions;
+using BH.oM.Base;
 
 namespace RFEM_Toolkit_Test.Elements
 {
 
 
-	public class BarResultTestClass
+    public class LoadCombination_Test
 
-	{
+    {
 
-		RFEM6Adapter adapter;
+        RFEM6Adapter adapter;
 
-		//[TearDown]
-		//public void TearDown()
-		//{
-		//	adapter.Wipeout();
-		//}
 
-		[OneTimeSetUp]
-		public void InitializeRFEM6Adapter()
-		{
-			adapter = new RFEM6Adapter(true);
+        [SetUp]
+        public void EveryTimeSetUp()
+        {
+            //adapter = new RFEM6Adapter(true);
+        }
+
+        [OneTimeSetUp]
+        public void SetUpScenario()
+        {
+            adapter = new RFEM6Adapter(true);
+
+        }
+
+  //      [Test]
+  //      public void PullLoadCombination()
+  //      {
+
+           
+  //         var res= adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) });
+
+  //         var a =  res.ToArray().Count();
+
+		//}   
+        
+        [Test]
+        public void PushLoadCombination()
+        {
+
+			LoadCombination lc = new LoadCombination();
+
+			var res= adapter.Push(new List<Object>() { lc });
+
 
 		}
 
-		[Test]
-		public void ReadResult()
-		{
-			List<LoadCombination?> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l=> l as LoadCombination).ToList();
-
-			Loadcase loadcase1 = new Loadcase() { Name = "LC1", Nature = LoadNature.Dead, Number = 1 };
-			LoadCombination loadCombination = new LoadCombination { Name = "LoadCombination1", Number = 1 };
-
-			BarResultRequest request = new BarResultRequest();
-
-			request.ResultType = BarResultType.BarForce;
-			request.DivisionType = DivisionType.EvenlyDistributed;
-			request.Divisions = 3;
-			request.Cases = new List<Object> { loadCombList.First() };
-			//request.Cases = new List<Object> {1};
-			request.Modes = new List<string>();
-			request.ObjectIds = new List<object> {1};
-			//request.ObjectIds = new List<object> {1,2,3,4};
-
-			var obj = adapter.Pull(request);
-
-			obj.First();
-
-		}
 
 
-
-	}
+    }
 }
 
