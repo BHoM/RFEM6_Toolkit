@@ -9,10 +9,11 @@
 
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
-		<FileVersion>8.1.0.0</FileVersion>
+		<FileVersion>8.2.0.0</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.11" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
 		<PackageReference Include="NUnit" Version="3.13.3" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
