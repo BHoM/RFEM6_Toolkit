@@ -48,7 +48,7 @@ namespace BH.Adapter.RFEM6
 {
     public partial class RFEM6Adapter
     {
-        
+
         private bool CreateCollection(IEnumerable<ILoad> bhLoads)
         {
             //Container for Potential Surface IDs. Surface IDs are onle relevant when using Free Line Loads
@@ -92,21 +92,32 @@ namespace BH.Adapter.RFEM6
 
                         BH.Engine.Base.Compute.RecordError($"The Force Vector of {bhLoad} is not aligned with the X, Y or Z axis. Please make sure your Barload is either parallel to the X, Y or Z axis!");
 
-                        continue;
+                        //continue;
                     }
                     if (!DirectionVectorIsXYZAxisParallel((bhLoad as BarUniformlyDistributedLoad).Moment))
                     {
 
                         BH.Engine.Base.Compute.RecordError($"The Moment Vector of {bhLoad} is not aligned with the X, Y or Z axis. Please make sure your Barload is either parallel to the X, Y or Z axis!");
 
-                        continue;
+                        //continue;
                     }
 
-                    UpdateLoadIdDictionary(bhLoad);
-                    int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-                    member_load member_load = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6((member_load_load_type)nodalLoadType, id);
-                    var rfMemberLoad = member_load;
-                    m_Model.set_member_load(bhLoad.Loadcase.Number, rfMemberLoad);
+                    var splitLoadList=SplitLoadIntoAxisAlignedLoads((bhLoad as BarUniformlyDistributedLoad));
+
+                    foreach (var b in splitLoadList)
+                    {
+                        UpdateLoadIdDictionary(bhLoad);
+                        int id_ = m_LoadcaseLoadIdDict[b.Loadcase][b.GetType().Name];
+                        member_load member_load_ = (b as BarUniformlyDistributedLoad).ToRFEM6((member_load_load_type)nodalLoadType, id_);
+                        m_Model.set_member_load(bhLoad.Loadcase.Number, member_load_);
+                    }
+
+
+                    //UpdateLoadIdDictionary(bhLoad);
+                    //int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
+                    //member_load member_load = (bhLoad as BarUniformlyDistributedLoad).ToRFEM6((member_load_load_type)nodalLoadType, id);
+                    //var rfMemberLoad = member_load;
+                    //m_Model.set_member_load(bhLoad.Loadcase.Number, rfMemberLoad);
                     continue;
                 }
 
@@ -124,18 +135,20 @@ namespace BH.Adapter.RFEM6
                 if (bhLoad is GeometricalLineLoad)
                 {
                     // Handling Non-Free Line Loads
-                    
+
                     //Checking if the GeometricalLineLoad has a geometricalLineLoadType Fragment
                     bool lineLoadhasFragments = bhLoad.Fragments.ToList().Any(f => f.GetType().Name == "RFEM6GeometricalLineLoadTypes");
-                    
-                    
-                    if (!lineLoadhasFragments) {
 
-                        BH.Engine.Base.Compute.RecordWarning($"{bhLoad} has no geometricalLineLoadType set. As a default value geometricalLineLoadType.geometricalLineLoadEnum has been set to FreeLineLoad.\n In case you want to generate LineLoads please add the fragment geometricalLineLoadTyp to the {bhLoad} and set the parameters accordingly."); }
 
-                     
+                    if (!lineLoadhasFragments)
+                    {
+
+                        BH.Engine.Base.Compute.RecordWarning($"{bhLoad} has no geometricalLineLoadType set. As a default value geometricalLineLoadType.geometricalLineLoadEnum has been set to FreeLineLoad.\n In case you want to generate LineLoads please add the fragment geometricalLineLoadTyp to the {bhLoad} and set the parameters accordingly.");
+                    }
+
+
                     //If Load is a Non-Free Line Load
-                    if (lineLoadhasFragments&& BH.Engine.Base.Query.GetAllFragments(bhLoad)[0].PropertyValue("geometrialLineLoadType").ToString()!= "FreeLineLoad")
+                    if (lineLoadhasFragments && BH.Engine.Base.Query.GetAllFragments(bhLoad)[0].PropertyValue("geometrialLineLoadType").ToString() != "FreeLineLoad")
 
                     {
                         EdgeComparer edgeComparer = new EdgeComparer();
@@ -181,7 +194,7 @@ namespace BH.Adapter.RFEM6
 
                         // Updating the load dictionary
                         UpdateLoadIdDictionary(bhLoad);
-                        
+
                         //Has surface been added to the Load? If not , get all surface IDs
                         if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null || (bhLoad as GeometricalLineLoad).Objects.Elements.Count == 0 || ((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
                         {
@@ -192,7 +205,7 @@ namespace BH.Adapter.RFEM6
                         {
                             //currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
                             List<Panel> panelCachList = GetCachedOrRead<Panel>();
-                            currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e =>m_PanelIDdict[e as Panel]).ToArray();
+                            currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => m_PanelIDdict[e as Panel]).ToArray();
 
 
                         }
@@ -343,6 +356,81 @@ namespace BH.Adapter.RFEM6
 
             return isParallel;
 
+        }
+
+        private  List<BarUniformlyDistributedLoad> SplitLoadIntoAxisAlignedLoads( BarUniformlyDistributedLoad barLoad)
+        {
+            // Only works for BarUniformlyDistributedLoad
+
+            //if (barLoad == null)
+            //    return null;
+
+            // Example: Create a dictionary with "X", "Y", "Z" as keys and corresponding values from a vector
+            var moment_dict = new Dictionary<string, double>
+            {
+                { "X", barLoad.Moment.X },
+                { "Y", barLoad.Moment.Y },
+                { "Z", barLoad.Moment.Z }
+            };
+
+            var force_dict = new Dictionary<string, double>
+            {
+                { "X", barLoad.Force.X },
+                { "Y", barLoad.Force.Y },
+                { "Z", barLoad.Force.Z }
+            };
+
+
+            int nonZeroMoment = moment_dict.Values.Count(x => Math.Abs(x) > 1e-8);
+            int nonZeroForce = force_dict.Values.Count(x => Math.Abs(x) > 1e-8);
+
+            // If only one axis is non-zero for moment or force, return as is
+            if ((nonZeroMoment == 1 && nonZeroForce == 0) || (nonZeroForce == 1 && nonZeroMoment == 0))
+                return new List<BarUniformlyDistributedLoad> { barLoad };
+
+            List<BarUniformlyDistributedLoad> resultList = new List<BarUniformlyDistributedLoad>();
+
+            int index = 0;
+            foreach (KeyValuePair<string, double> kvp in moment_dict)
+            {
+                Console.WriteLine($"Key: {kvp.Key}, Value: {kvp.Value}");
+                if (Math.Abs(kvp.Value) > 0)
+                {
+                    BarUniformlyDistributedLoad barMoment = barLoad.DeepClone();
+                    barMoment.Force = BH.Engine.Geometry.Create.Vector(0, 0, 0);
+                    double x_coord = index == 0 ? barMoment.Moment.X : 0;
+                    double y_coord = index == 1 ? barMoment.Moment.Y : 0;
+                    double z_coord = index == 2 ? barMoment.Moment.Z : 0;
+                    barMoment.Moment = new BH.oM.Geometry.Vector() { X = x_coord, Y = y_coord, Z = z_coord };
+                    barMoment.Name = $"{barLoad.Name}_{kvp.Key}_Moment";
+                    resultList.Add(barMoment);
+
+                }
+                index++;
+            }
+
+            index = 0;
+            foreach (KeyValuePair<string, double> kvp in force_dict)
+            {
+                Console.WriteLine($"Key: {kvp.Key}, Value: {kvp.Value}");
+                if (Math.Abs(kvp.Value) > 0)
+                {
+                    BarUniformlyDistributedLoad barForce = barLoad.DeepClone();
+                    barForce.Moment = BH.Engine.Geometry.Create.Vector(0, 0, 0);
+                    double x_coord = index == 0 ? barForce.Force.X : 0;
+                    double y_coord = index == 1 ? barForce.Force.Y : 0;
+                    double z_coord = index == 2 ? barForce.Force.Z : 0;
+                    barForce.Force = new BH.oM.Geometry.Vector() { X = x_coord, Y = y_coord, Z = z_coord };
+                    barForce.Name = $"{barLoad.Name}_{kvp.Key}_Force";
+                    resultList.Add(barForce);
+
+                }
+                index++;
+            }
+
+            // If both are zero, or more than one axis is non-zero, splitting is required or invalid
+            // This method currently does not implement splitting, so return null
+            return resultList;
         }
 
     }

@@ -54,6 +54,9 @@ namespace RFEM_Toolkit_Test.Elements
         BH.oM.Base.BHoMGroup<Node> nodeGroup4;
         BH.oM.Base.BHoMGroup<Node> nodeGroup5;
 
+        PointLoad pointLoadInclined0;
+
+
         PointLoad pointLoad0;
         PointLoad pointLoad1;
         PointLoad pointLoad2;
@@ -85,6 +88,8 @@ namespace RFEM_Toolkit_Test.Elements
 
             var nodeGroup0 = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { node0 } };
 
+            pointLoadInclined0 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, new Vector() { X = 1, Y = 1, Z = 0 },null,LoadAxis.Global,"");
+
             pointLoad0 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, Vector.XAxis, null);
             pointLoad1 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, Vector.YAxis, null);
             pointLoad2 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, Vector.ZAxis, null);
@@ -113,7 +118,35 @@ namespace RFEM_Toolkit_Test.Elements
         [TearDown]
         public void TearDown()
         {
-            adapter.Wipeout();
+            //adapter.Wipeout();
+        }
+
+        [Test]
+        public void PushPullInclinedForces()
+        {
+            adapter.Push(new List<IBHoMObject>() { pointLoadInclined0 });
+            FilterRequest pointLoadFilter = new FilterRequest() { Type = typeof(PointLoad) };
+            List<PointLoad> pointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p => (PointLoad)p).ToList();
+
+            //Assert.IsTrue((pointLoad[0]).Force == (pointLoad0.Force));
+            //Assert.IsTrue((pointLoad[0]).Moment == (pointLoad0.Moment));
+
+            //Assert.IsTrue((pointLoad[1]).Force == (pointLoad1.Force));
+            //Assert.IsTrue((pointLoad[1]).Moment == (pointLoad1.Moment));
+
+            //Assert.IsTrue((pointLoad[2]).Force == (pointLoad2.Force));
+            //Assert.IsTrue((pointLoad[2]).Moment == (pointLoad2.Moment));
+
+            //Assert.IsTrue((pointLoad[3]).Force == (pointLoad3.Force));
+            //Assert.IsTrue((pointLoad[3]).Moment == (pointLoad3.Moment));
+
+            //Assert.IsTrue((pointLoad[4]).Force == (pointLoad4.Force));
+            //Assert.IsTrue((pointLoad[4]).Moment == (pointLoad4.Moment));
+
+            //Assert.IsTrue((pointLoad[5]).Force == (pointLoad5.Force));
+            //Assert.IsTrue((pointLoad[5]).Moment == (pointLoad5.Moment));
+
+
         }
 
 
