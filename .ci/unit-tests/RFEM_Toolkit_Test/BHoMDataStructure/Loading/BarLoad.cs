@@ -153,7 +153,7 @@ namespace RFEM_Toolkit_Test.Elements
             //adapter.Push(new List<Bar>() { barSteelSection0, barSteelSection1, barSteelSection2, barSteelSection3 });
 
             // Defining Loadcase
-            loadCase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead };
+            loadCase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead, Number = 1 };
 
             // Defining group
             barGroup0 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { barSteelSection0 } };
@@ -168,6 +168,7 @@ namespace RFEM_Toolkit_Test.Elements
             barLoadInclined1 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, BH.Engine.Geometry.Create.Vector(100, 100, 0), LoadAxis.Global, false);
             barLoadInclined2 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, BH.Engine.Geometry.Create.Vector(100, 100, 0), BH.Engine.Geometry.Create.Vector(100, 100, 0), LoadAxis.Global, false);
             inclinedForces.AddRange(new List<BarUniformlyDistributedLoad>() { barLoadInclined0, barLoadInclined1, barLoadInclined2 });
+            //inclinedForces.AddRange(new List<BarUniformlyDistributedLoad>() { barLoadInclined2 });
 
             // Forces
             barLoad0 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, Vector.XAxis * 100, null, LoadAxis.Global, false);
