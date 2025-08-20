@@ -228,51 +228,23 @@ namespace RFEM_Toolkit_Test.Elements
             //Act
             adapter.Push(inclinedForces);
 
-            //FilterRequest pointLoadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
-            //List<BarUniformlyDistributedLoad> pointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p => (BarUniformlyDistributedLoad)p).ToList();
+            FilterRequest barLoadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
+            List<BarUniformlyDistributedLoad> barLoads = adapter.Pull(barLoadFilter).ToList().Select(p => (BarUniformlyDistributedLoad)p).ToList();
+
+            barLoads.Count();
 
             ////Assert
-            //int i = 0;
-            //Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
-            //Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
-            //Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+            //Check for amount of loads push + pulled
+            Assert.AreEqual(barLoads.Count(), inclinedForces.Count());
 
-            //i = 1;
-            //Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
-            //Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
-            //Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
+            //Check if loads have forces/moment
+            Assert.IsTrue(barLoads[0].Force == inclinedForces[0].Force);
+            Assert.IsTrue(barLoads[0].Moment == inclinedForces[0].Moment);
+            Assert.IsTrue(barLoads[1].Force == inclinedForces[1].Force);
+            Assert.IsTrue(barLoads[1].Moment == inclinedForces[1].Moment);
+            Assert.IsTrue(barLoads[2].Force == inclinedForces[2].Force);
+            Assert.IsTrue(barLoads[2].Moment == inclinedForces[2].Moment);
 
-            //i = 2;
-            //Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
-            //Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
-
-            //i = 3;
-            //Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
-            //Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
-            //Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
-
-            //i = 4;
-            //Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
-            //Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
-            //Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
-
-            //i = 5;
-            //Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
-            //Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
-
-            //i = 6;
-            //Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
-            //Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
-            //Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
-
-            //i = 7;
-            //Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
-            //Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
-            //Assert.True(axisAlForces[i].Projected.Equals(pointLoad[i].Projected));
-
-            //i = 8;
-            //Assert.True(axisAlForces[i].Force.Equals(pointLoad[i].Force));
-            //Assert.True(axisAlForces[i].Axis.Equals(pointLoad[i].Axis));
 
         }
 

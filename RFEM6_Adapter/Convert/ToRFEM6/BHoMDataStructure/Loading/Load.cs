@@ -113,7 +113,7 @@ namespace BH.Adapter.RFEM6
             member_load rfLoadCase = new rfModel.member_load()
             {
                 no = id,
-                comment = $"{bhBarLoad.Name}_{bhBarLoad.GetRFEM6ID()}",
+                comment = bhBarLoad.Name,
                 members = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToArray(),
                 load_distribution = member_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,

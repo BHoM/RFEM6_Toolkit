@@ -44,42 +44,87 @@ namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-
-        public static BarUniformlyDistributedLoad FromRFEM(this rfModel.member_load rfMemberLoad, List<Bar> bhBars, Loadcase bhLoadCase)
+        public static BarUniformlyDistributedLoad FromRFEM(this List<rfModel.member_load> rfMemberLoad_list, List<Bar> bhBars, Loadcase bhLoadCase)
         {
+
             Vector forceVector = new Vector() { X = 0, Y = 0, Z = 0 };
             Vector momentVector = new Vector() { X = 0, Y = 0, Z = 0 };
 
-            if (rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_LOCAL_X)
+            foreach (rfModel.member_load rfMemberLoadItem in rfMemberLoad_list)
             {
-                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? new Vector() { X = rfMemberLoad.magnitude, Y = 0, Z = 0 } : new Vector() { X = 0, Y = 0, Z = 0 };
-                forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? new Vector() { X = rfMemberLoad.magnitude, Y = 0, Z = 0 } : new Vector() { X = 0, Y = 0, Z = 0 };
+
+                switch (rfMemberLoadItem.load_direction)
+                {
+                    case member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
+                    case member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
+                    case member_load_load_direction.LOAD_DIRECTION_LOCAL_X:
+
+                        if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_MOMENT)
+                        {
+                            momentVector = momentVector + new Vector() { X = rfMemberLoadItem.magnitude, Y = 0, Z = 0 };
+                        }
+                        else if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_FORCE)
+                        {
+                            forceVector = forceVector + new Vector() { X = rfMemberLoadItem.magnitude, Y = 0, Z = 0 };
+
+                        }
+
+                        break;
+
+                    case member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
+                    case member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
+                    case member_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
+
+                        if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_MOMENT)
+                        {
+                            momentVector = momentVector + new Vector() { X = 0, Y = rfMemberLoadItem.magnitude, Z = 0 };
+                        }
+                        else if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_FORCE)
+                        {
+                            forceVector = forceVector + new Vector() { X = 0, Y = rfMemberLoadItem.magnitude, Z = 0 };
+                        }
+
+                        break;
+                    default:
+
+
+                        if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_MOMENT)
+                        {
+                            momentVector = momentVector + new Vector() { X = 0, Y = 0, Z = rfMemberLoadItem.magnitude };
+                        }
+                        else if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_FORCE)
+                        {
+                            forceVector = forceVector + new Vector() { X = 0, Y = 0, Z = rfMemberLoadItem.magnitude };
+                        }
+
+                        break;
+
+                }
+
+
 
             }
-            else if (rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_LOCAL_Y)
-            {
-                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
-                forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
-            }
-            else
-            {
-                momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? new Vector() { X = 0, Y = 0, Z = rfMemberLoad.magnitude } : new Vector() { X = 0, Y = 0, Z = 0 };
-                forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? new Vector() { X = 0, Y = 0, Z = rfMemberLoad.magnitude } : new Vector() { X = 0, Y = 0, Z = 0 };
-            }
 
+            rfModel.member_load rfMemberLoad = rfMemberLoad_list.First();
             LoadAxis axis = LoadAxis.Global;
             bool isProjected = false;
-            if (rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_X) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Y) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Z))
+
+            switch (rfMemberLoad.load_direction)
             {
-                axis = LoadAxis.Local;
 
+                case member_load_load_direction.LOAD_DIRECTION_LOCAL_X:
+                case member_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
+                case member_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
+                    axis = LoadAxis.Local;
+                    break;
+                case member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
+                case member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
+                case member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
+                    isProjected = true;
+                    break;
+                default:
+                    break;
             }
-            else if (rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED))
-            {
-                isProjected = true;
-            }
-
-
 
             BarUniformlyDistributedLoad bhLoad = new BarUniformlyDistributedLoad
             {
@@ -90,11 +135,60 @@ namespace BH.Adapter.RFEM6
                 Moment = momentVector,
                 Axis = axis,
                 Projected = isProjected
-
             };
 
             return bhLoad;
         }
+        //public static BarUniformlyDistributedLoad FromRFEM(this rfModel.member_load rfMemberLoad, List<Bar> bhBars, Loadcase bhLoadCase)
+        //{
+        //    Vector forceVector = new Vector() { X = 0, Y = 0, Z = 0 };
+        //    Vector momentVector = new Vector() { X = 0, Y = 0, Z = 0 };
+
+        //    if (rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_LOCAL_X)
+        //    {
+        //        momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? new Vector() { X = rfMemberLoad.magnitude, Y = 0, Z = 0 } : new Vector() { X = 0, Y = 0, Z = 0 };
+        //        forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? new Vector() { X = rfMemberLoad.magnitude, Y = 0, Z = 0 } : new Vector() { X = 0, Y = 0, Z = 0 };
+
+        //    }
+        //    else if (rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE || rfMemberLoad.load_direction == member_load_load_direction.LOAD_DIRECTION_LOCAL_Y)
+        //    {
+        //        momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
+        //        forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? (new Vector() { X = 0, Y = rfMemberLoad.magnitude, Z = 0 }) : new Vector() { X = 0, Y = 0, Z = 0 };
+        //    }
+        //    else
+        //    {
+        //        momentVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_MOMENT ? new Vector() { X = 0, Y = 0, Z = rfMemberLoad.magnitude } : new Vector() { X = 0, Y = 0, Z = 0 };
+        //        forceVector = rfMemberLoad.load_type == member_load_load_type.LOAD_TYPE_FORCE ? new Vector() { X = 0, Y = 0, Z = rfMemberLoad.magnitude } : new Vector() { X = 0, Y = 0, Z = 0 };
+        //    }
+
+        //    LoadAxis axis = LoadAxis.Global;
+        //    bool isProjected = false;
+        //    if (rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_X) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Y) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_LOCAL_Z))
+        //    {
+        //        axis = LoadAxis.Local;
+
+        //    }
+        //    else if (rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED) || rfMemberLoad.load_direction.Equals(member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED))
+        //    {
+        //        isProjected = true;
+        //    }
+
+
+
+        //    BarUniformlyDistributedLoad bhLoad = new BarUniformlyDistributedLoad
+        //    {
+        //        Name = rfMemberLoad.comment,
+        //        Objects = new BH.oM.Base.BHoMGroup<Bar>() { Elements = bhBars },
+        //        Loadcase = bhLoadCase,
+        //        Force = forceVector,
+        //        Moment = momentVector,
+        //        Axis = axis,
+        //        Projected = isProjected
+
+        //    };
+
+        //    return bhLoad;
+        //}
 
         public static PointLoad FromRFEM(this rfModel.nodal_load nodeLoad, List<Node> bhNodes, Loadcase bhLoadCase)
         {
@@ -205,7 +299,7 @@ namespace BH.Adapter.RFEM6
             bool isProjected = false;
             Vector impactA = new Vector();
             Vector impactB = new Vector();
-         
+
             switch (rfLineload.load_direction)
             {
                 case free_line_load_load_direction.LOAD_DIRECTION_LOCAL_X:
@@ -256,7 +350,7 @@ namespace BH.Adapter.RFEM6
             }
 
 
-            BHoMGroup<IAreaElement> relatedPanels= new BHoMGroup<IAreaElement>() {Elements=panels.Select(p=>(IAreaElement)p).ToList()};
+            BHoMGroup<IAreaElement> relatedPanels = new BHoMGroup<IAreaElement>() { Elements = panels.Select(p => (IAreaElement)p).ToList() };
 
 
             GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
@@ -268,8 +362,8 @@ namespace BH.Adapter.RFEM6
                 ForceB = impactB,
                 Axis = axis,
                 Projected = isProjected,
-                Objects= relatedPanels
-                
+                Objects = relatedPanels
+
             };
 
             bhLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(bhLineLoad, (new RFEM6GeometricalLineLoadTypes() { geometrialLineLoadType = GeometricalLineLoadTypesEnum.FreeLineLoad }));

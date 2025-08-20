@@ -81,7 +81,7 @@ namespace BH.Adapter.RFEM6
                 if (bhLoad is BarUniformlyDistributedLoad)
                 {
 
-                    var splitLoadList=SplitLoadIntoAxisAlignedLoads((bhLoad as BarUniformlyDistributedLoad));
+                    var splitLoadList=SplitLoadIntoAxisParallelLoads((bhLoad as BarUniformlyDistributedLoad));
 
                     foreach (var b in splitLoadList)
                     {
@@ -213,8 +213,8 @@ namespace BH.Adapter.RFEM6
             {
 
                 PointLoad bhPointLoad = bhLoad as PointLoad;
-                momentHasBeenSet = !(bhPointLoad.Moment.X == 0 && bhPointLoad.Moment.Y == 0 && bhPointLoad.Moment.Z == 0);
-                forceHasBeenSet = !(bhPointLoad.Force.X == 0 && bhPointLoad.Force.Y == 0 && bhPointLoad.Force.Z == 0);
+                momentHasBeenSet = ! ((bhLoad as PointLoad).Moment.Length() < 1e-8);
+                forceHasBeenSet =!((bhLoad as PointLoad).Force.Length() < 1e-8);
                 bhLoadType = forceHasBeenSet == true ? nodal_load_load_type.LOAD_TYPE_FORCE : nodal_load_load_type.LOAD_TYPE_MOMENT;
 
             }
@@ -222,8 +222,8 @@ namespace BH.Adapter.RFEM6
             {
 
                 BarUniformlyDistributedLoad bhBarLoad = bhLoad as BarUniformlyDistributedLoad;
-                momentHasBeenSet = !(bhBarLoad.Moment.X == 0 && bhBarLoad.Moment.Y == 0 && bhBarLoad.Moment.Z == 0);
-                forceHasBeenSet = !(bhBarLoad.Force.X == 0 && bhBarLoad.Force.Y == 0 && bhBarLoad.Force.Z == 0);
+                momentHasBeenSet = !(bhBarLoad.Moment.Length()<1e-8);
+                forceHasBeenSet = !(bhBarLoad.Force.Length() < 1e-8);
                 bhLoadType = forceHasBeenSet == true ? member_load_load_type.LOAD_TYPE_FORCE : member_load_load_type.LOAD_TYPE_MOMENT;
 
             }
@@ -232,21 +232,28 @@ namespace BH.Adapter.RFEM6
                 //Implicitly assuming that the GeometricalLineLoad is is a Non-Free Line Load as Free Line Loads only allow forces
 
                 GeometricalLineLoad geolLineload = bhLoad as GeometricalLineLoad;
-                if ((geolLineload.ForceA.Length() == 0 && geolLineload.ForceB.Length() == 0) && (geolLineload.MomentA.Length() == 0 && geolLineload.MomentB.Length() == 0)) { return null; }
 
-                if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.ForceA, geolLineload.ForceB)) != 1 && (geolLineload.ForceA.Length() > 0 && geolLineload.ForceB.Length() > 0))
+                if (geolLineload.ForceA.Length() < 1e-8 && geolLineload.ForceB.Length() < 1e-8
+                    && geolLineload.MomentA.Length() < 1e-8 && geolLineload.MomentB.Length() < 1e-8)
                 {
                     return null;
                 }
-                else if (Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.MomentA, geolLineload.MomentA)) != 1 && (geolLineload.MomentA.Length() > 0 && geolLineload.MomentB.Length() > 0))
+
+                if ((geolLineload.ForceA.Length() > 0 && geolLineload.ForceB.Length() > 0) && 
+                    Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.ForceA, geolLineload.ForceB)) != 1)
+                {
+                    return null;
+                }
+                else if ((geolLineload.MomentA.Length() > 0 && geolLineload.MomentB.Length() > 0) && 
+                    Math.Abs(BH.Engine.Geometry.Query.IsParallel(geolLineload.MomentA, geolLineload.MomentA)) != 1)
                 {
                     return null;
                 }
                 else
                 {
                     //boolean for check of atleas one moment Vector that has been set
-                    momentHasBeenSet = !(geolLineload.MomentA.X == 0 && geolLineload.MomentA.Y == 0 && geolLineload.MomentA.Z == 0);
-                    momentHasBeenSet = momentHasBeenSet || !(geolLineload.MomentB.X == 0 && geolLineload.MomentB.Y == 0 && geolLineload.MomentB.Z == 0);
+                    momentHasBeenSet = (!(geolLineload.MomentA.Length() < 1e-8 )) || (!(geolLineload.MomentB.Length() < 1e-8));
+                    //momentHasBeenSet = momentHasBeenSet || !(geolLineload.MomentB.X == 0 && geolLineload.MomentB.Y == 0 && geolLineload.MomentB.Z == 0);
 
                     //boolean for check of atleas one force Vector that has been set
                     forceHasBeenSet = !(geolLineload.ForceA.X == 0 && geolLineload.ForceA.Y == 0 && geolLineload.ForceA.Z == 0);
@@ -295,44 +302,44 @@ namespace BH.Adapter.RFEM6
         }
 
 
-        private bool DirectionVectorIsXYZAxisParallel(Vector vector)
-        {
-            bool isParallel = false;
+        //private bool DirectionVectorIsXYZAxisParallel(Vector vector)
+        //{
+        //    bool isParallel = false;
 
-            if (vector.X != 0 && ((vector.Y == 0 && vector.Z == 0)))
-            {
+        //    if (vector.X != 0 && ((vector.Y == 0 && vector.Z == 0)))
+        //    {
 
-                isParallel = true;
+        //        isParallel = true;
 
-            }
-            else if (vector.Y != 0 && ((vector.X == 0 && vector.Z == 0)))
-            {
-
-
-                isParallel = true;
-
-            }
-            else if (vector.Z != 0 && ((vector.X == 0 && vector.Y == 0)))
-            {
+        //    }
+        //    else if (vector.Y != 0 && ((vector.X == 0 && vector.Z == 0)))
+        //    {
 
 
-                isParallel = true;
+        //        isParallel = true;
 
-            }
-            else if (vector.X == 0 && vector.Y == 0 && vector.Z == 0)
-            {
-
-
-                isParallel = true;
-
-            }
+        //    }
+        //    else if (vector.Z != 0 && ((vector.X == 0 && vector.Y == 0)))
+        //    {
 
 
-            return isParallel;
+        //        isParallel = true;
 
-        }
+        //    }
+        //    else if (vector.X == 0 && vector.Y == 0 && vector.Z == 0)
+        //    {
 
-        private  List<BarUniformlyDistributedLoad> SplitLoadIntoAxisAlignedLoads( BarUniformlyDistributedLoad barLoad)
+
+        //        isParallel = true;
+
+        //    }
+
+
+        //    return isParallel;
+
+        //}
+
+        private  List<BarUniformlyDistributedLoad> SplitLoadIntoAxisParallelLoads( BarUniformlyDistributedLoad barLoad)
         {
             // Only works for BarUniformlyDistributedLoad
 
@@ -360,7 +367,10 @@ namespace BH.Adapter.RFEM6
 
             // If only one axis is non-zero for moment or force, return as is
             if ((nonZeroMoment == 1 && nonZeroForce == 0) || (nonZeroForce == 1 && nonZeroMoment == 0))
+            {
+                barLoad.Name = $"{barLoad.BHoM_Guid}";
                 return new List<BarUniformlyDistributedLoad> { barLoad };
+            }
 
             List<BarUniformlyDistributedLoad> resultList = new List<BarUniformlyDistributedLoad>();
 
@@ -380,7 +390,7 @@ namespace BH.Adapter.RFEM6
                     double z_coord = index == 2 ? barLoad.Moment.Z : 0;
                     barMoment.Force = BH.Engine.Geometry.Create.Vector(0, 0, 0);
                     barMoment.Moment = new BH.oM.Geometry.Vector() { X = x_coord, Y = y_coord, Z = z_coord };
-                    barMoment.Name = $"{barLoad.Name}_{barLoad.BHoM_Guid}_Moment";
+                    barMoment.Name = $"{barLoad.BHoM_Guid}";
                     resultList.Add(barMoment);
 
                 }
@@ -400,7 +410,7 @@ namespace BH.Adapter.RFEM6
                     double y_coord = index == 1 ? barLoad.Force.Y : 0;
                     double z_coord = index == 2 ? barLoad.Force.Z : 0;
                     barForce.Force = new BH.oM.Geometry.Vector() { X = x_coord, Y = y_coord, Z = z_coord };
-                    barForce.Name = $"{barLoad.Name}_{barLoad.BHoM_Guid}_Force";
+                    barForce.Name = $"{barLoad.BHoM_Guid}";
                     resultList.Add(barForce);
 
                 }
