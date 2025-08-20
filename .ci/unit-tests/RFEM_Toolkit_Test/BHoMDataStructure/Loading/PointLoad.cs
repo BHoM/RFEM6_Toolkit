@@ -74,7 +74,7 @@ namespace RFEM_Toolkit_Test.Elements
 
 
         [OneTimeSetUp]
-        public void InitializeOpenings()
+        public void Initialize()
         {
             adapter = new RFEM6Adapter(true);
             node0 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 0 } };
@@ -84,7 +84,7 @@ namespace RFEM_Toolkit_Test.Elements
             node4 = new Node() { Position = new Point() { X = 40, Y = 0, Z = 0 } };
             node5 = new Node() { Position = new Point() { X = 50, Y = 0, Z = 0 } };
 
-            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead };
+            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead,Number=1 };
 
             var nodeGroup0 = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { node0 } };
 
@@ -118,35 +118,7 @@ namespace RFEM_Toolkit_Test.Elements
         [TearDown]
         public void TearDown()
         {
-            //adapter.Wipeout();
-        }
-
-        [Test]
-        public void PushPullInclinedForces()
-        {
-            adapter.Push(new List<IBHoMObject>() { pointLoadInclined0 });
-            FilterRequest pointLoadFilter = new FilterRequest() { Type = typeof(PointLoad) };
-            List<PointLoad> pointLoad = adapter.Pull(pointLoadFilter).ToList().Select(p => (PointLoad)p).ToList();
-
-            //Assert.IsTrue((pointLoad[0]).Force == (pointLoad0.Force));
-            //Assert.IsTrue((pointLoad[0]).Moment == (pointLoad0.Moment));
-
-            //Assert.IsTrue((pointLoad[1]).Force == (pointLoad1.Force));
-            //Assert.IsTrue((pointLoad[1]).Moment == (pointLoad1.Moment));
-
-            //Assert.IsTrue((pointLoad[2]).Force == (pointLoad2.Force));
-            //Assert.IsTrue((pointLoad[2]).Moment == (pointLoad2.Moment));
-
-            //Assert.IsTrue((pointLoad[3]).Force == (pointLoad3.Force));
-            //Assert.IsTrue((pointLoad[3]).Moment == (pointLoad3.Moment));
-
-            //Assert.IsTrue((pointLoad[4]).Force == (pointLoad4.Force));
-            //Assert.IsTrue((pointLoad[4]).Moment == (pointLoad4.Moment));
-
-            //Assert.IsTrue((pointLoad[5]).Force == (pointLoad5.Force));
-            //Assert.IsTrue((pointLoad[5]).Moment == (pointLoad5.Moment));
-
-
+            adapter.Wipeout();
         }
 
 
@@ -209,12 +181,6 @@ namespace RFEM_Toolkit_Test.Elements
 
         }
 
-
-        //[Test]
-        //public void DoublePushPullOfOpenings()
-        //{
-
-        //}
     }
 
 

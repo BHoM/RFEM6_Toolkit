@@ -113,7 +113,7 @@ namespace RFEM_Toolkit_Test.Elements
             panelGroup2 = new List<IAreaElement>() { panel2 };
             panelGroup3 = new List<IAreaElement>() { panel3 };
 
-            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead };
+            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead, Number = 1 };
 
 
             // NON-Free Line Loads
