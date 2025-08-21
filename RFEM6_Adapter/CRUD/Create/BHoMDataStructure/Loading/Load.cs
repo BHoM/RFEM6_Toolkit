@@ -171,14 +171,9 @@ namespace BH.Adapter.RFEM6
                 else
                 {
                     //boolean for check of atleas one moment Vector that has been set
-                    //momentHasBeenSet = (!(geolLineload.MomentA.Length() < 1e-8)) || (!(geolLineload.MomentB.Length() < 1e-8));
                     momentHasBeenSet = geolLineload.MomentA.Length() > 1e-8 || geolLineload.MomentB.Length() > 1e-8;
-                    //momentHasBeenSet = momentHasBeenSet || !(geolLineload.MomentB.X == 0 && geolLineload.MomentB.Y == 0 && geolLineload.MomentB.Z == 0);
 
                     //boolean for check of atleas one force Vector that has been set
-                    //forceHasBeenSet = !(geolLineload.ForceA.X == 0 && geolLineload.ForceA.Y == 0 && geolLineload.ForceA.Z == 0);
-                    //forceHasBeenSet = forceHasBeenSet || !(geolLineload.ForceB.X == 0 && geolLineload.ForceB.Y == 0 && geolLineload.ForceB.Z == 0);
-
                     forceHasBeenSet =geolLineload.ForceA.Length() > 1e-8 || geolLineload.ForceB.Length() > 1e-8;
 
                     bhLoadType = forceHasBeenSet == true ? line_load_load_type.LOAD_TYPE_FORCE : line_load_load_type.LOAD_TYPE_MOMENT;
