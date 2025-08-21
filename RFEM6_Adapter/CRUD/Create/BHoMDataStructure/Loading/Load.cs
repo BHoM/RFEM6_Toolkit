@@ -61,27 +61,12 @@ namespace BH.Adapter.RFEM6
 
                 if (bhLoad is AreaUniformlyDistributedLoad)
                 {
-                    // Updating the load dictionary
-                    UpdateLoadIdDictionary(bhLoad);
-
-                    //Call Panel Load Methond to update the Panel ID Dictionary
-                    this.GetCachedOrReadAsDictionary<int, Panel>();
-                    int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-                    surface_load rfemAreaLoad = (bhLoad as AreaUniformlyDistributedLoad).ToRFEM6(id);
-                    var currrSurfaceIds = (bhLoad as AreaUniformlyDistributedLoad).Objects.Elements.ToList().Select(e => m_PanelIDdict[e as Panel]).ToArray();
-                    rfemAreaLoad.surfaces = currrSurfaceIds;
-                    m_Model.set_surface_load(bhLoad.Loadcase.Number, rfemAreaLoad);
-
+                    CreateLoad(bhLoad as AreaUniformlyDistributedLoad);
                     continue;
                 }
 
-
-                object loadType = null;
-
-
                 if (bhLoad is BarUniformlyDistributedLoad)
                 {
-
                     CreateLoad(bhLoad as BarUniformlyDistributedLoad);
                     continue;
                 }
@@ -101,6 +86,7 @@ namespace BH.Adapter.RFEM6
                     if (!lineLoadhasFragments)
                         BH.Engine.Base.Compute.RecordWarning($"{bhLoad} has no geometricalLineLoadType set. As a default value geometricalLineLoadType.geometricalLineLoadEnum has been set to FreeLineLoad.\n In case you want to generate LineLoads please add the fragment geometricalLineLoadTyp to the {bhLoad} and set the parameters accordingly.");
 
+                    // checking if the GeometricalLineLoad has a geometricalLineLoadType Fragment and if it is not FreeLineLoad
                     bool isNonFreeLineLoad = lineLoadhasFragments && BH.Engine.Base.Query.GetAllFragments(bhLoad)[0].PropertyValue("geometrialLineLoadType").ToString() != "FreeLineLoad";
 
                     //If Load is a Non-Free Line Load
@@ -108,9 +94,9 @@ namespace BH.Adapter.RFEM6
                         CreateLoad_NonFreeLineLoad(bhLoad as GeometricalLineLoad);
                         continue;
                     }
-                    // If Load is a FreeLineLoad
                     else
                     {
+                    // Handling FreeLineLoad
 
 
                         // Checking if Moment and Force Vectors have been mixed. Free Line Loads only allow Forces or only Moments
@@ -122,33 +108,7 @@ namespace BH.Adapter.RFEM6
 
                         CreateLoad_FreeLineLoad(bhLoad as GeometricalLineLoad, ref surfaceIds);
 
-                        //int[] currrSurfaceIds = new int[] { };
-
-                        //// Updating the load dictionary
-                        //UpdateLoadIdDictionary(bhLoad);
-
-                        ////Has surface been added to the Load? If not , get all surface IDs
-                        //if (surfaceIds.Count() == 0 && (bhLoad as GeometricalLineLoad).Objects is null || (bhLoad as GeometricalLineLoad).Objects.Elements.Count == 0 || ((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
-                        //{
-                        //    surfaceIds = m_Model.get_all_object_numbers(object_types.E_OBJECT_TYPE_SURFACE, 0);
-                        //}
-                        //// If Surface has been added to the Load, get current Surface IDs
-                        //if (!((bhLoad as GeometricalLineLoad).Objects is null) && (bhLoad as GeometricalLineLoad).Objects.Elements.Count() != 0 && !((bhLoad as GeometricalLineLoad).Objects.Elements.First() is null))
-                        //{
-                        //    //currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => (e as Panel).GetRFEM6ID()).ToArray();
-                        //    List<Panel> panelCachList = GetCachedOrRead<Panel>();
-                        //    currrSurfaceIds = (bhLoad as GeometricalLineLoad).Objects.Elements.ToList().Select(e => m_PanelIDdict[e as Panel]).ToArray();
-
-
-                        //}
-                        //else
-                        //{
-                        //    currrSurfaceIds = surfaceIds;
-                        //}
-                        //// 
-                        //int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name + "_FreeLineLoad"];
-                        //free_line_load rfFreeLineLoad = (bhLoad as GeometricalLineLoad).ToRFEM6(id, currrSurfaceIds);
-                        //m_Model.set_free_line_load(bhLoad.Loadcase.Number, rfFreeLineLoad);
+                        
                         continue;
                     }
 
@@ -260,6 +220,20 @@ namespace BH.Adapter.RFEM6
 
         }
 
+
+
+        private void CreateLoad(AreaUniformlyDistributedLoad bhLoad)
+        {
+            UpdateLoadIdDictionary(bhLoad);
+            //Call Panel Load Methond to update the Panel ID Dictionary
+            this.GetCachedOrReadAsDictionary<int, Panel>();
+            int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
+            surface_load rfemAreaLoad = (bhLoad as AreaUniformlyDistributedLoad).ToRFEM6(id);
+            var currrSurfaceIds = (bhLoad as AreaUniformlyDistributedLoad).Objects.Elements.ToList().Select(e => m_PanelIDdict[e as Panel]).ToArray();
+            rfemAreaLoad.surfaces = currrSurfaceIds;
+            m_Model.set_surface_load(bhLoad.Loadcase.Number, rfemAreaLoad);
+
+        }
 
         private void CreateLoad(BarUniformlyDistributedLoad bhLoad)
         {
