@@ -13,6 +13,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="IntermediateDataStructures\**" />
+	  <EmbeddedResource Remove="IntermediateDataStructures\**" />
+	  <None Remove="IntermediateDataStructures\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.11" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
 		<PackageReference Include="NUnit" Version="3.13.3" />
@@ -108,10 +114,6 @@
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Structure_oM.dll</HintPath>
 			<SpecificVersion>false</SpecificVersion>
 		</Reference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="IntermediateDataStructures\" />
 	</ItemGroup>
 
 </Project>

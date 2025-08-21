@@ -235,7 +235,7 @@ namespace RFEM_Toolkit_Test.Elements
 
             ////Assert
             //Check for amount of loads push + pulled
-            Assert.AreEqual(barLoads.Count(), inclinedForces.Count());
+            Assert.AreEqual(barLoads.Count, inclinedForces.Count);
 
             //Check if loads have forces/moment
             Assert.IsTrue(barLoads[0].Force == inclinedForces[0].Force);

@@ -183,7 +183,6 @@ namespace RFEM_Toolkit_Test.Elements
         public void PushOrNonFreeGeometricalLineLoad_Forces()
         {
             adapter.Push(new List<Panel>() { panel1,panel2,panel3 });
-            //panel1.Centroid();
 
             //Act
 

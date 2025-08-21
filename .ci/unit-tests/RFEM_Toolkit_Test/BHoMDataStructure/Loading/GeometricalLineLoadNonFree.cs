@@ -186,7 +186,7 @@ namespace RFEM_Toolkit_Test.Elements
         //}
 
         [Test]
-        public void PushOrNonFreeGeometricalLineLoad_Forces()
+        public void PushOfNonFreeGeometricalLineLoad_Forces()
         {
 
             //Act
@@ -194,53 +194,53 @@ namespace RFEM_Toolkit_Test.Elements
             // Push
             adapter.Push(this.forceList1);
 
-            //// Pull
-            //FilterRequest loadFilter = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
-            //List<GeometricalLineLoad> lineLoadList = adapter.Pull(loadFilter).ToList().Select(p => (GeometricalLineLoad)p).ToList();
+            // Pull
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(GeometricalLineLoad) };
+            List<GeometricalLineLoad> lineLoadList = adapter.Pull(loadFilter).ToList().Select(p => (GeometricalLineLoad)p).ToList();
 
-            ////Assert
-            //int i = 0;
-            //Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
-            //Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
-            //Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
-            //Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
+            //Assert
+            int i = 0;
+            Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
+            Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
+            Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
+            Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
 
-            //i = 1;
-            //Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
-            //Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
-            //Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
-            //Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
+            i = 1;
+            Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
+            Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
+            Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
+            Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
 
-            //i = 2;
-            //Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
-            //Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
-            //Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
-            //Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
+            i = 2;
+            Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
+            Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
+            Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
+            Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
 
-            //i = 3;
-            //Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
-            //Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
-            //Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
-            //Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
+            i = 3;
+            Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
+            Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
+            Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
+            Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
 
-            //i = 4;
-            //Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
-            //Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
-            //Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
-            //Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
+            i = 4;
+            Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
+            Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
+            Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
+            Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
 
-            //i = 5;
-            //Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
-            //Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
-            //Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
-            //Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
+            i = 5;
+            Assert.True(this.forceList1[i].ForceA.Equals(lineLoadList[i].ForceA));
+            Assert.True(this.forceList1[i].ForceB.Equals(lineLoadList[i].ForceB));
+            Assert.True(this.forceList1[i].Axis.Equals(lineLoadList[i].Axis));
+            Assert.True(this.forceList1[i].Projected.Equals(lineLoadList[i].Projected));
 
 
         }
 
 
         [Test]
-        public void PushOrNonFreeGeometricalLineLoad_Moments()
+        public void PushOFNonFreeGeometricalLineLoad_Moments()
         {
 
             // Act
