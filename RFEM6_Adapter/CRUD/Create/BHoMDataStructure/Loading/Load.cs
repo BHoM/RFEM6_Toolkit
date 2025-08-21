@@ -356,10 +356,7 @@ namespace BH.Adapter.RFEM6
 
         private List<BarUniformlyDistributedLoad> SplitLoadIntoAxisParallelLoads(BarUniformlyDistributedLoad barLoad)
         {
-            // Only works for BarUniformlyDistributedLoad
-
-            //if (barLoad == null)
-            //    return null;
+      
 
             // Example: Create a dictionary with "X", "Y", "Z" as keys and corresponding values from a vector
             var moment_dict = new Dictionary<string, double>
