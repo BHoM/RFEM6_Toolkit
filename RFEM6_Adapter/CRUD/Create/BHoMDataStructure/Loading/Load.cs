@@ -19,30 +19,30 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Structure.Loads;
-using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
-using System.Security.Cryptography;
 using BH.Engine.Base;
-using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
-using BH.Engine.Structure;
-using BH.oM.Adapters.RFEM6;
 using BH.Engine.Geometry;
 using BH.Engine.Spatial;
-using BH.oM.Base.Attributes;
-using System.ComponentModel;
+using BH.Engine.Structure;
+using BH.oM.Adapter;
+using BH.oM.Adapters.RFEM6;
 using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
 using BH.oM.Adapters.RFEM6.Fragments.Enums;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Base.Attributes;
+using BH.oM.Geometry;
+using BH.oM.Structure.Elements;
+using BH.oM.Structure.Loads;
+using BH.oM.Structure.MaterialFragments;
+using BH.oM.Structure.Results;
+using BH.oM.Structure.SectionProperties;
+using Dlubal.WS.Rfem6.Model;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
@@ -352,7 +352,7 @@ namespace BH.Adapter.RFEM6
             // If only one axis is non-zero for moment or force, return as is
             if ((nonZeroMoment == 1 && nonZeroForce == 0) || (nonZeroForce == 1 && nonZeroMoment == 0))
             {
-                barLoad.Name = $"{barLoad.BHoM_Guid}";
+                barLoad.Name = $"Name::{barLoad.Name}::GUID::{barLoad.BHoM_Guid}";
                 return new List<BarUniformlyDistributedLoad> { barLoad };
             }
 
@@ -374,7 +374,7 @@ namespace BH.Adapter.RFEM6
                     double z_coord = index == 2 ? barLoad.Moment.Z : 0;
                     barMoment.Force = BH.Engine.Geometry.Create.Vector(0, 0, 0);
                     barMoment.Moment = new BH.oM.Geometry.Vector() { X = x_coord, Y = y_coord, Z = z_coord };
-                    barMoment.Name = $"{barLoad.BHoM_Guid}";
+                    barMoment.Name = $"Name::{barLoad.Name}::GUID::{barLoad.BHoM_Guid}";
                     resultList.Add(barMoment);
 
                 }
@@ -394,7 +394,7 @@ namespace BH.Adapter.RFEM6
                     double y_coord = index == 1 ? barLoad.Force.Y : 0;
                     double z_coord = index == 2 ? barLoad.Force.Z : 0;
                     barForce.Force = new BH.oM.Geometry.Vector() { X = x_coord, Y = y_coord, Z = z_coord };
-                    barForce.Name = $"{barLoad.BHoM_Guid}";
+                    barForce.Name = $"Name::{barLoad.Name}::GUID::{barLoad.BHoM_Guid}";
                     resultList.Add(barForce);
 
                 }

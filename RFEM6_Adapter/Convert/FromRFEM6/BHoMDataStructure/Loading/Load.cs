@@ -126,9 +126,12 @@ namespace BH.Adapter.RFEM6
                     break;
             }
 
+            string loadName = rfMemberLoad.comment?.Split(new[] { "::" }, StringSplitOptions.None).ElementAtOrDefault(1) ?? string.Empty;
+            string guid = rfMemberLoad.comment.Split(new[] { "::" }, StringSplitOptions.None).Last();
+
             BarUniformlyDistributedLoad bhLoad = new BarUniformlyDistributedLoad
             {
-                Name = rfMemberLoad.comment,
+                Name = loadName,
                 Objects = new BH.oM.Base.BHoMGroup<Bar>() { Elements = bhBars },
                 Loadcase = bhLoadCase,
                 Force = forceVector,
@@ -136,6 +139,7 @@ namespace BH.Adapter.RFEM6
                 Axis = axis,
                 Projected = isProjected
             };
+           bhLoad.SetRFEM6ID(guid);
 
             return bhLoad;
         }
