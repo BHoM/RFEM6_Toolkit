@@ -39,6 +39,7 @@ using BH.oM.Adapters.RFEM6.Fragments.Enums;
 using System.Linq.Expressions;
 using System.Diagnostics;
 using BH.oM.Base;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -127,7 +128,7 @@ namespace BH.Adapter.RFEM6
             }
 
             string loadName = rfMemberLoad.comment?.Split(new[] { "::" }, StringSplitOptions.None).ElementAtOrDefault(1) ?? string.Empty;
-            string guid = rfMemberLoad.comment.Split(new[] { "::" }, StringSplitOptions.None).Last();
+            string bhomGuid = rfMemberLoad.comment.Split(new[] { "::" }, StringSplitOptions.None).Last();
 
             BarUniformlyDistributedLoad bhLoad = new BarUniformlyDistributedLoad
             {
@@ -139,7 +140,7 @@ namespace BH.Adapter.RFEM6
                 Axis = axis,
                 Projected = isProjected
             };
-           bhLoad.SetRFEM6ID(guid);
+            bhLoad.BHoM_Guid = Guid.Parse(bhomGuid);
 
             return bhLoad;
         }

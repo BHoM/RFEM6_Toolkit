@@ -328,7 +328,8 @@ namespace BH.Adapter.RFEM6
 
         private List<BarUniformlyDistributedLoad> SplitLoadIntoAxisParallelLoads(BarUniformlyDistributedLoad barLoad)
         {
-      
+
+            var bhomGuid = barLoad.BHoM_Guid;
 
             // Example: Create a dictionary with "X", "Y", "Z" as keys and corresponding values from a vector
             var moment_dict = new Dictionary<string, double>
@@ -352,7 +353,7 @@ namespace BH.Adapter.RFEM6
             // If only one axis is non-zero for moment or force, return as is
             if ((nonZeroMoment == 1 && nonZeroForce == 0) || (nonZeroForce == 1 && nonZeroMoment == 0))
             {
-                barLoad.Name = $"Name::{barLoad.Name}::GUID::{barLoad.BHoM_Guid}";
+                barLoad.Name = $"Name::{barLoad.Name}::GUID::{bhomGuid}";
                 return new List<BarUniformlyDistributedLoad> { barLoad };
             }
 
@@ -374,7 +375,7 @@ namespace BH.Adapter.RFEM6
                     double z_coord = index == 2 ? barLoad.Moment.Z : 0;
                     barMoment.Force = BH.Engine.Geometry.Create.Vector(0, 0, 0);
                     barMoment.Moment = new BH.oM.Geometry.Vector() { X = x_coord, Y = y_coord, Z = z_coord };
-                    barMoment.Name = $"Name::{barLoad.Name}::GUID::{barLoad.BHoM_Guid}";
+                    barMoment.Name = $"Name::{barLoad.Name}::GUID::{bhomGuid}";
                     resultList.Add(barMoment);
 
                 }
@@ -394,7 +395,7 @@ namespace BH.Adapter.RFEM6
                     double y_coord = index == 1 ? barLoad.Force.Y : 0;
                     double z_coord = index == 2 ? barLoad.Force.Z : 0;
                     barForce.Force = new BH.oM.Geometry.Vector() { X = x_coord, Y = y_coord, Z = z_coord };
-                    barForce.Name = $"Name::{barLoad.Name}::GUID::{barLoad.BHoM_Guid}";
+                    barForce.Name = $"Name::{barLoad.Name}::GUID::{bhomGuid}";
                     resultList.Add(barForce);
 
                 }
