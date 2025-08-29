@@ -56,7 +56,7 @@ namespace BH.Adapter.RFEM6
                 }
                 else if (bhLoad is PointLoad)
                 {
-                    nodal_load_load_type nodalLoadType = (nodal_load_load_type)MomentOfForceLoad(bhLoad as PointLoad);
+                    nodal_load_load_type nodalLoadType = (nodal_load_load_type)MomentOrForceLoad(bhLoad as PointLoad);
                     if (nodalLoadType == 0) continue;
 
                     //var rfPointLoad = (bhLoad as PointLoad).ToRFEM6(nodalLoadType);
