@@ -46,6 +46,7 @@ using BH.oM.Adapters.RFEM6;
 using BH.Engine.Structure;
 using BH.Engine.Geometry;
 using BH.oM.Adapter;
+using System.Diagnostics;
 
 
 namespace BH.Adapter.RFEM6
@@ -58,7 +59,7 @@ namespace BH.Adapter.RFEM6
 
         [Description("Adapter for RFEM6.")]
         [Output("The created RFEM6 adapter.")]
-        public RFEM6Adapter(bool active = false)
+        public RFEM6Adapter(string filePath = "", bool active = false)
         {
 
             // The Adapter constructor can be used to configure the Adapter behaviour.
@@ -66,7 +67,7 @@ namespace BH.Adapter.RFEM6
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
             //m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly;
             m_AdapterSettings.OnlyUpdateChangedObjects = false; // Setting this to true causes a Stackoverflow in some cases from the HashComparer called from the base FullCRUD.
-            m_AdapterSettings.CreateOnly_DistinctObjects = false; 
+            m_AdapterSettings.CreateOnly_DistinctObjects = false;
 
             AddAdapterModules();
 
@@ -76,16 +77,18 @@ namespace BH.Adapter.RFEM6
 
             AdapterIdFragmentType = typeof(RFEM6ID);
 
+            m_filepath = filePath;
+
         }
 
         /***************************************************/
         /**** Private  Fields                           ****/
         /***************************************************/
 
-        public Dictionary<Loadcase, Dictionary<String,int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
+        public string m_filepath = "";
+
+        public Dictionary<Loadcase, Dictionary<String, int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
         public Dictionary<Panel, int> m_PanelIDdict = new Dictionary<Panel, int>(new RFEMPanelComparer());
-
-
 
         /***************************************************/
         /**** Private Methods                           ****/
@@ -100,19 +103,65 @@ namespace BH.Adapter.RFEM6
 
         public void Connect()
         {
+            if (ApplicationIsRunning())
+            {
+                string modelUrl = "";
 
-            string modelUrl = m_Application.get_active_model();
+                try
+                {
+                    modelUrl=m_Application.open_model(m_filepath);
 
-            // connects to RFEM6/RSTAB9 model
-            m_Model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
+                }
+                catch
+                {
+                    modelUrl=GetOpenModel();
 
-            // var tst= m_Model.get_section(1);
+                }
+
+                 //modelUrl = m_Application.get_active_model();
+                // connects to RFEM6/RSTAB9 model
+                m_Model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
+                //m_Model.get_model_settings_and_options().global_axes_orientation=model_settings_and_options_global_axes_orientation_type.E_GLOBAL_AXES_ORIENTATION_ZUP;
+                //m_Model.get_model_settings_and_options().global_axes_orientationSpecified = true;
+
+            }
+            else
+            {
+
+                BH.Engine.Base.Compute.RecordWarning("RFEM6 application is not running. Please start RFEM6 and open the application on your system.");
+
+            }
         }
 
         public void Disconnect()
         {
             m_Model.close_connection();
             m_Model = null;
+        }
+
+        public bool ApplicationIsRunning()
+        {
+            if (Process.GetProcessesByName("RFEM6").Count() > 0) return true;
+            else return false;
+        }
+
+        public string GetOpenModel()
+        {
+
+            string modelUrl = "";
+
+            try
+            {
+                modelUrl = m_Application.get_active_model();
+                return modelUrl;
+            }
+            catch
+            {
+                string dateTimeSignature = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string modelName = $"New_Model_{dateTimeSignature}";
+                modelUrl = m_Application.new_model(modelName);
+                return modelUrl;
+            }
         }
 
         //RFEM stuff ----------------------------
@@ -123,7 +172,7 @@ namespace BH.Adapter.RFEM6
         {
             get
             {
-                BasicHttpBinding binding = new BasicHttpBinding { SendTimeout = new TimeSpan(0, 0, 180), UseDefaultWebProxy = true,MaxReceivedMessageSize= 2147483647 };
+                BasicHttpBinding binding = new BasicHttpBinding { SendTimeout = new TimeSpan(0, 0, 180), UseDefaultWebProxy = true, MaxReceivedMessageSize = 2147483647 };
                 return binding;
             }
         }

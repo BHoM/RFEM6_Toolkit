@@ -53,7 +53,7 @@ namespace RFEM_Toolkit_Test.Elements
             /***************************************************/
             /**** Arrange                                   ****/
             /***************************************************/
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
 
             comparer = new NameOrDescriptionComparer();
 

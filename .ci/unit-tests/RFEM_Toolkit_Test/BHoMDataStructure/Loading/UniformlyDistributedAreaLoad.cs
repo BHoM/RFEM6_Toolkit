@@ -74,7 +74,7 @@ namespace RFEM_Toolkit_Test.Elements
         [OneTimeSetUp]
         public void InitializeOpenings()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
 
             comparer = new RFEMPanelComparer();
 

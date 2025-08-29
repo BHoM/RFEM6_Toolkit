@@ -68,7 +68,7 @@ namespace RFEM_Toolkit_Test.Elements
         [SetUp]
         public void EveryTimeSetUp()
         {
-            //adapter = new RFEM6Adapter(true);
+            //adapter = new RFEM6Adapter(active:true);
             loadcase1 = new Loadcase() { Name = "LC1", Nature = LoadNature.Dead, Number = 1 };
             loadcase2 = new Loadcase() { Name = "LC2", Nature = LoadNature.Accidental, Number = 2 };
             loadcase3 = new Loadcase() { Name = "LC3", Nature = LoadNature.Live, Number = 3 };
@@ -91,7 +91,7 @@ namespace RFEM_Toolkit_Test.Elements
         [OneTimeSetUp]
         public void SetUpScenario()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
 
         }
 
