@@ -63,7 +63,6 @@ namespace BH.Adapter.RFEM6
         {
 
             // The Adapter constructor can be used to configure the Adapter behaviour.
-            // For example:
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
             //m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly;
             m_AdapterSettings.OnlyUpdateChangedObjects = false; // Setting this to true causes a Stackoverflow in some cases from the HashComparer called from the base FullCRUD.
@@ -85,7 +84,7 @@ namespace BH.Adapter.RFEM6
         /**** Private  Fields                           ****/
         /***************************************************/
 
-        public string m_filepath = "";
+        private string m_filepath = "";
 
         public Dictionary<Loadcase, Dictionary<String, int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
         public Dictionary<Panel, int> m_PanelIDdict = new Dictionary<Panel, int>(new RFEMPanelComparer());
@@ -118,11 +117,7 @@ namespace BH.Adapter.RFEM6
 
                 }
 
-                 //modelUrl = m_Application.get_active_model();
-                // connects to RFEM6/RSTAB9 model
                 m_Model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
-                //m_Model.get_model_settings_and_options().global_axes_orientation=model_settings_and_options_global_axes_orientation_type.E_GLOBAL_AXES_ORIENTATION_ZUP;
-                //m_Model.get_model_settings_and_options().global_axes_orientationSpecified = true;
 
             }
             else
