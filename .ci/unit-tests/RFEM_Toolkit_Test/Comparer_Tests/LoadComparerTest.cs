@@ -58,7 +58,7 @@ namespace RFEM_Toolkit_Test.Loading
 
 
         [OneTimeSetUp]
-        public void InitializeRFEM6Adapter()
+        public void PushPullLoadComparer_InitializeRFEM6Adapter()
         {
             adapter = new RFEM6Adapter(active:true);
         }
