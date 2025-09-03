@@ -58,6 +58,8 @@ namespace RFEM_Toolkit_Test.Loading
 
 
         [OneTimeSetUp]
+
+        [Description("Method Initializes all used components ones")]
         public void LoadComparerTest_InitializeRFEM6Adapter()
         {
             adapter = new BH.Adapter.RFEM6.RFEM6Adapter(active: true);
