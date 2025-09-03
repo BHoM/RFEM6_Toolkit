@@ -40,7 +40,7 @@ namespace RFEM_Toolkit_Test.Loading
 {
 
 
-    public class PushPullLoadComparer
+    public class LoadComparerTest
 
     {
 

@@ -41,7 +41,7 @@ using System.Threading.Tasks;
 
 namespace RFEM_Toolkit_Test.Comparer_Tests
 {
-    internal class ComparerTests
+    internal class Edge_Test
     {
 
         EdgeComparer edgeComparer;
@@ -119,6 +119,7 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         IProfile concreteRectangleProfile;
 
         [SetUp]
+        [Description("Set up scenario.")]
         public void Edge_Test_Setup()
         {
 
