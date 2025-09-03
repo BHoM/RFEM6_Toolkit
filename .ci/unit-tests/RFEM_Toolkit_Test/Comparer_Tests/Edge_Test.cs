@@ -213,6 +213,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [OneTimeSetUp]
+
+        [Description("Method Initializes all used components ones.")]
         public void InitializeRFEM6Adapter()
         {
             edgeComparer = new EdgeComparer();
