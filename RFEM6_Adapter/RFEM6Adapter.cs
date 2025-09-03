@@ -123,7 +123,7 @@ namespace BH.Adapter.RFEM6
             else
             {
 
-                BH.Engine.Base.Compute.RecordWarning("RFEM6 application is not running. Please start RFEM6 and open the application on your system.");
+                BH.Engine.Base.Compute.RecordWarning("RFEM6 application is not running. Please start RFEM6 on your system.");
 
             }
         }
