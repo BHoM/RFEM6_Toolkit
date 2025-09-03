@@ -60,7 +60,7 @@ namespace RFEM_Toolkit_Test.Loading
         [OneTimeSetUp]
         public void LoadComparerTest_InitializeRFEM6Adapter()
         {
-            adapter = new RFEM6Adapter(active:true);
+            adapter = new BH.Adapter.RFEM6.RFEM6Adapter(active: true);
         }
 
 
