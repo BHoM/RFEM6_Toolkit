@@ -56,7 +56,7 @@ namespace BH.Adapter.RFEM6
         /***************************************************/
         /**** Constructors                              ****/
         /***************************************************/
-        [PreviousVersion("8.2", "BH.Adapter.RFEM6Adapter.RFEM6Adapter(bool)")]
+        [PreviousVersion("8.3", "BH.Adapter.RFEM6Adapter.RFEM6Adapter(bool)")]
         [Description("Adapter for RFEM6.")]
         [Output("The created RFEM6 adapter.")]
         public RFEM6Adapter(string filePath = "", bool active = false)
