@@ -61,29 +61,37 @@ namespace BH.Adapter.RFEM6
         [Output("The created RFEM6 adapter.")]
         public RFEM6Adapter(string filePath = "", bool active = false)
         {
+            if (active)
+            {
+                // The Adapter constructor can be used to configure the Adapter behaviour.
+                m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
+                                                                                  //m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly;
+                m_AdapterSettings.OnlyUpdateChangedObjects = false; // Setting this to true causes a Stackoverflow in some cases from the HashComparer called from the base FullCRUD.
+                m_AdapterSettings.CreateOnly_DistinctObjects = false;
 
-            // The Adapter constructor can be used to configure the Adapter behaviour.
-            m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
-            //m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly;
-            m_AdapterSettings.OnlyUpdateChangedObjects = false; // Setting this to true causes a Stackoverflow in some cases from the HashComparer called from the base FullCRUD.
-            m_AdapterSettings.CreateOnly_DistinctObjects = false;
+                AddAdapterModules();
 
-            AddAdapterModules();
+                AdapterComparers = GenerateAdapterComparersSettings();
 
-            AdapterComparers = GenerateAdapterComparersSettings();
+                DependencyTypes = GenerateDependencyTypes();
 
-            DependencyTypes = GenerateDependencyTypes();
+                AdapterIdFragmentType = typeof(RFEM6ID);
 
-            AdapterIdFragmentType = typeof(RFEM6ID);
+                m_filepath = filePath;
 
-            m_filepath = filePath;
-
+                m_isActive = true;
+            }
+            else
+            {
+                m_isActive = false;
+            }
         }
 
         /***************************************************/
         /**** Private  Fields                           ****/
         /***************************************************/
 
+        private bool m_isActive = false;
         private string m_filepath = "";
 
         public Dictionary<Loadcase, Dictionary<String, int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
@@ -102,6 +110,12 @@ namespace BH.Adapter.RFEM6
 
         public void Connect()
         {
+            if (!m_isActive)
+            {
+                BH.Engine.Base.Compute.RecordWarning("RFEM6 adapter is not active. Please set the 'active' input to true in the constructor.");
+                return;
+            }
+
             if (ApplicationIsRunning())
             {
                 string modelUrl = "";
