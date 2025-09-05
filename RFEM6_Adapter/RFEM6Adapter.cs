@@ -60,9 +60,10 @@ namespace BH.Adapter.RFEM6
         [Description("Adapter for RFEM6.")]
         [Input("filePath", "Input the optional file path to RFEM model. Default is to use the currently running instance")]
         [Output("The created RFEM6 adapter.")]
-        [PreviousVersion("8.3", "BH.Adapter.RFEM6Adapter.RFEM6Adapter(System.Boolean)")]
+        [PreviousVersion("8.3", "BH.Adapter.RFEM6.RFEM6Adapter(System.Boolean)")]
         public RFEM6Adapter(string filePath = "", bool active = false)
         {
+
             if (active)
             {
                 // The Adapter constructor can be used to configure the Adapter behaviour.
