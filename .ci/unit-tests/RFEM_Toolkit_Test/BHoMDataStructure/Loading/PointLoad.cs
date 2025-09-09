@@ -76,7 +76,7 @@ namespace RFEM_Toolkit_Test.Elements
         [OneTimeSetUp]
         public void Initialize()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
             node0 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 0 } };
             node1 = new Node() { Position = new Point() { X = 10, Y = 0, Z = 0 } };
             node2 = new Node() { Position = new Point() { X = 20, Y = 0, Z = 0 } };

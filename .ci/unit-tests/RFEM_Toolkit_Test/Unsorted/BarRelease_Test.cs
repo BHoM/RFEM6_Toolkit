@@ -52,7 +52,7 @@ namespace RFEM_Toolkit_Test
         [OneTimeSetUp]
         public void InitializeRFEM6Adapter()
         {
-            adapter = new BH.Adapter.RFEM6.RFEM6Adapter(true);
+            adapter = new BH.Adapter.RFEM6.RFEM6Adapter(active:true);
         }
 
         [Test]

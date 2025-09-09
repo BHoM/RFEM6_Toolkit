@@ -46,6 +46,7 @@ using BH.oM.Adapters.RFEM6;
 using BH.Engine.Structure;
 using BH.Engine.Geometry;
 using BH.oM.Adapter;
+using System.Diagnostics;
 
 
 namespace BH.Adapter.RFEM6
@@ -55,37 +56,49 @@ namespace BH.Adapter.RFEM6
         /***************************************************/
         /**** Constructors                              ****/
         /***************************************************/
-
+            
         [Description("Adapter for RFEM6.")]
+        [Input("filePath", "Input the optional file path to RFEM model. Default is to use the currently running instance")]
         [Output("The created RFEM6 adapter.")]
-        public RFEM6Adapter(bool active = false)
+        [PreviousVersion("8.3", "BH.Adapter.RFEM6.RFEM6Adapter(System.Boolean)")]
+        public RFEM6Adapter(string filePath = "", bool active = false)
         {
 
-            // The Adapter constructor can be used to configure the Adapter behaviour.
-            // For example:
-            m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
-            //m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly;
-            m_AdapterSettings.OnlyUpdateChangedObjects = false; // Setting this to true causes a Stackoverflow in some cases from the HashComparer called from the base FullCRUD.
-            m_AdapterSettings.CreateOnly_DistinctObjects = false; 
+            if (active)
+            {
+                // The Adapter constructor can be used to configure the Adapter behaviour.
+                m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.FullPush; // Adapter `Push` Action simply calls "Create" method.
+                                                                                  //m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly;
+                m_AdapterSettings.OnlyUpdateChangedObjects = false; // Setting this to true causes a Stackoverflow in some cases from the HashComparer called from the base FullCRUD.
+                m_AdapterSettings.CreateOnly_DistinctObjects = false;
 
-            AddAdapterModules();
+                AddAdapterModules();
 
-            AdapterComparers = GenerateAdapterComparersSettings();
+                AdapterComparers = GenerateAdapterComparersSettings();
 
-            DependencyTypes = GenerateDependencyTypes();
+                DependencyTypes = GenerateDependencyTypes();
 
-            AdapterIdFragmentType = typeof(RFEM6ID);
+                AdapterIdFragmentType = typeof(RFEM6ID);
 
+                m_filepath = filePath;
+
+                m_isActive = true;
+            }
+            else
+            {
+                m_isActive = false;
+            }
         }
 
         /***************************************************/
         /**** Private  Fields                           ****/
         /***************************************************/
 
-        public Dictionary<Loadcase, Dictionary<String,int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
+        private bool m_isActive = false;
+        private string m_filepath = "";
+
+        public Dictionary<Loadcase, Dictionary<String, int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
         public Dictionary<Panel, int> m_PanelIDdict = new Dictionary<Panel, int>(new RFEMPanelComparer());
-
-
 
         /***************************************************/
         /**** Private Methods                           ****/
@@ -100,19 +113,67 @@ namespace BH.Adapter.RFEM6
 
         public void Connect()
         {
+            if (!m_isActive)
+            {
+                BH.Engine.Base.Compute.RecordWarning("RFEM6 adapter is not active. Please set the 'active' input to true in the constructor.");
+                return;
+            }
 
-            string modelUrl = m_Application.get_active_model();
+            if (ApplicationIsRunning())
+            {
+                string modelUrl = "";
 
-            // connects to RFEM6/RSTAB9 model
-            m_Model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
+                try
+                {
+                    modelUrl=m_Application.open_model(m_filepath);
 
-            // var tst= m_Model.get_section(1);
+                }
+                catch
+                {
+                    modelUrl=GetOpenModel();
+
+                }
+
+                m_Model = new RfemModelClient(Binding, new EndpointAddress(modelUrl));
+
+            }
+            else
+            {
+
+                BH.Engine.Base.Compute.RecordWarning("RFEM6 application is not running. Please start RFEM6 on your system.");
+
+            }
         }
 
         public void Disconnect()
         {
             m_Model.close_connection();
             m_Model = null;
+        }
+
+        public bool ApplicationIsRunning()
+        {
+            if (Process.GetProcessesByName("RFEM6").Count() > 0) return true;
+            else return false;
+        }
+
+        public string GetOpenModel()
+        {
+
+            string modelUrl = "";
+
+            try
+            {
+                modelUrl = m_Application.get_active_model();
+                return modelUrl;
+            }
+            catch
+            {
+                string dateTimeSignature = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string modelName = $"New_Model_{dateTimeSignature}";
+                modelUrl = m_Application.new_model(modelName);
+                return modelUrl;
+            }
         }
 
         //RFEM stuff ----------------------------
@@ -123,7 +184,7 @@ namespace BH.Adapter.RFEM6
         {
             get
             {
-                BasicHttpBinding binding = new BasicHttpBinding { SendTimeout = new TimeSpan(0, 0, 180), UseDefaultWebProxy = true,MaxReceivedMessageSize= 2147483647 };
+                BasicHttpBinding binding = new BasicHttpBinding { SendTimeout = new TimeSpan(0, 0, 180), UseDefaultWebProxy = true, MaxReceivedMessageSize = 2147483647 };
                 return binding;
             }
         }

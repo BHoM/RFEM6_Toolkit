@@ -125,14 +125,14 @@ namespace RFEM_Toolkit_Test.Elements
         [SetUp]
         public void EveryTimeSetUp()
         {
-            //adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(filePath: @"C:\Users\amartensen\Downloads\test3.rf6", active: true);
             adapter.Push(new List<Bar>() { barSteelSection0, barSteelSection1, barSteelSection2 });
         }
 
         [OneTimeSetUp]
         public void SetUpScenario()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
 
             //Set Up Sections
             steelSection = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
