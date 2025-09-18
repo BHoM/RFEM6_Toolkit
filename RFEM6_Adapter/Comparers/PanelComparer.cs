@@ -50,9 +50,7 @@ namespace BH.Adapter.RFEM6
 
         public bool Equals(Panel panel0, Panel panel1)
         {
-            Polyline polyline0 = BH.Engine.Geometry.Create.Polyline(panel0.ExternalEdges.ToList().Select(s => s.Curve as Line).ToList()).Close();
-            Polyline polyline1 = BH.Engine.Geometry.Create.Polyline(panel1.ExternalEdges.ToList().Select(s => s.Curve as Line).ToList()).Close();
-            if (polyline0.Centroid().Distance(polyline1.Centroid()) <0.001) return true;
+            if (panel0.Centroid().Distance(panel1.Centroid()) <0.001) return true;
             return false;
         }
 
