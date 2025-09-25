@@ -74,7 +74,7 @@ namespace RFEM_Toolkit_Test.Elements
         [OneTimeSetUp]
         public void InitializeOpenings()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
 
             comparer = new RFEMPanelComparer();
 
@@ -103,7 +103,7 @@ namespace RFEM_Toolkit_Test.Elements
             panel2 = new Panel() { ExternalEdges = outlineEdges2, /*Openings = new List<Opening>() { opening2 },*/ Property = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = concrete } };
             panel3 = new Panel() { ExternalEdges = outlineEdges3, /*Openings = new List<Opening>() { opening2 },*/ Property = new BH.oM.Structure.SurfaceProperties.ConstantThickness() { Thickness = 0.1, Material = concrete } };
 
-            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead };
+            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead, Number=1 };
 
 
             panelGroup1 = new List<IAreaElement>() { panel1 };

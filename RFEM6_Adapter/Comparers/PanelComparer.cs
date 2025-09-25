@@ -50,9 +50,7 @@ namespace BH.Adapter.RFEM6
 
         public bool Equals(Panel panel0, Panel panel1)
         {
-         
-            if(panel0.Centroid().Distance(panel1.Centroid())<0.001) return true;
-
+            if (panel0.Centroid().Distance(panel1.Centroid()) <0.001) return true;
             return false;
         }
 

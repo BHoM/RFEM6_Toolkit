@@ -40,7 +40,7 @@ namespace RFEM_Toolkit_Test.Loading
 {
 
 
-    public class PushPullLoadComparer
+    public class LoadComparerTest
 
     {
 
@@ -58,15 +58,19 @@ namespace RFEM_Toolkit_Test.Loading
 
 
         [OneTimeSetUp]
-        public void InitializeRFEM6Adapter()
+
+        [Description("Method Initializes all used components ones.")]
+        public void LoadComparerTest_InitializeRFEM6Adapter()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new BH.Adapter.RFEM6.RFEM6Adapter(active: true);
         }
 
 
 
         [Test]
-        public void CompareLoads()
+
+        [Description("Test For Comparing Pushed vs Pulled Loads.")]
+        public void LoadComparerTest_CompareLoads()
         {
             n1 = new Node() { Position = new Point() { X = 0, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };
             n2 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 }, Support = BH.Engine.Structure.Create.FixConstraint6DOF() };

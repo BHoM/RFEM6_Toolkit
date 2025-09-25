@@ -52,16 +52,33 @@ namespace BH.Adapter.RFEM6
 
 			rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER_LOAD);
 
-			IEnumerable<rfModel.member_load> foundLoadCases = numbers.SelectMany(n => n.children.ToList().Select(child => m_Model.get_member_load(child, n.no)));
+			List<rfModel.member_load> foundMemberLoads = numbers.SelectMany(n => n.children.ToList().Select(child => m_Model.get_member_load(child, n.no))).ToList();
+
+
+
+			//Dictionary<String,HashSet<rfModel.member_load>> memberLoadMap = new Dictionary<String, HashSet<rfModel.member_load>>();
 
 			List<ILoad> loadCases = new List<ILoad>();
-			foundLoadCases = foundLoadCases.OrderBy(n => n.load_case).ThenBy(t => t.no);
-			foreach (rfModel.member_load memberLoad in foundLoadCases)
-			{
+			var memeberLoadsGroups=foundMemberLoads.GroupBy(l => l.comment);
 
-				loadCases.Add(memberLoad.FromRFEM(memberLoad.members.ToList().Select(m => memberMap[m]).ToList(), loadCaseMap[memberLoad.load_case]));
 
-			}
+            foreach (var memberLoadGroup in memeberLoadsGroups)
+            {
+				var membersLoadList=memberLoadGroup.ToList();
+				var members=membersLoadList.SelectMany(l => l.members).Distinct().ToList().Select(m => memberMap[m]).ToList();
+				var loadCase = loadCaseMap[membersLoadList.First().load_case];
+
+                loadCases.Add(membersLoadList.FromRFEM(members, loadCase));
+            }
+
+
+            foundMemberLoads = foundMemberLoads.OrderBy(n => n.load_case).ThenBy(t => t.no).ToList();
+			//foreach (rfModel.member_load memberLoad in foundMemberLoads)
+			//{
+
+			//	loadCases.Add(memberLoad.FromRFEM(memberLoad.members.ToList().Select(m => memberMap[m]).ToList(), loadCaseMap[memberLoad.load_case]));
+
+			//}
 
 			return loadCases;
 		}

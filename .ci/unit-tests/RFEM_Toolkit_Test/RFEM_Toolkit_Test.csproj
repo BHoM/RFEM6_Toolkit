@@ -9,8 +9,14 @@
 
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
-		<FileVersion>8.2.0.0</FileVersion>
+		<FileVersion>8.3.0.0</FileVersion>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="IntermediateDataStructures\**" />
+	  <EmbeddedResource Remove="IntermediateDataStructures\**" />
+	  <None Remove="IntermediateDataStructures\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.11" />
@@ -108,10 +114,6 @@
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Structure_oM.dll</HintPath>
 			<SpecificVersion>false</SpecificVersion>
 		</Reference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="IntermediateDataStructures\" />
 	</ItemGroup>
 
 </Project>

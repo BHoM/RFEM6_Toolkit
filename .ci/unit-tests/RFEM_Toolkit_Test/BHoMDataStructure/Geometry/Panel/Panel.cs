@@ -76,7 +76,7 @@ namespace RFEM_Toolkit_Test.Elements
 
 
 
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
 
             comparer = new RFEMPanelComparer();
 
@@ -104,13 +104,30 @@ namespace RFEM_Toolkit_Test.Elements
 
         }
 
-    
+
 
         //[TearDown]
         //public void TearDown()
         //{
         //    adapter.Wipeout();
         //}
+
+        [Test]
+        public void PushPullPanel()
+        {
+
+            adapter.Push(new List<Panel>() { panel1});
+
+            //// Pull it
+            //FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
+            //var panelPulled = adapter.Pull(panelFilter).ToList();
+            //Panel pp = (Panel)panelPulled[0];
+
+            //// Check
+            //Assert.IsNotNull(pp);
+            //Assert.IsTrue(comparer.Equals(pp, panel1));
+        }
+
 
         [Test]
         public void SinglePushPullOfOpening()

@@ -88,7 +88,7 @@ namespace RFEM_Toolkit_Test.Elements
         [OneTimeSetUp]
         public void InitializeOpenings()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
 
             comparer = new RFEMPanelComparer();
 
@@ -113,7 +113,7 @@ namespace RFEM_Toolkit_Test.Elements
             panelGroup2 = new List<IAreaElement>() { panel2 };
             panelGroup3 = new List<IAreaElement>() { panel3 };
 
-            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead };
+            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead, Number = 1 };
 
 
             // NON-Free Line Loads
@@ -186,7 +186,7 @@ namespace RFEM_Toolkit_Test.Elements
         //}
 
         [Test]
-        public void PushOrNonFreeGeometricalLineLoad_Forces()
+        public void PushOfNonFreeGeometricalLineLoad_Forces()
         {
 
             //Act
@@ -240,7 +240,7 @@ namespace RFEM_Toolkit_Test.Elements
 
 
         [Test]
-        public void PushOrNonFreeGeometricalLineLoad_Moments()
+        public void PushOFNonFreeGeometricalLineLoad_Moments()
         {
 
             // Act

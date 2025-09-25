@@ -90,7 +90,7 @@ namespace RFEM_Toolkit_Test.Elements
         [OneTimeSetUp]
         public void InitializeOpenings()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
 
             comparer = new RFEMPanelComparer();
 
@@ -115,7 +115,7 @@ namespace RFEM_Toolkit_Test.Elements
             panelGroup2 = new BHoMGroup<IAreaElement>() { Elements = new List<IAreaElement>() { panel2 } };
             panelGroup3 = new BHoMGroup<IAreaElement>() { Elements = new List<IAreaElement>() { panel3 } };
 
-            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead };
+            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead, Number=1 };
 
 
 
@@ -166,22 +166,23 @@ namespace RFEM_Toolkit_Test.Elements
 
         }
 
-        [SetUp]
-        public void SetUp()
-        {
-            adapter.Push(new List<Panel>() { panel1, panel2, panel3 });
-        }
-
-
-        //[TearDown]
-        //public void TearDown()
+        //[SetUp]
+        //public void SetUp()
         //{
-        //    adapter.Wipeout();
+        //    adapter.Push(new List<Panel>() { panel1, panel2, panel3 });
         //}
+
+
+        [TearDown]
+        public void TearDown()
+        {
+            //adapter.Wipeout();
+        }
 
         [Test]
         public void PushOrNonFreeGeometricalLineLoad_Forces()
         {
+            adapter.Push(new List<Panel>() { panel1,panel2,panel3 });
 
             //Act
 

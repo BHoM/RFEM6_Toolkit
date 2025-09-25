@@ -41,7 +41,7 @@ using System.Threading.Tasks;
 
 namespace RFEM_Toolkit_Test.Comparer_Tests
 {
-    internal class ComparerTests
+    internal class Edge_Test
     {
 
         EdgeComparer edgeComparer;
@@ -119,7 +119,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         IProfile concreteRectangleProfile;
 
         [SetUp]
-        public void Setup()
+        [Description("Set up scenario.")]
+        public void Edge_Test_Setup()
         {
 
             node0 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 0 } };
@@ -213,7 +214,9 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [OneTimeSetUp]
-        public void InitializeRFEM6Adapter()
+
+        [Description("Method Initializes all used components ones.")]
+        public void Edge_Test_InitializeRFEM6Adapter()
         {
             edgeComparer = new EdgeComparer();
             hingeComparer = new RFEMHingeComparer();
@@ -229,7 +232,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [Test]
-        public void EdgeComparer_Test()
+        [Description("Test.")]
+        public void Edge_Test_EdgeComparer_Test()
         {
             //Test equal Elements for equality
             Assert.IsTrue(edgeComparer.Equals(edge0, edge0));
@@ -241,7 +245,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [Test]
-        public void HingeComparer_Test()
+        [Description("Test.")]
+        public void Edge_Test_HingeComparer_Test()
         {
             //Test equal Elements for equality
             Assert.IsTrue(hingeComparer.Equals(hinge0, hinge0));
@@ -254,7 +259,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [Test]
-        public void LineComparer_Test()
+        [Description("Test.")]
+        public void Edge_Test_LineComparer_Test()
         {
             ////Test equal Elements for equality////
 
@@ -289,7 +295,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [Test]
-        public void LineSupportComparer_Test()
+        [Description("Test.")]
+        public void Edge_Test_LineSupportComparer_Test()
         {
 
 
@@ -305,7 +312,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [Test]
-        public void NodalSupportComparer_Test()
+        [Description("Test.")]
+        public void Edge_Test_NodalSupportComparer_Test()
         {
 
 
@@ -320,7 +328,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [Test]
-        public void SectionComparer_Test()
+        [Description("Test.")]
+        public void Edge_Test_SectionComparer_Test()
         {
 
             //Steel
@@ -345,7 +354,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
 
 
         [Test]
-        public void PanelComparer_Test()
+        [Description("Test.")]
+        public void Edge_Test_PanelComparer_Test()
         {
 
             //Define two equal objects e0 and e1
@@ -359,7 +369,8 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [Test]
-        public void SurfaceProperty_Test()
+        [Description("Test.")]
+        public void Edge_Test_SurfaceProperty_Test()
         {
 
             //Define two equal objects e0 and e1

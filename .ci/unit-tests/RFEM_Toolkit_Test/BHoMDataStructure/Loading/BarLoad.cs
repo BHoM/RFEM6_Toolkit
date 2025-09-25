@@ -63,6 +63,10 @@ namespace RFEM_Toolkit_Test.Elements
         BH.oM.Base.BHoMGroup<Bar> barGroup4;
         BH.oM.Base.BHoMGroup<Bar> barGroup5;
 
+        BarUniformlyDistributedLoad barLoadInclined0;
+        BarUniformlyDistributedLoad barLoadInclined1;
+        BarUniformlyDistributedLoad barLoadInclined2;
+
         BarUniformlyDistributedLoad barLoad0;
         BarUniformlyDistributedLoad barLoad1;
         BarUniformlyDistributedLoad barLoad2;
@@ -104,6 +108,7 @@ namespace RFEM_Toolkit_Test.Elements
         BarUniformlyDistributedLoad barLoad34;
         BarUniformlyDistributedLoad barLoad35;
 
+        List<BarUniformlyDistributedLoad> inclinedForces = new List<BarUniformlyDistributedLoad>();
         List<BarUniformlyDistributedLoad> axisAlForces = new List<BarUniformlyDistributedLoad>();
         List<BarUniformlyDistributedLoad> axisAlMoments = new List<BarUniformlyDistributedLoad>();
         List<BarUniformlyDistributedLoad> revAxisAlForces = new List<BarUniformlyDistributedLoad>();
@@ -120,14 +125,14 @@ namespace RFEM_Toolkit_Test.Elements
         [SetUp]
         public void EveryTimeSetUp()
         {
-            //adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(filePath: @"C:\Users\amartensen\Downloads\test3.rf6", active: true);
             adapter.Push(new List<Bar>() { barSteelSection0, barSteelSection1, barSteelSection2 });
         }
 
         [OneTimeSetUp]
         public void SetUpScenario()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
 
             //Set Up Sections
             steelSection = BH.Engine.Library.Query.Match("EU_SteelSections", "IPE 300", true, true) as ISectionProperty;
@@ -148,7 +153,7 @@ namespace RFEM_Toolkit_Test.Elements
             //adapter.Push(new List<Bar>() { barSteelSection0, barSteelSection1, barSteelSection2, barSteelSection3 });
 
             // Defining Loadcase
-            loadCase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead };
+            loadCase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead, Number = 1 };
 
             // Defining group
             barGroup0 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { barSteelSection0 } };
@@ -157,6 +162,14 @@ namespace RFEM_Toolkit_Test.Elements
             barGroup3 = new BH.oM.Base.BHoMGroup<Bar>() { Elements = new List<Bar> { barSteelSection3 } };
 
             //Defining Loads
+
+            // Inclined Forces
+            barLoadInclined0 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, BH.Engine.Geometry.Create.Vector(100, 100, 0), null, LoadAxis.Global, false);
+            barLoadInclined1 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, null, BH.Engine.Geometry.Create.Vector(100, 100, 0), LoadAxis.Global, false);
+            barLoadInclined2 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, BH.Engine.Geometry.Create.Vector(100, 100, 0), BH.Engine.Geometry.Create.Vector(100, 100, 0), LoadAxis.Global, false);
+            inclinedForces.AddRange(new List<BarUniformlyDistributedLoad>() { barLoadInclined0, barLoadInclined1, barLoadInclined2 });
+            //inclinedForces.AddRange(new List<BarUniformlyDistributedLoad>() { barLoadInclined2 });
+
             // Forces
             barLoad0 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, Vector.XAxis * 100, null, LoadAxis.Global, false);
             barLoad1 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup0, Vector.XAxis * 100, null, LoadAxis.Global, true);
@@ -207,6 +220,32 @@ namespace RFEM_Toolkit_Test.Elements
             barLoad34 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis.Reverse() * 100, LoadAxis.Global, true);
             barLoad35 = BH.Engine.Structure.Create.BarUniformlyDistributedLoad(loadCase, barGroup2, null, Vector.ZAxis.Reverse() * 100, LoadAxis.Local, false);
             revAxisAlMoments = new List<BarUniformlyDistributedLoad>() { barLoad27, barLoad28, barLoad29, barLoad30, barLoad31, barLoad32, barLoad33, barLoad34, barLoad35 };
+        }
+
+        [Test]
+        public void PushPullInclinedForces()
+        {
+            //Act
+            adapter.Push(inclinedForces);
+
+            FilterRequest barLoadFilter = new FilterRequest() { Type = typeof(BarUniformlyDistributedLoad) };
+            List<BarUniformlyDistributedLoad> barLoads = adapter.Pull(barLoadFilter).ToList().Select(p => (BarUniformlyDistributedLoad)p).ToList();
+
+            barLoads.Count();
+
+            ////Assert
+            //Check for amount of loads push + pulled
+            Assert.AreEqual(barLoads.Count, inclinedForces.Count);
+
+            //Check if loads have forces/moment
+            Assert.IsTrue(barLoads[0].Force == inclinedForces[0].Force);
+            Assert.IsTrue(barLoads[0].Moment == inclinedForces[0].Moment);
+            Assert.IsTrue(barLoads[1].Force == inclinedForces[1].Force);
+            Assert.IsTrue(barLoads[1].Moment == inclinedForces[1].Moment);
+            Assert.IsTrue(barLoads[2].Force == inclinedForces[2].Force);
+            Assert.IsTrue(barLoads[2].Moment == inclinedForces[2].Moment);
+
+
         }
 
         [Test]

@@ -82,7 +82,7 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
 		public void InitializeRFEM6Adapter()
 		{
 
-			adapter = new RFEM6Adapter(true);
+			adapter = new RFEM6Adapter(active:true);
 			comparer = new RFEMSectionComparer();
 
 		}

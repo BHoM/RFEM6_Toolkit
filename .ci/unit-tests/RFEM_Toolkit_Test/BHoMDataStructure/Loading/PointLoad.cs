@@ -54,6 +54,9 @@ namespace RFEM_Toolkit_Test.Elements
         BH.oM.Base.BHoMGroup<Node> nodeGroup4;
         BH.oM.Base.BHoMGroup<Node> nodeGroup5;
 
+        PointLoad pointLoadInclined0;
+
+
         PointLoad pointLoad0;
         PointLoad pointLoad1;
         PointLoad pointLoad2;
@@ -71,9 +74,9 @@ namespace RFEM_Toolkit_Test.Elements
 
 
         [OneTimeSetUp]
-        public void InitializeOpenings()
+        public void Initialize()
         {
-            adapter = new RFEM6Adapter(true);
+            adapter = new RFEM6Adapter(active:true);
             node0 = new Node() { Position = new Point() { X = 0, Y = 0, Z = 0 } };
             node1 = new Node() { Position = new Point() { X = 10, Y = 0, Z = 0 } };
             node2 = new Node() { Position = new Point() { X = 20, Y = 0, Z = 0 } };
@@ -81,9 +84,11 @@ namespace RFEM_Toolkit_Test.Elements
             node4 = new Node() { Position = new Point() { X = 40, Y = 0, Z = 0 } };
             node5 = new Node() { Position = new Point() { X = 50, Y = 0, Z = 0 } };
 
-            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead };
+            loadcase = new BH.oM.Structure.Loads.Loadcase() { Name = "Loadcase", Nature = LoadNature.Dead,Number=1 };
 
             var nodeGroup0 = new BH.oM.Base.BHoMGroup<Node>() { Elements = new List<Node> { node0 } };
+
+            pointLoadInclined0 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, new Vector() { X = 1, Y = 1, Z = 0 },null,LoadAxis.Global,"");
 
             pointLoad0 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, Vector.XAxis, null);
             pointLoad1 = BH.Engine.Structure.Create.PointLoad(loadcase, nodeGroup0, Vector.YAxis, null);
@@ -176,12 +181,6 @@ namespace RFEM_Toolkit_Test.Elements
 
         }
 
-
-        //[Test]
-        //public void DoublePushPullOfOpenings()
-        //{
-
-        //}
     }
 
 
