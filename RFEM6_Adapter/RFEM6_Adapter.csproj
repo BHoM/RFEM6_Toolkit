@@ -2,12 +2,12 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net48</TargetFrameworks>
-		<AssemblyVersion>8.0.0.0</AssemblyVersion>
+		<AssemblyVersion>9.0.0.0</AssemblyVersion>
 		<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
 		<AssemblyName>RFEM6_Adapter</AssemblyName>
 		<RootNamespace>BH.Adapter.RFEM6</RootNamespace>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<FileVersion>8.3.0.0</FileVersion>
+		<FileVersion>9.0.0.0</FileVersion>
 		<BaseOutputPath>..\Build\</BaseOutputPath>
 	</PropertyGroup>
 

@@ -2,14 +2,14 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<AssemblyVersion>8.0.0.0</AssemblyVersion>
+		<AssemblyVersion>9.0.0.0</AssemblyVersion>
 		<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
-		<FileVersion>8.3.0.0</FileVersion>
+		<FileVersion>9.0.0.0</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
