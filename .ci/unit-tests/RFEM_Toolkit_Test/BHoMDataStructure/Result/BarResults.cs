@@ -36,52 +36,74 @@ namespace RFEM_Toolkit_Test.Elements
 {
 
 
-	public class BarResultTestClass
+    public class BarResultTestClass
 
-	{
+    {
 
-		RFEM6Adapter adapter;
+        RFEM6Adapter adapter;
 
-		//[TearDown]
-		//public void TearDown()
-		//{
-		//	adapter.Wipeout();
-		//}
+        //[TearDown]
+        //public void TearDown()
+        //{
+        //	adapter.Wipeout();
+        //}
 
-		[OneTimeSetUp]
-		public void InitializeRFEM6Adapter()
-		{
-			adapter = new RFEM6Adapter(active:true);
+        [OneTimeSetUp]
+        public void InitializeRFEM6Adapter()
+        {
+            adapter = new RFEM6Adapter(active: true);
 
-		}
+        }
 
-		[Test]
-		public void ReadResult()
-		{
-			List<LoadCombination?> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l=> l as LoadCombination).ToList();
+        [Test]
+        public void ReadResult()
+        {
+            List<LoadCombination?> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l => l as LoadCombination).ToList();
 
-			Loadcase loadcase1 = new Loadcase() { Name = "LC1", Nature = LoadNature.Dead, Number = 1 };
-			LoadCombination loadCombination = new LoadCombination { Name = "LoadCombination1", Number = 1 };
+            Loadcase loadcase1 = new Loadcase() { Name = "LC1", Nature = LoadNature.Dead, Number = 1 };
+            LoadCombination loadCombination = new LoadCombination { Name = "LoadCombination1", Number = 1 };
 
-			BarResultRequest request = new BarResultRequest();
+            BarResultRequest request = new BarResultRequest();
 
-			request.ResultType = BarResultType.BarForce;
-			request.DivisionType = DivisionType.EvenlyDistributed;
-			request.Divisions = 3;
-			request.Cases = new List<Object> { loadCombList.First() };
-			//request.Cases = new List<Object> {1};
-			request.Modes = new List<string>();
-			request.ObjectIds = new List<object> {1};
-			//request.ObjectIds = new List<object> {1,2,3,4};
+            request.ResultType = BarResultType.BarForce;
+            request.DivisionType = DivisionType.EvenlyDistributed;
+            request.Divisions = 3;
+            request.Cases = new List<Object> { loadCombList.First() };
+            //request.Cases = new List<Object> {1};
+            request.Modes = new List<string>();
+            request.ObjectIds = new List<object> { 1 };
+            //request.ObjectIds = new List<object> {1,2,3,4};
 
-			var obj = adapter.Pull(request);
+            var obj = adapter.Pull(request);
 
-			obj.First();
+            obj.First();
 
-		}
+        }
+
+        [Test]
+        public void ReadResult2()
+        {
+            List<LoadCombination?> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l => l as LoadCombination).ToList();
+            List<LoadCombination?> relevantLoadComb = loadCombList.Take(38).ToList();
+
+            BarResultRequest request = new BarResultRequest();
+
+            request.ResultType = BarResultType.BarForce;
+            request.DivisionType = DivisionType.EvenlyDistributed;
+            request.Divisions = 2;
+            request.Cases = new List<Object> {relevantLoadComb.First()};
+            request.Modes = new List<string>();
+            //request.ObjectIds = new List<object> { 1 };
+            //request.ObjectIds = new List<object> {1,2,3,4};
+
+            var obj = adapter.Pull(request);
+
+
+            var obj_first = obj.First();
+        }
 
 
 
-	}
+    }
 }
 
