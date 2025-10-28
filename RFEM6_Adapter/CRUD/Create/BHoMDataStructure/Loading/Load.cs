@@ -239,15 +239,20 @@ namespace BH.Adapter.RFEM6
 
         private void CreateLoad_Polygon(AreaUniformlyDistributedLoad bhLoad)
         {
-            UpdateLoadIdDictionary(bhLoad);
-            //Call Panel Load Methond to update the Panel ID Dictionary
-            this.GetCachedOrReadAsDictionary<int, Panel>();
-            int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
-            free_polygon_load rfemAreaLoad = (bhLoad as AreaUniformlyDistributedLoad).ToRFEM6_Polygon(id);
-            var currrSurfaceIds = (bhLoad as AreaUniformlyDistributedLoad).Objects.Elements.ToList().Select(e => m_PanelIDdict[e as Panel]).ToArray();
-            rfemAreaLoad.surfaces = currrSurfaceIds;
-            m_Model.set_free_polygon_load(bhLoad.Loadcase.Number, rfemAreaLoad);
+            try
+            {
+                UpdateLoadIdDictionary(bhLoad);
+                //Call Panel Load Methond to update the Panel ID Dictionary
+                this.GetCachedOrReadAsDictionary<int, Panel>();
+                int id = m_LoadcaseLoadIdDict[bhLoad.Loadcase][bhLoad.GetType().Name];
+                free_polygon_load rfemAreaLoad = (bhLoad as AreaUniformlyDistributedLoad).ToRFEM6_Polygon(id);
+                var currrSurfaceIds = (bhLoad as AreaUniformlyDistributedLoad).Objects.Elements.ToList().Select(e => m_PanelIDdict[e as Panel]).ToArray();
+                rfemAreaLoad.surfaces = currrSurfaceIds;
+                m_Model.set_free_polygon_load(bhLoad.Loadcase.Number, rfemAreaLoad);
 
+            } catch {
+                BH.Engine.Base.Compute.RecordError($"The creation of {bhLoad} failed.\nA potential cause is that the applied polygon is non-planar or not parallel to the XY, YZ, or ZX plane.");
+            }
         }
 
         private void CreateLoad(BarUniformlyDistributedLoad bhLoad)
