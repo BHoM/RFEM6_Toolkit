@@ -45,10 +45,6 @@ namespace BH.Adapter.RFEM6
         public static Panel FromRFEM(this rfModel.surface rfSurface, Dictionary<int, Edge> edgeDict, Dictionary<int, ISurfaceProperty> surfaceProperty, HashSet<int> openingIDs, Dictionary<int, RFEMOpening> surfaceOpening)
         {
 
-            //HashSet<int> openingIDs = new HashSet<int>();
-
-            //openingIDDict.TryGetValue(rfPanelNo,out openingIDs);
-
 
             List<int> rfEdgeNumbers = rfSurface.boundary_lines.ToList();
             List<Edge> bhEdges = rfEdgeNumbers.Select(n => edgeDict[n]).ToList();

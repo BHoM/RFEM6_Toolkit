@@ -324,6 +324,8 @@ namespace BH.Adapter.RFEM6
                 if (bhAreaLoad.Axis.Equals(LoadAxis.Local))
                 {
                     loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                    if (bhAreaLoad.Projected) BH.Engine.Base.Compute.RecordWarning($"The 'Projected' option for {bhAreaLoad} is not supported when the Axis is set to Local and will therefore be ignored.");
+
                 }
                 else if (bhAreaLoad.Projected)
                 {
@@ -341,6 +343,7 @@ namespace BH.Adapter.RFEM6
                 if (bhAreaLoad.Axis.Equals(LoadAxis.Local))
                 {
                     loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                    if (bhAreaLoad.Projected) BH.Engine.Base.Compute.RecordWarning($"The 'Projected' option for {bhAreaLoad} is not supported when the Axis is set to Local and will therefore be ignored.");
                 }
                 else if (bhAreaLoad.Projected)
                 {
@@ -358,6 +361,7 @@ namespace BH.Adapter.RFEM6
                 if (bhAreaLoad.Axis.Equals(LoadAxis.Local))
                 {
                     loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                    if (bhAreaLoad.Projected) BH.Engine.Base.Compute.RecordWarning($"The 'Projected' option for {bhAreaLoad} is not supported when the Axis is set to Local and will therefore be ignored.");
                 }
                 else if (bhAreaLoad.Projected)
                 {
