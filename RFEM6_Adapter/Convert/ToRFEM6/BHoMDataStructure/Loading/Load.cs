@@ -268,6 +268,13 @@ namespace BH.Adapter.RFEM6
         public static rfModel.free_polygon_load ToRFEM6_Polygon(this AreaUniformlyDistributedLoad bhAreaLoad, int loadCaseSpecificLoadId)
         {
 
+            if (bhAreaLoad.Pressure.IsParallel(BH.oM.Geometry.Vector.XAxis)==0 
+                && bhAreaLoad.Pressure.IsParallel(BH.oM.Geometry.Vector.YAxis) == 0
+                && bhAreaLoad.Pressure.IsParallel(BH.oM.Geometry.Vector.ZAxis) == 0)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Please make sure that the direction of {bhAreaLoad} is axis-aligned.");
+            }
+
             Polygon polgon = (Polygon)bhAreaLoad.CustomData.Values.First(p => p is Polygon);
             List<double[]> polygonValues = new List<double[]>();
             var loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_XZ_OR_UW;
