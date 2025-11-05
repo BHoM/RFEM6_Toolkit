@@ -48,7 +48,7 @@ namespace BH.Adapter.RFEM6
 
             //var i = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToList();
 
-            double loadMagintude;
+            double loadMagnitude;
             member_load_load_direction loadDirecteion;
             Vector orientationVector = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
 
@@ -73,7 +73,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
                 }
-                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.X : bhBarLoad.Moment.X;
+                loadMagnitude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.X : bhBarLoad.Moment.X;
 
 
             }
@@ -91,7 +91,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
                 }
-                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Y : bhBarLoad.Moment.Y;
+                loadMagnitude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Y : bhBarLoad.Moment.Y;
 
             }
             else
@@ -108,7 +108,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
                 }
-                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Z : bhBarLoad.Moment.Z;
+                loadMagnitude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Z : bhBarLoad.Moment.Z;
             }
 
             member_load rfLoadCase = new rfModel.member_load()
@@ -122,7 +122,7 @@ namespace BH.Adapter.RFEM6
                 load_typeSpecified = true,
                 load_direction = loadDirecteion,
                 load_directionSpecified = true,
-                magnitude = loadMagintude,
+                magnitude = loadMagnitude,
                 magnitudeSpecified = true,
                 load_is_over_total_length = true,
                 load_is_over_total_lengthSpecified = true,
@@ -175,7 +175,7 @@ namespace BH.Adapter.RFEM6
         {
 
 
-            double loadMagintude;
+            double loadMagnitude;
             surface_load_load_direction loadDirection;
             Vector orientationVector = bhAreaLoad.Pressure;
 
@@ -200,7 +200,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
                 }
-                loadMagintude = orientationVector.X;
+                loadMagnitude = orientationVector.X;
 
             }
             else if (orientationVector.Y != 0)
@@ -217,7 +217,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
                 }
-                loadMagintude = orientationVector.Y;
+                loadMagnitude = orientationVector.Y;
 
             }
             else
@@ -234,7 +234,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
                 }
-                loadMagintude = orientationVector.Z;
+                loadMagnitude = orientationVector.Z;
             }
 
 
@@ -247,9 +247,9 @@ namespace BH.Adapter.RFEM6
                 load_caseSpecified = true,
                 load_distribution = surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
-                magnitude_force_u = loadMagintude,
+                magnitude_force_u = loadMagnitude,
                 magnitude_force_uSpecified = true,
-                uniform_magnitude = loadMagintude,
+                uniform_magnitude = loadMagnitude,
                 uniform_magnitudeSpecified = true,
                 is_generated = false,
                 is_generatedSpecified = true,
