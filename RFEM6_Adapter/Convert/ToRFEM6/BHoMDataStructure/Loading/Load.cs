@@ -266,6 +266,7 @@ namespace BH.Adapter.RFEM6
 
         public static rfModel.free_polygon_load ToRFEM6_Polygon(this AreaUniformlyDistributedLoad bhAreaLoad, int loadCaseSpecificLoadId)
         {
+            free_polygon_load_load_projection loadProjection;
 
             if (bhAreaLoad.Pressure.IsParallel(BH.oM.Geometry.Vector.XAxis)==0 
                 && bhAreaLoad.Pressure.IsParallel(BH.oM.Geometry.Vector.YAxis) == 0
@@ -276,18 +277,21 @@ namespace BH.Adapter.RFEM6
 
             Polygon polygon = (Polygon)bhAreaLoad.CustomData.Values.First(p => p is Polygon);
             List<double[]> polygonValues;
-            var fitPlane=polgon.IFitPlane();
+            var fitPlane=polygon.IFitPlane();
             if (fitPlane.Normal.CrossProduct(Plane.XY.Normal).Length() < 0.01)
             {
-                polygonValues=polgon.Vertices.Select(v => new double[] { v.X, v.Y }).ToList();
+                polygonValues= polygon.Vertices.Select(v => new double[] { v.X, v.Y }).ToList();
+                loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_XY_OR_UV;
             }
             else if (fitPlane.Normal.CrossProduct(Plane.XZ.Normal).Length() < 0.01)
             {
-                polygonValues=polgon.Vertices.Select(v => new double[] { v.X, v.Z }).ToList();
+                polygonValues= polygon.Vertices.Select(v => new double[] { v.X, v.Z }).ToList();
+                loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_XZ_OR_UW;
             }
             else {
-                polygonValues=polgon.Vertices.Select(v => new double[] { v.Y, v.Z }).ToList();
-            
+                polygonValues= polygon.Vertices.Select(v => new double[] { v.Y, v.Z }).ToList();
+                loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_YZ_OR_VW;
+
             }
 
             free_polygon_load_load_location k = new free_polygon_load_load_location() { first_coordinate = 10, second_coordinate = 100 };
