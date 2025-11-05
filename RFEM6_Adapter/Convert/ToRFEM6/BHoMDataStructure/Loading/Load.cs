@@ -37,7 +37,6 @@ using Dlubal.WS.Rfem6.Model;
 using BH.Engine.Geometry;
 using BH.oM.Geometry;
 using BH.Engine.Spatial;
-using System.Transactions;
 
 namespace BH.Adapter.RFEM6
 {
