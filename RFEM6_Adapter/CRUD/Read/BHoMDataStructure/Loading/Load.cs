@@ -186,7 +186,6 @@ namespace BH.Adapter.RFEM6
             foreach (rfModel.free_polygon_load polLoad in foundPolygonLoad)
             {
                 List<Panel> panels = polLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
-                Loadcase loadcase = loadCaseMap[polLoad.load_case];
 
                 if (!(polLoad.load_distribution is rfModel.free_polygon_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
                 {
