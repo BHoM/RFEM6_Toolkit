@@ -250,8 +250,8 @@ namespace BH.Adapter.RFEM6
                 rfemAreaLoad.surfaces = currrSurfaceIds;
                 m_Model.set_free_polygon_load(bhLoad.Loadcase.Number, rfemAreaLoad);
 
-            } catch {
-                BH.Engine.Base.Compute.RecordError($"The creation of {bhLoad} failed.\nA potential cause is that the applied polygon is non-planar or not parallel to the XY, YZ, or ZX plane.");
+            } catch (Exception ex) {
+                BH.Engine.Base.Compute.RecordError($"The creation of {bhLoad} failed.\nA potential cause is that the applied polygon is non-planar or not parallel to the XY, YZ, or ZX plane.\nException: {ex.Message}\nStackTrace: {ex.StackTrace}");
             }
         }
 
