@@ -294,8 +294,6 @@ namespace BH.Adapter.RFEM6
 
             }
 
-            free_polygon_load_load_location k = new free_polygon_load_load_location() { first_coordinate = 10, second_coordinate = 100 };
-            free_polygon_load_load_location_row r = new free_polygon_load_load_location_row() { row = k };
             free_polygon_load_load_location_row[] locationPolygons = polygonValues.Select((v, i) => new free_polygon_load_load_location_row()
             {
                 no = (i+1),
