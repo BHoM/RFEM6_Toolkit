@@ -194,7 +194,7 @@ namespace BH.Adapter.RFEM6
             List<double> firstCoordinate = polygonLoad.load_location.ToList().Select(r => r.row.first_coordinate).ToList();
             List<double> secondCoordinate = polygonLoad.load_location.ToList().Select(r => r.row.second_coordinate).ToList();
             List<double> thirdCoordinate = Enumerable.Repeat(0.0, firstCoordinate.Count).ToList();
-            List<Point> loadPolygon = new List<Point>();
+            List<Point> loadPolygon;
 
             switch (polygonLoad.load_projection)
             {
