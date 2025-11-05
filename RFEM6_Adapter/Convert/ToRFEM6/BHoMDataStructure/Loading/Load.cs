@@ -274,22 +274,22 @@ namespace BH.Adapter.RFEM6
                 BH.Engine.Base.Compute.RecordWarning($"Please make sure that the direction of {bhAreaLoad} is axis-aligned.");
             }
 
-            Polygon polgon = (Polygon)bhAreaLoad.CustomData.Values.First(p => p is Polygon);
+            Polygon polygon = (Polygon)bhAreaLoad.CustomData.Values.First(p => p is Polygon);
             List<double[]> polygonValues = new List<double[]>();
             var loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_XZ_OR_UW;
-            var fitPlane=polgon.IFitPlane();
+            var fitPlane=polygon.IFitPlane();
             if (fitPlane.Normal.CrossProduct(Plane.XY.Normal).Length() < 0.01)
             {
-                polygonValues=polgon.Vertices.Select(v => new double[] { v.X, v.Y }).ToList();
+                polygonValues=polygon.Vertices.Select(v => new double[] { v.X, v.Y }).ToList();
                 loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_XY_OR_UV;    
             }
             else if (fitPlane.Normal.CrossProduct(Plane.XZ.Normal).Length() < 0.01)
             {
-                polygonValues=polgon.Vertices.Select(v => new double[] { v.X, v.Z }).ToList();
+                polygonValues=polygon.Vertices.Select(v => new double[] { v.X, v.Z }).ToList();
                 loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_XZ_OR_UW;
             }
             else {
-                polygonValues=polgon.Vertices.Select(v => new double[] { v.Y, v.Z }).ToList();
+                polygonValues=polygon.Vertices.Select(v => new double[] { v.Y, v.Z }).ToList();
                 loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_YZ_OR_VW;
             
             }
