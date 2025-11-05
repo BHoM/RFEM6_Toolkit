@@ -137,7 +137,7 @@ namespace BH.Adapter.RFEM6
 
 				if (!(surfaceLoad.load_distribution is rfModel.surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
 				{
-					Engine.Base.Compute.RecordNote("The current RFEM6 includes Surfaceloads with a non-uniformal load distributeion, these Loads will not be pulled.");
+					Engine.Base.Compute.RecordNote("The current RFEM6 includes Surface loads with a non-uniformal load distributeion, these Loads will not be pulled.");
 					continue;
 				}
 
@@ -157,7 +157,7 @@ namespace BH.Adapter.RFEM6
                 List<Panel> panels = polygonLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
                 if (!(polygonLoad.load_distribution is rfModel.free_polygon_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
                 {
-                    Engine.Base.Compute.RecordNote("The current RFEM6 includes Surfaceloads with a non-uniformal load distributeion, these Loads will not be pulled.");
+                    Engine.Base.Compute.RecordNote("The current RFEM6 includes Surface loads with a non-uniformal load distributeion, these Loads will not be pulled.");
                     continue;
                 }
 
@@ -189,7 +189,7 @@ namespace BH.Adapter.RFEM6
 
                 if (!(polLoad.load_distribution is rfModel.free_polygon_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
                 {
-                    Engine.Base.Compute.RecordNote("The current RFEM6 includes Surfaceloads with a non-uniformal load distributeion, these Loads will not be pulled.");
+                    Engine.Base.Compute.RecordNote("The current RFEM6 includes Surface loads with a non-uniformal load distributeion, these Loads will not be pulled.");
                     continue;
                 }
 

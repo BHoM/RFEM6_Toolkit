@@ -274,7 +274,7 @@ namespace BH.Adapter.RFEM6
             {
                 BH.Engine.Base.Compute.RecordWarning($"Please make sure that the direction of {bhAreaLoad} is axis-aligned.");
             }
-
+            
             Polygon polygon = (Polygon)bhAreaLoad.CustomData.Values.First(p => p is Polygon);
             List<double[]> polygonValues;
             var fitPlane=polygon.IFitPlane();
@@ -314,7 +314,7 @@ namespace BH.Adapter.RFEM6
 
             ).ToArray();
 
-            double loadMagintude;
+            double loadMagnitude;
             free_polygon_load_load_direction loadDirection;
             Vector orientationVector = bhAreaLoad.Pressure;
 
@@ -341,7 +341,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE;
                 }
-                loadMagintude = orientationVector.X;
+                loadMagnitude = orientationVector.X;
 
             }
             else if (orientationVector.Y != 0)
@@ -359,7 +359,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE;
                 }
-                loadMagintude = orientationVector.Y;
+                loadMagnitude = orientationVector.Y;
 
             }
             else
@@ -377,7 +377,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE;
                 }
-                loadMagintude = orientationVector.Z;
+                loadMagnitude = orientationVector.Z;
             }
 
 
@@ -391,9 +391,9 @@ namespace BH.Adapter.RFEM6
                 load_caseSpecified = true,
                 load_distribution = free_polygon_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
-                magnitude_linear_1 = loadMagintude,
+                magnitude_linear_1 = loadMagnitude,
                 magnitude_linear_1Specified = true,
-                magnitude_uniform = loadMagintude,
+                magnitude_uniform = loadMagnitude,
                 magnitude_uniformSpecified = true,
                 is_generated = false,
                 is_generatedSpecified = true,
