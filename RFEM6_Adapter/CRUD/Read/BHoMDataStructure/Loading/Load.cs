@@ -169,37 +169,7 @@ namespace BH.Adapter.RFEM6
             return loads;
 		}
 
-        private List<ILoad> ReadPolygonLoad(List<string> ids = null)
-        {
-            List<ILoad> loads = new List<ILoad>();
-
-            //Find all possible Load cases
-            Dictionary<int, Loadcase> loadCaseMap = this.GetCachedOrReadAsDictionary<int, Loadcase>();
-            Dictionary<int, Panel> panelMap = this.GetCachedOrReadAsDictionary<int, Panel>();
-
-            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_FREE_POLYGON_LOAD);
-
-            //IEnumerable<rfModel.surface_load> foundSurfaceLoad = numbers.ToList().Select(n => m_Model.get_surface_load(n.children[0], n.no));
-            IEnumerable<rfModel.free_polygon_load> foundPolygonLoad = numbers.SelectMany(n => n.children.Select(child => m_Model.get_free_polygon_load(child, n.no)));
-
-            foundPolygonLoad = foundPolygonLoad.OrderBy(n => n.load_case).ThenBy(t => t.no);
-            foreach (rfModel.free_polygon_load polLoad in foundPolygonLoad)
-            {
-                List<Panel> panels = polLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
-
-                if (!(polLoad.load_distribution is rfModel.free_polygon_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
-                {
-                    Engine.Base.Compute.RecordNote("The current RFEM6 includes Surface loads with a non-uniformal load distributeion, these Loads will not be pulled.");
-                    continue;
-                }
-
-                loads.Add(polLoad.FromRFEM(loadCaseMap[polLoad.load_case], panels));
-
-            }
-
-            return loads;
-        }
-
+   
 
         private List<ILoad> ReadFreeLineLoad(List<string> ids = null)
 		{
