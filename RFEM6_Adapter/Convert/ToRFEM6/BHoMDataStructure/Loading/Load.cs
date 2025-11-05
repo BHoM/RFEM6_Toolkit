@@ -275,7 +275,7 @@ namespace BH.Adapter.RFEM6
             }
 
             Polygon polygon = (Polygon)bhAreaLoad.CustomData.Values.First(p => p is Polygon);
-            List<double[]> polygonValues = new List<double[]>();
+            List<double[]> polygonValues;
             var fitPlane=polgon.IFitPlane();
             if (fitPlane.Normal.CrossProduct(Plane.XY.Normal).Length() < 0.01)
             {
