@@ -155,8 +155,6 @@ namespace BH.Adapter.RFEM6
             foreach (rfModel.free_polygon_load polygonLoad in foundPolygonLoad_)
             {
                 List<Panel> panels = polygonLoad.surfaces.ToList().Select(s => panelMap[s]).ToList();
-                Loadcase loadcase = loadCaseMap[polygonLoad.load_case];
-
                 if (!(polygonLoad.load_distribution is rfModel.free_polygon_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM))
                 {
                     Engine.Base.Compute.RecordNote("The current RFEM6 includes Surfaceloads with a non-uniformal load distributeion, these Loads will not be pulled.");
