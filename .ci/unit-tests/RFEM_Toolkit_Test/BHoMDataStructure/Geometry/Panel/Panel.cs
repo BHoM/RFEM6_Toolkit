@@ -116,12 +116,12 @@ namespace RFEM_Toolkit_Test.Elements
         public void PushPullPanel()
         {
 
-            adapter.Push(new List<Panel>() { panel1});
+            //adapter.Push(new List<Panel>() { panel1});
 
             //// Pull it
-            //FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
-            //var panelPulled = adapter.Pull(panelFilter).ToList();
-            //Panel pp = (Panel)panelPulled[0];
+            FilterRequest panelFilter = new FilterRequest() { Type = typeof(Panel) };
+            var panelPulled = adapter.Pull(panelFilter).ToList();
+            Panel pp = (Panel)panelPulled[0];
 
             //// Check
             //Assert.IsNotNull(pp);
