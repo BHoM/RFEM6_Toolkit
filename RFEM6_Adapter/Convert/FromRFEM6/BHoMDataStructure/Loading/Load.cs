@@ -185,6 +185,121 @@ namespace BH.Adapter.RFEM6
             return bhLoad;
         }
 
+        public static AreaUniformlyDistributedLoad FromRFEM(this rfModel.free_polygon_load polygonLoad, Loadcase loadcase, List<Panel> panels)
+        {
+
+            Vector forceDirection;
+            bool isProjected = false;
+            LoadAxis axis = LoadAxis.Global;
+            List<double> firstCoordinate = polygonLoad.load_location.ToList().Select(r => r.row.first_coordinate).ToList();
+            List<double> secondCoordinate = polygonLoad.load_location.ToList().Select(r => r.row.second_coordinate).ToList();
+            List<double> thirdCoordinate = Enumerable.Repeat(0.0, firstCoordinate.Count).ToList();
+            List<Point> loadPolygon;
+
+            switch (polygonLoad.load_projection)
+            {
+                case free_polygon_load_load_projection.LOAD_PROJECTION_XY_OR_UV:
+
+                    loadPolygon = firstCoordinate.Select((x, i) => new Point()
+                    {
+                        X = x,
+                        Y = secondCoordinate[i],
+                        Z = thirdCoordinate[i]
+                    }).ToList();
+                                 
+
+                    break;
+
+                case free_polygon_load_load_projection.LOAD_PROJECTION_YZ_OR_VW:
+
+                    loadPolygon = firstCoordinate.Select((x, i) => new Point()
+                    {
+                        X = thirdCoordinate[i],
+                        Y = x,
+                        Z = secondCoordinate[i]
+                    }).ToList();
+
+                    break;
+
+                default:
+
+                    loadPolygon = firstCoordinate.Select((x, i) => new Point()
+                    {
+                        X = secondCoordinate[i],
+                        Y = thirdCoordinate[i],
+                        Z = x
+                    }).ToList();
+
+                    break;
+
+
+            }
+
+            var polygon = BH.Engine.Geometry.Create.Polygon(loadPolygon);
+
+            switch (polygonLoad.load_direction)
+            {
+                //case free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
+                case free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(polygonLoad.magnitude_uniform, 0, 0);
+                    break;
+                //case surface_load_load_direction.LOAD_DIRECTION_LOCAL_X:
+                case free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_X:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(polygonLoad.magnitude_uniform, 0, 0);
+                    axis = LoadAxis.Local;
+                    break;
+
+                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
+                case free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, polygonLoad.magnitude_uniform, 0);
+                    break;
+                //case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
+                case free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, polygonLoad.magnitude_uniform, 0);
+                    axis = LoadAxis.Local;
+                    break;
+
+                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
+                case free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, polygonLoad.magnitude_uniform);
+                    break;
+                //case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
+                case free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, polygonLoad.magnitude_uniform);
+                    axis = LoadAxis.Local;
+                    break;
+
+                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
+                case free_polygon_load_load_direction.LOAD_DIRECTION_USER_DEFINED_U_PROJECTED:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(polygonLoad.magnitude_uniform, 0, 0);
+                    isProjected = true;
+                    break;
+
+                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
+                case free_polygon_load_load_direction.LOAD_DIRECTION_USER_DEFINED_V_PROJECTED:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, polygonLoad.magnitude_uniform, 0);
+                    isProjected = true;
+                    break;
+
+                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
+                case free_polygon_load_load_direction.LOAD_DIRECTION_USER_DEFINED_W_PROJECTED:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, polygonLoad.magnitude_uniform);
+                    isProjected = true;
+                    break;
+
+                default:
+                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, polygonLoad.magnitude_uniform);
+                    break;
+            }
+
+
+            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels, axis, isProjected, polygonLoad.comment);
+            bhAreaload = bhAreaload.SetHashFragment("Polygon");
+            bhAreaload.SetPropertyValue("Polygon", polygon);
+
+            return bhAreaload;
+        }
+
         public static AreaUniformlyDistributedLoad FromRFEM(this rfModel.surface_load surfaceload, Loadcase loadcase, List<Panel> panels)
         {
 

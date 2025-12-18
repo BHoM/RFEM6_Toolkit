@@ -63,11 +63,12 @@ namespace BH.Adapter.RFEM6
             foreach (var rfMember in allRfMembers)
             {
 
+               
                 Node node0 = null;
-                nodes.TryGetValue(rfMember.nodes[0], out node0);
+                nodes.TryGetValue(rfMember.node_start, out node0);
 
                 Node node1 = null;
-                nodes.TryGetValue(rfMember.nodes[1], out node1);
+                nodes.TryGetValue(rfMember.node_end, out node1);
 
                 ISectionProperty section = null;
                 sections.TryGetValue(rfMember.section_end, out section);

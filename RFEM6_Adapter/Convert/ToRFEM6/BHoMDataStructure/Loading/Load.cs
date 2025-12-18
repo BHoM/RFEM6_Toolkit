@@ -36,6 +36,7 @@ using BH.oM.Adapter.Commands;
 using Dlubal.WS.Rfem6.Model;
 using BH.Engine.Geometry;
 using BH.oM.Geometry;
+using BH.Engine.Spatial;
 
 namespace BH.Adapter.RFEM6
 {
@@ -47,7 +48,7 @@ namespace BH.Adapter.RFEM6
 
             //var i = bhBarLoad.Objects.Elements.ToList().Select(x => x.GetRFEM6ID()).ToList();
 
-            double loadMagintude;
+            double loadMagnitude;
             member_load_load_direction loadDirecteion;
             Vector orientationVector = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force : bhBarLoad.Moment;
 
@@ -72,7 +73,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
                 }
-                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.X : bhBarLoad.Moment.X;
+                loadMagnitude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.X : bhBarLoad.Moment.X;
 
 
             }
@@ -90,7 +91,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
                 }
-                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Y : bhBarLoad.Moment.Y;
+                loadMagnitude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Y : bhBarLoad.Moment.Y;
 
             }
             else
@@ -107,7 +108,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirecteion = member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
                 }
-                loadMagintude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Z : bhBarLoad.Moment.Z;
+                loadMagnitude = loadType == member_load_load_type.LOAD_TYPE_FORCE ? bhBarLoad.Force.Z : bhBarLoad.Moment.Z;
             }
 
             member_load rfLoadCase = new rfModel.member_load()
@@ -121,7 +122,7 @@ namespace BH.Adapter.RFEM6
                 load_typeSpecified = true,
                 load_direction = loadDirecteion,
                 load_directionSpecified = true,
-                magnitude = loadMagintude,
+                magnitude = loadMagnitude,
                 magnitudeSpecified = true,
                 load_is_over_total_length = true,
                 load_is_over_total_lengthSpecified = true,
@@ -174,7 +175,7 @@ namespace BH.Adapter.RFEM6
         {
 
 
-            double loadMagintude;
+            double loadMagnitude;
             surface_load_load_direction loadDirection;
             Vector orientationVector = bhAreaLoad.Pressure;
 
@@ -199,7 +200,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE;
                 }
-                loadMagintude = orientationVector.X;
+                loadMagnitude = orientationVector.X;
 
             }
             else if (orientationVector.Y != 0)
@@ -216,7 +217,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE;
                 }
-                loadMagintude = orientationVector.Y;
+                loadMagnitude = orientationVector.Y;
 
             }
             else
@@ -233,7 +234,7 @@ namespace BH.Adapter.RFEM6
                 {
                     loadDirection = surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE;
                 }
-                loadMagintude = orientationVector.Z;
+                loadMagnitude = orientationVector.Z;
             }
 
 
@@ -246,9 +247,9 @@ namespace BH.Adapter.RFEM6
                 load_caseSpecified = true,
                 load_distribution = surface_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
                 load_distributionSpecified = true,
-                magnitude_force_u = loadMagintude,
+                magnitude_force_u = loadMagnitude,
                 magnitude_force_uSpecified = true,
-                uniform_magnitude = loadMagintude,
+                uniform_magnitude = loadMagnitude,
                 uniform_magnitudeSpecified = true,
                 is_generated = false,
                 is_generatedSpecified = true,
@@ -256,6 +257,149 @@ namespace BH.Adapter.RFEM6
                 load_directionSpecified = true,
                 load_type = surface_load_load_type.LOAD_TYPE_FORCE,
                 load_typeSpecified = true,
+            };
+
+
+            return rfSurfaceLoad;
+
+        }
+
+        public static rfModel.free_polygon_load ToRFEM6_Polygon(this AreaUniformlyDistributedLoad bhAreaLoad, int loadCaseSpecificLoadId)
+        {
+            free_polygon_load_load_projection loadProjection;
+
+            if (bhAreaLoad.Pressure.IsParallel(BH.oM.Geometry.Vector.XAxis)==0 
+                && bhAreaLoad.Pressure.IsParallel(BH.oM.Geometry.Vector.YAxis) == 0
+                && bhAreaLoad.Pressure.IsParallel(BH.oM.Geometry.Vector.ZAxis) == 0)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Please make sure that the direction of {bhAreaLoad} is axis-aligned.");
+            }
+            
+            Polygon polygon = (Polygon)bhAreaLoad.CustomData.Values.First(p => p is Polygon);
+            List<double[]> polygonValues;
+            var fitPlane=polygon.IFitPlane();
+            if (fitPlane.Normal.CrossProduct(Plane.XY.Normal).Length() < 0.01)
+            {
+                polygonValues= polygon.Vertices.Select(v => new double[] { v.X, v.Y }).ToList();
+                loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_XY_OR_UV;
+            }
+            else if (fitPlane.Normal.CrossProduct(Plane.XZ.Normal).Length() < 0.01)
+            {
+                polygonValues= polygon.Vertices.Select(v => new double[] { v.X, v.Z }).ToList();
+                loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_XZ_OR_UW;
+            }
+            else {
+                polygonValues= polygon.Vertices.Select(v => new double[] { v.Y, v.Z }).ToList();
+                loadProjection = free_polygon_load_load_projection.LOAD_PROJECTION_YZ_OR_VW;
+
+            }
+
+            free_polygon_load_load_location_row[] locationPolygons = polygonValues.Select((v, i) => new free_polygon_load_load_location_row()
+            {
+                no = (i+1),
+                description=(i+1)+"",
+                row = new free_polygon_load_load_location()
+                {
+                    magnitude=0,
+                    magnitudeSpecified=false,
+                    first_coordinate = v[0],
+                    first_coordinateSpecified = true,
+                    second_coordinate = v[1],
+                    second_coordinateSpecified = true
+                    
+                }
+            }
+
+            ).ToArray();
+
+            double loadMagnitude;
+            free_polygon_load_load_direction loadDirection;
+            Vector orientationVector = bhAreaLoad.Pressure;
+
+            if (bhAreaLoad.Projected && bhAreaLoad.Axis == LoadAxis.Local)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Projected Area Load is not supported for Local Axis. The Load will be projected to the Global Axis");
+            }
+
+            // Checkinf if Load is Orientied in X directin
+            if (orientationVector.X != 0)
+            {
+                // If the load Axis in slocal the load direction is local x
+                if (bhAreaLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_X;
+                    if (bhAreaLoad.Projected) BH.Engine.Base.Compute.RecordWarning($"The 'Projected' option for {bhAreaLoad} is not supported when the Axis is set to Local and will therefore be ignored.");
+
+                }
+                else if (bhAreaLoad.Projected)
+                {
+                    loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_X_PROJECTED;
+                }
+                else
+                {
+                    loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE;
+                }
+                loadMagnitude = orientationVector.X;
+
+            }
+            else if (orientationVector.Y != 0)
+            {
+                if (bhAreaLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_Y;
+                    if (bhAreaLoad.Projected) BH.Engine.Base.Compute.RecordWarning($"The 'Projected' option for {bhAreaLoad} is not supported when the Axis is set to Local and will therefore be ignored.");
+                }
+                else if (bhAreaLoad.Projected)
+                {
+                    loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_PROJECTED;
+                }
+                else
+                {
+                    loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE;
+                }
+                loadMagnitude = orientationVector.Y;
+
+            }
+            else
+            {
+                if (bhAreaLoad.Axis.Equals(LoadAxis.Local))
+                {
+                    loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_Z;
+                    if (bhAreaLoad.Projected) BH.Engine.Base.Compute.RecordWarning($"The 'Projected' option for {bhAreaLoad} is not supported when the Axis is set to Local and will therefore be ignored.");
+                }
+                else if (bhAreaLoad.Projected)
+                {
+                    loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED;
+                }
+                else
+                {
+                    loadDirection = free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE;
+                }
+                loadMagnitude = orientationVector.Z;
+            }
+
+
+
+            free_polygon_load rfSurfaceLoad = new rfModel.free_polygon_load()
+            {
+                no = loadCaseSpecificLoadId,
+                comment = bhAreaLoad.Name,
+                surfaces = bhAreaLoad.Objects.Elements.ToList().Select(x => (x as Panel).GetRFEM6ID()).ToArray(),
+                load_case = bhAreaLoad.Loadcase.Number,
+                load_caseSpecified = true,
+                load_distribution = free_polygon_load_load_distribution.LOAD_DISTRIBUTION_UNIFORM,
+                load_distributionSpecified = true,
+                magnitude_linear_1 = loadMagnitude,
+                magnitude_linear_1Specified = true,
+                magnitude_uniform = loadMagnitude,
+                magnitude_uniformSpecified = true,
+                is_generated = false,
+                is_generatedSpecified = true,
+                load_direction = loadDirection,
+                load_directionSpecified = true,
+                load_location = locationPolygons,
+                load_projection = loadProjection,
+                load_projectionSpecified = true
             };
 
 

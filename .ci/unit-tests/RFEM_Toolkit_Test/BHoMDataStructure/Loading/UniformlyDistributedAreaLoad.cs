@@ -142,7 +142,7 @@ namespace RFEM_Toolkit_Test.Elements
         [SetUp]
         public void SetUp()
         {
-            adapter.Push(new List<Panel>() { panel1, panel2, panel3 });
+            //adapter.Push(new List<Panel>() { panel1, panel2, panel3 });
         }
 
 
@@ -268,7 +268,19 @@ namespace RFEM_Toolkit_Test.Elements
             Assert.True(this.reverseAreaLoadList[i].Axis.Equals(areaLoadList[i].Axis));
         }
 
+        [Test]
+        public void PullUniformlyDistributedLoad()
+        {
 
+            //Act
+
+            // Push
+
+            // Pull
+            FilterRequest loadFilter = new FilterRequest() { Type = typeof(AreaUniformlyDistributedLoad) };
+            List<AreaUniformlyDistributedLoad> areaLoadList = adapter.Pull(loadFilter).ToList().Select(p => (AreaUniformlyDistributedLoad)p).ToList();
+            var a = areaLoadList.First();
+        }
     }
 
 
