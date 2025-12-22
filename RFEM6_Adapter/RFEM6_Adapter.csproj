@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net48</TargetFrameworks>
@@ -7,7 +7,7 @@
 		<AssemblyName>RFEM6_Adapter</AssemblyName>
 		<RootNamespace>BH.Adapter.RFEM6</RootNamespace>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<FileVersion>9.0.0.0</FileVersion>
+		<FileVersion>9.1.0.0</FileVersion>
 		<BaseOutputPath>..\Build\</BaseOutputPath>
 	</PropertyGroup>
 
