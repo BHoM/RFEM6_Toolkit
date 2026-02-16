@@ -31,6 +31,8 @@ using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
+using BH.oM.Structure.Constraints;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -52,15 +54,48 @@ namespace BH.Adapter.RFEM6
             //constraint.RotationalStiffnessX = support.rotational_restraint.x;
             //constraint.RotationalStiffnessY = support.rotational_restraint.y;
             //constraint.RotationalStiffnessZ = support.rotational_restraint.z;
-            
+
 
             constraint.SetRFEM6ID(support.no);
             constraint.Name = support.name;
-            
-            RFEMNodalSupport rfemNodalSupport = new RFEMNodalSupport() {Constraint=constraint};
+
+            RFEMNodalSupport rfemNodalSupport = new RFEMNodalSupport() { Constraint = constraint };
             rfemNodalSupport.SetRFEM6ID(support.no);
-            
+
             return rfemNodalSupport;
+        }
+
+            
+        public static Constraint6DOF FromRFEMNodalConstraint(this rfModel.nodal_support support)
+        {
+
+            BH.oM.Structure.Constraints.Constraint6DOF constraint = new BH.oM.Structure.Constraints.Constraint6DOF();
+            //constraint.TranslationX = (support.spring.x == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.TranslationX = TranslateStiffness(support.spring.x);
+            constraint.TranslationY = TranslateStiffness(support.spring.y);
+            constraint.TranslationZ = TranslateStiffness(support.spring.z);
+            constraint.RotationX = TranslateStiffness(support.rotational_restraint.x);
+            constraint.RotationY = TranslateStiffness(support.rotational_restraint.y);
+            constraint.RotationZ = TranslateStiffness(support.rotational_restraint.z);
+            constraint.TranslationalStiffnessX = constraint.TranslationX is DOFType.Spring ? support.spring.x : 0;
+            constraint.TranslationalStiffnessY = constraint.TranslationY is DOFType.Spring ? support.spring.y : 0;
+            constraint.TranslationalStiffnessZ = constraint.TranslationY is DOFType.Spring ? support.spring.z : 0;
+            constraint.RotationalStiffnessX = constraint.RotationX is DOFType.Spring ? support.rotational_restraint.x : 0;
+            constraint.RotationalStiffnessY = constraint.RotationY is DOFType.Spring ? support.rotational_restraint.y : 0;
+            constraint.RotationalStiffnessZ = constraint.RotationZ is DOFType.Spring ? support.rotational_restraint.z : 0;
+            support.nodes.ToList();
+            //constraint.AddFragment(support.nodes.ToList());
+            oM.Base.HashFragment fragmentSet = new oM.Base.HashFragment();
+            fragmentSet.SetPropertyValue("NodeList", support.nodes.ToString());
+            constraint.AddFragment(fragmentSet);
+            
+            constraint.SetRFEM6ID(support.no);
+            constraint.Name = support.name;
+
+            //RFEMNodalSupport rfemNodalSupport = new RFEMNodalSupport() { Constraint = constraint };
+            //rfemNodalSupport.SetRFEM6ID(support.no);
+
+            return constraint;
         }
 
 
@@ -85,7 +120,7 @@ namespace BH.Adapter.RFEM6
             constraint.SetRFEM6ID(support.no);
             constraint.Name = support.name;
 
-            RFEMLineSupport rfemLineSupport = new RFEMLineSupport() { Constraint = constraint,nodesIDs=support.lines.ToList() };
+            RFEMLineSupport rfemLineSupport = new RFEMLineSupport() { Constraint = constraint, nodesIDs = support.lines.ToList() };
             rfemLineSupport.SetRFEM6ID(support.no);
 
             return rfemLineSupport;
@@ -110,18 +145,25 @@ namespace BH.Adapter.RFEM6
             //constraint.RotationalStiffnessX = support.rotational_restraint.x;
             //constraint.RotationalStiffnessY = support.rotational_restraint.y;
             //constraint.RotationalStiffnessZ = support.rotational_restraint.z;
-            
+
 
             //constraint.SetRFEM6ID(hinge.no);
             //constraint.Name = hinge.name;
 
-            RFEMHinge rfemLineSupport = new RFEMHinge() {Constraint=constraint};
+            RFEMHinge rfemLineSupport = new RFEMHinge() { Constraint = constraint };
             rfemLineSupport.SetRFEM6ID(hinge.no);
 
             return rfemLineSupport;
         }
 
+        private static oM.Structure.Constraints.DOFType TranslateStiffness(double value)
+        {
+            if(value ==Double.PositiveInfinity) return ( oM.Structure.Constraints.DOFType.Fixed);
+            else if(value == 0) return (oM.Structure.Constraints.DOFType.Free);
+            else return (oM.Structure.Constraints.DOFType.Spring);
 
+
+        }
     }
 }
 

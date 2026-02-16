@@ -51,7 +51,23 @@ namespace BH.Adapter.RFEM6
             return constraintList;
         }
 
-    
+
+        private List<Constraint6DOF> ReadConstraint6DOFNode(List<string> ids = null)
+        {
+
+            List<Constraint6DOF> constraints = new List<Constraint6DOF>();
+
+            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
+            IEnumerable<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no));
+
+            foreach (rfModel.nodal_support s in foundSupports)
+            {
+                Constraint6DOF rfConstraint = Convert.FromRFEMNodalConstraint(s);
+                constraints.Add(rfConstraint);
+            }
+
+            return constraints;
+        }
 
     }
 }
