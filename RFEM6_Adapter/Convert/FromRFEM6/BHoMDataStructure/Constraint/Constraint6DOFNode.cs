@@ -42,22 +42,26 @@ namespace BH.Adapter.RFEM6
         {
 
             BH.oM.Structure.Constraints.Constraint6DOF constraint = new BH.oM.Structure.Constraints.Constraint6DOF();
-            constraint.TranslationX = (support.spring.x == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.TranslationY = (support.spring.y == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.TranslationZ = (support.spring.z == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.RotationX = (support.rotational_restraint.x == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.RotationY = (support.rotational_restraint.y == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.RotationZ = (support.rotational_restraint.z == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            //constraint.TranslationalStiffnessX = support.spring.x;
-            //constraint.TranslationalStiffnessY = support.spring.y;
-            //constraint.TranslationalStiffnessZ = support.spring.z;
-            //constraint.RotationalStiffnessX = support.rotational_restraint.x;
-            //constraint.RotationalStiffnessY = support.rotational_restraint.y;
-            //constraint.RotationalStiffnessZ = support.rotational_restraint.z;
+            //constraint.TranslationX = (support.spring.x == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
+            constraint.TranslationX = TranslateStiffnessToRFEM(support.spring.x);
+            constraint.TranslationY = TranslateStiffnessToRFEM(support.spring.y);
+            constraint.TranslationZ = TranslateStiffnessToRFEM(support.spring.z);
+            constraint.RotationX = TranslateStiffnessToRFEM(support.rotational_restraint.x);
+            constraint.RotationY = TranslateStiffnessToRFEM(support.rotational_restraint.y);
+            constraint.RotationZ = TranslateStiffnessToRFEM(support.rotational_restraint.z);
+            constraint.TranslationalStiffnessX = constraint.TranslationX is DOFType.Spring ? support.spring.x : 0;
+            constraint.TranslationalStiffnessY = constraint.TranslationY is DOFType.Spring ? support.spring.y : 0;
+            constraint.TranslationalStiffnessZ = constraint.TranslationY is DOFType.Spring ? support.spring.z : 0;
+            constraint.RotationalStiffnessX = constraint.RotationX is DOFType.Spring ? support.rotational_restraint.x : 0;
+            constraint.RotationalStiffnessY = constraint.RotationY is DOFType.Spring ? support.rotational_restraint.y : 0;
+            constraint.RotationalStiffnessZ = constraint.RotationZ is DOFType.Spring ? support.rotational_restraint.z : 0;
 
+            //Adding nodelist to frament
+            constraint.SetPropertyValue("NodeList", support.nodes.ToList());
 
             constraint.SetRFEM6ID(support.no);
-            constraint.Name = support.name;
+            //constraint.Name = support.name;
+            constraint.Name = null;
 
             RFEMNodalSupport rfemNodalSupport = new RFEMNodalSupport() { Constraint = constraint };
             rfemNodalSupport.SetRFEM6ID(support.no);
