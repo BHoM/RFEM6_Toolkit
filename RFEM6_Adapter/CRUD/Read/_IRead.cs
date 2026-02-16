@@ -59,8 +59,8 @@ namespace BH.Adapter.RFEM6
                     return ReadNodes(ids as dynamic);
                 else if (type == typeof(Constraint6DOF))
                     return ReadConstraint6DOFNode(ids as dynamic);
-                else if (type == typeof(RFEMNodalSupport))
-                    return ReadRFEMNodalSupports(ids as dynamic);
+                //else if (type == typeof(RFEMNodalSupport))
+                //    return ReadRFEMNodalSupports(ids as dynamic);
                 else if (type == typeof(RFEMHinge))
                     return ReadRFEMHinges(ids as dynamic);
                 else if (type == typeof(ISectionProperty) || type.GetInterfaces().Contains(typeof(ISectionProperty)))

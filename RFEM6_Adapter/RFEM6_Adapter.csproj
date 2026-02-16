@@ -131,7 +131,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Convert\ToRFEM6\BHoMDataStructure\Constraints\" />
+		<Folder Include="Convert\FromRFEM6\IntermediateDataStructure\" />
+		<Folder Include="Convert\ToRFEM6\BHoMDataStructure\Constraints\NewFolder\" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

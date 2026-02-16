@@ -96,8 +96,13 @@ namespace BH.Adapter.RFEM6
         private bool m_isActive = false;
         private string m_filepath = "";
 
+        /***************************************************/
+        /**** Public  Fields                           ****/
+        /***************************************************/
+
         public Dictionary<Loadcase, Dictionary<String, int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
         public Dictionary<Panel, int> m_PanelIDdict = new Dictionary<Panel, int>(new RFEMPanelComparer());
+        public Dictionary<Constraint6DOF,int> m_NodalSupportDictionary = new Dictionary<Constraint6DOF, int>(new Constraint6DOFComparer());
 
         /***************************************************/
         /**** Private Methods                           ****/
@@ -175,7 +180,10 @@ namespace BH.Adapter.RFEM6
             }
         }
 
-        //RFEM stuff ----------------------------
+        /***************************************************/
+        /**** RFEM6 specific fields                     ****/
+        /***************************************************/
+        
         private RfemModelClient m_Model;
         public static EndpointAddress Address { get; set; } = new EndpointAddress("http://localhost:8081");
 

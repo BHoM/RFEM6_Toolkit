@@ -38,6 +38,7 @@ namespace RFEM_Toolkit_Test.Elements
         RFEM6Adapter adapter;
         Node n1;
         Node n2;
+        Constraint6DOF constraint6dof;
         NodeDistanceComparer comparer;
 
         [OneTimeSetUp]
@@ -96,6 +97,48 @@ namespace RFEM_Toolkit_Test.Elements
             Assert.IsNotNull(nodePulled);
             //Assert.IsTrue(comparer.Equals(n1, np));            
         }
+
+        [Test]
+        public void PushConstraint6DO()
+        {
+            //comparer = new NodeDistanceComparer(3);
+
+            //Define Nodes
+            n1 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 } };
+
+            constraint6dof = new Constraint6DOF()
+            {
+                TranslationX = DOFType.Spring,
+                TranslationY = DOFType.Spring,
+                TranslationZ = DOFType.Spring,
+                RotationX = DOFType.Spring,
+                RotationY = DOFType.Spring,
+                RotationZ = DOFType.Spring,
+                TranslationalStiffnessX = 1000,
+                TranslationalStiffnessY = 2000,
+                TranslationalStiffnessZ = 3000,
+                RotationalStiffnessX = 1000,
+                RotationalStiffnessY = 2000,
+                RotationalStiffnessZ = 3000,
+            };
+            
+            n1.Support = constraint6dof;
+
+            //Push them once
+            adapter.Push(new List<Node>() { n1 });
+
+            //Pull it
+            //FilterRequest constraint6DOFFilter = new FilterRequest() { Type = typeof(Constraint6DOF) };
+
+
+            //var nodePulled = adapter.Pull(constraint6DOFFilter).ToList();
+            //Constraint6DOF np = (Constraint6DOF)nodePulled[0];
+
+            //Check
+            //Assert.IsNotNull(np);
+            //Assert.IsTrue(comparer.Equals(n1, np));            
+        }
+
 
 
     }

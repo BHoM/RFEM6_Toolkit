@@ -19,20 +19,20 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+using BH.Engine.Adapter;
+using BH.Engine.Base;
+using BH.oM.Adapter;
+using BH.oM.Adapters.RFEM6;
+using BH.oM.Base;
+using BH.oM.Geometry;
+using BH.oM.Structure.Constraints;
+using BH.oM.Structure.Elements;
+using Dlubal.WS.Rfem6.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
-
 using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
-using BH.oM.Structure.Constraints;
-using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -65,7 +65,7 @@ namespace BH.Adapter.RFEM6
             return rfemNodalSupport;
         }
 
-            
+
         public static Constraint6DOF FromRFEMNodalConstraint(this rfModel.nodal_support support)
         {
 
@@ -83,17 +83,12 @@ namespace BH.Adapter.RFEM6
             constraint.RotationalStiffnessX = constraint.RotationX is DOFType.Spring ? support.rotational_restraint.x : 0;
             constraint.RotationalStiffnessY = constraint.RotationY is DOFType.Spring ? support.rotational_restraint.y : 0;
             constraint.RotationalStiffnessZ = constraint.RotationZ is DOFType.Spring ? support.rotational_restraint.z : 0;
-            support.nodes.ToList();
-            //constraint.AddFragment(support.nodes.ToList());
-            oM.Base.HashFragment fragmentSet = new oM.Base.HashFragment();
-            fragmentSet.SetPropertyValue("NodeList", support.nodes.ToString());
-            constraint.AddFragment(fragmentSet);
-            
+
+            //Adding nodelist to frament
+            constraint.SetPropertyValue("NodeList", support.nodes.ToList());
+
             constraint.SetRFEM6ID(support.no);
             constraint.Name = support.name;
-
-            //RFEMNodalSupport rfemNodalSupport = new RFEMNodalSupport() { Constraint = constraint };
-            //rfemNodalSupport.SetRFEM6ID(support.no);
 
             return constraint;
         }
@@ -158,8 +153,8 @@ namespace BH.Adapter.RFEM6
 
         private static oM.Structure.Constraints.DOFType TranslateStiffness(double value)
         {
-            if(value ==Double.PositiveInfinity) return ( oM.Structure.Constraints.DOFType.Fixed);
-            else if(value == 0) return (oM.Structure.Constraints.DOFType.Free);
+            if (value == Double.PositiveInfinity) return (oM.Structure.Constraints.DOFType.Fixed);
+            else if (value == 0) return (oM.Structure.Constraints.DOFType.Free);
             else return (oM.Structure.Constraints.DOFType.Spring);
 
 

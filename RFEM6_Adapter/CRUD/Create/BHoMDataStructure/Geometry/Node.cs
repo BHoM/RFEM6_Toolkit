@@ -20,16 +20,17 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Engine.Base;
+using BH.Engine.Structure;
+using BH.oM.Adapter;
+using BH.oM.Structure.Constraints;
+using BH.oM.Structure.Elements;
+using BH.oM.Structure.MaterialFragments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Numerics;
-
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-
+using System.Text;
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
@@ -39,18 +40,32 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<Node> bhNodes)
         {
             //NOTE:A geometric object has, in general, a parent_no = 0. The parent_no parameter becomes significant for example with loads.
+            //Dictionary<int, Constraint6DOF> constraints = this.GetCachedOrReadAsDictionary<int, Constraint6DOF>();
+            List<Constraint6DOF> constraints = this.GetCachedOrRead<Constraint6DOF>();
+            Dictionary<Constraint6DOF,HashSet<int>> constraintToNodeMap = new Dictionary<Constraint6DOF, HashSet<int>>(new Constraint6DOFComparer());
+            foreach (Constraint6DOF c in constraints) {
+
+                constraintToNodeMap[c] = new HashSet<int>((List<int>)c.PropertyValue("NodeList"));
+
+            }
+
+
+
             foreach (Node bhNode in bhNodes)
             {
                 rfModel.node rfNode = bhNode.ToRFEM6();
+
                 m_Model.set_node(rfNode);
 
                 if (bhNode.Support != null)
                 {
+
                     rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
                     List<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no)).ToList();
                     var foundRFNodalSupport = foundSupports.Where(s => ComparerRFEMSupportAndBHoMConstraint(s, bhNode.Support)).FirstOrDefault();
                     foundRFNodalSupport.nodes = foundRFNodalSupport.nodes.Append(rfNode.no).ToArray();
                     m_Model.set_nodal_support(foundRFNodalSupport);
+                    
 
                 }
 

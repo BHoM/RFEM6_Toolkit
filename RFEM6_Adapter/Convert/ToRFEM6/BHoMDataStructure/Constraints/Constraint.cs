@@ -23,32 +23,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Numerics;
 
 using BH.oM.Adapter;
+using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+   public static partial class Convert
     {
 
-        private List<Constraint6DOF> ReadConstraint6DOFNode(List<string> ids = null)
+        public static rfModel.nodal_support ToRFEM6(this Constraint6DOF constraint)
         {
+            rfModel.nodal_support rfConstraint = new rfModel.nodal_support();
+            rfConstraint.no = constraint.GetRFEM6ID();
+            //rfConstraint.tran
 
-            List<Constraint6DOF> constraints = new List<Constraint6DOF>();
-
-            rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
-            IEnumerable<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no));
-
-            foreach (rfModel.nodal_support s in foundSupports)
-            {
-                Constraint6DOF rfConstraint = Convert.FromRFEMNodalConstraint(s);
-                constraints.Add(rfConstraint);
-            }
-
-            return constraints;
+            return null;
         }
 
     }
