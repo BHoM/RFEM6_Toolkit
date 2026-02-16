@@ -60,7 +60,6 @@ namespace BH.Adapter.RFEM6
             return new Dictionary<Type, List<Type>>
             {
                 {typeof(Point), new List<Type> { typeof(Node) } },
-                //{typeof(Node), new List<Type> { } },
                 //{typeof(Node), new List<Type> { typeof(RFEMNodalSupport) } },
                 {typeof(Edge), new List<Type> { typeof(RFEMLineSupport),typeof(RFEMLine) } },
                 {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },

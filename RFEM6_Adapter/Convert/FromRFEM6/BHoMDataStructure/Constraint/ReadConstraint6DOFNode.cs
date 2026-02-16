@@ -71,12 +71,12 @@ namespace BH.Adapter.RFEM6
 
             BH.oM.Structure.Constraints.Constraint6DOF constraint = new BH.oM.Structure.Constraints.Constraint6DOF();
             //constraint.TranslationX = (support.spring.x == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.TranslationX = TranslateStiffness(support.spring.x);
-            constraint.TranslationY = TranslateStiffness(support.spring.y);
-            constraint.TranslationZ = TranslateStiffness(support.spring.z);
-            constraint.RotationX = TranslateStiffness(support.rotational_restraint.x);
-            constraint.RotationY = TranslateStiffness(support.rotational_restraint.y);
-            constraint.RotationZ = TranslateStiffness(support.rotational_restraint.z);
+            constraint.TranslationX = TranslateStiffnessToRFEM(support.spring.x);
+            constraint.TranslationY = TranslateStiffnessToRFEM(support.spring.y);
+            constraint.TranslationZ = TranslateStiffnessToRFEM(support.spring.z);
+            constraint.RotationX = TranslateStiffnessToRFEM(support.rotational_restraint.x);
+            constraint.RotationY = TranslateStiffnessToRFEM(support.rotational_restraint.y);
+            constraint.RotationZ = TranslateStiffnessToRFEM(support.rotational_restraint.z);
             constraint.TranslationalStiffnessX = constraint.TranslationX is DOFType.Spring ? support.spring.x : 0;
             constraint.TranslationalStiffnessY = constraint.TranslationY is DOFType.Spring ? support.spring.y : 0;
             constraint.TranslationalStiffnessZ = constraint.TranslationY is DOFType.Spring ? support.spring.z : 0;
@@ -88,7 +88,8 @@ namespace BH.Adapter.RFEM6
             constraint.SetPropertyValue("NodeList", support.nodes.ToList());
 
             constraint.SetRFEM6ID(support.no);
-            constraint.Name = support.name;
+            //constraint.Name = support.name;
+            constraint.Name = "";
 
             return constraint;
         }
@@ -151,7 +152,7 @@ namespace BH.Adapter.RFEM6
             return rfemLineSupport;
         }
 
-        private static oM.Structure.Constraints.DOFType TranslateStiffness(double value)
+        private static oM.Structure.Constraints.DOFType TranslateStiffnessToRFEM(double value)
         {
             if (value == Double.PositiveInfinity) return (oM.Structure.Constraints.DOFType.Fixed);
             else if (value == 0) return (oM.Structure.Constraints.DOFType.Free);

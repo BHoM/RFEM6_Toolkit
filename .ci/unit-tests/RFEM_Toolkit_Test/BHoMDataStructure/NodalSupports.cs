@@ -108,6 +108,7 @@ namespace RFEM_Toolkit_Test.Elements
 
             constraint6dof = new Constraint6DOF()
             {
+                Name = "",
                 TranslationX = DOFType.Spring,
                 TranslationY = DOFType.Spring,
                 TranslationZ = DOFType.Spring,
@@ -124,9 +125,30 @@ namespace RFEM_Toolkit_Test.Elements
             
             n1.Support = constraint6dof;
 
-            //Push them once
-            adapter.Push(new List<Node>() { n1 });
+            n2 = new Node() { Position = new Point() { X = 15, Y = 15, Z = 0 } };
 
+            constraint6dof = new Constraint6DOF()
+            {
+                Name = "",
+                TranslationX = DOFType.Spring,
+                TranslationY = DOFType.Spring,
+                TranslationZ = DOFType.Spring,
+                RotationX = DOFType.Spring,
+                RotationY = DOFType.Spring,
+                RotationZ = DOFType.Spring,
+                TranslationalStiffnessX = 1000,
+                TranslationalStiffnessY = 2000,
+                TranslationalStiffnessZ = 3000,
+                RotationalStiffnessX = 4000,
+                RotationalStiffnessY = 5000,
+                RotationalStiffnessZ = 6000,
+            };
+
+            n2.Support = constraint6dof;
+
+
+            //Push them once
+            adapter.Push(new List<Node>() { n1, n2 });
             //Pull it
             //FilterRequest constraint6DOFFilter = new FilterRequest() { Type = typeof(Constraint6DOF) };
 
