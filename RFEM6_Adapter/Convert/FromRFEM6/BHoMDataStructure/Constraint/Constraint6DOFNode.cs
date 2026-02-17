@@ -61,7 +61,7 @@ namespace BH.Adapter.RFEM6
 
             constraint.SetRFEM6ID(support.no);
             //constraint.Name = support.name;
-            constraint.Name = null;
+            constraint.Name = "";
 
             RFEMNodalSupport rfemNodalSupport = new RFEMNodalSupport() { Constraint = constraint };
             rfemNodalSupport.SetRFEM6ID(support.no);

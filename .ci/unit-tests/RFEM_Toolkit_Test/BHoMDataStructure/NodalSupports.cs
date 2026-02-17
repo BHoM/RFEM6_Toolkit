@@ -23,6 +23,7 @@ using BH.Adapter.RFEM6;
 using BH.oM.Data.Requests;
 using BH.oM.Geometry;
 using BH.oM.Structure.Elements;
+using BH.Engine.Structure;
 using BH.oM.Base;
 using BH.Engine.Structure;
 using BH.oM.Structure.Constraints;
@@ -36,9 +37,13 @@ namespace RFEM_Toolkit_Test.Elements
     {
 
         RFEM6Adapter adapter;
+        Node n0;
         Node n1;
         Node n2;
-        Constraint6DOF constraint6dof;
+        Node n3;
+        Constraint6DOF constraint6dof0;
+        Constraint6DOF constraint6dof1;
+        Constraint6DOF constraint6dof2;
         NodeDistanceComparer comparer;
 
         [OneTimeSetUp]
@@ -54,59 +59,34 @@ namespace RFEM_Toolkit_Test.Elements
         }
 
         [Test]
-        public void PullConstraint6DO()
+        public void PushPullConstraintNodes()
         {
-            //comparer = new NodeDistanceComparer(3);
 
-            ////Define Nodes
-            //n1 = new Node() { Position = new Point() { X = 1, Y = 1, Z = 0} };
-            
-            ////Push them once
-            //adapter.Push(new List<Node>() { n1 });
+            // Arrange
+            n0 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 15 } };
 
-            //Pull it
-            FilterRequest constraint6DOFFilter = new FilterRequest() { Type = typeof(Constraint6DOF) };
-          
-
-            var nodePulled = adapter.Pull(constraint6DOFFilter).ToList();
-            Constraint6DOF np = (Constraint6DOF)nodePulled[0];
-
-            //Check
-            Assert.IsNotNull(np);
-            //Assert.IsTrue(comparer.Equals(n1, np));            
-        }
-        [Test]
-        public void PullNodeWithConstraint6DOF()
-        {
-            //comparer = new NodeDistanceComparer(3);
-
-            ////Define Nodes
-            //n1 = new Node() { Position = new Point() { X = 1, Y = 1, Z = 0} };
-
-            ////Push them once
-            //adapter.Push(new List<Node>() { n1 });
-
-            //Pull it
-            FilterRequest constraint6DOFFilter = new FilterRequest() { Type = typeof(Node) };
-
-
-            var nodePulled = adapter.Pull(constraint6DOFFilter).ToList();
-            //Constraint6DOF np = (Constraint6DOF)nodePulled[0];
-
-            //Check
-            Assert.IsNotNull(nodePulled);
-            //Assert.IsTrue(comparer.Equals(n1, np));            
-        }
-
-        [Test]
-        public void PushConstraint6DOF()
-        {
-            //comparer = new NodeDistanceComparer(3);
+            constraint6dof0 = new Constraint6DOF()
+            {
+                Name = "",
+                TranslationX = DOFType.Spring,
+                TranslationY = DOFType.Spring,
+                TranslationZ = DOFType.Spring,
+                RotationX = DOFType.Spring,
+                RotationY = DOFType.Spring,
+                RotationZ = DOFType.Spring,
+                TranslationalStiffnessX = 1000,
+                TranslationalStiffnessY = 2000,
+                TranslationalStiffnessZ = 3000,
+                RotationalStiffnessX = 1000,
+                RotationalStiffnessY = 2000,
+                RotationalStiffnessZ = 3000,
+            };
+            n0.Support = constraint6dof0;
 
             //Define Nodes
             n1 = new Node() { Position = new Point() { X = 10, Y = 10, Z = 0 } };
 
-            constraint6dof = new Constraint6DOF()
+            constraint6dof1 = new Constraint6DOF()
             {
                 Name = "",
                 TranslationX = DOFType.Spring,
@@ -123,11 +103,11 @@ namespace RFEM_Toolkit_Test.Elements
                 RotationalStiffnessZ = 3000,
             };
             
-            n1.Support = constraint6dof;
+            n1.Support = constraint6dof1;
 
             n2 = new Node() { Position = new Point() { X = 15, Y = 15, Z = 0 } };
 
-            constraint6dof = new Constraint6DOF()
+            constraint6dof2 = new Constraint6DOF()
             {
                 Name = "",
                 TranslationX = DOFType.Spring,
@@ -144,22 +124,35 @@ namespace RFEM_Toolkit_Test.Elements
                 RotationalStiffnessZ = 6000,
             };
 
-            n2.Support = constraint6dof;
+            n2.Support = constraint6dof2;
+
+            n3 = new Node() { Position = new Point() { X = 15, Y = 15, Z = 15 } };
+
+            var pushNodeList = new List<Node>() { n0, n1, n2, n3 };
+            //Act
+            adapter.Push(pushNodeList);
+            FilterRequest nodesFilter = new FilterRequest() { Type = typeof(Node) };
 
 
-            //Push them once
-            adapter.Push(new List<Node>() { n1, n2 });
-            //Pull it
-            //FilterRequest constraint6DOFFilter = new FilterRequest() { Type = typeof(Constraint6DOF) };
+            List<Node> constrainedNodes = (adapter.Pull(nodesFilter).Select(n=>(Node)n).ToList());
 
+            //Assert
 
-            //var nodePulled = adapter.Pull(constraint6DOFFilter).ToList();
-            //Constraint6DOF np = (Constraint6DOF)nodePulled[0];
+            //Null Check
+            Assert.IsNotNull(constrainedNodes);
 
-            //Check
-            //Assert.IsNotNull(np);
-            //Assert.IsTrue(comparer.Equals(n1, np));            
-        }
+            //Check for pulled node size
+            Assert.That(constrainedNodes.Count(), Is.EqualTo(pushNodeList.Count()));
+
+            //
+            //Assert.
+            var extractedConstraints = constrainedNodes.Select(c => c.Support).Where(s=> s != null).ToHashSet(new BH.Engine.Structure.Constraint6DOFComparer());
+            Assert.IsTrue(extractedConstraints.Contains(n0.Support));
+            Assert.IsTrue(extractedConstraints.Contains(n1.Support));
+            Assert.IsTrue(extractedConstraints.Contains(n2.Support));
+            Assert.That(extractedConstraints.Count(), Is.EqualTo(3));
+
+        }   
 
 
 

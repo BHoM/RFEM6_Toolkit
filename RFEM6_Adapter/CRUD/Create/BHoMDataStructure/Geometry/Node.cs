@@ -59,8 +59,10 @@ namespace BH.Adapter.RFEM6
 
                 m_Model.set_node(rfNode);
 
-                // If bhom node has support
-                if (bhNode.Support != null)
+                if (bhNode.Support is null) { 
+                    continue; 
+                }
+                else 
                 {
                     //if support already exist, add index to map and update support with new node list
                     constraintToNodeMap.TryGetValue(bhNode.Support, out HashSet<int> nodeList);
@@ -71,12 +73,13 @@ namespace BH.Adapter.RFEM6
 
                         //Add node index to list and add support to map
                         nodeList = new HashSet<int>() { rfNode.no };
-                        constraintToNodeMap[bhNode.Support] = nodeList;
 
                         rfModel.nodal_support rfNodalSupport = bhNode.Support.ToRFEM6();
                         rfNodalSupport.nodes = nodeList.ToArray();
                         int no = m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT, 0);
                         rfNodalSupport.no = no;
+                        bhNode.Support.SetRFEM6ID(no);
+                        constraintToNodeMap[bhNode.Support] = nodeList;
                         m_Model.set_nodal_support(rfNodalSupport);
                     }
                     else
