@@ -29,6 +29,7 @@ using BH.oM.Analytical.Elements;
 using BH.oM.Geometry;
 using BH.Engine.Geometry;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Structure.Constraints;
 
 namespace BH.Adapter.RFEM6
 {

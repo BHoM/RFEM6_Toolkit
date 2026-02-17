@@ -99,7 +99,7 @@ namespace RFEM_Toolkit_Test.Elements
         }
 
         [Test]
-        public void PushConstraint6DO()
+        public void PushConstraint6DOF()
         {
             //comparer = new NodeDistanceComparer(3);
 

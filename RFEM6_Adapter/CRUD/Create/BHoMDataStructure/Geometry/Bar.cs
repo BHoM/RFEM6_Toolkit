@@ -100,6 +100,15 @@ namespace BH.Adapter.RFEM6
             return true;
         }
 
+
+
+        private static DOFType Translate(double input)
+        {
+            if (input.Equals(double.PositiveInfinity))
+                return DOFType.Fixed;
+            else return
+                    DOFType.Free;
+        }
     }
 }
 

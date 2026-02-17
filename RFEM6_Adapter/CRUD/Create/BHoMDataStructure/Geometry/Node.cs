@@ -23,6 +23,7 @@
 using BH.Engine.Base;
 using BH.Engine.Structure;
 using BH.oM.Adapter;
+using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.MaterialFragments;
@@ -30,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 using rfModel = Dlubal.WS.Rfem6.Model;
 
@@ -39,16 +41,16 @@ namespace BH.Adapter.RFEM6
     {
         private bool CreateCollection(IEnumerable<Node> bhNodes)
         {
-            
-            //Read all support from RFEM model
-            List<Constraint6DOF> constraints = this.GetCachedOrRead<Constraint6DOF>();
+
+            //Read all support from RFEM model + Removint the added nodes
+            HashSet<Constraint6DOF> constraints = this.GetCachedOrRead<RFEMNodalSupport>().Select(n => n.Constraint).ToHashSet(new Constraint6DOFComparer());
+            constraints = constraints.Where(c => !(c.PropertyValue("NodeList") is null)).ToHashSet();
 
             //Create map of support and node list to be able to update supports with new nodes if support already exist
-            Dictionary<Constraint6DOF,HashSet<int>> constraintToNodeMap = new Dictionary<Constraint6DOF, HashSet<int>>(new Constraint6DOFComparer());
-            foreach (Constraint6DOF c in constraints) {
-
+            Dictionary<Constraint6DOF, HashSet<int>> constraintToNodeMap = new Dictionary<Constraint6DOF, HashSet<int>>(new Constraint6DOFComparer());
+            foreach (Constraint6DOF c in constraints)
+            {
                 constraintToNodeMap[c] = new HashSet<int>((List<int>)c.PropertyValue("NodeList"));
-
             }
 
             foreach (Node bhNode in bhNodes)
@@ -64,15 +66,16 @@ namespace BH.Adapter.RFEM6
                     constraintToNodeMap.TryGetValue(bhNode.Support, out HashSet<int> nodeList);
 
                     //if support does not exist, create new support and add to map and RFEM model
-                    if (nodeList is null) {
+                    if (nodeList is null)
+                    {
 
                         //Add node index to list and add support to map
-                        nodeList = new HashSet<int>() { rfNode.no};
+                        nodeList = new HashSet<int>() { rfNode.no };
                         constraintToNodeMap[bhNode.Support] = nodeList;
-                        
+
                         rfModel.nodal_support rfNodalSupport = bhNode.Support.ToRFEM6();
                         rfNodalSupport.nodes = nodeList.ToArray();
-                        int no=m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT,0);
+                        int no = m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT, 0);
                         rfNodalSupport.no = no;
                         m_Model.set_nodal_support(rfNodalSupport);
                     }
@@ -80,7 +83,7 @@ namespace BH.Adapter.RFEM6
                     {
                         constraintToNodeMap[bhNode.Support].Add(rfNode.no);
                         var comparer = new Constraint6DOFComparer();
-                        Constraint6DOF found =constraintToNodeMap.Keys.Where(n => comparer.Equals(n, bhNode.Support)).First();
+                        Constraint6DOF found = constraintToNodeMap.Keys.Where(n => comparer.Equals(n, bhNode.Support)).First();
                         rfModel.nodal_support rfNodalSupport = m_Model.get_nodal_support(found.GetRFEM6ID());
                         rfNodalSupport.nodes = constraintToNodeMap[bhNode.Support].ToArray();
                         m_Model.set_nodal_support(rfNodalSupport);
@@ -89,14 +92,6 @@ namespace BH.Adapter.RFEM6
                 }
             }
             return true;
-        }
-
-        private static DOFType Translate(double input)
-        {
-            if (input.Equals(double.PositiveInfinity))
-                return DOFType.Fixed;
-            else return
-                    DOFType.Free;
         }
     }
 }

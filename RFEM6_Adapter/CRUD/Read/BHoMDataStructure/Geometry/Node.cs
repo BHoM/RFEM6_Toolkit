@@ -46,8 +46,7 @@ namespace BH.Adapter.RFEM6
             IEnumerable<rfModel.node> allRfNodes = nodeNumbers.Length >= 1 ? nodeNumbers.ToList().Select(n => m_Model.get_node(n.no)) : new List<rfModel.node>();
 
 
-            //Dictionary<int, RFEMNodalSupport> supportMap = this.GetCachedOrReadAsDictionary<int, RFEMNodalSupport>();
-            Dictionary<int, Constraint6DOF> constraintMap = this.GetCachedOrReadAsDictionary<int, Constraint6DOF>();
+            Dictionary<int, RFEMNodalSupport> nodalSupportMap = this.GetCachedOrReadAsDictionary<int, RFEMNodalSupport>();
 
             if (ids == null)
             {
@@ -57,14 +56,9 @@ namespace BH.Adapter.RFEM6
 
                     int supportId = rfNode.support;
 
-                    //RFEMNodalSupport support;
-                    //if (supportMap.TryGetValue(supportId, out support))
-                    //    node.Support = support.Constraint;
-             
-                    Constraint6DOF constraint;
-                    if (constraintMap.TryGetValue(supportId, out constraint))
-                        node.Support = constraint;
-
+                    RFEMNodalSupport support;
+                    if (nodalSupportMap.TryGetValue(supportId, out support))
+                        node.Support = support.Constraint;
 
                     nodeList.Add(node);
                 }

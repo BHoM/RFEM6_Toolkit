@@ -24,8 +24,10 @@ using System;
 using System.Collections.Generic;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Constraints;
+using BH.Engine.Structure;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
+using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -48,26 +50,29 @@ namespace BH.Adapter.RFEM6
         public bool Equals(RFEMNodalSupport support1, RFEMNodalSupport support2)
         {
 
-            Constraint6DOF constraint1 = support1.Constraint;
-            Constraint6DOF constraint2 = support2.Constraint;
+            Constraint6DOF c1 = support1.Constraint;
+            Constraint6DOF c2 = support2.Constraint;
 
-            if (!constraint1.TranslationalStiffnessX.Equals(constraint2.TranslationalStiffnessX)) return false;
-            if (!constraint1.TranslationalStiffnessY.Equals(constraint2.TranslationalStiffnessY)) return false;
-            if (!constraint1.TranslationalStiffnessZ.Equals(constraint2.TranslationalStiffnessZ)) return false;
-            if (!constraint1.TranslationX.Equals(constraint2.TranslationX)) return false;
-            if (!constraint1.TranslationY.Equals(constraint2.TranslationY)) return false;
-            if (!constraint1.TranslationZ.Equals(constraint2.TranslationZ)) return false;
+            //Constraint6DOFComparer comparer = new Constraint6DOFComparer();
+            //return comparer.Equals(constraint1, constraint2);
 
-            if (!constraint1.RotationalStiffnessX.Equals(constraint2.RotationalStiffnessX)) return false;
-            if (!constraint1.RotationalStiffnessY.Equals(constraint2.RotationalStiffnessY)) return false;
-            if (!constraint1.RotationalStiffnessZ.Equals(constraint2.RotationalStiffnessZ)) return false;
-            if (!constraint1.RotationX.Equals(constraint2.RotationX)) return false;
-            if (!constraint1.RotationY.Equals(constraint2.RotationY)) return false;
-            if (!constraint1.RotationZ.Equals(constraint2.RotationZ)) return false;
+            var nodeList1 = c1.PropertyValue("NodeList");
+            var nodeList2 = c2.PropertyValue("NodeList");
 
+            return (nodeList1 is null && nodeList2 is null)
+                && c1.TranslationalStiffnessX == c2.TranslationalStiffnessX
+                && c1.TranslationalStiffnessY == c2.TranslationalStiffnessY
+                && c1.TranslationalStiffnessZ == c2.TranslationalStiffnessZ
+                && c1.TranslationX == c2.TranslationX
+                && c1.TranslationY == c2.TranslationY
+                && c1.TranslationZ == c2.TranslationZ
+                && c1.RotationalStiffnessX == c2.RotationalStiffnessX
+                && c1.RotationalStiffnessY == c2.RotationalStiffnessY
+                && c1.RotationalStiffnessZ == c2.RotationalStiffnessZ
+                && c1.RotationX == c2.RotationX
+                && c1.RotationY == c2.RotationY
+                && c1.RotationZ == c2.RotationZ;
 
-
-            return true;
 
         }
 
@@ -79,7 +84,7 @@ namespace BH.Adapter.RFEM6
             //return surfaceSupport.GetHashCode();
 
             return 0;
-            
+
         }
 
 
