@@ -53,6 +53,8 @@ namespace BH.Adapter.RFEM6
                 constraintToNodeMap[c] = new HashSet<int>((List<int>)c.PropertyValue("NodeList"));
             }
 
+            bool supportInBHNodes = false;
+
             foreach (Node bhNode in bhNodes)
             {
                 rfModel.node rfNode = bhNode.ToRFEM6();
@@ -64,6 +66,9 @@ namespace BH.Adapter.RFEM6
                 }
                 else 
                 {
+                    
+                    supportInBHNodes = true;
+
                     //if support already exist, add index to map and update support with new node list
                     constraintToNodeMap.TryGetValue(bhNode.Support, out HashSet<int> nodeList);
 
@@ -94,6 +99,15 @@ namespace BH.Adapter.RFEM6
                     }
                 }
             }
+
+
+            if (supportInBHNodes) BH.Engine.Base.Compute.RecordWarning(
+@"Please check at least one of the nodes pushed to RFEM6 has a support assigned. At this stage this might result in duplicate nodes.
+To clear the RFEM model please do the following:
+Remove duplicates: Tools > Model Check > Identical Nodes
+Renumbering: Tools > Renumber > Automatically"
+);
+
             return true;
         }
     }

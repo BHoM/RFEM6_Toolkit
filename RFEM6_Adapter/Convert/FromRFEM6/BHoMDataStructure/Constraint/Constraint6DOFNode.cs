@@ -93,7 +93,7 @@ namespace BH.Adapter.RFEM6
 
             constraint.SetRFEM6ID(support.no);
             //constraint.Name = support.name;
-            constraint.Name = null;
+            constraint.Name = "";
 
             return constraint;
         }

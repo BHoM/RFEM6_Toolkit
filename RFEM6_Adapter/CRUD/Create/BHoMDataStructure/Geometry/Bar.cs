@@ -50,13 +50,6 @@ namespace BH.Adapter.RFEM6
                 if (bhBar.Start == null || bhBar.End == null)
                     continue;
 
-                ////Checking if the bar has a section property, if not set default section property
-                //if (bhBar.SectionProperty == null)
-                //{
-                //    bhBar.SectionProperty = BH.Engine.Library.Query.Match("EU_SteelSections", "CHS 42.4x3.2", true, true).DeepClone() as SteelSection;
-                //    BH.Engine.Base.Compute.RecordWarning($"Bar {bhBar} has no section property assinged. The section {bhBar.SectionProperty} has been set as default.");
-                //}
-
                 rfModel.member rfMember = bhBar.ToRFEM6();
 
                 if (bhBar.Release != null)
@@ -71,7 +64,6 @@ namespace BH.Adapter.RFEM6
                     rfMember.member_hinge_end = foundHinges1.no;
                     rfMember.member_hinge_endSpecified = true;
 
-                    //m_Model.set_line_support(foundLineSupport);
                 }
 
                 m_Model.set_member(rfMember);

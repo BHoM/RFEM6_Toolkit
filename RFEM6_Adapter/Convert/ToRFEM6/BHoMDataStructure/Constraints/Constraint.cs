@@ -100,11 +100,11 @@ namespace BH.Adapter.RFEM6
 
             if (movement == DOFType.Fixed)
             {
-                return 0;
+                return Double.PositiveInfinity;
             }
             else if (movement == DOFType.Free)
             {
-                return Double.PositiveInfinity;
+                return 0;
             }
             else if (movement == DOFType.Spring)
             {

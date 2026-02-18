@@ -42,7 +42,9 @@ namespace BH.Adapter.RFEM6
             try
             {
                 this.Connect();
+                
                 TwoStagePushErrorMessageCheck(objects);
+
                 return base.Push(objects, tag, pushType, actionConfig);
 
             }

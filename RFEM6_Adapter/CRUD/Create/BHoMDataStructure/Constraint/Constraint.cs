@@ -19,16 +19,17 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+using BH.Engine.Base;
+using BH.oM.Adapter;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Analytical.Elements;
+using BH.oM.Structure.Constraints;
+using BH.oM.Structure.Elements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Numerics;
-
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-
+using System.Text;
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
@@ -38,6 +39,13 @@ namespace BH.Adapter.RFEM6
 
         private bool CreateCollection(IEnumerable<Constraint6DOF> supports)
         {
+
+            // Adding ID to avoid warning!
+            foreach (Constraint6DOF c in supports)
+            {
+                c.SetRFEM6ID(c.FindFragment<Constraint6DOF>().GetRFEM6ID());
+
+            }
 
             return true;
 
