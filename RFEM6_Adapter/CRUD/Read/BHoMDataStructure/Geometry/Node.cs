@@ -45,7 +45,6 @@ namespace BH.Adapter.RFEM6
             nodeNumbers=nodeNumbers.ToList().Where(n => n.no != 0).ToArray();
             IEnumerable<rfModel.node> allRfNodes = nodeNumbers.Length >= 1 ? nodeNumbers.ToList().Select(n => m_Model.get_node(n.no)) : new List<rfModel.node>();
 
-
             Dictionary<int, RFEMNodalSupport> nodalSupportMap = this.GetCachedOrReadAsDictionary<int, RFEMNodalSupport>();
 
             if (ids == null)
