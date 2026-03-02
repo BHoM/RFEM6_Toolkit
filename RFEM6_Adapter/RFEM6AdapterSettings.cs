@@ -100,7 +100,7 @@ namespace BH.Adapter.RFEM6
             return new Dictionary<Type, object>
             {
                 {typeof(Bar), new BarEndNodesDistanceComparer(3) },
-                {typeof(Node), new NodeDistanceComparer(3) },
+                {typeof(Node), new RFEMNodalComparer() },
                 {typeof(RFEMHinge), new RFEMHingeComparer() },
                 {typeof(ISectionProperty), new RFEMSectionComparer() },
                 {typeof(ISurfaceProperty), new RFEMSurfacePropertyComparer() },

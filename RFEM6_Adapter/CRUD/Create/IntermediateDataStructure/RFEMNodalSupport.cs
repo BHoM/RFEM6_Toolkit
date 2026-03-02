@@ -40,18 +40,14 @@ namespace BH.Adapter.RFEM6
         private bool CreateCollection(IEnumerable<RFEMNodalSupport> supportList)
         {
 
-            foreach (RFEMNodalSupport support in supportList)
-            {
-                rfModel.nodal_support rfNodelSuport = support.ToRFEM6();
+            //foreach (RFEMNodalSupport support in supportList)
+            //{
+            //    rfModel.nodal_support rfNodelSuport = support.ToRFEM6();
 
-                m_Model.set_nodal_support(rfNodelSuport);
-            }
-
-
+            //    m_Model.set_nodal_support(rfNodelSuport);
+            //}
 
             return true;
-
-
 
         }
 

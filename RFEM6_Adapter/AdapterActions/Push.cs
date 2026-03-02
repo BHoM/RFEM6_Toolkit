@@ -42,7 +42,9 @@ namespace BH.Adapter.RFEM6
             try
             {
                 this.Connect();
+                
                 TwoStagePushErrorMessageCheck(objects);
+
                 return base.Push(objects, tag, pushType, actionConfig);
 
             }
@@ -54,10 +56,44 @@ namespace BH.Adapter.RFEM6
         }
 
 
-       
+        
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+
+        /// <summary>
+        /// Validates that the pushed objects do not contain both structural elements and their corresponding loads in the same push operation.
+        /// RFEM6 requires a two-stage push: first push structural elements (Bars, Panels), then push their associated loads (BarUDL, AreaUDL).
+        /// </summary>
+        /// <param name="obj">The collection of objects being pushed to RFEM6.</param>
+        private void TwoStagePushErrorMessageCheck(IEnumerable<object> obj)
+        {
+
+            bool hasBar = obj.Any(o => o is Bar);
+            bool hasBarLoad = obj.Any(o => o is BarUniformlyDistributedLoad);
+
+
+            if (hasBar && hasBarLoad)
+            {
+                BH.Engine.Base.Compute.RecordError("Pushed Set has both Bars and Loads. Please make sure that Bars and BarUDLs are pushed seperatly. First Push bars, next push BarUDL!");
+            }
+
+            bool hasPanel = obj.Any(o => o is Panel);
+            bool hasAreaLoad = obj.Any(o => o is AreaUniformlyDistributedLoad);
+
+            if (hasPanel && hasAreaLoad)
+            {
+                BH.Engine.Base.Compute.RecordError("Pushed Set has both Panels and AreaUniformlyDistributedLoad. Please make sure that Panels and AreaUniformlyDistributedLoad are pushed seperatly. First Push Panels, next push AreaUniformlyDistributedLoads!");
+            }
+
+        }
+
+
+
 
     }
 }
+
 
 
 

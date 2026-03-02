@@ -20,16 +20,19 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Engine.Base;
+using BH.Engine.Structure;
+using BH.oM.Adapter;
+using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.Constraints;
+using BH.oM.Structure.Elements;
+using BH.oM.Structure.MaterialFragments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Numerics;
-
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-
+using System.Reflection;
+using System.Text;
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
@@ -38,52 +41,74 @@ namespace BH.Adapter.RFEM6
     {
         private bool CreateCollection(IEnumerable<Node> bhNodes)
         {
-            //NOTE:A geometric object has, in general, a parent_no = 0. The parent_no parameter becomes significant for example with loads.
+
+            //Read all support from RFEM model + Removint the added nodes
+            HashSet<Constraint6DOF> constraints = this.GetCachedOrRead<RFEMNodalSupport>().Select(n => n.Constraint).ToHashSet(new Constraint6DOFComparer());
+            constraints = constraints.Where(c => !(c.PropertyValue("NodeList") is null)).ToHashSet();
+
+            //Create map of support and node list to be able to update supports with new nodes if support already exist
+            Dictionary<Constraint6DOF, HashSet<int>> constraintToNodeMap = new Dictionary<Constraint6DOF, HashSet<int>>(new Constraint6DOFComparer());
+            foreach (Constraint6DOF c in constraints)
+            {
+                constraintToNodeMap[c] = new HashSet<int>((List<int>)c.PropertyValue("NodeList"));
+            }
+
+            bool supportInBHNodes = false;
+
             foreach (Node bhNode in bhNodes)
             {
                 rfModel.node rfNode = bhNode.ToRFEM6();
+
                 m_Model.set_node(rfNode);
 
-                if (bhNode.Support != null)
-                {
-                    rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
-                    List<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no)).ToList();
-                    var foundRFNodalSupport = foundSupports.Where(s => ComparerRFEMSupportAndBHoMConstraint(s, bhNode.Support)).FirstOrDefault();
-                    foundRFNodalSupport.nodes = foundRFNodalSupport.nodes.Append(rfNode.no).ToArray();
-                    m_Model.set_nodal_support(foundRFNodalSupport);
-
+                if (bhNode.Support is null) { 
+                    continue; 
                 }
+                else 
+                {
+                    
+                    supportInBHNodes = true;
 
+                    //if support already exist, add index to map and update support with new node list
+                    constraintToNodeMap.TryGetValue(bhNode.Support, out HashSet<int> nodeList);
+
+                    //if support does not exist, create new support and add to map and RFEM model
+                    if (nodeList is null)
+                    {
+
+                        //Add node index to list and add support to map
+                        nodeList = new HashSet<int>() { rfNode.no };
+
+                        rfModel.nodal_support rfNodalSupport = bhNode.Support.ToRFEM6();
+                        rfNodalSupport.nodes = nodeList.ToArray();
+                        int no = m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT, 0);
+                        rfNodalSupport.no = no;
+                        bhNode.Support.SetRFEM6ID(no);
+                        constraintToNodeMap[bhNode.Support] = nodeList;
+                        m_Model.set_nodal_support(rfNodalSupport);
+                    }
+                    else
+                    {
+                        constraintToNodeMap[bhNode.Support].Add(rfNode.no);
+                        var comparer = new Constraint6DOFComparer();
+                        Constraint6DOF found = constraintToNodeMap.Keys.Where(n => comparer.Equals(n, bhNode.Support)).First();
+                        rfModel.nodal_support rfNodalSupport = m_Model.get_nodal_support(found.GetRFEM6ID());
+                        rfNodalSupport.nodes = constraintToNodeMap[bhNode.Support].ToArray();
+                        m_Model.set_nodal_support(rfNodalSupport);
+
+                    }
+                }
             }
-            return true;
-        }
 
 
-        private static bool ComparerRFEMSupportAndBHoMConstraint(rfModel.nodal_support rfSupport, Constraint6DOF bhConstraint)
-        {
-
-            if (!Translate(rfSupport.spring_x).Equals(bhConstraint.TranslationX)) 
-                return false;
-            if (!Translate(rfSupport.spring_y).Equals(bhConstraint.TranslationY)) 
-                return false;
-            if (!Translate(rfSupport.spring_z).Equals(bhConstraint.TranslationZ)) 
-                return false;
-            if (!Translate(rfSupport.rotational_restraint_x).Equals(bhConstraint.RotationX)) 
-                return false;
-            if (!Translate(rfSupport.rotational_restraint_y).Equals(bhConstraint.RotationY)) 
-                return false;
-            if (!Translate(rfSupport.rotational_restraint_z).Equals(bhConstraint.RotationZ)) 
-                return false;
+            if (supportInBHNodes) BH.Engine.Base.Compute.RecordWarning(
+@"Please check at least one of the nodes pushed to RFEM6 has a support assigned. At this stage this might result in duplicate nodes.
+To clear the RFEM model please do the following:
+Remove duplicates: Tools > Model Check > Identical Nodes
+Renumbering: Tools > Renumber > Automatically"
+);
 
             return true;
-        }
-
-        private static DOFType Translate(double input)
-        {
-            if (input.Equals(double.PositiveInfinity))
-                return DOFType.Fixed;
-            else return
-                    DOFType.Free;
         }
     }
 }

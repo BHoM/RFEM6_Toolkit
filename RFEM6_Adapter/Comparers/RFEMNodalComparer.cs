@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Constraints;
+using BH.oM.Structure.Elements;
 using BH.Engine.Structure;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
@@ -31,13 +32,13 @@ using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
-    public class RFEMNodalSupportComparer : IEqualityComparer<RFEMNodalSupport>
+    public class RFEMNodalComparer : IEqualityComparer<Node>
     {
         /***************************************************/
         /**** Constructors                              ****/
         /***************************************************/
 
-        public RFEMNodalSupportComparer()
+        public RFEMNodalComparer()
         {
 
         }
@@ -47,20 +48,18 @@ namespace BH.Adapter.RFEM6
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public bool Equals(RFEMNodalSupport support1, RFEMNodalSupport support2)
+        //public bool Equals(RFEMNodalSupport support1, RFEMNodalSupport support2)
+        //{
+
+        public bool Equals(Node node1, Node node2)
         {
+            Constraint6DOF c1 = node1.Support as Constraint6DOF;
+            Constraint6DOF c2 = node2.Support as Constraint6DOF;
 
-            Constraint6DOF c1 = support1.Constraint;
-            Constraint6DOF c2 = support2.Constraint;
+            Constraint6DOFComparer constraint6DOFComparer = new Constraint6DOFComparer();
 
-            //Constraint6DOFComparer comparer = new Constraint6DOFComparer();
-            //return comparer.Equals(constraint1, constraint2);
-
-            var nodeList1 = c1.PropertyValue("NodeList");
-            var nodeList2 = c2.PropertyValue("NodeList");
-
-            return (nodeList1 is null && nodeList2 is null)
-                && c1.TranslationalStiffnessX == c2.TranslationalStiffnessX
+            bool supportsAreEqual =
+                c1.TranslationalStiffnessX == c2.TranslationalStiffnessX
                 && c1.TranslationalStiffnessY == c2.TranslationalStiffnessY
                 && c1.TranslationalStiffnessZ == c2.TranslationalStiffnessZ
                 && c1.TranslationX == c2.TranslationX
@@ -73,12 +72,14 @@ namespace BH.Adapter.RFEM6
                 && c1.RotationY == c2.RotationY
                 && c1.RotationZ == c2.RotationZ;
 
+            var nodecomp = new NodeDistanceComparer(3);
 
+            return supportsAreEqual && nodecomp.Equals(node1, node2);
         }
 
         /***************************************************/
 
-        public int GetHashCode(RFEMNodalSupport surfaceSupport)
+        public int GetHashCode(Node surfaceSupport)
         {
 
             //return surfaceSupport.GetHashCode();

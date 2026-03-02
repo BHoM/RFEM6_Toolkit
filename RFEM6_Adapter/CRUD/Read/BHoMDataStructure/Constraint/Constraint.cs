@@ -34,24 +34,23 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6Adapter
     {
 
-        private List<Constraint6DOF> ReadNodalSupports(List<string> ids = null)
+        private List<Constraint6DOF> ReadConstraint6DOFNode(List<string> ids = null)
         {
 
-            List<Constraint6DOF> constraintList = new List<Constraint6DOF>();
+            List<Constraint6DOF> constraints = new List<Constraint6DOF>();
 
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
             IEnumerable<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no));
 
             foreach (rfModel.nodal_support s in foundSupports)
             {
-                Constraint6DOF rfConstraint = Convert.FromRFEM(s).Constraint;
-                constraintList.Add(rfConstraint);
+                Constraint6DOF rfConstraint = Convert.FromRFEMNodalConstraint(s);
+                rfConstraint.SetRFEM6ID(s.no);
+                constraints.Add(rfConstraint);
             }
 
-            return constraintList;
+            return constraints;
         }
-
-    
 
     }
 }
