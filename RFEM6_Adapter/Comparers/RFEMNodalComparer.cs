@@ -34,14 +34,15 @@ namespace BH.Adapter.RFEM6
 {
     public class RFEMNodalComparer : IEqualityComparer<Node>
     {
-        /***************************************************/
-        /**** Constructors                              ****/
-        /***************************************************/
+		/***************************************************/
+		/**** Constructors                              ****/
+		/***************************************************/
+		private static readonly NodeDistanceComparer _nodeComp = new NodeDistanceComparer(3);
 
-        public RFEMNodalComparer()
+		public RFEMNodalComparer()
         {
 
-        }
+		}
 
 
         /***************************************************/
@@ -56,8 +57,19 @@ namespace BH.Adapter.RFEM6
             Constraint6DOF c1 = node1.Support as Constraint6DOF;
             Constraint6DOF c2 = node2.Support as Constraint6DOF;
 
-            Constraint6DOFComparer constraint6DOFComparer = new Constraint6DOFComparer();
+            
+            
+            if (!_nodeComp.Equals(node1, node2)) return false;
 
+            //Nodes are equal
+            if ((c1 is null) && (c2 is null)) return true;
+            
+            //Atelase one support is not null
+            if ((c1 is null) && !(c2 is null)) return false;
+            if (!(c1 is null) && (c2 is null)) return false;
+
+
+            //Both support are not null
             bool supportsAreEqual =
                 c1.TranslationalStiffnessX == c2.TranslationalStiffnessX
                 && c1.TranslationalStiffnessY == c2.TranslationalStiffnessY
@@ -72,9 +84,8 @@ namespace BH.Adapter.RFEM6
                 && c1.RotationY == c2.RotationY
                 && c1.RotationZ == c2.RotationZ;
 
-            var nodecomp = new NodeDistanceComparer(3);
 
-            return supportsAreEqual && nodecomp.Equals(node1, node2);
+            return supportsAreEqual && _nodeComp.Equals(node1, node2);
         }
 
         /***************************************************/
