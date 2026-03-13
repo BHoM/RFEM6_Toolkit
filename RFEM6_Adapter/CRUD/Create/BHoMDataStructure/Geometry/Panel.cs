@@ -36,7 +36,7 @@ using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6AdapterBase
     {
 
 		private bool CreateCollection(IEnumerable<Panel> bhPanels)

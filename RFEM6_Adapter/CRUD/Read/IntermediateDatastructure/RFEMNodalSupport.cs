@@ -27,12 +27,11 @@ using System.Text;
 using BH.oM.Adapter;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Constraints;
-using Newtonsoft.Json;
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6AdapterBase
     {
 
         private List<RFEMNodalSupport> ReadRFEMNodalSupports(List<string> ids = null)
@@ -41,7 +40,10 @@ namespace BH.Adapter.RFEM6
             List<RFEMNodalSupport> constraintList = new List<RFEMNodalSupport>();
 
             rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT);
-            IEnumerable<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no));
+            
+            if (numbers.Length == 0) return constraintList;
+
+			IEnumerable<rfModel.nodal_support> foundSupports = numbers.ToList().Select(n => m_Model.get_nodal_support(n.no));
 
             foreach (rfModel.nodal_support s in foundSupports)
             {

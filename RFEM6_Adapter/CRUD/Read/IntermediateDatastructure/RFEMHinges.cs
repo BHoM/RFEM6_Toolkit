@@ -27,12 +27,11 @@ using System.Text;
 using BH.oM.Adapter;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Constraints;
-using Newtonsoft.Json;
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6AdapterBase
     {
 
         private List<RFEMHinge> ReadRFEMHinges(List<string> ids = null)

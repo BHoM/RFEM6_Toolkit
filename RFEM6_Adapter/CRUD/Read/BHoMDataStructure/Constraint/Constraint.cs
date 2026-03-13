@@ -31,7 +31,7 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6AdapterBase
     {
 
         private List<Constraint6DOF> ReadConstraint6DOFNode(List<string> ids = null)

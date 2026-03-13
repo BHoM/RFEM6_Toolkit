@@ -32,7 +32,7 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6AdapterBase
     {
 
         private List<IMaterialFragment> ReadMaterial(List<string> ids = null)

@@ -34,7 +34,7 @@ using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6AdapterBase
     {
 
         private bool CreateCollection(IEnumerable<RFEMLineSupport> supportList)

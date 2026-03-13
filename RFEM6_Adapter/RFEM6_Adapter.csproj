@@ -15,9 +15,15 @@
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'">
 		<DefineConstants>$(DefineConstants);RFEM6_8_2</DefineConstants>
+		<AssemblyName>RFEM6_V8_2_Adapter</AssemblyName>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12'">
 		<DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
+		<AssemblyName>RFEM6_V12_11_Adapter</AssemblyName>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Debug_V12'">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
 	</PropertyGroup>
 
 
@@ -26,7 +32,6 @@
 		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.2" Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'" />
 		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.12.11" Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12'" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Private.ServiceModel" Version="4.10.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
 	</ItemGroup>
@@ -140,7 +145,9 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
+		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
+		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_V8_2\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Release_V682'" />
+		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_V12_11\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release_V12'" />
 	</Target>
 
 </Project>

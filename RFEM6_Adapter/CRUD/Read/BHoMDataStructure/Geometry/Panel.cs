@@ -37,7 +37,7 @@ using BH.Engine.Spatial;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6AdapterBase
     {
 
         private List<Panel> ReadPanels(List<string> ids = null)

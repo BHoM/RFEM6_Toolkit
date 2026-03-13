@@ -44,7 +44,7 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter
+    public partial class RFEM6AdapterBase
     {
 
         public IEnumerable<IResult> ReadResults(BarResultRequest request, ActionConfig actionConfig)

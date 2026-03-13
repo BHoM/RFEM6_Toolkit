@@ -31,7 +31,7 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter : BHoMAdapter
+    public partial class RFEM6AdapterBase : BHoMAdapter
     {
         // Basic Delete method that deletes objects depending on their Type and Id. 
         // It gets called by the Push or by the Remove Adapter Actions.

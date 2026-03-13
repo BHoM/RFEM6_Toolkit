@@ -19,11 +19,15 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_V12|AnyCPU'">
 	  <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
 	  <OutputPath>..\Build\</OutputPath>
+	  <DebugSymbols>true</DebugSymbols>
+	  <DebugType>full</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_V682|AnyCPU'">
 	  <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
 	  <OutputPath>..\Build\</OutputPath>
+	  <DebugSymbols>true</DebugSymbols>
+	  <DebugType>full</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
