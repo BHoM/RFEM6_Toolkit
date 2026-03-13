@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"C:\\\\BHoMGit\\\\RFEM6_Toolkit\\\\packages\"\" 2>/dev/null && echo \"---\" && ls \"C:BHoMGitRFEM6_ToolkitpackagesBHoM.Interop.RFEM6\"\")"
+    ]
+  }
+}

@@ -71,7 +71,11 @@ namespace BH.Adapter.RFEM6
                 nodes.TryGetValue(rfMember.node_end, out node1);
 
                 ISectionProperty section = null;
+#if RFEM6_12_11
+                sections.TryGetValue(rfMember.cross_section_end, out section);
+#else
                 sections.TryGetValue(rfMember.section_end, out section);
+#endif
 
                 RFEMHinge hingeStart = null;
                 RFEMHinge hingeEnd = null;

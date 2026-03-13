@@ -9,15 +9,22 @@
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<FileVersion>9.1.0.0</FileVersion>
 		<BaseOutputPath>..\Build\</BaseOutputPath>
+		<Configurations>Debug;Release;Debug_V682;Release_V682;Debug_V12;Release_V12</Configurations>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<Compile Remove="CRUD\Update\Node - Copy.cs" />
-	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'">
+		<DefineConstants>$(DefineConstants);RFEM6_8_2</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12'">
+		<DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
+	</PropertyGroup>
 
 
+
 	<ItemGroup>
-		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.2" />
+		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.2" Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'" />
+		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.12.11" Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12'" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Private.ServiceModel" Version="4.10.0" />
@@ -89,9 +96,6 @@
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Physical_oM.dll</HintPath>
 			<SpecificVersion>false</SpecificVersion>
 			<Private>false</Private>
-		</Reference>
-		<Reference Include="RFEMWebServiceLibrary">
-			<HintPath>..\packages\BHoM.Interop.RFEM6\RFEMWebServiceLibrary.dll</HintPath>
 		</Reference>
 		<Reference Include="Search_Engine">
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Search_Engine.dll</HintPath>

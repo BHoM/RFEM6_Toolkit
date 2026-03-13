@@ -65,7 +65,11 @@ namespace BH.Adapter.RFEM6
                     }
                 }
 
+#if RFEM6_12_11
+                rfModel.cross_section rfSection;
+#else
                 rfModel.section rfSection;
+#endif
 
                 //creation of Section Split up into different if statements for different section types
 
@@ -79,7 +83,11 @@ namespace BH.Adapter.RFEM6
                 }
 
 
+#if RFEM6_12_11
+                m_Model.set_cross_section(rfSection);
+#else
                 m_Model.set_section(rfSection);
+#endif
 
             }
 
