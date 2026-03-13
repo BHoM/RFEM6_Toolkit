@@ -146,8 +146,8 @@
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
-		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_V8_2\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Release_V682'" />
-		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_V12_11\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release_V12'" />
+		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V8_2\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Release_V682'" />
+		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V12_11\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release_V12'" />
 	</Target>
 
 </Project>

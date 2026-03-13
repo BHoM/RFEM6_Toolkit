@@ -36,7 +36,7 @@ namespace BH.Adapter.RFEM6
             {
                 var name = new System.Reflection.AssemblyName(args.Name);
                 if (name.Name == "RFEMWebServiceLibrary" && name.Version?.Minor == 8)
-                    return Assembly.LoadFile(@"C:\ProgramData\BHoM\Assemblies\RFEM6_V8_2\RFEMWebServiceLibrary.dll");
+                    return Assembly.LoadFile(@"C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V8_2\RFEMWebServiceLibrary.dll");
                 return null;
             };
         }
