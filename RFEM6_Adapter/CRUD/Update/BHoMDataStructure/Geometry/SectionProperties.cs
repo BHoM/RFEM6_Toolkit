@@ -34,7 +34,7 @@ using System.Text.RegularExpressions;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6AdapterBase : BHoMAdapter
+    public partial class RFEM6Adapter : BHoMAdapter
     {
         /***************************************************/
         /**** Update Node                               ****/

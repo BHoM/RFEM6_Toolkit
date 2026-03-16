@@ -34,7 +34,7 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6AdapterBase
+    public partial class RFEM6Adapter
     {
 
         private bool CreateCollection(IEnumerable<Constraint6DOF> supports)

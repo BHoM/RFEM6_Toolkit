@@ -51,7 +51,7 @@ using System.Net.PeerToPeer.Collaboration;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6AdapterBase : BHoMAdapter
+    public partial class RFEM6Adapter : BHoMAdapter
     {
 
         private Dictionary<Type, List<Type>> GenerateDependencyTypes()

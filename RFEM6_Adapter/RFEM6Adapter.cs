@@ -51,7 +51,7 @@ using System.Diagnostics;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6AdapterBase : BHoMAdapter
+    public abstract partial class RFEM6Adapter : BHoMAdapter
     {
         /***************************************************/
         /**** Constructors                              ****/
@@ -59,8 +59,8 @@ namespace BH.Adapter.RFEM6
             
         [Description("Adapter for RFEM6.")]
         [Input("filePath", "Input the optional file path to RFEM model. Default is to use the currently running instance")]
-        [Output("The created RFEM6 adapter.")]
-        public RFEM6AdapterBase(string filePath = "", bool active = false)
+        [Output("the created RFEM6 adapter.")]
+        protected RFEM6Adapter(string filePath = "", bool active = false)
         {
 
             if (active)

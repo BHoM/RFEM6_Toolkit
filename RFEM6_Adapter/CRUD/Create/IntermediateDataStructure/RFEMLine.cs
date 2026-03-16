@@ -39,7 +39,7 @@ using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6AdapterBase
+    public partial class RFEM6Adapter
     {
 
         private bool CreateCollection(IEnumerable<RFEMLine> rfemLines)

@@ -41,7 +41,7 @@ using System.Configuration;
 
 namespace BH.Adapter.RFEM6
 {
-	public partial class RFEM6AdapterBase
+	public partial class RFEM6Adapter
 	{
 
 		public IEnumerable<IResult> ReadResults(NodeResultRequest request, ActionConfig actionConfig)

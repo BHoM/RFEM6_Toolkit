@@ -28,7 +28,7 @@ using BH.oM.Base.Attributes;
 
 namespace BH.Adapter.RFEM6
 {
-    public class RFEM6AdapterV8_2 : RFEM6AdapterBase
+    public class RFEM6AdapterV8_2 : RFEM6Adapter
     {
         static RFEM6AdapterV8_2()
         {
