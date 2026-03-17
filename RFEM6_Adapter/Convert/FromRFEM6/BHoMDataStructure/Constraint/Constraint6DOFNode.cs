@@ -60,8 +60,8 @@ namespace BH.Adapter.RFEM6
             constraint.SetPropertyValue("NodeList", support.nodes.ToList());
 
             constraint.SetRFEM6ID(support.no);
-            //constraint.Name = support.name;
-            constraint.Name = "";
+            constraint.Name = support.name;
+            //constraint.Name = "";
 
             RFEMNodalSupport rfemNodalSupport = new RFEMNodalSupport() { Constraint = constraint };
             rfemNodalSupport.SetRFEM6ID(support.no);
@@ -92,8 +92,8 @@ namespace BH.Adapter.RFEM6
             constraint.SetPropertyValue("NodeList", support.nodes.ToList());
 
             constraint.SetRFEM6ID(support.no);
-            //constraint.Name = support.name;
-            constraint.Name = "";
+            constraint.Name = support.name;
+            //constraint.Name = "";
 
             return constraint;
         }
