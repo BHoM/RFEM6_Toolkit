@@ -30,7 +30,11 @@ using System.Threading.Tasks;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter : BHoMAdapter
+#if RFEM6_8_2
+    public partial class RFEM6AdapterV8_2 : BHoMAdapter
+#elif RFEM6_12_11
+    public partial class RFEM6AdapterV12_11 : BHoMAdapter
+#endif
     {
         // NOTE: CRUD folder methods
         // All methods in the CRUD folder are used as "back-end" methods by the Adapter itself.
