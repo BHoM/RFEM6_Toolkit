@@ -42,7 +42,7 @@ using BH.oM.Structure.Requests;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6AdapterBase : BHoMAdapter
+    public partial class RFEM6Adapter : BHoMAdapter
     {
         /***************************************************/
         /**** Adapter overload method                   ****/

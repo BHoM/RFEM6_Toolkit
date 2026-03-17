@@ -38,7 +38,7 @@ using System.Security.RightsManagement;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6AdapterBase
+    public partial class RFEM6Adapter
     {
 
         private List<ISectionProperty> ReadSectionProperties(List<string> ids = null)

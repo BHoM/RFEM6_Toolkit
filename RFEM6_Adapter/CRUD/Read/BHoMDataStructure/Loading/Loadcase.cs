@@ -34,7 +34,7 @@ using BH.oM.Structure.Loads;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6AdapterBase
+    public partial class RFEM6Adapter
     {
 
         private List<Loadcase> ReadLoadCase(List<string> ids = null)

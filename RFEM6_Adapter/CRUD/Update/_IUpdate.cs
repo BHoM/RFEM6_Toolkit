@@ -30,7 +30,7 @@ using BH.oM.Base;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6AdapterBase : BHoMAdapter
+    public partial class RFEM6Adapter : BHoMAdapter
     {
         // This method gets called when appropriate by the Push method contained in the base Adapter class.
         // Unlike the Create, Delete and Read, this method already exposes a simple implementation: it calls Delete and then Create.
