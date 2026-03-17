@@ -67,10 +67,10 @@ namespace BH.Adapter.RFEM6
             }
             else if (bhType == typeof(ISectionProperty))
             {
-#if RFEM6_12_11
-                return rfModel.object_types.E_OBJECT_TYPE_CROSS_SECTION;
-#else
+#if RFEM6_8_2
                 return rfModel.object_types.E_OBJECT_TYPE_SECTION;
+#else
+                return rfModel.object_types.E_OBJECT_TYPE_CROSS_SECTION;
 #endif
             }
             else if (bhType == typeof(RFEMLine))

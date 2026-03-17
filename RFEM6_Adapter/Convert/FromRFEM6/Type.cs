@@ -61,10 +61,10 @@ namespace BH.Adapter.RFEM6
             {
                 return typeof(IMaterialFragment);
             }
-#if RFEM6_12_11
-            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_CROSS_SECTION)
-#else
+#if RFEM6_8_2
             else if (rfType == rfModel.object_types.E_OBJECT_TYPE_SECTION)
+#else
+            else if (rfType == rfModel.object_types.E_OBJECT_TYPE_CROSS_SECTION)
 #endif
             {
                 return typeof(ISectionProperty);

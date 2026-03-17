@@ -39,6 +39,8 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6AdapterV8_2
 #elif RFEM6_12_11
     public partial class RFEM6AdapterV12_11
+#else
+    public partial class RFEM6Adapter
 #endif
     {
 
@@ -75,10 +77,10 @@ namespace BH.Adapter.RFEM6
                 nodes.TryGetValue(rfMember.node_end, out node1);
 
                 ISectionProperty section = null;
-#if RFEM6_12_11
-                sections.TryGetValue(rfMember.cross_section_end, out section);
-#else
+#if RFEM6_8_2
                 sections.TryGetValue(rfMember.section_end, out section);
+#else
+                sections.TryGetValue(rfMember.cross_section_end, out section);
 #endif
 
                 RFEMHinge hingeStart = null;

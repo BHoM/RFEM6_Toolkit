@@ -56,6 +56,8 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6AdapterV8_2 : BHoMAdapter
 #elif RFEM6_12_11
     public partial class RFEM6AdapterV12_11 : BHoMAdapter
+#else
+    public partial class RFEM6Adapter : BHoMAdapter
 #endif
     {
         /***************************************************/
@@ -66,6 +68,8 @@ namespace BH.Adapter.RFEM6
         static RFEM6AdapterV8_2()
 #elif RFEM6_12_11
         static RFEM6AdapterV12_11()
+#else
+        static RFEM6Adapter()
 #endif
         {
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
@@ -73,22 +77,40 @@ namespace BH.Adapter.RFEM6
                 var name = new System.Reflection.AssemblyName(args.Name);
 #if RFEM6_8_2
                 if (name.Name == "RFEMWebServiceLibrary" && name.Version?.Minor == 8)
-                    return System.Reflection.Assembly.LoadFile (@"C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V8_2\RFEMWebServiceLibrary.dll");
+                    return System.Reflection.Assembly.LoadFile(@"C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V8_2\RFEMWebServiceLibrary.dll");
 #elif RFEM6_12_11
-				if (name.Name == "RFEMWebServiceLibrary" && name.Version?.Minor == 12)
+                if (name.Name == "RFEMWebServiceLibrary" && name.Version?.Minor == 12)
+                    return System.Reflection.Assembly.LoadFile(@"C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V12_11\RFEMWebServiceLibrary.dll");
+#else
+                if (name.Name == "RFEMWebServiceLibrary" && name.Version?.Minor == 12)
                     return System.Reflection.Assembly.LoadFile(@"C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V12_11\RFEMWebServiceLibrary.dll");
 #endif
                 return null;
             };
         }
 
-        [Description("Adapter for RFEM6.")]
-        [Input("filePath", "Input the optional file path to RFEM model. Default is to use the currently running instance")]
-        [Output("The created RFEM6 adapter.")]
+#if RFEM6_8_2
+        [Description("Adapter for RFEM6 using Dlubal Web Service API version 6.8.2. Intended for use with RFEM6 versions prior to 6.12.11. For RFEM6 version 6.12.11 or newer, use RFEM6AdapterV12_11 or RFEM6Adapter instead.")]
+        [Input("filePath", "Optional file path to the RFEM6 model. If left empty, the adapter will connect to the currently running RFEM6 instance.")]
+        [Input("active", "Set to true to activate the adapter and establish a connection to RFEM6.")]
+        [Output("adapter", "The created RFEM6 adapter configured for API version 6.8.2.")]
+#elif RFEM6_12_11
+        [Description("Adapter for RFEM6 using Dlubal Web Service API version 6.12.11. Intended for use with RFEM6 version 6.12.11 or newer. For RFEM6 versions prior to 6.12.11, use RFEM6AdapterV8_2 instead.")]
+        [Input("filePath", "Optional file path to the RFEM6 model. If left empty, the adapter will connect to the currently running RFEM6 instance.")]
+        [Input("active", "Set to true to activate the adapter and establish a connection to RFEM6.")]
+        [Output("adapter", "The created RFEM6 adapter configured for API version 6.12.11.")]
+#else
+        [Description("Adapter for RFEM6 using the latest supported Dlubal Web Service API (version 6.12.11 or newer). This is the recommended adapter for use with current RFEM6 installations. For RFEM6 versions prior to 6.12.11, use RFEM6AdapterV8_2 instead.")]
+        [Input("filePath", "Optional file path to the RFEM6 model. If left empty, the adapter will connect to the currently running RFEM6 instance.")]
+        [Input("active", "Set to true to activate the adapter and establish a connection to RFEM6.")]
+        [Output("adapter", "The created RFEM6 adapter configured for the latest supported API version.")]
+#endif
 #if RFEM6_8_2
         public RFEM6AdapterV8_2(string filePath = "", bool active = false)
 #elif RFEM6_12_11
         public RFEM6AdapterV12_11(string filePath = "", bool active = false)
+#else
+        public RFEM6Adapter(string filePath = "", bool active = false)
 #endif
         {
 

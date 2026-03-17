@@ -30,7 +30,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.2" Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'" />
-		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.12.11" Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12'" />
+		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.12.11" Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="System.Private.ServiceModel" Version="4.10.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
@@ -147,7 +147,7 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
 		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V8_2\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Release_V682'" />
-		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V12_11\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release_V12'" />
+		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V12_11\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Release'" />
 	</Target>
 
 </Project>

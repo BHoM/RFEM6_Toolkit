@@ -39,6 +39,8 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6AdapterV8_2
 #elif RFEM6_12_11
     public partial class RFEM6AdapterV12_11
+#else
+    public partial class RFEM6Adapter
 #endif
     {
         private bool CreateCollection(IEnumerable<RFEMHinge> rfemHinges)

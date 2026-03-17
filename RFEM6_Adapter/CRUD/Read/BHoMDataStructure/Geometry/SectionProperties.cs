@@ -42,6 +42,8 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6AdapterV8_2
 #elif RFEM6_12_11
     public partial class RFEM6AdapterV12_11
+#else
+    public partial class RFEM6Adapter
 #endif
     {
 
@@ -58,12 +60,12 @@ namespace BH.Adapter.RFEM6
             IMaterialFragment sectionMaterials;
 
             // Read RFEM Sections from Model
-#if RFEM6_12_11
-            var sectionNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_CROSS_SECTION);
-            var allSections = sectionNumbers.ToList().Select(n => m_Model.get_cross_section(n.no));
-#else
+#if RFEM6_8_2
             var sectionNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SECTION);
             var allSections = sectionNumbers.ToList().Select(n => m_Model.get_section(n.no));
+#else
+            var sectionNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_CROSS_SECTION);
+            var allSections = sectionNumbers.ToList().Select(n => m_Model.get_cross_section(n.no));
 #endif
 
             foreach (var section in allSections)
@@ -74,10 +76,10 @@ namespace BH.Adapter.RFEM6
                 //sectionName = sectionName.Split('|')[0];
                 ISectionProperty bhSection;
                 //Standard steel sections
-#if RFEM6_12_11
-                if (section.type.Equals(rfModel.cross_section_type.TYPE_STANDARDIZED_STEEL))
-#else
+#if RFEM6_8_2
                 if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_STEEL))
+#else
+                if (section.type.Equals(rfModel.cross_section_type.TYPE_STANDARDIZED_STEEL))
 #endif
                 {
                     if (!materials.TryGetValue(section.material, out sectionMaterials))
@@ -92,10 +94,10 @@ namespace BH.Adapter.RFEM6
 
                 }
                 // Concrete Section Parametric Massive I
-#if RFEM6_12_11
-                else if (section.type.Equals(rfModel.cross_section_type.TYPE_PARAMETRIC_MASSIVE_I))
-#else
+#if RFEM6_8_2
                 else if (section.type.Equals(rfModel.section_type.TYPE_PARAMETRIC_MASSIVE_I))
+#else
+                else if (section.type.Equals(rfModel.cross_section_type.TYPE_PARAMETRIC_MASSIVE_I))
 #endif
                 {
 
@@ -108,10 +110,10 @@ namespace BH.Adapter.RFEM6
                     sectionList.Add(bhSection);
                 }
                 // Standardized Timber Section
-#if RFEM6_12_11
-                else if (section.type.Equals(rfModel.cross_section_type.TYPE_STANDARDIZED_TIMBER))
-#else
+#if RFEM6_8_2
                 else if (section.type.Equals(rfModel.section_type.TYPE_STANDARDIZED_TIMBER))
+#else
+                else if (section.type.Equals(rfModel.cross_section_type.TYPE_STANDARDIZED_TIMBER))
 #endif
                 {
                     if (!materials.TryGetValue(section.material, out sectionMaterials))
@@ -130,10 +132,10 @@ namespace BH.Adapter.RFEM6
                     }
                 }
                 // Parametric Thin Walled Section
-#if RFEM6_12_11
-                else if (section.type.Equals(rfModel.cross_section_type.TYPE_PARAMETRIC_THIN_WALLED))
-#else
+#if RFEM6_8_2
                 else if (section.type.Equals(rfModel.section_type.TYPE_PARAMETRIC_THIN_WALLED))
+#else
+                else if (section.type.Equals(rfModel.cross_section_type.TYPE_PARAMETRIC_THIN_WALLED))
 #endif
                 {
                     if (!materials.TryGetValue(section.material, out sectionMaterials))

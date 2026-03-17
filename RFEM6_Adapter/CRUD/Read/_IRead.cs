@@ -46,6 +46,8 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6AdapterV8_2 : BHoMAdapter
 #elif RFEM6_12_11
     public partial class RFEM6AdapterV12_11 : BHoMAdapter
+#else
+    public partial class RFEM6Adapter : BHoMAdapter
 #endif
     {
         /***************************************************/

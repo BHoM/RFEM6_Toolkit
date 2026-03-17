@@ -38,6 +38,8 @@ namespace BH.Adapter.RFEM6
     public partial class RFEM6AdapterV8_2 : BHoMAdapter
 #elif RFEM6_12_11
     public partial class RFEM6AdapterV12_11 : BHoMAdapter
+#else
+    public partial class RFEM6Adapter : BHoMAdapter
 #endif
     {
         /***************************************************/
@@ -57,10 +59,10 @@ namespace BH.Adapter.RFEM6
                 String materialName=material.GetType().Name;
 
 
-#if RFEM6_12_11
-                rfModel.cross_section rfSection = null;
-#else
+#if RFEM6_8_2
                 rfModel.section rfSection = null;
+#else
+                rfModel.cross_section rfSection = null;
 #endif
                 if (section is GenericSection && (section.Material is Glulam || section.Material is SawnTimber))
                 {
@@ -71,10 +73,10 @@ namespace BH.Adapter.RFEM6
                     rfSection = section.ToRFEM6(section.Material.GetRFEM6ID(), section.Material.GetType().Name);
                 }
 
-#if RFEM6_12_11
-                m_Model.set_cross_section(rfSection);
-#else
+#if RFEM6_8_2
                 m_Model.set_section(rfSection);
+#else
+                m_Model.set_cross_section(rfSection);
 #endif
                 //m_Model.set_section(section.ToRFEM6(section.Material.GetRFEM6ID(), materialName));
 
