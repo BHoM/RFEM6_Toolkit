@@ -51,7 +51,7 @@ using System.Diagnostics;
 
 namespace BH.Adapter.RFEM6
 {
-    public partial class RFEM6Adapter : BHoMAdapter
+    public abstract partial class RFEM6Adapter : BHoMAdapter
     {
         /***************************************************/
         /**** Constructors                              ****/
