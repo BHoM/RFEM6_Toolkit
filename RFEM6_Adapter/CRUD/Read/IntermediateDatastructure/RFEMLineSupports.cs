@@ -32,7 +32,13 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
+#if RFEM6_8_2
+    public partial class RFEM6AdapterV8_2
+#elif RFEM6_12_11
+    public partial class RFEM6AdapterV12_11
+#else
     public partial class RFEM6Adapter
+#endif
     {
 
         private List<RFEMLineSupport> ReadLineSupports(List<string> ids = null)
@@ -51,9 +57,6 @@ namespace BH.Adapter.RFEM6
 
             // The serialization below can be helpful to debug the Stackoverflow Exception that occurs when setting m_AdapterSettings.OnlyUpdateChangedObjects to true.
 
-            //Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
-            //settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.All;
-            //System.IO.File.WriteAllText(@"C:\BHoMGit\RFEM6_Toolkit\RFEMNodalSupports.json", Newtonsoft.Json.JsonConvert.SerializeObject(constraintList, settings));
             
             return constraintList;
         }

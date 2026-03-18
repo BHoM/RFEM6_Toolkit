@@ -31,7 +31,6 @@ using BH.oM.Adapters.RFEM6;
 
 using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
-using Newtonsoft.Json.Linq;
 
 namespace BH.Adapter.RFEM6
 {

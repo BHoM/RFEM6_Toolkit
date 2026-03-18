@@ -33,7 +33,6 @@ using BH.oM.Geometry;
 using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
-using Newtonsoft.Json.Linq;
 using System.Xml.Linq;
 
 namespace BH.Adapter.RFEM6

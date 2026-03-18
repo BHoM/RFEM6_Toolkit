@@ -55,9 +55,15 @@ namespace BH.Adapter.RFEM6
                 typeSpecified = true,
                 line = bar.FindFragment<RFEMLine>().GetRFEM6ID(),
                 lineSpecified = true,
+#if RFEM6_8_2
                 section_start = bar.SectionProperty.GetRFEM6ID(),
                 section_startSpecified = true,
                 section_endSpecified = true,
+#else
+                cross_section_start = bar.SectionProperty.GetRFEM6ID(),
+                cross_section_startSpecified = true,
+                cross_section_endSpecified = true,
+#endif
                 comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
 
             };

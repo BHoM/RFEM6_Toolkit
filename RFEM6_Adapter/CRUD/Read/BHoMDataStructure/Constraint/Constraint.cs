@@ -31,7 +31,13 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
+#if RFEM6_8_2
+    public partial class RFEM6AdapterV8_2
+#elif RFEM6_12_11
+    public partial class RFEM6AdapterV12_11
+#else
     public partial class RFEM6Adapter
+#endif
     {
 
         private List<Constraint6DOF> ReadConstraint6DOFNode(List<string> ids = null)
@@ -44,7 +50,7 @@ namespace BH.Adapter.RFEM6
 
             foreach (rfModel.nodal_support s in foundSupports)
             {
-                Constraint6DOF rfConstraint = Convert.FromRFEMNodalConstraint(s);
+                Constraint6DOF rfConstraint = Convert.FromRFEM(s).Constraint;
                 rfConstraint.SetRFEM6ID(s.no);
                 constraints.Add(rfConstraint);
             }
