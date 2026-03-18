@@ -44,7 +44,8 @@ namespace BH.Adapter.RFEM6
 			var factors = rfLoadCombination.individual_factors_of_selected_objects_table;
 
 			double[] factorsArray = rfLoadCombination.items.Select(i => i.row.factor).ToArray();
-			Loadcase[] loadCaseArray = rfLoadCombination.items.Select(i => i.no).Select(s => loadCaseDict[s]).ToArray();
+
+			Loadcase[] loadCaseArray = rfLoadCombination.items.Select(i => i.row.load_case).Select(s => loadCaseDict[s]).ToArray();
 
 			List<Tuple<double, ICase>> tupelList = factorsArray.Zip(loadCaseArray, (f, l) => Tuple.Create(f, l as ICase)).ToList();
 
