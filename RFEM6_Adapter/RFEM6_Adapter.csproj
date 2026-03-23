@@ -29,11 +29,15 @@
 		<DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
 	</PropertyGroup>
 
+	<ItemGroup Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'">
+		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.2" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
+		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.12.11" />
+	</ItemGroup>
 
 
 	<ItemGroup>
-		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.2" Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'" />
-		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.12.11" Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="System.Private.ServiceModel" Version="4.10.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
