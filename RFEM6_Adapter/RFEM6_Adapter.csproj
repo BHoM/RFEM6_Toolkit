@@ -1,56 +1,50 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>net48</TargetFrameworks>
-		<AssemblyVersion>9.0.0.0</AssemblyVersion>
-		<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
-		<AssemblyName>RFEM6_Adapter</AssemblyName>
-		<RootNamespace>BH.Adapter.RFEM6</RootNamespace>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<FileVersion>9.1.0.0</FileVersion>
-		<BaseOutputPath>..\Build\</BaseOutputPath>
-		<Configurations>Debug;Release;Debug_V682;Release_V682;Debug_V12;Release_V12</Configurations>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyVersion>9.0.0.0</AssemblyVersion>
+    <Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
+    <AssemblyName>RFEM6_Adapter</AssemblyName>
+    <RootNamespace>BH.Adapter.RFEM6</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <FileVersion>9.1.0.0</FileVersion>
+    <BaseOutputPath>..\Build\</BaseOutputPath>
+    <Configurations>Debug;Release;Debug_V682;Release_V682;Debug_V12;Release_V12</Configurations>
+    <RfemWebServiceLibraryVersion>6.12.11</RfemWebServiceLibraryVersion>
+  </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'">
+    <DefineConstants>$(DefineConstants);RFEM6_8_2</DefineConstants>
+    <AssemblyName>RFEM6_V8_2_Adapter</AssemblyName>
+    <RfemWebServiceLibraryVersion>6.8.2</RfemWebServiceLibraryVersion>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'">
-		<DefineConstants>$(DefineConstants);RFEM6_8_2</DefineConstants>
-		<AssemblyName>RFEM6_V8_2_Adapter</AssemblyName>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12'">
-		<DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
-		<AssemblyName>RFEM6_V12_11_Adapter</AssemblyName>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Debug_V12'">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-		<DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
-	</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12'">
+    <DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
+    <AssemblyName>RFEM6_V12_11_Adapter</AssemblyName>
+    <RfemWebServiceLibraryVersion>6.12.11</RfemWebServiceLibraryVersion>
+  </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Debug_V12'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
 
-	  <!-- Pick package version based on configuration -->
-	  <PropertyGroup Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'">
-		<RfemWebServiceLibraryVersion>6.8.2</RfemWebServiceLibraryVersion>
-	  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
+    <DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
+    <RfemWebServiceLibraryVersion>6.12.11</RfemWebServiceLibraryVersion>
+  </PropertyGroup>
 
-	  <PropertyGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-		<RfemWebServiceLibraryVersion>6.12.11</RfemWebServiceLibraryVersion>
-	  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Dlubal.RFEMWebServiceLibrary"
+                      Version="$(RfemWebServiceLibraryVersion)" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Private.ServiceModel" Version="4.10.0" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
+  </ItemGroup>
 
-	  <ItemGroup>
-		<PackageReference Include="Dlubal.RFEMWebServiceLibrary"
-						  Version="$(RfemWebServiceLibraryVersion)" />
-	  </ItemGroup>
+  <!-- rest of your project unchanged -->
 
-
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="System.Private.ServiceModel" Version="4.10.0" />
-		<PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\RFEM6_Engine\RFEM6_Engine.csproj" />
