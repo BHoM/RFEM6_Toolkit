@@ -25,6 +25,9 @@
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>full</DebugType>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
+		<DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
+	</PropertyGroup>
 
 
 
