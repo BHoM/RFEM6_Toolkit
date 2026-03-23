@@ -29,12 +29,21 @@
 		<DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'">
-		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.8.2" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-		<PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.12.11" />
-	</ItemGroup>
+
+	  <!-- Pick package version based on configuration -->
+	  <PropertyGroup Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'">
+		<RfemWebServiceLibraryVersion>6.8.2</RfemWebServiceLibraryVersion>
+	  </PropertyGroup>
+
+	  <PropertyGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
+		<RfemWebServiceLibraryVersion>6.12.11</RfemWebServiceLibraryVersion>
+	  </PropertyGroup>
+
+	  <ItemGroup>
+		<PackageReference Include="Dlubal.RFEMWebServiceLibrary"
+						  Version="$(RfemWebServiceLibraryVersion)" />
+	  </ItemGroup>
+
 
 
 	<ItemGroup>
