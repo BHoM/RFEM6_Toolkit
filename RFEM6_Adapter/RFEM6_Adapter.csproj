@@ -22,7 +22,6 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12'">
     <DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
     <AssemblyName>RFEM6_V12_11_Adapter</AssemblyName>
-    <RfemWebServiceLibraryVersion>6.12.11</RfemWebServiceLibraryVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Debug_V12'">
@@ -32,7 +31,6 @@
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
     <DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
-    <RfemWebServiceLibraryVersion>6.12.11</RfemWebServiceLibraryVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,9 +45,6 @@
     <PackageDownload Include="Dlubal.RFEMWebServiceLibrary" Version="[6.8.2]" />
     <PackageDownload Include="Dlubal.RFEMWebServiceLibrary" Version="[6.12.11]" />
   </ItemGroup>
-
-  <!-- rest of your project unchanged -->
-
 
 	<ItemGroup>
 		<ProjectReference Include="..\RFEM6_Engine\RFEM6_Engine.csproj" />
