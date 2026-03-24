@@ -43,6 +43,11 @@
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageDownload Include="Dlubal.RFEMWebServiceLibrary" Version="[6.8.2]" />
+    <PackageDownload Include="Dlubal.RFEMWebServiceLibrary" Version="[6.12.11]" />
+  </ItemGroup>
+
   <!-- rest of your project unchanged -->
 
 
@@ -157,7 +162,10 @@
 	<Target Name="EnsureConfigurationRestore"
 	        BeforeTargets="ResolvePackageAssets"
 	        Condition="'$(DesignTimeBuild)' != 'true' And '$(BuildingInsideVisualStudio)' != 'true'">
-		<Exec Command="&quot;$(MSBuildToolsPath)\MSBuild.exe&quot; &quot;$(MSBuildProjectFullPath)&quot; /t:Restore /p:Configuration=$(Configuration) /v:q /nologo" />
+		<Exec Command="dotnet restore &quot;$(MSBuildProjectFullPath)&quot; /p:Configuration=$(Configuration) --verbosity quiet"
+		      Condition="'$(MSBuildRuntimeType)' == 'Core'" />
+		<Exec Command="&quot;$(MSBuildToolsPath)\MSBuild.exe&quot; &quot;$(MSBuildProjectFullPath)&quot; /t:Restore /p:Configuration=$(Configuration) /v:q /nologo"
+		      Condition="'$(MSBuildRuntimeType)' == 'Full'" />
 	</Target>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
