@@ -43,6 +43,11 @@
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageDownload Include="Dlubal.RFEMWebServiceLibrary" Version="[6.8.2]" />
+    <PackageDownload Include="Dlubal.RFEMWebServiceLibrary" Version="[6.12.11]" />
+  </ItemGroup>
+
   <!-- rest of your project unchanged -->
 
 
@@ -153,6 +158,14 @@
 		<Folder Include="Convert\FromRFEM6\IntermediateDataStructure\" />
 		<Folder Include="Convert\ToRFEM6\BHoMDataStructure\Constraints\NewFolder\" />
 	</ItemGroup>
+
+	<Target Name="EnsureConfigurationRestore"
+	        BeforeTargets="ResolvePackageAssets"
+	        Condition="'$(DesignTimeBuild)' != 'true' And '$(BuildingInsideVisualStudio)' != 'true'">
+		<MSBuild Projects="$(MSBuildProjectFullPath)"
+		         Targets="Restore"
+		         Properties="Configuration=$(Configuration)" />
+	</Target>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
