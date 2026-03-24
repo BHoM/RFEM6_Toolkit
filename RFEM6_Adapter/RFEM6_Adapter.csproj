@@ -30,9 +30,9 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-    <DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
+    <DefineConstants>$(DefineConstants);RFEM6_Base</DefineConstants>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Dlubal.RFEMWebServiceLibrary"
                       Version="$(RfemWebServiceLibraryVersion)" />
