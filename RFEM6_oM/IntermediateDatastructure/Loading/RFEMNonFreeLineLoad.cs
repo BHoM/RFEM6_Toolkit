@@ -37,7 +37,7 @@ namespace BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry
     public class RFEMNonFreeLineLoad : GeometricalLineLoad, IRFEMLineLoad
     {
 
-        public GeometricalLineLoad geometrialLineLoad { set; get; }
+        public virtual GeometricalLineLoad geometrialLineLoad { set; get; }
 
     }
 

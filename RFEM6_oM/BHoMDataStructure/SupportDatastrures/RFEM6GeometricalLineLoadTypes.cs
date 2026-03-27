@@ -37,7 +37,7 @@ namespace BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures
 {
     public class RFEM6GeometricalLineLoadTypes : IFragment
     {
-        public GeometricalLineLoadTypesEnum geometrialLineLoadType { set; get; }
+        public virtual GeometricalLineLoadTypesEnum geometrialLineLoadType { set; get; }
     }
 
 
