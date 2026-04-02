@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Constraints;
+using BH.oM.Structure.Elements;
 using BH.Engine.Structure;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
@@ -31,36 +32,46 @@ using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
-    public class RFEMNodalSupportComparer : IEqualityComparer<RFEMNodalSupport>
+    public class RFEMNodalComparer : IEqualityComparer<Node>
     {
-        /***************************************************/
-        /**** Constructors                              ****/
-        /***************************************************/
+		/***************************************************/
+		/**** Constructors                              ****/
+		/***************************************************/
+		private static readonly NodeDistanceComparer _nodeComp = new NodeDistanceComparer(3);
 
-        public RFEMNodalSupportComparer()
+		public RFEMNodalComparer()
         {
 
-        }
+		}
 
 
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public bool Equals(RFEMNodalSupport support1, RFEMNodalSupport support2)
+        //public bool Equals(RFEMNodalSupport support1, RFEMNodalSupport support2)
+        //{
+
+        public bool Equals(Node node1, Node node2)
         {
+            Constraint6DOF c1 = node1.Support as Constraint6DOF;
+            Constraint6DOF c2 = node2.Support as Constraint6DOF;
 
-            Constraint6DOF c1 = support1.Constraint;
-            Constraint6DOF c2 = support2.Constraint;
+            
+            
+            if (!_nodeComp.Equals(node1, node2)) return false;
 
-            //Constraint6DOFComparer comparer = new Constraint6DOFComparer();
-            //return comparer.Equals(constraint1, constraint2);
+            //Nodes are equal
+            if ((c1 is null) && (c2 is null)) return true;
+            
+            //Atelase one support is not null
+            if ((c1 is null) && !(c2 is null)) return false;
+            if (!(c1 is null) && (c2 is null)) return false;
 
-            var nodeList1 = c1.PropertyValue("NodeList");
-            var nodeList2 = c2.PropertyValue("NodeList");
 
-            return (nodeList1 is null && nodeList2 is null)
-                && c1.TranslationalStiffnessX == c2.TranslationalStiffnessX
+            //Both support are not null
+            bool supportsAreEqual =
+                c1.TranslationalStiffnessX == c2.TranslationalStiffnessX
                 && c1.TranslationalStiffnessY == c2.TranslationalStiffnessY
                 && c1.TranslationalStiffnessZ == c2.TranslationalStiffnessZ
                 && c1.TranslationX == c2.TranslationX
@@ -74,11 +85,12 @@ namespace BH.Adapter.RFEM6
                 && c1.RotationZ == c2.RotationZ;
 
 
+            return supportsAreEqual && _nodeComp.Equals(node1, node2);
         }
 
         /***************************************************/
 
-        public int GetHashCode(RFEMNodalSupport surfaceSupport)
+        public int GetHashCode(Node surfaceSupport)
         {
 
             //return surfaceSupport.GetHashCode();

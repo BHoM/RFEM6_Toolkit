@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -155,10 +155,6 @@
 //        // This requires to set the m_AdapterSettings.OnlyUpdateChangedObjects to True, and serialize the object throwing the Stackoverflow exception..
 //        // The exception is generally thowing from HashString or Hash methods, both called from the FullCRUD.
 //        public void TestHashStringWithSerializer(){
-//            Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
-//            settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.All;
-//            var jsonWriter = new Newtonsoft.Json.JsonTextReader(new System.IO.StreamReader(@"C:\BHoMGit\RFEM6_Toolkit\RFEMNodalSupports.json"));
-//            var serializer = Newtonsoft.Json.JsonSerializer.Create(settings);
 //            var objs = serializer.Deserialize<IEnumerable<RFEMLineSupport>>(jsonWriter);
 
 //            foreach (var OBJ in objs)
@@ -272,4 +268,5 @@
 
 //    }
 //}
+
 

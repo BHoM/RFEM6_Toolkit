@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -33,7 +33,13 @@ using BH.oM.Adapters.RFEM6;
 
 namespace BH.Adapter.RFEM6
 {
+#if RFEM6_8_2
+    public partial class RFEM6AdapterV8_2
+#elif RFEM6_12_11
+    public partial class RFEM6AdapterV12_11
+#else
     public partial class RFEM6Adapter
+#endif
     {
 
         private List<Node> ReadNodes(List<string> ids = null)
@@ -45,8 +51,7 @@ namespace BH.Adapter.RFEM6
             nodeNumbers=nodeNumbers.ToList().Where(n => n.no != 0).ToArray();
             IEnumerable<rfModel.node> allRfNodes = nodeNumbers.Length >= 1 ? nodeNumbers.ToList().Select(n => m_Model.get_node(n.no)) : new List<rfModel.node>();
 
-
-            Dictionary<int, RFEMNodalSupport> supportMap = this.GetCachedOrReadAsDictionary<int, RFEMNodalSupport>();
+            Dictionary<int, RFEMNodalSupport> nodalSupportMap = this.GetCachedOrReadAsDictionary<int, RFEMNodalSupport>();
 
             if (ids == null)
             {
@@ -57,7 +62,7 @@ namespace BH.Adapter.RFEM6
                     int supportId = rfNode.support;
 
                     RFEMNodalSupport support;
-                    if (supportMap.TryGetValue(supportId, out support))
+                    if (nodalSupportMap.TryGetValue(supportId, out support))
                         node.Support = support.Constraint;
 
                     nodeList.Add(node);
@@ -69,5 +74,6 @@ namespace BH.Adapter.RFEM6
 
     }
 }
+
 
 

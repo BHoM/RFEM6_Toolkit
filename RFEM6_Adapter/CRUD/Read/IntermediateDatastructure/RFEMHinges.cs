@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -27,12 +27,17 @@ using System.Text;
 using BH.oM.Adapter;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.Constraints;
-using Newtonsoft.Json;
 using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
+#if RFEM6_8_2
+    public partial class RFEM6AdapterV8_2
+#elif RFEM6_12_11
+    public partial class RFEM6AdapterV12_11
+#else
     public partial class RFEM6Adapter
+#endif
     {
 
         private List<RFEMHinge> ReadRFEMHinges(List<string> ids = null)
@@ -59,5 +64,6 @@ namespace BH.Adapter.RFEM6
 
     }
 }
+
 
 

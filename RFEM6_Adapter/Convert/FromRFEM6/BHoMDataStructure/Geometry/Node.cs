@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -40,7 +40,8 @@ namespace BH.Adapter.RFEM6
         public static Node FromRFEM(this rfModel.node node)
         {
 
-            Node bhNode = new Node { Position = new oM.Geometry.Point() { X = node.coordinate_1, Y = node.coordinate_2, Z = node.coordinate_3 } };
+            Node bhNode = new Node { Position = new oM.Geometry.Point() { X = node.global_coordinate_1, Y = node.global_coordinate_2, Z = node.global_coordinate_3 } };
+            //Node bhNode = new Node { Position = new oM.Geometry.Point() { X = node.coordinate_1, Y = node.coordinate_2, Z = node.coordinate_3 } };
 
             bhNode.Name = "Node Nr. " + node.no;
             bhNode.SetRFEM6ID(node.no);
@@ -54,5 +55,6 @@ namespace BH.Adapter.RFEM6
 
     }
 }
+
 
 

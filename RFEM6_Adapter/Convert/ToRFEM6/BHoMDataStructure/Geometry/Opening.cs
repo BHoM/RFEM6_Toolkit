@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -33,7 +33,6 @@ using BH.oM.Geometry;
 using rfModel = Dlubal.WS.Rfem6.Model;
 using Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
-using Newtonsoft.Json.Linq;
 using System.Xml.Linq;
 
 namespace BH.Adapter.RFEM6
@@ -61,5 +60,6 @@ namespace BH.Adapter.RFEM6
         }
     }
 }
+
 
 

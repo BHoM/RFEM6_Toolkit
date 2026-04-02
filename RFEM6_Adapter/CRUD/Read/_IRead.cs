@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -42,7 +42,13 @@ using BH.oM.Structure.Requests;
 
 namespace BH.Adapter.RFEM6
 {
+#if RFEM6_8_2
+    public partial class RFEM6AdapterV8_2 : BHoMAdapter
+#elif RFEM6_12_11
+    public partial class RFEM6AdapterV12_11 : BHoMAdapter
+#else
     public partial class RFEM6Adapter : BHoMAdapter
+#endif
     {
         /***************************************************/
         /**** Adapter overload method                   ****/
@@ -57,6 +63,8 @@ namespace BH.Adapter.RFEM6
             {
                 if (type == typeof(Node))
                     return ReadNodes(ids as dynamic);
+                else if (type == typeof(Constraint6DOF))
+                    return ReadConstraint6DOFNode(ids as dynamic);
                 else if (type == typeof(RFEMNodalSupport))
                     return ReadRFEMNodalSupports(ids as dynamic);
                 else if (type == typeof(RFEMHinge))
@@ -124,6 +132,7 @@ namespace BH.Adapter.RFEM6
 
     }
 }
+
 
 
 

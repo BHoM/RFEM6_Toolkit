@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -31,7 +31,13 @@ using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
+#if RFEM6_8_2
+    public partial class RFEM6AdapterV8_2 : BHoMAdapter
+#elif RFEM6_12_11
+    public partial class RFEM6AdapterV12_11 : BHoMAdapter
+#else
     public partial class RFEM6Adapter : BHoMAdapter
+#endif
     {
         // Basic Delete method that deletes objects depending on their Type and Id. 
         // It gets called by the Push or by the Remove Adapter Actions.
@@ -68,6 +74,7 @@ namespace BH.Adapter.RFEM6
         /***************************************************/
     }
 }
+
 
 
 

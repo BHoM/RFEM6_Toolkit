@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -44,7 +44,8 @@ namespace BH.Adapter.RFEM6
 			var factors = rfLoadCombination.individual_factors_of_selected_objects_table;
 
 			double[] factorsArray = rfLoadCombination.items.Select(i => i.row.factor).ToArray();
-			Loadcase[] loadCaseArray = rfLoadCombination.items.Select(i => i.no).Select(s => loadCaseDict[s]).ToArray();
+
+			Loadcase[] loadCaseArray = rfLoadCombination.items.Select(i => i.row.load_case).Select(s => loadCaseDict[s]).ToArray();
 
 			List<Tuple<double, ICase>> tupelList = factorsArray.Zip(loadCaseArray, (f, l) => Tuple.Create(f, l as ICase)).ToList();
 
@@ -57,5 +58,6 @@ namespace BH.Adapter.RFEM6
 
 	}
 }
+
 
 

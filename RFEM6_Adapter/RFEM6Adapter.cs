@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -47,20 +47,71 @@ using BH.Engine.Structure;
 using BH.Engine.Geometry;
 using BH.oM.Adapter;
 using System.Diagnostics;
+using System.Reflection;
 
 
 namespace BH.Adapter.RFEM6
 {
+#if RFEM6_8_2
+    public partial class RFEM6AdapterV8_2 : BHoMAdapter
+#elif RFEM6_12_11
+    public partial class RFEM6AdapterV12_11 : BHoMAdapter
+#else
     public partial class RFEM6Adapter : BHoMAdapter
+#endif
     {
         /***************************************************/
         /**** Constructors                              ****/
         /***************************************************/
-            
-        [Description("Adapter for RFEM6.")]
-        [Input("filePath", "Input the optional file path to RFEM model. Default is to use the currently running instance")]
-        [Output("The created RFEM6 adapter.")]
+
+#if RFEM6_8_2
+        static RFEM6AdapterV8_2()
+#elif RFEM6_12_11
+        static RFEM6AdapterV12_11()
+#else
+        static RFEM6Adapter()
+#endif
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                var name = new System.Reflection.AssemblyName(args.Name);
+#if RFEM6_8_2
+                if (name.Name == "RFEMWebServiceLibrary" && name.Version?.Minor == 8)
+                    return System.Reflection.Assembly.LoadFile(@"C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V8_2\RFEMWebServiceLibrary.dll");
+#elif RFEM6_12_11
+                if (name.Name == "RFEMWebServiceLibrary" && name.Version?.Minor == 12)
+                    return System.Reflection.Assembly.LoadFile(@"C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V12_11\RFEMWebServiceLibrary.dll");
+#else
+                if (name.Name == "RFEMWebServiceLibrary" && name.Version?.Minor == 12)
+                    return System.Reflection.Assembly.LoadFile(@"C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V12_11\RFEMWebServiceLibrary.dll");
+#endif
+                return null;
+            };
+        }
+
+#if RFEM6_8_2
+        [Description("Adapter for RFEM6 using Dlubal Web Service API version 6.8.2. Intended for use with RFEM6 versions prior to 6.12.11. For RFEM6 version 6.12.11 or newer, use RFEM6AdapterV12_11 or RFEM6Adapter instead.")]
+        [Input("filePath", "Optional file path to the RFEM6 model. If left empty, the adapter will connect to the currently running RFEM6 instance.")]
+        [Input("active", "Set to true to activate the adapter and establish a connection to RFEM6.")]
+        [Output("adapter", "The created RFEM6 adapter configured for API version 6.8.2.")]
+#elif RFEM6_12_11
+        [Description("Adapter for RFEM6 using Dlubal Web Service API version 6.12.11. Intended for use with RFEM6 version 6.12.11 or newer. For RFEM6 versions prior to 6.12.11, use RFEM6AdapterV8_2 instead.")]
+        [Input("filePath", "Optional file path to the RFEM6 model. If left empty, the adapter will connect to the currently running RFEM6 instance.")]
+        [Input("active", "Set to true to activate the adapter and establish a connection to RFEM6.")]
+        [Output("adapter", "The created RFEM6 adapter configured for API version 6.12.11.")]
+#else
+        [Description("Adapter for RFEM6 using the latest supported Dlubal Web Service API (version 6.12.11 or newer). This is the recommended adapter for use with current RFEM6 installations. For RFEM6 versions prior to 6.12.11, use RFEM6AdapterV8_2 instead.")]
+        [Input("filePath", "Optional file path to the RFEM6 model. If left empty, the adapter will connect to the currently running RFEM6 instance.")]
+        [Input("active", "Set to true to activate the adapter and establish a connection to RFEM6.")]
+        [Output("adapter", "The created RFEM6 adapter configured for the latest supported API version.")]
+#endif
+#if RFEM6_8_2
+        public RFEM6AdapterV8_2(string filePath = "", bool active = false)
+#elif RFEM6_12_11
+        public RFEM6AdapterV12_11(string filePath = "", bool active = false)
+#else
         public RFEM6Adapter(string filePath = "", bool active = false)
+#endif
         {
 
             if (active)
@@ -87,6 +138,9 @@ namespace BH.Adapter.RFEM6
             {
                 m_isActive = false;
             }
+
+            //var loadedVersion = typeof(Dlubal.WS.Rfem6.Model.RfemModelClient).Assembly.GetName().Version;
+            //BH.Engine.Base.Compute.RecordNote($"RFEM6 Adapter referencing Dlubal Web Service API version: {loadedVersion}");
         }
 
         /***************************************************/
@@ -96,8 +150,13 @@ namespace BH.Adapter.RFEM6
         private bool m_isActive = false;
         private string m_filepath = "";
 
+        /***************************************************/
+        /**** Public  Fields                           ****/
+        /***************************************************/
+
         public Dictionary<Loadcase, Dictionary<String, int>> m_LoadcaseLoadIdDict = new Dictionary<Loadcase, Dictionary<String, int>>(new LoadCaseComparer());
         public Dictionary<Panel, int> m_PanelIDdict = new Dictionary<Panel, int>(new RFEMPanelComparer());
+        public Dictionary<Constraint6DOF,int> m_NodalSupportDictionary = new Dictionary<Constraint6DOF, int>(new Constraint6DOFComparer());
 
         /***************************************************/
         /**** Private Methods                           ****/
@@ -112,6 +171,7 @@ namespace BH.Adapter.RFEM6
 
         public void Connect()
         {
+            if (m_Application == null) m_Application = new RfemApplicationClient(Binding, Address);
             if (!m_isActive)
             {
                 BH.Engine.Base.Compute.RecordWarning("RFEM6 adapter is not active. Please set the 'active' input to true in the constructor.");
@@ -175,7 +235,10 @@ namespace BH.Adapter.RFEM6
             }
         }
 
-        //RFEM stuff ----------------------------
+        /***************************************************/
+        /**** RFEM6 specific fields                     ****/
+        /***************************************************/
+        
         private RfemModelClient m_Model;
         public static EndpointAddress Address { get; set; } = new EndpointAddress("http://localhost:8081");
 
@@ -187,11 +250,12 @@ namespace BH.Adapter.RFEM6
                 return binding;
             }
         }
-        private static RfemApplicationClient m_Application = new RfemApplicationClient(Binding, Address);
+        private static RfemApplicationClient m_Application;
 
         /***************************************************/
     }
 }
+
 
 
 

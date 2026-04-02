@@ -7,12 +7,27 @@
 		<Version>5.0.0</Version>
 		<Copyright>Copyright © https://github.com/BHoM</Copyright>
 		<RootNamespace>BH.Engine.Adapters.RFEM6</RootNamespace>
-		<FileVersion>9.0.0.0</FileVersion>
+		<FileVersion>9.1.0.0</FileVersion>
+		<Configurations>Debug;Release;Debug_V682;Release_V682;Debug_V12;Release_V12</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
 		<OutputPath>..\Build\</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_V12|AnyCPU'">
+	  <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+	  <OutputPath>..\Build\</OutputPath>
+	  <DebugSymbols>true</DebugSymbols>
+	  <DebugType>full</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_V682|AnyCPU'">
+	  <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+	  <OutputPath>..\Build\</OutputPath>
+	  <DebugSymbols>true</DebugSymbols>
+	  <DebugType>full</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
