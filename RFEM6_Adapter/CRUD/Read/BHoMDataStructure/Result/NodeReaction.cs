@@ -53,10 +53,28 @@ namespace BH.Adapter.RFEM6
 		public IEnumerable<IResult> ReadResults(NodeResultRequest request, ActionConfig actionConfig)
 		{
 
-
-
 			List<int> nodeIds = request.ObjectIds.Select(s => Int32.Parse(s.ToString())).ToList();
-			List<int> loadCaseIds = request.Cases.Select(s => Int32.Parse(s.ToString())).ToList();
+			List<int> caseIds = new List<int>();
+			Dictionary<int, case_object_types> caseIDToTypeMap = new Dictionary<int, case_object_types>();
+			foreach (var c in request.Cases)
+			{
+
+				if (c is Loadcase)
+				{
+
+					caseIds.Add(Int32.Parse((c as Loadcase).Number.ToString()));
+					caseIDToTypeMap.Add(Int32.Parse((c as Loadcase).Number.ToString()), case_object_types.E_OBJECT_TYPE_LOAD_CASE);
+
+				}
+				else if (c is LoadCombination)
+				{
+
+					caseIds.Add(Int32.Parse((c as LoadCombination).Number.ToString()));
+					caseIDToTypeMap.Add((c as LoadCombination).Number, case_object_types.E_OBJECT_TYPE_LOAD_COMBINATION);
+
+				}
+
+			}
 
 			switch (request.ResultType)
 			{
@@ -64,7 +82,7 @@ namespace BH.Adapter.RFEM6
 				case NodeResultType.NodeReaction:
 
 					//m_Model.calculate_all(true);
-					var result = ExtractNodeReaction(nodeIds, loadCaseIds);
+					var result = ExtractNodeReaction(nodeIds, caseIDToTypeMap);
 					return result;
 
 				default:
@@ -78,7 +96,7 @@ namespace BH.Adapter.RFEM6
 			return null;
 		}
 
-		private IEnumerable<IResult> ExtractNodeReaction(List<int> nodeIds, List<int> loadCaseIds)
+		private IEnumerable<IResult> ExtractNodeReaction(List<int> nodeIds, Dictionary<int, case_object_types> loadCaseIds)
 		{
 
 			List<IResult> resultList = new List<IResult>();
@@ -104,18 +122,22 @@ namespace BH.Adapter.RFEM6
 
 			m_Model.calculate_all(true);
 
-			foreach (int lc in loadCaseIds)
+
+
+			foreach (var lc in loadCaseIds)
 			{
 
 				nodes_support_forces_row[] res_all = m_Model.get_results_for_nodes_support_forces(
-					case_object_types.E_OBJECT_TYPE_LOAD_CASE,
-					lc,
+					lc.Value,
+					lc.Key,
 					filter
 					);
 
 
 				//Gather all ids of Nodes that are linked to a Nodal support
 				HashSet<int> idsOfAllNodesLikedToNodalSupport = res_all.Select(z => z.row.node_no).ToHashSet();
+
+				nodeIds = nodeIds.Count == 0 ? m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_NODE).ToList().Select(n=>n.no).ToList() : nodeIds;
 
 				for (int i = 0; i < nodeIds.Count; i++)
 				{
@@ -125,7 +147,7 @@ namespace BH.Adapter.RFEM6
 						BH.Engine.Base.Compute.RecordWarning(String.Format("There is no node id {0} linked to an Nodal Support", nodeIds[i]));
 						continue;
 					}
-					
+
 
 					var r = res_all.First(k => k.row.node_no.Equals(nodeIds[i]));
 
@@ -136,7 +158,7 @@ namespace BH.Adapter.RFEM6
 					double myValue = r.row.support_moment_m_y;
 					double mzValue = r.row.support_moment_m_z;
 
-					NodeReaction nodeReaction = new NodeReaction(r.row.node_no, lc, 0, 0, oM.Geometry.Basis.XY, fxValue, fyValue, fzValue, mxValue, myValue, mzValue);
+					NodeReaction nodeReaction = new NodeReaction(r.row.node_no, lc.Key, 0, 0, oM.Geometry.Basis.XY, fxValue, fyValue, fzValue, mxValue, myValue, mzValue);
 					resultList.Add(nodeReaction);
 				}
 
