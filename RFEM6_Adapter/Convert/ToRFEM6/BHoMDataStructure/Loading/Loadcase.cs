@@ -42,8 +42,6 @@ namespace BH.Adapter.RFEM6
 
         public static rfModel.load_case ToRFEM6(this Loadcase bhLoadcase, int analysisNo)
         {
-
-
             load_case rfLoadCase = new rfModel.load_case()
             {
                 no = bhLoadcase.Number,
@@ -58,10 +56,7 @@ namespace BH.Adapter.RFEM6
                 stability_analysis_settings = analysisNo,
                 stability_analysis_settingsSpecified = true,
             };
-
-
             return rfLoadCase;
-
         }
 
         private static String ToRFEM(this LoadNature loadNature)
@@ -105,9 +100,6 @@ namespace BH.Adapter.RFEM6
                     BH.Engine.Base.Compute.RecordWarning($"Load cases of Nature Type {loadNature} will be set as Dead Load!");
                     return "ACTION_CATEGORY_PERMANENT_G";
             }
-
-
-            //return "";
         }
 
     }
