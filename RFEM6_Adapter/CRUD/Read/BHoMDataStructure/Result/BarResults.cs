@@ -80,24 +80,18 @@ namespace BH.Adapter.RFEM6
             {
                 int cId = 0;
 
-                if (c is Loadcase)
+                if (c is Loadcase lc)
                 {
-                    cId = (c as Loadcase).Number;
-
+                    cId = lc.Number;
                 }
-                else if (c is LoadCombination)
+                else if (c is LoadCombination lcom)
                 {
-
-                    cId = (c as LoadCombination).Number;
-
+                    cId = lcom.Number;
                 }
                 else
                 {
-
                     cId = Int32.Parse(c.ToString());
                 }
-
-
 
                 //Loading resulst from RFEM
                 INotifyPropertyChanged[] barResults = new INotifyPropertyChanged[1];
@@ -139,13 +133,11 @@ namespace BH.Adapter.RFEM6
                     double memberLength = 0;
                     try
                     {
-
                         if (barDictionary.Keys.Contains(member.Key))
                         {
                             memberLength = barDictionary[member.Key].Length();
                             continue;
                         }
-
                         String lengthAsString = member.ToList()[0].PropertyValue("row.specification").ToString().Split(new[] { "L : ", " m" }, StringSplitOptions.None)[1];
                         memberLength = double.Parse(lengthAsString, CultureInfo.InvariantCulture);// Member Length in SI unit m;
                     }
@@ -155,17 +147,13 @@ namespace BH.Adapter.RFEM6
                         memberLength = barDictionary[member.Key].Length();
                     }
 
-
-
                     var memberSegmentValues = member.ToList();
 
                     //If we are looking for exterme Values
                     if (request.DivisionType == DivisionType.ExtremeValues)
                     {
-
                         memberSegmentValues = member.SkipWhile(m => !m.PropertyValue("description").ToString().Contains("Extremes")).ToList();
                         memberSegmentValues = memberSegmentValues.TakeWhile(m => !m.PropertyValue("description").ToString().Contains("Total")).ToList();
-
                     }
 
                     else
