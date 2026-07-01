@@ -2,9 +2,7 @@
 
 # RFEM6_Toolkit
 
-This toolkit allows interoperability between the BHoM and RFEM6. It enables creation, manipulation and reading of structural finite element analysis models and analysis results. Please see the [BHoM RFEM6 Object Relations](https://github.com/BHoM/RFEM6_Toolkit/wiki/Feature-Overview) for a comprehensive list of supported BHoM objects.
-
-https://www.dlubal.com/en/products/rfem-fea-software/rfem/what-is-rfem?srsltid=AfmBOoq3j1_L003WaFTw4thLi0UWIl8W-Yjd-JDNCkF6-5xb45P4t66Z
+This toolkit allows interoperability between the BHoM and (RFEM6)[https://www.dlubal.com/en/products/rfem-fea-software/rfem/what-is-rfem?srsltid=AfmBOoq3j1_L003WaFTw4thLi0UWIl8W-Yjd-JDNCkF6-5xb45P4t66Z]. It enables creation, manipulation and reading of structural finite element analysis models and analysis results. Please see the [BHoM RFEM6 Object Relations](https://github.com/BHoM/RFEM6_Toolkit/wiki/Feature-Overview) for a comprehensive list of supported BHoM objects.
 
 ### API
 The RFEM6_Toolkit uses the RFEMWebServiceLibrary to connect to active sessions of RFEM. The webservice is no longer maintained or actively developed by Dlubal. Refer to:
