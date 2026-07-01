@@ -113,6 +113,13 @@ namespace BH.Adapter.RFEM6
         public RFEM6Adapter(string filePath = "", bool active = false)
 #endif
         {
+#if RFEM6_8_2
+            Engine.Base.Compute.RecordWarning("This adapter should be used for RFEM6 versions 6.12.11 or older. \n" +
+    "Please refer to the README for further details: https://github.com/BHoM/RFEM6_Toolkit");
+#else
+            Engine.Base.Compute.RecordWarning("This toolkit has been tested for RFEM6 versions 6.14.0002 and 6.14.0008. \n" +
+                "Please refer to the README for further detail: https://github.com/BHoM/RFEM6_Toolkit.");
+#endif
 
             if (active)
             {
