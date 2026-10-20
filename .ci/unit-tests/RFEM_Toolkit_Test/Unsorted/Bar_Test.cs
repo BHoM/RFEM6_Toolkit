@@ -27,7 +27,6 @@ using BH.oM.Geometry;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
 using BH.oM.Data.Library;
-using Dlubal.WS.Rfem6.Model;
 using BH.oM.Physical.Materials;
 using BH.oM.Structure.MaterialFragments;
 
@@ -43,7 +42,14 @@ namespace RFEM_Toolkit_Test
         [SetUp]
         public void Setup()
         {
-            //adapter.Wipeout();
+            RFEM6TestCleanup.WipeModel(adapter);
+        }
+
+        
+        [TearDown]
+        public void TearDown()
+        {
+            RFEM6TestCleanup.WipeModel(adapter);
         }
 
         [OneTimeSetUp]

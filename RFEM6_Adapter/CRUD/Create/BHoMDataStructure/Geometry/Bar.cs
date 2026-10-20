@@ -4,111 +4,124 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
-
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.oM.Geometry;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
-using BH.oM.Adapters.RFEM6;
 using BH.Engine.Base;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.oM.Structure.Constraints;
+using BH.oM.Structure.Elements;
+using BH.oM.Structure.SectionProperties;
 
 namespace BH.Adapter.RFEM6
 {
-#if RFEM6_8_2
-    public partial class RFEM6AdapterV8_2
-#elif RFEM6_12_11
-    public partial class RFEM6AdapterV12_11
-#else
     public partial class RFEM6Adapter
-#endif
     {
         private bool CreateCollection(IEnumerable<Bar> bhBars)
         {
+            return QueueMembers(bhBars);
+        }
+
+        private bool UpdateObjects(IEnumerable<Bar> bars)
+        {
+            return QueueMembers(bars);
+        }
+
+        private bool QueueMembers(IEnumerable<Bar> bhBars)
+        {
+            HashSet<int> usedNumbers = UsedNumbers<StructureCore.Member>();
+            List<StructureCore.Member> members = new List<StructureCore.Member>();
+            bool success = true;
+
+            // RFEM allows only one member per line, so a bar on a line that already carries a member reuses that member.
+            Dictionary<int, int> existingMembersByLine = new Dictionary<int, int>();
+            foreach (StructureCore.Member rfMember in GetObjectList(new StructureCore.Member()).Where(m => m.No > 0 && m.Line > 0))
+            {
+                if (!existingMembersByLine.ContainsKey(rfMember.Line))
+                    existingMembersByLine[rfMember.Line] = rfMember.No;
+            }
+            int reusedCount = 0;
+
             foreach (Bar bhBar in bhBars)
             {
-
-
-                //Checking if the bar has a start and end point
                 if (bhBar.Start == null || bhBar.End == null)
-                    continue;
-
-                rfModel.member rfMember = bhBar.ToRFEM6();
-
-                if (bhBar.Release != null)
                 {
-
-                    rfModel.object_with_children[] numbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER_HINGE);
-                    List<rfModel.member_hinge> foundMemberHinges = numbers.ToList().Select(n => m_Model.get_member_hinge(n.no)).ToList();
-                    var foundHinges0 = foundMemberHinges.Where(s => ComparerRFEMHingeAndBHoMConstraint(s, bhBar.Release.StartRelease)).FirstOrDefault();
-                    rfMember.member_hinge_start = foundHinges0.no;
-                    rfMember.member_hinge_startSpecified = true;
-                    var foundHinges1 = foundMemberHinges.Where(s => ComparerRFEMHingeAndBHoMConstraint(s, bhBar.Release.EndRelease)).FirstOrDefault();
-                    rfMember.member_hinge_end = foundHinges1.no;
-                    rfMember.member_hinge_endSpecified = true;
-
+                    BH.Engine.Base.Compute.RecordError($"Bar {bhBar.BHoM_Guid} is missing a start or end node and was not pushed.");
+                    success = false;
+                    continue;
                 }
 
-                m_Model.set_member(rfMember);
+                int sectionNo = FindSectionNumber(bhBar.SectionProperty);
+                if (sectionNo <= 0)
+                {
+                    BH.Engine.Base.Compute.RecordError($"Bar {bhBar.BHoM_Guid} has no RFEM6 cross-section. Push its section property first or give the section a name RFEM recognises.");
+                    success = false;
+                    continue;
+                }
 
+                bhBar.SectionProperty.SetRFEM6ID(sectionNo);
+
+                int lineNo = bhBar.FindFragment<RFEMLine>()?.GetRFEM6ID() ?? 0;
+                if (existingMembersByLine.TryGetValue(lineNo, out int existingNo))
+                {
+                    bhBar.SetRFEM6ID(existingNo);
+                    reusedCount++;
+                    continue;
+                }
+
+                bhBar.SetRFEM6ID(ClaimNumber(bhBar.GetRFEM6ID(), usedNumbers));
+                StructureCore.Member member = bhBar.ToRFEM6();
+                if (lineNo > 0)
+                    existingMembersByLine[lineNo] = member.No;
+
+                if (bhBar.Release?.StartRelease != null && !bhBar.Release.StartRelease.IsFullyFixed())
+                    member.MemberHingeStart = GetOrQueueMemberHinge(bhBar.Release.StartRelease);
+                if (bhBar.Release?.EndRelease != null && !bhBar.Release.EndRelease.IsFullyFixed())
+                    member.MemberHingeEnd = GetOrQueueMemberHinge(bhBar.Release.EndRelease);
+
+                members.Add(member);
             }
 
-            return true;
+            if (reusedCount > 0)
+                BH.Engine.Base.Compute.RecordNote($"{reusedCount} bar(s) lie on RFEM lines that already have a member. The existing members were kept and not modified.");
+
+            CreateObjectList(members);
+            return success;
         }
 
-        private static bool ComparerRFEMHingeAndBHoMConstraint(rfModel.member_hinge rfMemberHinge, Constraint6DOF bhConstraint)
+        /// <summary>
+        /// Members reference hinges by number, so hinges already in RFEM can be reused without an update request.
+        /// </summary>
+        private int GetOrQueueMemberHinge(Constraint6DOF release)
         {
+            double[] stiffnesses = release.ToRFEM6Stiffnesses();
 
-            if (!Translate(rfMemberHinge.axial_release_n).Equals(bhConstraint.TranslationX))
-                return false;
-            if (!Translate(rfMemberHinge.axial_release_vy).Equals(bhConstraint.TranslationY))
-                return false;
-            if (!Translate(rfMemberHinge.axial_release_vz).Equals(bhConstraint.TranslationZ))
-                return false;
-            if (!Translate(rfMemberHinge.moment_release_mt).Equals(bhConstraint.RotationX))
-                return false;
-            if (!Translate(rfMemberHinge.moment_release_my).Equals(bhConstraint.RotationY))
-                return false;
-            if (!Translate(rfMemberHinge.moment_release_mz).Equals(bhConstraint.RotationZ))
-                return false;
+            TypesForMembers.MemberHinge hinge = GetObjectList(new TypesForMembers.MemberHinge())
+                .Concat(m_createQueue.OfType<TypesForMembers.MemberHinge>())
+                .FirstOrDefault(h => Convert.StiffnessesMatch(stiffnesses, new[] { h.AxialReleaseN, h.AxialReleaseVy, h.AxialReleaseVz, h.MomentReleaseMt, h.MomentReleaseMy, h.MomentReleaseMz }));
 
-            return true;
-        }
+            if (hinge == null)
+            {
+                hinge = release.ToRFEM6MemberHinge(ClaimNumber(0, UsedNumbers<TypesForMembers.MemberHinge>()));
+                CreateObject(hinge);
+            }
 
-
-
-        private static DOFType Translate(double input)
-        {
-            if (input.Equals(double.PositiveInfinity))
-                return DOFType.Fixed;
-            else return
-                    DOFType.Free;
+            return hinge.No;
         }
     }
 }
-
-
-

@@ -20,6 +20,9 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
 global using NUnit.Framework;
 
 

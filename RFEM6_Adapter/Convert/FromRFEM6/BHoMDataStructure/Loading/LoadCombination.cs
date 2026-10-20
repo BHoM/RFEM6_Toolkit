@@ -4,60 +4,52 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
+using BH.oM.Base;
 using BH.oM.Structure.Loads;
-using Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-	public static partial class Convert
-	{
+    public static partial class Convert
+    {
+        public static LoadCombination FromRFEM(this RfLoading.LoadCombination rfCombination, Dictionary<int, Loadcase> loadcases)
+        {
+            List<Tuple<double, ICase>> factoredCases = new List<Tuple<double, ICase>>();
 
-		public static LoadCombination FromRFEM(this rfModel.load_combination rfLoadCombination, Dictionary<int, Loadcase> loadCaseDict)
-		{
+            foreach (RfLoading.LoadCombination.Types.ItemsRow item in rfCombination.Items?.Rows ?? Enumerable.Empty<RfLoading.LoadCombination.Types.ItemsRow>())
+            {
+                if (loadcases.TryGetValue(item.LoadCase, out Loadcase loadcase))
+                    factoredCases.Add(new Tuple<double, ICase>(item.Factor, loadcase));
+                else
+                    BH.Engine.Base.Compute.RecordWarning($"Load combination {rfCombination.No} references load case {item.LoadCase}, which could not be read. It is left out of the combination.");
+            }
 
-			var factors = rfLoadCombination.individual_factors_of_selected_objects_table;
-
-			double[] factorsArray = rfLoadCombination.items.Select(i => i.row.factor).ToArray();
-
-			Loadcase[] loadCaseArray = rfLoadCombination.items.Select(i => i.row.load_case).Select(s => loadCaseDict[s]).ToArray();
-
-			List<Tuple<double, ICase>> tupelList = factorsArray.Zip(loadCaseArray, (f, l) => Tuple.Create(f, l as ICase)).ToList();
-
-			LoadCombination bhLoadCombination = new LoadCombination() { Name = rfLoadCombination.name, LoadCases = tupelList, Number = rfLoadCombination.no };
-
-			bhLoadCombination.SetRFEM6ID(rfLoadCombination.no);
-
-			return bhLoadCombination;
-		}
-
-	}
+            LoadCombination bhCombination = new LoadCombination
+            {
+                Name = rfCombination.Name,
+                Number = rfCombination.No,
+                LoadCases = factoredCases,
+            };
+            bhCombination.SetRFEM6ID(rfCombination.No);
+            return bhCombination;
+        }
+    }
 }
-
-
-

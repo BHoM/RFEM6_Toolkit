@@ -36,17 +36,18 @@ namespace RFEM_Toolkit_Test.Elements
 {
 
 
+    [Ignore("RFEM6 v1 adapter does not support structural result pull.")]
     public class BarResultTestClass
 
     {
 
         RFEM6Adapter adapter;
 
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //	adapter.Wipeout();
-        //}
+        [TearDown]
+        public void TearDown()
+        {
+            RFEM6TestCleanup.WipeModel(adapter);
+        }
 
         [OneTimeSetUp]
         public void InitializeRFEM6Adapter()

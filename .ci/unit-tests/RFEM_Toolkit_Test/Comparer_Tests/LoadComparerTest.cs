@@ -28,7 +28,6 @@ using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
 using BH.oM.Data.Library;
 using BH.Engine.Library;
-using Dlubal.WS.Rfem6.Model;
 using BH.oM.Physical.Materials;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
@@ -57,8 +56,14 @@ namespace RFEM_Toolkit_Test.Loading
         Bar bar;
 
 
-        [OneTimeSetUp]
+        
+        [TearDown]
+        public void TearDown()
+        {
+            RFEM6TestCleanup.WipeModel(adapter);
+        }
 
+        [OneTimeSetUp]
         [Description("Method Initializes all used components ones.")]
         public void LoadComparerTest_InitializeRFEM6Adapter()
         {

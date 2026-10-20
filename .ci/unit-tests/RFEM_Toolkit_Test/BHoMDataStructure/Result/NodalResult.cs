@@ -35,6 +35,7 @@ namespace RFEM_Toolkit_Test.Elements
 {
 
 
+	[Ignore("RFEM6 v1 adapter does not support structural result pull.")]
 	public class NodalResultTestClass
 
 	{
@@ -71,8 +72,8 @@ namespace RFEM_Toolkit_Test.Elements
 		[TearDown]
 		public void TearDown()
 		{
-			adapter.Wipeout();
-		}
+            RFEM6TestCleanup.WipeModel(adapter);
+        }
 
 		[OneTimeSetUp]
 		public void InitializeRFEM6Adapter()

@@ -4,532 +4,268 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.oM.Structure.Loads;
-using BH.oM.Geometry;
-using BH.Engine.Spatial;
-using Dlubal.WS.Rfem6.Model;
+using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
 using BH.oM.Adapters.RFEM6.Fragments.Enums;
-using System.Linq.Expressions;
-using System.Diagnostics;
 using BH.oM.Base;
-using BH.Engine.Base;
+using BH.oM.Geometry;
+using BH.oM.Structure.Elements;
+using BH.oM.Structure.Loads;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-        public static BarUniformlyDistributedLoad FromRFEM(this List<rfModel.member_load> rfMemberLoad_list, List<Bar> bhBars, Loadcase bhLoadCase)
+        // Each RFEM load acts along one axis. The Read methods merge loads that were split per axis on push.
+
+        public static PointLoad FromRFEM(this RfLoads.NodalLoad rfLoad, List<Node> nodes, Loadcase loadcase)
         {
+            Vector force = new Vector();
+            Vector moment = new Vector();
 
-            Vector forceVector = new Vector() { X = 0, Y = 0, Z = 0 };
-            Vector momentVector = new Vector() { X = 0, Y = 0, Z = 0 };
-
-            foreach (rfModel.member_load rfMemberLoadItem in rfMemberLoad_list)
+            switch (rfLoad.LoadType)
             {
-
-                switch (rfMemberLoadItem.load_direction)
-                {
-                    case member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
-                    case member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
-                    case member_load_load_direction.LOAD_DIRECTION_LOCAL_X:
-
-                        if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_MOMENT)
-                        {
-                            momentVector = momentVector + new Vector() { X = rfMemberLoadItem.magnitude, Y = 0, Z = 0 };
-                        }
-                        else if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_FORCE)
-                        {
-                            forceVector = forceVector + new Vector() { X = rfMemberLoadItem.magnitude, Y = 0, Z = 0 };
-
-                        }
-
-                        break;
-
-                    case member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
-                    case member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
-                    case member_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
-
-                        if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_MOMENT)
-                        {
-                            momentVector = momentVector + new Vector() { X = 0, Y = rfMemberLoadItem.magnitude, Z = 0 };
-                        }
-                        else if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_FORCE)
-                        {
-                            forceVector = forceVector + new Vector() { X = 0, Y = rfMemberLoadItem.magnitude, Z = 0 };
-                        }
-
-                        break;
-                    default:
-
-
-                        if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_MOMENT)
-                        {
-                            momentVector = momentVector + new Vector() { X = 0, Y = 0, Z = rfMemberLoadItem.magnitude };
-                        }
-                        else if (rfMemberLoadItem.load_type == member_load_load_type.LOAD_TYPE_FORCE)
-                        {
-                            forceVector = forceVector + new Vector() { X = 0, Y = 0, Z = rfMemberLoadItem.magnitude };
-                        }
-
-                        break;
-
-                }
-
-
-
-            }
-
-            rfModel.member_load rfMemberLoad = rfMemberLoad_list.First();
-            LoadAxis axis = LoadAxis.Global;
-            bool isProjected = false;
-
-            switch (rfMemberLoad.load_direction)
-            {
-
-                case member_load_load_direction.LOAD_DIRECTION_LOCAL_X:
-                case member_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
-                case member_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
-                    axis = LoadAxis.Local;
+                case RfLoads.NodalLoad.Types.LoadType.Components:
+                    force = new Vector { X = rfLoad.ComponentsForceX, Y = rfLoad.ComponentsForceY, Z = rfLoad.ComponentsForceZ };
+                    moment = new Vector { X = rfLoad.ComponentsMomentX, Y = rfLoad.ComponentsMomentY, Z = rfLoad.ComponentsMomentZ };
                     break;
-                case member_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
-                case member_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
-                case member_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
-                    isProjected = true;
+                case RfLoads.NodalLoad.Types.LoadType.Force:
+                case RfLoads.NodalLoad.Types.LoadType.Moment:
+                    if (!TryParseLoadDirection(rfLoad.LoadDirection.ToString(), out int axis, out LoadAxis loadAxis, out _))
+                        return null;
+                    if (loadAxis == LoadAxis.Local)
+                        BH.Engine.Base.Compute.RecordWarning($"Nodal load {rfLoad.No} in load case {rfLoad.LoadCase} acts in a local direction and is read in global axes.");
+                    if (rfLoad.LoadType == RfLoads.NodalLoad.Types.LoadType.Force)
+                        force = AxisVector(axis, rfLoad.ForceMagnitude);
+                    else
+                        moment = AxisVector(axis, rfLoad.MomentMagnitude);
                     break;
                 default:
-                    break;
+                    BH.Engine.Base.Compute.RecordWarning($"Nodal load {rfLoad.No} in load case {rfLoad.LoadCase} is of type {rfLoad.LoadType}, which cannot be read. Only force, moment and component loads are supported.");
+                    return null;
             }
-
-            string loadName = rfMemberLoad.comment?.Split(new[] { "::" }, StringSplitOptions.None).ElementAtOrDefault(1) ?? string.Empty;
-            string bhomGuid = rfMemberLoad.comment.Split(new[] { "::" }, StringSplitOptions.None).Last();
-
-            BarUniformlyDistributedLoad bhLoad = new BarUniformlyDistributedLoad
-            {
-                Name = loadName,
-                Objects = new BH.oM.Base.BHoMGroup<Bar>() { Elements = bhBars },
-                Loadcase = bhLoadCase,
-                Force = forceVector,
-                Moment = momentVector,
-                Axis = axis,
-                Projected = isProjected
-            };
-            bhLoad.BHoM_Guid = Guid.Parse(bhomGuid);
-
-            return bhLoad;
-        }
-
-        public static PointLoad FromRFEM(this rfModel.nodal_load nodeLoad, List<Node> bhNodes, Loadcase bhLoadCase)
-        {
-
-
-            PointLoad pointLoad;
-            double[] force = new double[3];
-            double[] moment = new double[3];
-
-            if (nodeLoad.load_type == nodal_load_load_type.LOAD_TYPE_COMPONENTS)
-            {
-                force = new double[] { nodeLoad.components_force_x, nodeLoad.components_force_y, nodeLoad.components_force_z };
-                moment = new double[] { nodeLoad.components_moment_x, nodeLoad.components_moment_y, nodeLoad.components_moment_z }; ;
-
-            }
-            else if (nodeLoad.load_type == nodal_load_load_type.LOAD_TYPE_MOMENT)
-            {
-                force = new double[] { 0, 0, 0 };
-                moment = new double[] { nodeLoad.components_moment_x, nodeLoad.components_moment_y, nodeLoad.components_moment_z };
-
-            }
-            else
-            { /*(nodeLoad.load_type == nodal_load_load_type.LOAD_TYPE_FORCE)*/
-                force = new double[] { nodeLoad.components_force_x, nodeLoad.components_force_y, nodeLoad.components_force_z };
-                moment = new double[] { 0, 0, 0 }; ;
-            }
-
 
             PointLoad bhLoad = new PointLoad
             {
-                Objects = new BH.oM.Base.BHoMGroup<Node>() { Elements = bhNodes },
-                Loadcase = bhLoadCase,
-                Force = BH.Engine.Geometry.Create.Vector(force[0], force[1], force[2]),
-                Moment = BH.Engine.Geometry.Create.Vector(moment[0], moment[1], moment[2]),
-                Name = nodeLoad.comment
+                Name = rfLoad.Comment,
+                Loadcase = loadcase,
+                Objects = new BHoMGroup<Node> { Elements = nodes },
+                Force = force,
+                Moment = moment,
+                Axis = LoadAxis.Global,
             };
-
-
+            bhLoad.SetRFEM6ID(rfLoad.No);
             return bhLoad;
         }
 
-        public static AreaUniformlyDistributedLoad FromRFEM(this rfModel.free_polygon_load polygonLoad, Loadcase loadcase, List<Panel> panels)
+        public static BarUniformlyDistributedLoad FromRFEM(this RfLoads.MemberLoad rfLoad, List<Bar> bars, Loadcase loadcase)
         {
-
-            Vector forceDirection;
-            bool isProjected = false;
-            LoadAxis axis = LoadAxis.Global;
-            List<double> firstCoordinate = polygonLoad.load_location.ToList().Select(r => r.row.first_coordinate).ToList();
-            List<double> secondCoordinate = polygonLoad.load_location.ToList().Select(r => r.row.second_coordinate).ToList();
-            List<double> thirdCoordinate = Enumerable.Repeat(0.0, firstCoordinate.Count).ToList();
-            List<Point> loadPolygon;
-
-            switch (polygonLoad.load_projection)
+            bool isForce = rfLoad.LoadType == RfLoads.MemberLoad.Types.LoadType.Force;
+            if ((!isForce && rfLoad.LoadType != RfLoads.MemberLoad.Types.LoadType.Moment) || rfLoad.LoadDistribution != RfLoads.MemberLoad.Types.LoadDistribution.Uniform)
             {
-                case free_polygon_load_load_projection.LOAD_PROJECTION_XY_OR_UV:
-
-                    loadPolygon = firstCoordinate.Select((x, i) => new Point()
-                    {
-                        X = x,
-                        Y = secondCoordinate[i],
-                        Z = thirdCoordinate[i]
-                    }).ToList();
-                                 
-
-                    break;
-
-                case free_polygon_load_load_projection.LOAD_PROJECTION_YZ_OR_VW:
-
-                    loadPolygon = firstCoordinate.Select((x, i) => new Point()
-                    {
-                        X = thirdCoordinate[i],
-                        Y = x,
-                        Z = secondCoordinate[i]
-                    }).ToList();
-
-                    break;
-
-                default:
-
-                    loadPolygon = firstCoordinate.Select((x, i) => new Point()
-                    {
-                        X = secondCoordinate[i],
-                        Y = thirdCoordinate[i],
-                        Z = x
-                    }).ToList();
-
-                    break;
-
-
+                BH.Engine.Base.Compute.RecordWarning($"Member load {rfLoad.No} in load case {rfLoad.LoadCase} is a {rfLoad.LoadDistribution} {rfLoad.LoadType} load. Only uniform force and moment loads can be read.");
+                return null;
             }
 
-            var polygon = BH.Engine.Geometry.Create.Polygon(loadPolygon);
+            if (!TryParseLoadDirection(rfLoad.LoadDirection.ToString(), out int axis, out LoadAxis loadAxis, out bool projected))
+                return null;
 
-            switch (polygonLoad.load_direction)
+            BarUniformlyDistributedLoad bhLoad = new BarUniformlyDistributedLoad
             {
-                //case free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
-                case free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(polygonLoad.magnitude_uniform, 0, 0);
-                    break;
-                //case surface_load_load_direction.LOAD_DIRECTION_LOCAL_X:
-                case free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_X:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(polygonLoad.magnitude_uniform, 0, 0);
-                    axis = LoadAxis.Local;
-                    break;
-
-                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
-                case free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, polygonLoad.magnitude_uniform, 0);
-                    break;
-                //case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
-                case free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, polygonLoad.magnitude_uniform, 0);
-                    axis = LoadAxis.Local;
-                    break;
-
-                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
-                case free_polygon_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, polygonLoad.magnitude_uniform);
-                    break;
-                //case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
-                case free_polygon_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, polygonLoad.magnitude_uniform);
-                    axis = LoadAxis.Local;
-                    break;
-
-                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
-                case free_polygon_load_load_direction.LOAD_DIRECTION_USER_DEFINED_U_PROJECTED:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(polygonLoad.magnitude_uniform, 0, 0);
-                    isProjected = true;
-                    break;
-
-                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
-                case free_polygon_load_load_direction.LOAD_DIRECTION_USER_DEFINED_V_PROJECTED:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, polygonLoad.magnitude_uniform, 0);
-                    isProjected = true;
-                    break;
-
-                //case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
-                case free_polygon_load_load_direction.LOAD_DIRECTION_USER_DEFINED_W_PROJECTED:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, polygonLoad.magnitude_uniform);
-                    isProjected = true;
-                    break;
-
-                default:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, polygonLoad.magnitude_uniform);
-                    break;
-            }
-
-
-            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels, axis, isProjected, polygonLoad.comment);
-            bhAreaload = bhAreaload.SetHashFragment("Polygon");
-            bhAreaload.SetPropertyValue("Polygon", polygon);
-
-            return bhAreaload;
-        }
-
-        public static AreaUniformlyDistributedLoad FromRFEM(this rfModel.surface_load surfaceload, Loadcase loadcase, List<Panel> panels)
-        {
-
-            Vector forceDirection;
-            bool isProjected = false;
-            LoadAxis axis = LoadAxis.Global;
-
-            switch (surfaceload.load_direction)
-            {
-                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
-                    break;
-                case surface_load_load_direction.LOAD_DIRECTION_LOCAL_X:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
-                    axis = LoadAxis.Local;
-                    break;
-
-                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
-                    break;
-                case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
-                    axis = LoadAxis.Local;
-                    break;
-
-                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
-                    break;
-                case surface_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
-                    axis = LoadAxis.Local;
-                    break;
-
-                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(surfaceload.uniform_magnitude, 0, 0);
-                    isProjected = true;
-                    break;
-
-                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, surfaceload.uniform_magnitude, 0);
-                    isProjected = true;
-                    break;
-
-                case surface_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
-                    isProjected = true;
-                    break;
-
-                default:
-                    forceDirection = BH.Engine.Geometry.Create.Vector(0, 0, surfaceload.uniform_magnitude);
-                    break;
-            }
-
-
-            AreaUniformlyDistributedLoad bhAreaload = BH.Engine.Structure.Create.AreaUniformlyDistributedLoad(loadcase, forceDirection, panels, axis, isProjected, surfaceload.comment);
-
-            return bhAreaload;
-        }
-
-        // convert Free Line Loads into Geometrical Line Loads
-        public static GeometricalLineLoad FromRFEM(this rfModel.free_line_load rfLineload, Loadcase loadcase, List<Panel> panels)
-        {
-
-
-            Line loadLocationLine = new BH.oM.Geometry.Line() { Start = new Point() { X = rfLineload.load_location_first_x, Y = rfLineload.load_location_first_y, Z = 0 }, End = new Point() { X = rfLineload.load_location_second_x, Y = rfLineload.load_location_second_y, Z = 0 } };
-            LoadAxis axis = LoadAxis.Global;
-            bool isProjected = false;
-            Vector impactA = new Vector();
-            Vector impactB = new Vector();
-
-            switch (rfLineload.load_direction)
-            {
-                case free_line_load_load_direction.LOAD_DIRECTION_LOCAL_X:
-                    impactA.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
-                    impactB.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
-                    axis = LoadAxis.Local;
-                    break;
-                case free_line_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
-                    impactA.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
-                    impactB.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
-                    axis = LoadAxis.Local;
-                    break;
-                case free_line_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
-                    impactA.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
-                    impactB.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
-                    axis = LoadAxis.Local;
-                    break;
-                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_TRUE:
-                    impactA.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
-                    impactB.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
-                    break;
-                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_TRUE:
-                    impactA.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
-                    impactB.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
-                    break;
-                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_TRUE:
-                    impactA.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
-                    impactB.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
-                    break;
-                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_PROJECTED:
-                    impactA.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
-                    impactB.X = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
-                    isProjected = true;
-                    break;
-                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_PROJECTED:
-                    impactA.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
-                    impactB.Y = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
-                    isProjected = true;
-                    break;
-                case free_line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_PROJECTED:
-                    impactA.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_first : rfLineload.magnitude_uniform;
-                    impactB.Z = rfLineload.magnitude_secondSpecified ? rfLineload.magnitude_second : rfLineload.magnitude_uniform;
-                    isProjected = true;
-                    break;
-                default:
-                    break;
-
-            }
-
-
-            BHoMGroup<IAreaElement> relatedPanels = new BHoMGroup<IAreaElement>() { Elements = panels.Select(p => (IAreaElement)p).ToList() };
-
-
-            GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
-            {
-                Name = rfLineload.comment,
+                Name = rfLoad.Comment,
                 Loadcase = loadcase,
-                Location = loadLocationLine,
-                ForceA = impactA,
-                ForceB = impactB,
-                Axis = axis,
-                Projected = isProjected,
-                Objects = relatedPanels
+                Objects = new BHoMGroup<Bar> { Elements = bars },
+                Force = isForce ? AxisVector(axis, rfLoad.Magnitude) : new Vector(),
+                Moment = isForce ? new Vector() : AxisVector(axis, rfLoad.Magnitude),
+                Axis = loadAxis,
+                Projected = projected,
+            };
+            bhLoad.SetRFEM6ID(rfLoad.No);
+            return bhLoad;
+        }
 
+        public static AreaUniformlyDistributedLoad FromRFEM(this RfLoads.SurfaceLoad rfLoad, List<Panel> panels, Loadcase loadcase)
+        {
+            if (rfLoad.LoadType != RfLoads.SurfaceLoad.Types.LoadType.Force || rfLoad.LoadDistribution != RfLoads.SurfaceLoad.Types.LoadDistribution.Uniform)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Surface load {rfLoad.No} in load case {rfLoad.LoadCase} is a {rfLoad.LoadDistribution} {rfLoad.LoadType} load. Only uniform force loads can be read.");
+                return null;
+            }
+
+            if (!TryParseLoadDirection(rfLoad.LoadDirection.ToString(), out int axis, out LoadAxis loadAxis, out bool projected))
+                return null;
+
+            AreaUniformlyDistributedLoad bhLoad = new AreaUniformlyDistributedLoad
+            {
+                Name = rfLoad.Comment,
+                Loadcase = loadcase,
+                Objects = new BHoMGroup<IAreaElement> { Elements = panels.Cast<IAreaElement>().ToList() },
+                Pressure = AxisVector(axis, rfLoad.UniformMagnitude),
+                Axis = loadAxis,
+                Projected = projected,
+            };
+            bhLoad.SetRFEM6ID(rfLoad.No);
+            return bhLoad;
+        }
+
+        public static AreaUniformlyDistributedLoad FromRFEM(this RfLoads.FreePolygonLoad rfLoad, List<Panel> panels, Loadcase loadcase)
+        {
+            if (rfLoad.LoadDistribution != RfLoads.FreePolygonLoad.Types.LoadDistribution.Uniform)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Free polygon load {rfLoad.No} in load case {rfLoad.LoadCase} has a {rfLoad.LoadDistribution} distribution. Only uniform polygon loads can be read.");
+                return null;
+            }
+
+            if (!TryParseLoadDirection(rfLoad.LoadDirection.ToString(), out int axis, out LoadAxis loadAxis, out bool projected))
+                return null;
+
+            List<Point> vertices = (rfLoad.LoadLocation?.Rows ?? Enumerable.Empty<RfLoads.FreePolygonLoad.Types.LoadLocationRow>())
+                .Select(r => FromProjectedCoordinates(rfLoad.LoadProjection.ToString(), r.FirstCoordinate, r.SecondCoordinate))
+                .ToList();
+
+            AreaUniformlyDistributedLoad bhLoad = new AreaUniformlyDistributedLoad
+            {
+                Name = rfLoad.Comment,
+                Loadcase = loadcase,
+                Objects = new BHoMGroup<IAreaElement> { Elements = panels.Cast<IAreaElement>().ToList() },
+                Pressure = AxisVector(axis, rfLoad.MagnitudeUniform),
+                Axis = loadAxis,
+                Projected = projected,
             };
 
-            bhLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(bhLineLoad, (new RFEM6GeometricalLineLoadTypes() { geometrialLineLoadType = GeometricalLineLoadTypesEnum.FreeLineLoad }));
-            //GeometricalLineLoad bhLineLoad = BH.Engine.Structure.Create.GeometricalLineLoad(line, loadcase, Vector.ZAxis, Vector.ZAxis, panels);
+            if (vertices.Count >= 3)
+                bhLoad.SetPropertyValue("Polygon", BH.Engine.Geometry.Create.Polygon(vertices));
 
-
-            return bhLineLoad;
+            bhLoad.SetRFEM6ID(rfLoad.No);
+            return bhLoad;
         }
 
-        // convert NON Free Line Loads into Geometrical Line Loads
-        public static GeometricalLineLoad FromRFEM(this rfModel.line_load rfLineload, Loadcase loadcase, Line line)
+        public static GeometricalLineLoad FromRFEM(this RfLoads.FreeLineLoad rfLoad, List<Panel> panels, Loadcase loadcase)
         {
-            Vector impactA = new Vector();
-            Vector impactB = new Vector();
-            double impactMagnitudeA = rfLineload.load_distribution == line_load_load_distribution.LOAD_DISTRIBUTION_TRAPEZOIDAL ? rfLineload.magnitude_1 : rfLineload.magnitude;
-            double impactMagnitudeB = rfLineload.load_distribution == line_load_load_distribution.LOAD_DISTRIBUTION_TRAPEZOIDAL ? rfLineload.magnitude_2 : rfLineload.magnitude;
-            bool projected = false;
-            LoadAxis axis = LoadAxis.Global;
+            if (!TryParseLoadDirection(rfLoad.LoadDirection.ToString(), out int axis, out LoadAxis loadAxis, out bool projected))
+                return null;
 
+            double first = rfLoad.LoadDistribution == RfLoads.FreeLineLoad.Types.LoadDistribution.Uniform ? rfLoad.MagnitudeUniform : rfLoad.MagnitudeFirst;
+            double second = rfLoad.LoadDistribution == RfLoads.FreeLineLoad.Types.LoadDistribution.Uniform ? rfLoad.MagnitudeUniform : rfLoad.MagnitudeSecond;
+            string projection = rfLoad.LoadProjection.ToString();
 
-            switch (rfLineload.load_direction)
+            GeometricalLineLoad bhLoad = new GeometricalLineLoad
             {
-                case line_load_load_direction.LOAD_DIRECTION_LOCAL_X:
-                    axis = LoadAxis.Local;
-                    impactA.X = impactMagnitudeA;
-                    impactB.X = impactMagnitudeB;
-                    break;
-                case line_load_load_direction.LOAD_DIRECTION_LOCAL_Y:
-                    impactA.Y = impactMagnitudeA;
-                    impactB.Y = impactMagnitudeB;
-                    axis = LoadAxis.Local;
-                    break;
-                case line_load_load_direction.LOAD_DIRECTION_LOCAL_Z:
-                    impactA.Z = impactMagnitudeA;
-                    impactB.Z = impactMagnitudeB;
-                    axis = LoadAxis.Local;
-                    break;
-                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_TRUE:
-                    impactA.X = impactMagnitudeA;
-                    impactB.X = impactMagnitudeB;
-                    projected = false;
-                    break;
-                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_X_OR_USER_DEFINED_U_PROJECTED:
-                    impactA.X = impactMagnitudeA;
-                    impactB.X = impactMagnitudeB;
-                    projected = true;
-                    break;
-                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_TRUE:
-                    impactA.Y = impactMagnitudeA;
-                    impactB.Y = impactMagnitudeB;
-                    projected = false;
-                    break;
-                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Y_OR_USER_DEFINED_V_PROJECTED:
-                    impactA.Y = impactMagnitudeA;
-                    impactB.Y = impactMagnitudeB;
-                    projected = true;
-                    break;
-                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_TRUE:
-                    impactA.Z = impactMagnitudeA;
-                    impactB.Z = impactMagnitudeB;
-                    projected = false;
-                    break;
-                case line_load_load_direction.LOAD_DIRECTION_GLOBAL_Z_OR_USER_DEFINED_W_PROJECTED:
-                    impactA.Z = impactMagnitudeA;
-                    impactB.Z = impactMagnitudeB;
-                    projected = true;
-                    break;
-                default:
-                    BH.Engine.Base.Compute.RecordWarning($"The Load {rfLineload} within RFEM6 is has not direction that is Parallel to the X,Y or Z axist. The Load direction will be set to a null-vector!");
-                    break;
+                Name = rfLoad.Comment,
+                Loadcase = loadcase,
+                Objects = new BHoMGroup<IAreaElement> { Elements = panels.Cast<IAreaElement>().ToList() },
+                Location = new Line
+                {
+                    Start = FromProjectedCoordinates(projection, rfLoad.LoadLocationFirstPointCoordinate1, rfLoad.LoadLocationFirstPointCoordinate2),
+                    End = FromProjectedCoordinates(projection, rfLoad.LoadLocationSecondPointCoordinate1, rfLoad.LoadLocationSecondPointCoordinate2),
+                },
+                ForceA = AxisVector(axis, first),
+                ForceB = AxisVector(axis, second),
+                MomentA = new Vector(),
+                MomentB = new Vector(),
+                Axis = loadAxis,
+                Projected = projected,
+            };
+            bhLoad = (GeometricalLineLoad)bhLoad.AddFragment(new RFEM6GeometricalLineLoadTypes { geometrialLineLoadType = GeometricalLineLoadTypesEnum.FreeLineLoad });
+            bhLoad.SetRFEM6ID(rfLoad.No);
+            return bhLoad;
+        }
+
+        public static GeometricalLineLoad FromRFEM(this RfLoads.LineLoad rfLoad, Line location, Loadcase loadcase)
+        {
+            bool isForce = rfLoad.LoadType == RfLoads.LineLoad.Types.LoadType.Force;
+            if (!isForce && rfLoad.LoadType != RfLoads.LineLoad.Types.LoadType.Moment)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Line load {rfLoad.No} in load case {rfLoad.LoadCase} is of type {rfLoad.LoadType}. Only force and moment line loads can be read.");
+                return null;
             }
 
+            if (!TryParseLoadDirection(rfLoad.LoadDirection.ToString(), out int axis, out LoadAxis loadAxis, out bool projected))
+                return null;
 
-            GeometricalLineLoad bhLineLoad = new GeometricalLineLoad()
+            bool uniform = rfLoad.LoadDistribution == RfLoads.LineLoad.Types.LoadDistribution.Uniform;
+            Vector a = AxisVector(axis, uniform ? rfLoad.Magnitude : rfLoad.Magnitude1);
+            Vector b = AxisVector(axis, uniform ? rfLoad.Magnitude : rfLoad.Magnitude2);
+
+            GeometricalLineLoad bhLoad = new GeometricalLineLoad
             {
-                Name = rfLineload.comment,
+                Name = rfLoad.Comment,
                 Loadcase = loadcase,
-                Location = line,
-                ForceA = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_FORCE ? impactA : new Vector(),
-                ForceB = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_FORCE ? impactB : new Vector(),
-                MomentA = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_MOMENT ? impactA : new Vector(),
-                MomentB = rfLineload.load_type == rfModel.line_load_load_type.LOAD_TYPE_MOMENT ? impactB : new Vector(),
-                Axis = axis,
-                Projected = projected
-
+                Location = location,
+                ForceA = isForce ? a : new Vector(),
+                ForceB = isForce ? b : new Vector(),
+                MomentA = isForce ? new Vector() : a,
+                MomentB = isForce ? new Vector() : b,
+                Axis = loadAxis,
+                Projected = projected,
             };
-
-            bhLineLoad = (GeometricalLineLoad)BH.Engine.Base.Modify.AddFragment(bhLineLoad, (new RFEM6GeometricalLineLoadTypes() { geometrialLineLoadType = GeometricalLineLoadTypesEnum.NonFreeLineLoad }));
-
-            return bhLineLoad;
+            bhLoad = (GeometricalLineLoad)bhLoad.AddFragment(new RFEM6GeometricalLineLoadTypes { geometrialLineLoadType = GeometricalLineLoadTypesEnum.NonFreeLineLoad });
+            bhLoad.SetRFEM6ID(rfLoad.No);
+            return bhLoad;
         }
 
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
 
+        // Direction names are LocalX..Z or GlobalXOrUserDefinedU{True|Projected}Length..Z.
+        private static bool TryParseLoadDirection(string direction, out int axis, out LoadAxis loadAxis, out bool projected)
+        {
+            axis = -1;
+            loadAxis = LoadAxis.Global;
+            projected = false;
 
+            if (direction.StartsWith("Local") && direction.Length > 5)
+            {
+                axis = "XYZ".IndexOf(direction[5]);
+                loadAxis = LoadAxis.Local;
+            }
+            else if (direction.StartsWith("Global") && direction.Length > 6)
+            {
+                axis = "XYZ".IndexOf(direction[6]);
+                projected = direction.EndsWith("ProjectedLength");
+            }
+
+            if (axis < 0)
+                BH.Engine.Base.Compute.RecordWarning($"RFEM load direction {direction} is not supported and the load is not read.");
+
+            return axis >= 0;
+        }
+
+        private static Vector AxisVector(int axis, double value)
+        {
+            return new Vector { X = axis == 0 ? value : 0, Y = axis == 1 ? value : 0, Z = axis == 2 ? value : 0 };
+        }
+
+        private static Point FromProjectedCoordinates(string projection, double first, double second)
+        {
+            switch (projection)
+            {
+                case "XzOrUw":
+                    return new Point { X = first, Z = second };
+                case "YzOrVw":
+                    return new Point { Y = first, Z = second };
+                default:
+                    return new Point { X = first, Y = second };
+            }
+        }
     }
 }
-
-
-

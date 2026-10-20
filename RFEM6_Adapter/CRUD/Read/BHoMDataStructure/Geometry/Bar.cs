@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System;
 using System.Collections.Generic;
@@ -29,19 +29,12 @@ using BH.oM.Structure.Elements;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.Constraints;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
-#if RFEM6_8_2
-    public partial class RFEM6AdapterV8_2
-#elif RFEM6_12_11
-    public partial class RFEM6AdapterV12_11
-#else
     public partial class RFEM6Adapter
-#endif
     {
 
         private List<Bar> ReadBars(List<string> ids = null)
@@ -49,60 +42,46 @@ namespace BH.Adapter.RFEM6
 
             List<Bar> barList = new List<Bar>();
 
-            var barNumber = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MEMBER);
-
-            List<rfModel.member> allRfMembers = new List<rfModel.member>();
-
-            foreach (var n in barNumber)
-            {
-
-                allRfMembers.Add(m_Model.get_member(n.no));
-
-            }
+            List<StructureCore.Member> allRfMembers = GetObjectList(new StructureCore.Member());
 
             Dictionary<int, Node> nodes = this.GetCachedOrReadAsDictionary<int, Node>();
-            Dictionary<int, RFEMLine> lines = this.GetCachedOrReadAsDictionary<int, RFEMLine>();
             Dictionary<int, ISectionProperty> sections = this.GetCachedOrReadAsDictionary<int, ISectionProperty>();
-            Dictionary<int, RFEMHinge> hinges = this.GetCachedOrReadAsDictionary<int, RFEMHinge>();
-
+            Dictionary<int, Constraint6DOF> hinges = ReadMemberHinges().ToDictionary(h => h.GetRFEM6ID(), h => h.Constraint);
 
             foreach (var rfMember in allRfMembers)
             {
 
                
                 Node node0 = null;
-                nodes.TryGetValue(rfMember.node_start, out node0);
+                nodes.TryGetValue(rfMember.NodeStart, out node0);
 
                 Node node1 = null;
-                nodes.TryGetValue(rfMember.node_end, out node1);
+                nodes.TryGetValue(rfMember.NodeEnd, out node1);
 
                 ISectionProperty section = null;
-#if RFEM6_8_2
-                sections.TryGetValue(rfMember.section_end, out section);
-#else
-                sections.TryGetValue(rfMember.cross_section_end, out section);
-#endif
-
-                RFEMHinge hingeStart = null;
-                RFEMHinge hingeEnd = null;
-                BarRelease barRelease = new BarRelease();
-
-                hinges.TryGetValue(rfMember.member_hinge_start, out hingeStart);
-                hinges.TryGetValue(rfMember.member_hinge_end, out hingeEnd);
-                
-                if (hingeStart != null) { barRelease.StartRelease = hingeStart.Constraint; }
-                if (hingeEnd != null) { barRelease.EndRelease = hingeEnd.Constraint; }
-
-
+                sections.TryGetValue(rfMember.CrossSectionEnd, out section);
 
                 Bar bhBar = rfMember.FromRFEM(node0, node1, section);
-                bhBar.Release = barRelease;
+
+                if (rfMember.MemberHingeStart > 0 || rfMember.MemberHingeEnd > 0)
+                {
+                    bhBar.Release = new BarRelease
+                    {
+                        StartRelease = HingeOrFixed(hinges, rfMember.MemberHingeStart),
+                        EndRelease = HingeOrFixed(hinges, rfMember.MemberHingeEnd),
+                    };
+                }
 
                 barList.Add(bhBar);
 
             }
 
             return barList;
+        }
+
+        private static Constraint6DOF HingeOrFixed(Dictionary<int, Constraint6DOF> hinges, int hingeNo)
+        {
+            return hingeNo > 0 && hinges.TryGetValue(hingeNo, out Constraint6DOF hinge) ? hinge : BH.Engine.Structure.Create.FixConstraint6DOF();
         }
 
     }

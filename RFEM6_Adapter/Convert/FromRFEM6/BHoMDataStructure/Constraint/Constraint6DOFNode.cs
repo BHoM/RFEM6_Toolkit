@@ -4,132 +4,118 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
-using BH.Engine.Adapter;
-using BH.Engine.Base;
-using BH.oM.Adapter;
-using BH.oM.Adapters.RFEM6;
-using BH.oM.Base;
-using BH.oM.Geometry;
-using BH.oM.Structure.Constraints;
-using BH.oM.Structure.Elements;
-using Dlubal.WS.Rfem6.Model;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using rfModel = Dlubal.WS.Rfem6.Model;
+
+using BH.oM.Adapters.RFEM6;
+using BH.oM.Structure.Constraints;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-        public static RFEMNodalSupport FromRFEM(this rfModel.nodal_support support)
+        public static RFEMNodalSupport FromRFEM(this TypesForNodes.NodalSupport support)
         {
+            Constraint6DOF constraint = FromRFEMStiffnesses(
+                ConstraintNameFromRfem(support.Name, support.UserDefinedNameEnabled),
+                support.SpringX,
+                support.SpringY,
+                support.SpringZ,
+                support.RotationalRestraintX,
+                support.RotationalRestraintY,
+                support.RotationalRestraintZ);
+            constraint.SetRFEM6ID(support.No);
 
-            BH.oM.Structure.Constraints.Constraint6DOF constraint = new BH.oM.Structure.Constraints.Constraint6DOF();
-            
-            constraint.TranslationX = TranslateStiffnessToRFEM(support.spring.x);
-            constraint.TranslationY = TranslateStiffnessToRFEM(support.spring.y);
-            constraint.TranslationZ = TranslateStiffnessToRFEM(support.spring.z);
-            constraint.RotationX = TranslateStiffnessToRFEM(support.rotational_restraint.x);
-            constraint.RotationY = TranslateStiffnessToRFEM(support.rotational_restraint.y);
-            constraint.RotationZ = TranslateStiffnessToRFEM(support.rotational_restraint.z);
-            constraint.TranslationalStiffnessX = constraint.TranslationX is DOFType.Spring ? support.spring.x : 0;
-            constraint.TranslationalStiffnessY = constraint.TranslationY is DOFType.Spring ? support.spring.y : 0;
-            constraint.TranslationalStiffnessZ = constraint.TranslationY is DOFType.Spring ? support.spring.z : 0;
-            constraint.RotationalStiffnessX = constraint.RotationX is DOFType.Spring ? support.rotational_restraint.x : 0;
-            constraint.RotationalStiffnessY = constraint.RotationY is DOFType.Spring ? support.rotational_restraint.y : 0;
-            constraint.RotationalStiffnessZ = constraint.RotationZ is DOFType.Spring ? support.rotational_restraint.z : 0;
-
-            //Adding nodelist to frament
-            constraint.SetPropertyValue("NodeList", support.nodes.ToList());
-
-            constraint.SetRFEM6ID(support.no);
-            constraint.Name = support.name;
-            //constraint.Name = "";
-
-            RFEMNodalSupport rfemNodalSupport = new RFEMNodalSupport() { Constraint = constraint };
-            rfemNodalSupport.SetRFEM6ID(support.no);
-
-            return rfemNodalSupport;
+            RFEMNodalSupport nodalSupport = new RFEMNodalSupport { Constraint = constraint, nodesIDs = support.Nodes.ToList() };
+            nodalSupport.SetRFEM6ID(support.No);
+            return nodalSupport;
         }
 
-
-        public static RFEMLineSupport FromRFEM(this rfModel.line_support support)
+        public static RFEMLineSupport FromRFEM(this TypesForLines.LineSupport support)
         {
+            Constraint6DOF constraint = FromRFEMStiffnesses(
+                ConstraintNameFromRfem(support.Name, support.UserDefinedNameEnabled),
+                support.SpringX,
+                support.SpringY,
+                support.SpringZ,
+                support.RotationalRestraintX,
+                support.RotationalRestraintY,
+                support.RotationalRestraintZ);
+            constraint.SetRFEM6ID(support.No);
 
-            BH.oM.Structure.Constraints.Constraint6DOF constraint = new BH.oM.Structure.Constraints.Constraint6DOF();
-            constraint.TranslationX = (support.spring.x == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.TranslationY = (support.spring.y == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.TranslationZ = (support.spring.z == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.RotationX = (support.rotational_restraint.x == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.RotationY = (support.rotational_restraint.y == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.RotationZ = (support.rotational_restraint.z == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-
-            constraint.SetRFEM6ID(support.no);
-            constraint.Name = support.name;
-
-            RFEMLineSupport rfemLineSupport = new RFEMLineSupport() { Constraint = constraint, nodesIDs = support.lines.ToList() };
-            rfemLineSupport.SetRFEM6ID(support.no);
-
-            return rfemLineSupport;
+            RFEMLineSupport lineSupport = new RFEMLineSupport { Constraint = constraint, nodesIDs = support.Lines.ToList() };
+            lineSupport.SetRFEM6ID(support.No);
+            return lineSupport;
         }
 
-
-        public static RFEMHinge FromRFEM(this rfModel.member_hinge hinge)
+        public static RFEMHinge FromRFEM(this TypesForMembers.MemberHinge hinge)
         {
+            Constraint6DOF constraint = FromRFEMStiffnesses(hinge.Name, hinge.AxialReleaseN, hinge.AxialReleaseVy, hinge.AxialReleaseVz, hinge.MomentReleaseMt, hinge.MomentReleaseMy, hinge.MomentReleaseMz);
 
-
-
-            BH.oM.Structure.Constraints.Constraint6DOF constraint = new BH.oM.Structure.Constraints.Constraint6DOF();
-            constraint.TranslationX = (hinge.axial_release_n == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.TranslationY = (hinge.axial_release_vy == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.TranslationZ = (hinge.axial_release_vz == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.RotationX = (hinge.moment_release_mt == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.RotationY = (hinge.moment_release_my == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            constraint.RotationZ = (hinge.moment_release_mz == Double.PositiveInfinity ? oM.Structure.Constraints.DOFType.Fixed : oM.Structure.Constraints.DOFType.Free);
-            //constraint.TranslationalStiffnessX = support.spring.x;
-            //constraint.TranslationalStiffnessY = support.spring.y;
-            //constraint.TranslationalStiffnessZ = support.spring.z;
-            //constraint.RotationalStiffnessX = support.rotational_restraint.x;
-            //constraint.RotationalStiffnessY = support.rotational_restraint.y;
-            //constraint.RotationalStiffnessZ = support.rotational_restraint.z;
-
-
-            //constraint.SetRFEM6ID(hinge.no);
-            //constraint.Name = hinge.name;
-
-            RFEMHinge rfemLineSupport = new RFEMHinge() { Constraint = constraint };
-            rfemLineSupport.SetRFEM6ID(hinge.no);
-
-            return rfemLineSupport;
+            RFEMHinge rfemHinge = new RFEMHinge { Constraint = constraint };
+            rfemHinge.SetRFEM6ID(hinge.No);
+            return rfemHinge;
         }
 
-        private static oM.Structure.Constraints.DOFType TranslateStiffnessToRFEM(double value)
+        /// <summary>
+        /// Uses the RFEM user-defined support name when <paramref name="userDefinedNameEnabled"/> is set; otherwise leaves BHoM <see cref="Constraint6DOF.Name"/> empty.
+        /// </summary>
+        private static string ConstraintNameFromRfem(string name, bool userDefinedNameEnabled)
         {
-            if (value == Double.PositiveInfinity) return (oM.Structure.Constraints.DOFType.Fixed);
-            else if (value == 0) return (oM.Structure.Constraints.DOFType.Free);
-            else return (oM.Structure.Constraints.DOFType.Spring);
+            if (!userDefinedNameEnabled || string.IsNullOrWhiteSpace(name))
+                return null;
 
+            return name.Trim();
+        }
 
+        /// <summary>
+        /// Infinite stiffness is fixed, zero is free and anything else is a spring with that stiffness.
+        /// </summary>
+        private static Constraint6DOF FromRFEMStiffnesses(string name, double x, double y, double z, double xx, double yy, double zz)
+        {
+            return new Constraint6DOF
+            {
+                Name = name,
+                TranslationX = ToDOFType(x),
+                TranslationY = ToDOFType(y),
+                TranslationZ = ToDOFType(z),
+                RotationX = ToDOFType(xx),
+                RotationY = ToDOFType(yy),
+                RotationZ = ToDOFType(zz),
+                TranslationalStiffnessX = SpringStiffness(x),
+                TranslationalStiffnessY = SpringStiffness(y),
+                TranslationalStiffnessZ = SpringStiffness(z),
+                RotationalStiffnessX = SpringStiffness(xx),
+                RotationalStiffnessY = SpringStiffness(yy),
+                RotationalStiffnessZ = SpringStiffness(zz),
+            };
+        }
+
+        private static DOFType ToDOFType(double stiffness)
+        {
+            if (double.IsPositiveInfinity(stiffness))
+                return DOFType.Fixed;
+
+            return stiffness == 0 ? DOFType.Free : DOFType.Spring;
+        }
+
+        private static double SpringStiffness(double stiffness)
+        {
+            return ToDOFType(stiffness) == DOFType.Spring ? stiffness : 0;
         }
     }
 }
-
-
-

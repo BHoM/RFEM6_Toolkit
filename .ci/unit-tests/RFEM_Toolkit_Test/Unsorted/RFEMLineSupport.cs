@@ -26,7 +26,6 @@
 //using BH.oM.Geometry;
 //using BH.oM.Structure.Constraints;
 //using BH.oM.Structure.Elements;
-//using Dlubal.WS.Rfem6.Model;
 
 //namespace RFEM_Toolkit_Test
 //{
@@ -40,7 +39,7 @@
 //        [SetUp]
 //        public void Setup()
 //        {
-//            //adapter.Wipeout();
+//            RFEM6TestCleanup.WipeModel(adapter);
 //        }
 
 //        [OneTimeSetUp]
@@ -170,7 +169,7 @@
 //        //public void testHashString()
 //        //{
 
-//        //    //adapter.WipeOut();
+//        //    RFEM6TestCleanup.WipeModel(adapter);
 
 //        //    Point point0 = new Point() { X = 0, Y = 0, Z = 0 };
 //        //    Point point1 = new Point() { X = 1, Y = 0, Z = 0 };

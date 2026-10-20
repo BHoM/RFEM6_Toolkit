@@ -4,128 +4,140 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
-using BH.oM.Base;
-using BH.oM.Adapter;
-using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
 using System.ComponentModel;
-using BH.oM.Structure.Elements;
-using System.Collections;
-using BH.oM.Geometry;
+using System.Linq;
+
 using BH.Engine.Geometry;
-using System.Security.Cryptography;
+using BH.oM.Adapter;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Geometry;
+using BH.oM.Structure.Elements;
 
 namespace BH.Adapter.RFEM6
 {
-    [Description("Dependency module for fetching all Loadcase stored in a list of Loadcombinations.")]
+    [Description("Builds RFEM lines for panel and opening edges: straight segments, polylines split per segment, arcs and circles.")]
     public class GetLineFromEdgeModule : IGetDependencyModule<Edge, RFEMLine>
     {
+        private const double PositionTolerance = 1e-4;
 
-        //TODO 
-        //Make this work for polylines ....you need to split them and run the method over each curve
         public IEnumerable<RFEMLine> GetDependencies(IEnumerable<Edge> objects)
         {
-            List< RFEMLine> lines = new List<RFEMLine>();
-    
+            List<RFEMLine> lines = new List<RFEMLine>();
+
             foreach (Edge edge in objects)
             {
-                
-
-                RFEMLine rfLine =null;
-
-                if (edge.Curve is Line line)
+                List<RFEMLine> edgeLines = RFEMLinesFromEdge(edge);
+                if (edgeLines.Count == 0)
                 {
-                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = line.Start }, new Node { Position = line.End } } };
-
-                    rfLine.Curve = line;
-
+                    BH.Engine.Base.Compute.RecordError($"Edge {edge.BHoM_Guid} has curve type '{edge.Curve?.GetType().Name ?? "null"}'. Only Line, Polyline, Arc and Circle are supported.");
+                    continue;
                 }
 
-                else if (edge.Curve is Polyline polyline)
+                if (!string.IsNullOrWhiteSpace(edge.Name))
                 {
-                    List<Node> controlNodes = new List<Node>();
-                    polyline.ControlPoints.ForEach(p => controlNodes.Add(new Node { Position = p }));
-
-                    rfLine = new RFEMLine() { Nodes = controlNodes };
-
-
-                    rfLine.Curve = polyline;
+                    foreach (RFEMLine rfLine in edgeLines)
+                        rfLine.Name = edge.Name;
                 }
 
-                //Add for other line types and add convert in terms of nodes accordingly
-                else if (edge.Curve is Arc arc)
-                {
-
-                    double radius = 0;
-                    //BH.oM.Geometry.CoordinateSystem.Cartesian coordSyst = new oM.Geometry.CoordinateSystem.Cartesian();
-                    double angle = 0;
-                    double[] x_VectorArr = new double[3];
-                    double[] y_VectorArr = new double[3];
-
-                    Point[] pts = arc.ControlPoints().ToArray();
-                    Vector x_Vector = Engine.Geometry.Create.Vector(arc.Centre(), arc.StartPoint()).Normalise();
-                    Vector tempVector = Engine.Geometry.Create.Vector(arc.Centre(), arc.PointAtLength(0.5) * arc.Length()).Normalise();
-
-                    Vector z_Vector = Engine.Geometry.Query.CrossProduct(x_Vector, tempVector).Normalise();
-                    Vector y_Vector = Engine.Geometry.Query.CrossProduct(x_Vector, z_Vector).Normalise();
-
-
-
-                    x_VectorArr = new double[] { x_Vector.X, x_Vector.Y, x_Vector.Z };
-                    y_VectorArr = new double[] { y_Vector.X, y_Vector.Y, y_Vector.Z };
-
-                    angle = arc.Angle();
-                    radius = arc.Radius;
-
-                    rfLine = new RFEMLine() { Nodes = new List<Node> { new Node { Position = pts[0] }, new Node { Position = pts[2] }, new Node { Position = pts[4] } } };
-
-
-                    rfLine.Curve = arc;
-
-                }
-
-                else if (edge.Curve is Circle circle1)
-                {
-                    List<Node> controlePoints = new List<Node>();
-                    controlePoints.Add(new Node { Position = circle1.Centre });
-                    rfLine = new RFEMLine() { Curve = circle1 };
-                }
-
-                else {
-
-                    string s = rfLine.ToString();
-                }
-
-                if (edge.Support != null) { rfLine.Support = edge.Support; }
-
-                edge.Fragments.Add(rfLine);
-
-               
-
-                lines.Add(rfLine);
+                RFEM6EdgeLines.Set(edge, edgeLines);
+                lines.AddRange(edgeLines);
             }
 
             return lines;
         }
+
+        private static List<RFEMLine> RFEMLinesFromEdge(Edge edge)
+        {
+            switch (edge.Curve)
+            {
+                case Line line:
+                    return new List<RFEMLine>
+                    {
+                        new RFEMLine
+                        {
+                            Curve = line,
+                            Nodes = new List<Node> { new Node { Position = line.Start }, new Node { Position = line.End } },
+                        },
+                    };
+
+                case Polyline polyline:
+                    return PolylineSegments(polyline);
+
+                case Arc arc:
+                    return new List<RFEMLine> { ArcLine(arc) };
+
+                case Circle circle:
+                    return new List<RFEMLine>
+                    {
+                        new RFEMLine
+                        {
+                            Curve = circle,
+                            Nodes = new List<Node> { new Node { Position = circle.Centre } },
+                        },
+                    };
+
+                default:
+                    return new List<RFEMLine>();
+            }
+        }
+
+        /// <summary>
+        /// RFEM opening and surface boundaries use one line per straight segment. A closed polyline drops its repeated closing point.
+        /// </summary>
+        private static List<RFEMLine> PolylineSegments(Polyline polyline)
+        {
+            List<Point> points = polyline.ControlPoints?.ToList() ?? new List<Point>();
+            if (points.Count < 2)
+                return new List<RFEMLine>();
+
+            if (points.Count > 2 && points[0].Distance(points[points.Count - 1]) < PositionTolerance)
+                points.RemoveAt(points.Count - 1);
+
+            List<RFEMLine> segments = new List<RFEMLine>();
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                Point start = points[i];
+                Point end = points[i + 1];
+                Line segment = Create.Line(start, end);
+                segments.Add(new RFEMLine
+                {
+                    Curve = segment,
+                    Nodes = new List<Node> { new Node { Position = start }, new Node { Position = end } },
+                });
+            }
+
+            return segments;
+        }
+
+        private static RFEMLine ArcLine(Arc arc)
+        {
+            Point[] pts = arc.ControlPoints().ToArray();
+            return new RFEMLine
+            {
+                Curve = arc,
+                Nodes = new List<Node>
+                {
+                    new Node { Position = pts[0] },
+                    new Node { Position = pts[2] },
+                    new Node { Position = pts[4] },
+                },
+            };
+        }
     }
 }
-
-

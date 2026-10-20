@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System;
 using System.Collections.Generic;
@@ -31,25 +31,24 @@ using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.MaterialFragments;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
-
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-        public static Bar FromRFEM(this rfModel.member member, Node node0, Node node1, ISectionProperty section)
+        public static Bar FromRFEM(this StructureCore.Member member, Node node0, Node node1, ISectionProperty section)
         {
 
 
-            Bar bar = new Bar { Start = node0, End = node1, SectionProperty = section, Name = "member nr." + member.no, FEAType = member.type.FromRFEM() };
-
-            // If Comment has been added to Bar comment will be added as additinal property.
-            if (member.comment.Count() != 0)
+            Bar bar = new Bar
             {
-                BH.Engine.Base.Modify.SetPropertyValue(bar, "Comment", member.comment);
-            }
-            
-            bar.SetRFEM6ID(member.no);
+                Start = node0,
+                End = node1,
+                SectionProperty = section,
+                Name = !string.IsNullOrWhiteSpace(member.Comment) ? member.Comment : "member nr." + member.No,
+                FEAType = member.Type.FromRFEM(),
+            };
+
+            bar.SetRFEM6ID(member.No);
             return bar;
         }
     }

@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System;
 using System.Collections.Generic;
@@ -29,27 +29,24 @@ using BH.oM.Structure.Elements;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
-
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
 
-        public static Node FromRFEM(this rfModel.node node)
+        public static Node FromRFEM(this StructureCore.Node node)
         {
 
-            Node bhNode = new Node { Position = new oM.Geometry.Point() { X = node.global_coordinate_1, Y = node.global_coordinate_2, Z = node.global_coordinate_3 } };
+            Node bhNode = new Node { Position = new oM.Geometry.Point() { X = node.Coordinate1, Y = node.Coordinate2, Z = node.Coordinate3 } };
             //Node bhNode = new Node { Position = new oM.Geometry.Point() { X = node.coordinate_1, Y = node.coordinate_2, Z = node.coordinate_3 } };
 
-            bhNode.Name = "Node Nr. " + node.no;
-            bhNode.SetRFEM6ID(node.no);
+            bhNode.SetRFEM6ID(node.No);
 
-            if (node.comment.Count() != 0)
-            {
-                BH.Engine.Base.Modify.SetPropertyValue(bhNode, "Comment", node.comment);
-            }
+            if (!string.IsNullOrWhiteSpace(node.Comment))
+                bhNode.Name = node.Comment;
+            else
+                bhNode.Name = "Node Nr. " + node.No;
+
             return bhNode;
         }
 

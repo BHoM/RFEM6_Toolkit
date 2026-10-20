@@ -4,22 +4,21 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
-
 using BH.Adapter;
 using BH.oM.Base.Attributes;
 
@@ -31,8 +30,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Dlubal.WS.Rfem6.Application;
-using Dlubal.WS.Rfem6.Model;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.MaterialFragments;
@@ -47,17 +44,11 @@ using BH.Engine.Structure;
 using BH.Engine.Geometry;
 using BH.oM.Adapter;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
-using System.Net.PeerToPeer.Collaboration;
+
 
 namespace BH.Adapter.RFEM6
 {
-#if RFEM6_8_2
-    public partial class RFEM6AdapterV8_2 : BHoMAdapter
-#elif RFEM6_12_11
-    public partial class RFEM6AdapterV12_11 : BHoMAdapter
-#else
     public partial class RFEM6Adapter : BHoMAdapter
-#endif
     {
 
         private Dictionary<Type, List<Type>> GenerateDependencyTypes()
@@ -66,24 +57,19 @@ namespace BH.Adapter.RFEM6
             return new Dictionary<Type, List<Type>>
             {
                 {typeof(Point), new List<Type> { typeof(Node) } },
-                {typeof(Node), new List<Type> { typeof(RFEMNodalSupport) } },
-                {typeof(Edge), new List<Type> { typeof(RFEMLineSupport),typeof(RFEMLine) } },
                 {typeof(ISectionProperty), new List<Type> { typeof(IMaterialFragment) } },
-                {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine),typeof(RFEMHinge)} },
                 {typeof(ISurfaceProperty), new List<Type> { typeof(IMaterialFragment) } },
-                {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge), typeof(Opening), typeof(RFEMOpening) } },
-                {typeof(Opening), new List<Type> { typeof(Edge)} },
-                {typeof(RigidLink), new List<Type> { typeof(LinkConstraint), typeof(Node) } },
-                {typeof(FEMesh), new List<Type> { typeof(ISurfaceProperty), typeof(Node) } },
-                {typeof(RFEMLine), new List<Type> {typeof(Node), typeof(RFEMLineSupport) } },
-                {typeof(RFEMOpening), new List<Type> { typeof(Edge)} },
-                {typeof(BarUniformlyDistributedLoad), new List<Type> { typeof(Bar),typeof(Loadcase)} },
+                {typeof(Bar), new List<Type> { typeof(ISectionProperty), typeof(RFEMLine)} },
+                {typeof(RFEMLine), new List<Type> {typeof(Node) } },
+                {typeof(Edge), new List<Type> { typeof(RFEMLine) } },
+                {typeof(Opening), new List<Type> { typeof(Edge) } },
+                {typeof(Panel), new List<Type> { typeof(ISurfaceProperty), typeof(Edge), typeof(Opening) } },
                 {typeof(PointLoad), new List<Type> { typeof(Node), typeof(Loadcase) } },
+                {typeof(BarUniformlyDistributedLoad), new List<Type> { typeof(Bar), typeof(Loadcase) } },
                 {typeof(AreaUniformlyDistributedLoad), new List<Type> { typeof(Panel), typeof(Loadcase) } },
-                {typeof(GeometricalLineLoad), new List<Type> { typeof(Panel), typeof(Loadcase)} },
-				{typeof(LoadCombination), new List<Type> { typeof(Loadcase)} },
-
-			};
+                {typeof(GeometricalLineLoad), new List<Type> { typeof(Loadcase) } },
+                {typeof(LoadCombination), new List<Type> { typeof(Loadcase) } },
+            };
 
         }
 
@@ -91,12 +77,9 @@ namespace BH.Adapter.RFEM6
         {
 
             BH.Adapter.Modules.Structure.ModuleLoader.LoadModules(this);
-            this.AdapterModules.Add(new GetRFEMNodalSupportModule());
-            this.AdapterModules.Add(new GetRFEMHingeModule());
-            this.AdapterModules.Add(new GetRFEMLineSupportModule());
             this.AdapterModules.Add(new GetLineFromBarModule());
             this.AdapterModules.Add(new GetLineFromEdgeModule());
-            this.AdapterModules.Add(new GetOpeningFromOpeningModule());
+            this.AdapterModules.Add(new GetPanelFreomAreaUniformlyDistributedLoadModule());
 
         }
 
@@ -107,18 +90,13 @@ namespace BH.Adapter.RFEM6
             {
                 {typeof(Bar), new BarEndNodesDistanceComparer(3) },
                 {typeof(Node), new RFEMNodalComparer() },
-                {typeof(RFEMHinge), new RFEMHingeComparer() },
                 {typeof(ISectionProperty), new RFEMSectionComparer() },
-                {typeof(ISurfaceProperty), new RFEMSurfacePropertyComparer() },
                 {typeof(IMaterialFragment), new NameOrDescriptionComparer() },
-                {typeof(LinkConstraint), new NameOrDescriptionComparer() },
-                {typeof(Constraint6DOF), new Constraint6DOFComparer()},
-                {typeof(RFEMNodalSupport), new RFEMNodalSupportComparer()},
-                {typeof(Edge), new EdgeComparer()},
-                {typeof(RFEMLineSupport), new RFEMLineSupportComparer() },
+                {typeof(ISurfaceProperty), new RFEMSurfacePropertyComparer() },
                 {typeof(RFEMLine), new RFEMLineComparer(3) },
-				{typeof(Panel), new PanelComparer() },
-				{typeof(Loadcase), new LoadCaseComparer() },
+                {typeof(Edge), new EdgeComparer() },
+                {typeof(Panel), new PanelComparer() },
+                {typeof(Loadcase), new LoadCaseComparer() },
             };
              
            
@@ -126,7 +104,6 @@ namespace BH.Adapter.RFEM6
 
     }
 }
-
 
 
 

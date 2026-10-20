@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System;
 using System.Collections.Generic;
@@ -29,81 +29,105 @@ using BH.oM.Structure.Elements;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
-
 namespace BH.Adapter.RFEM6
 {
-#if RFEM6_8_2
-    public partial class RFEM6AdapterV8_2
-#elif RFEM6_12_11
-    public partial class RFEM6AdapterV12_11
-#else
     public partial class RFEM6Adapter
-#endif
     {
 
         private bool CreateCollection(IEnumerable<ISectionProperty> sectionProperties)
         {
+            return QueueSections(sectionProperties);
+        }
+
+        private bool UpdateObjects(IEnumerable<ISectionProperty> sections)
+        {
+            return QueueSections(sections);
+        }
+
+        private bool QueueSections(IEnumerable<ISectionProperty> sectionProperties)
+        {
+            List<StructureCore.CrossSection> existingSections = GetObjectList(new StructureCore.CrossSection());
+            HashSet<int> usedNumbers = new HashSet<int>(existingSections.Select(s => s.No).Where(n => n > 0));
+            List<StructureCore.CrossSection> sectionsToCreate = new List<StructureCore.CrossSection>();
+
+            foreach (IMessage queued in m_createQueue)
+            {
+                if (queued is StructureCore.CrossSection queuedSection && queuedSection.No > 0)
+                    usedNumbers.Add(queuedSection.No);
+            }
+
+            bool success = true;
 
             foreach (ISectionProperty section in sectionProperties)
             {
-
-
-                // TODO: Check if this could be made more efficiently. By chance instead of searcihng for id use the one that has been assigned
-
-                //Loading material numbers from RFEM
-                rfModel.object_with_children[] materials = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_MATERIAL);
-                IEnumerable<int> materialNumbers = materials.ToList().Select(m => m.no);
-                int matNo = m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_MATERIAL, 0);
-
-                //Find material number for section
-                foreach (int n in materialNumbers)
+                string sectionName = section.ToRFEM6SectionName();
+                if (string.IsNullOrWhiteSpace(sectionName))
                 {
-
-                    var rfMatrial = m_Model.get_material(n);
-                    string rfMatName = rfMatrial.name.Split('|')[0].Trim(new Char[] { ' ' });
-
-                    if (rfMatName.Equals(section.Material.Name))
-                    {
-                        matNo = n;
-
-                        break;
-                    }
+                    BH.Engine.Base.Compute.RecordError($"Cannot push section of type {section.GetType().Name}: it has no Name and no dimensions on the section or its SectionProfile/Profile that the adapter can turn into an RFEM name (R_M1 or CIRCLE_M1).");
+                    success = false;
+                    continue;
                 }
 
-#if RFEM6_8_2
-                rfModel.section rfSection;
-#else
-                rfModel.cross_section rfSection;
-#endif
+                StructureCore.CrossSection existingSection = existingSections
+                    .FirstOrDefault(s => SectionNamesMatch(s.Name, sectionName));
 
-                //creation of Section Split up into different if statements for different section types
-
-                if (section is GenericSection && (section.Material is Glulam|| section.Material is SawnTimber||section.Material is Concrete))
+                if (existingSection != null)
                 {
-                    rfSection = section.ToRFEM6_TimberSections( section.Material.GetType().Name );
-                }
-                else
-                {
-                    rfSection = section.ToRFEM6(matNo, section.Material.GetType().Name);
+                    section.SetRFEM6ID(existingSection.No);
+                    continue;
                 }
 
+                int matNo = FindMaterialNumber(section.Material);
+                if (matNo <= 0)
+                {
+                    BH.Engine.Base.Compute.RecordError($"Cannot create section '{sectionName}' because material '{section.Material.ToRFEM6MaterialName()}' is not in RFEM6 and was not queued in this push.");
+                    success = false;
+                    continue;
+                }
 
-#if RFEM6_8_2
-                m_Model.set_section(rfSection);
-#else
-                m_Model.set_cross_section(rfSection);
-#endif
+                int secNo = section.GetRFEM6ID();
+                if (secNo <= 0 || usedNumbers.Contains(secNo))
+                    secNo = GetNextFreeNumber(usedNumbers);
 
+                usedNumbers.Add(secNo);
+                section.SetRFEM6ID(secNo);
+                section.Name = sectionName;
+                sectionsToCreate.Add(section.ToRFEM6(matNo, section.Material.GetType().Name));
             }
 
-            return true;
-
+            CreateObjectList(sectionsToCreate);
+            return success;
         }
 
+        /// <summary>
+        /// Number of the RFEM cross-section for this BHoM section, from its fragment, the model snapshot, or the create queue.
+        /// </summary>
+        private int FindSectionNumber(ISectionProperty section)
+        {
+            if (section == null)
+                return 0;
 
+            int id = section.GetRFEM6ID();
+            if (id > 0)
+                return id;
+
+            string sectionName = section.ToRFEM6SectionName();
+            if (string.IsNullOrWhiteSpace(sectionName))
+                return 0;
+
+            StructureCore.CrossSection match = GetObjectList(new StructureCore.CrossSection())
+                .Concat(m_createQueue.OfType<StructureCore.CrossSection>())
+                .FirstOrDefault(s => s.No > 0 && SectionNamesMatch(s.Name, sectionName));
+
+            return match?.No ?? 0;
+        }
+
+        private static bool SectionNamesMatch(string rfemSectionName, string bhSectionName)
+        {
+            if (string.IsNullOrWhiteSpace(rfemSectionName) || string.IsNullOrWhiteSpace(bhSectionName))
+                return false;
+
+            return rfemSectionName.Split('|')[0].Trim().Equals(bhSectionName, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
-
-
-

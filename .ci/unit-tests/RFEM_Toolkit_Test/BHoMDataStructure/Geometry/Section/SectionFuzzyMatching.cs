@@ -26,7 +26,6 @@ using BH.oM.Data.Requests;
 using BH.oM.Spatial.ShapeProfiles;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
-using Dlubal.WS.Rfem6.Model;
 
 namespace RFEM_Toolkit_Test.Elements
 {
@@ -64,7 +63,7 @@ namespace RFEM_Toolkit_Test.Elements
         [TearDown]
         public void TearDown()
         {
-            //adapter.Wipeout();
+            RFEM6TestCleanup.WipeModel(adapter);
         }
 
         [Test]

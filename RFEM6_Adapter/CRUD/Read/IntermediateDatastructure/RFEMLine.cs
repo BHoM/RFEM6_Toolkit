@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System;
 using System.Collections.Generic;
@@ -29,19 +29,12 @@ using BH.oM.Structure.Elements;
 using BH.oM.Geometry;
 using BH.oM.Structure.Constraints;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Geometry;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 
 namespace BH.Adapter.RFEM6
 {
-#if RFEM6_8_2
-    public partial class RFEM6AdapterV8_2
-#elif RFEM6_12_11
-    public partial class RFEM6AdapterV12_11
-#else
     public partial class RFEM6Adapter
-#endif
     {
 
         private List<RFEMLine> ReadLines(List<string> ids = null)
@@ -49,18 +42,14 @@ namespace BH.Adapter.RFEM6
 
             List<RFEMLine> lineList = new List<RFEMLine>();
 
-            var lineNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE).Where(l => l.no > 0);
-            var allRfLInes = lineNumbers.ToList().Select(n => m_Model.get_line(n.no));
-            
-            //var lineSupportNumbers = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_LINE);
-            //var lineSupports = lineNumbers.ToList().Select(n => m_Model.get_line(n.no));
-
+            List<StructureCore.Line> allRfLInes = GetObjectList(new StructureCore.Line()).Where(l => l.No > 0).ToList();
 
             Dictionary<int, Node> nodes = this.GetCachedOrReadAsDictionary<int, Node>();
+            Dictionary<int, Constraint6DOF> supports = ReadLineSupports().ToDictionary(s => s.GetRFEM6ID(), s => s.Constraint);
 
             if (ids == null)
             {
-                foreach (rfModel.line rfLine in allRfLInes)
+                foreach (StructureCore.Line rfLine in allRfLInes)
                 {
              
                     ICurve Curve = null;
@@ -72,11 +61,11 @@ namespace BH.Adapter.RFEM6
 
                     List<Node> lineNodes = new List<Node>();
 
-                    if (rfLine.type is rfModel.line_type.TYPE_POLYLINE)
+                    if (rfLine.Type == StructureCore.Line.Types.Type.Polyline)
                     {
 
 
-                        foreach (var n in rfLine.definition_nodes.ToList())
+                        foreach (var n in rfLine.DefinitionNodes.ToList())
                         {
 
                             Node nd;
@@ -92,19 +81,19 @@ namespace BH.Adapter.RFEM6
 
                     }
 
-                    else if (rfLine.type is rfModel.line_type.TYPE_ARC)
+                    else if (rfLine.Type == StructureCore.Line.Types.Type.Arc)
                     {
 
                         Node n0;
-                        nodes.TryGetValue(rfLine.definition_nodes[0], out n0);
+                        nodes.TryGetValue(rfLine.DefinitionNodes[0], out n0);
 
                         Node n1;
-                        nodes.TryGetValue(rfLine.definition_nodes[1], out n1);
+                        nodes.TryGetValue(rfLine.DefinitionNodes[1], out n1);
 
                         //Point start = Engine.Geometry.Create.Point(rfLine.arc_control_point, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
-                        Point mid = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
-                        Point centre = Engine.Geometry.Create.Point(rfLine.arc_center_x, rfLine.arc_center_y, rfLine.arc_center_z);
-                        Point end = Engine.Geometry.Create.Point(rfLine.arc_control_point_x, rfLine.arc_control_point_y, rfLine.arc_control_point_z);
+                        Point mid = Engine.Geometry.Create.Point(rfLine.ArcControlPoint.X, rfLine.ArcControlPoint.Y, rfLine.ArcControlPoint.Z);
+                        Point centre = Engine.Geometry.Create.Point(rfLine.ArcCenter.X, rfLine.ArcCenter.Y, rfLine.ArcCenter.Z);
+                        Point end = Engine.Geometry.Create.Point(rfLine.ArcControlPoint.X, rfLine.ArcControlPoint.Y, rfLine.ArcControlPoint.Z);
 
 
 
@@ -127,28 +116,35 @@ namespace BH.Adapter.RFEM6
 
 
 
-                        angle = rfLine.arc_alpha;
-                        radius = rfLine.arc_radius;
+                        angle = rfLine.ArcAlpha;
+                        radius = rfLine.ArcRadius;
 
                         Curve = Engine.Geometry.Create.Arc(n1.Position,mid,n0.Position).Flip();    
 
                     }
 
-                    else if (rfLine.type is rfModel.line_type.TYPE_CIRCLE)
+                    else if (rfLine.Type == StructureCore.Line.Types.Type.Circle)
                     {
 
-                        lineNodes = new List<Node>() { new Node { Position = new Point { X = rfLine.circle_center.x, Y = rfLine.circle_center.y, Z = rfLine.circle_center.z } } };
-                        radius = rfLine.circle_radius;
+                        lineNodes = new List<Node>() { new Node { Position = new Point { X = rfLine.CircleCenter.X, Y = rfLine.CircleCenter.Y, Z = rfLine.CircleCenter.Z } } };
+                        radius = rfLine.CircleRadius;
 
                         Curve = Engine.Geometry.Create.Circle(lineNodes[0].Position, radius);
                     }
 
-                    RFEMLine l = new RFEMLine {Curve=Curve,Nodes = lineNodes };
+                    RFEMLine l = new RFEMLine { Curve = Curve, Nodes = lineNodes };
 
-                    if (rfLine.support != 0 && rfLine != null) { l.supportID = rfLine.support; };
+                    if (!string.IsNullOrWhiteSpace(rfLine.Comment))
+                        l.Name = rfLine.Comment;
+
+                    if (rfLine.Support > 0 && supports.TryGetValue(rfLine.Support, out Constraint6DOF support))
+                    {
+                        l.Support = support;
+                        l.supportID = rfLine.Support;
+                    }
 
                     // if (radius > 0) l.Radius = radius;
-                    l.SetRFEM6ID(rfLine.no);
+                    l.SetRFEM6ID(rfLine.No);
                     lineList.Add(l);
                 }
             }

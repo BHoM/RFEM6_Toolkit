@@ -4,62 +4,43 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.Engine.Adapter;
-using BH.oM.Adapters.RFEM6;
-using BH.oM.Geometry;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
-using Dlubal.WS.Rfem6.Model;
-using BH.Engine.Base;
-using System.Xml.Linq;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-
-        public static rfModel.opening ToRFEM6(this Opening bhOpening)
+        public static StructureCore.Opening ToRFEM6(this Opening bhOpening)
         {
-
-            List<int> edgeIdList = new List<int>();
-            Object bhComment = "";
-            if (bhOpening.CustomData.Count != 0)
+            StructureCore.Opening rfOpening = new StructureCore.Opening
             {
-                bhOpening.CustomData.TryGetValue("Comment", out bhComment);
-            }
-
-            rfModel.opening rfSurface = new opening
-            {
-                no = bhOpening.GetRFEM6ID(),
-                boundary_lines = bhOpening.Edges.Select(b => b.GetRFEM6ID()).ToArray(),
-                comment = (String)(bhComment == null || bhComment.Equals("") ? "" : $"BHComment:{bhComment}"),
+                No = bhOpening.GetRFEM6ID(),
             };
-            return rfSurface;
+            foreach (int lineNo in bhOpening.Edges.SelectMany(e => RFEM6EdgeLines.BoundaryLineNumbers(e)).Distinct())
+                rfOpening.BoundaryLines.Add(lineNo);
+
+            string comment = bhOpening.ToRFEM6Comment();
+            if (comment != null)
+                rfOpening.Comment = comment;
+
+            return rfOpening;
         }
     }
 }
-
-
-

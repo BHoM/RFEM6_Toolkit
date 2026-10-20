@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System;
 using System.Collections.Generic;
@@ -29,49 +29,48 @@ using BH.oM.Structure.Elements;
 using BH.Engine.Adapter;
 using BH.oM.Geometry;
 
-using rfModel = Dlubal.WS.Rfem6.Model;
 using BH.Engine.Base;
+using BH.Engine.Geometry;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Base;
+using Dlubal.Api.Common;
 
 namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
 
-        public static rfModel.line ToRFEM6(this Line line, int lineNo, Node startNode, Node endNode)
+        public static StructureCore.Line ToRFEM6(this Line line, int lineNo, Node startNode, Node endNode)
         {
 
 
-            rfModel.line rfLine = new rfModel.line()
+            StructureCore.Line rfLine = new StructureCore.Line
             {
-                no = lineNo,
-                definition_nodes = new int[] { startNode.GetRFEM6ID(), endNode.GetRFEM6ID() },
-                comment = "lines for beams",
-                type = rfModel.line_type.TYPE_POLYLINE,
-                typeSpecified = true,
+                No = lineNo,
+                Type = StructureCore.Line.Types.Type.Polyline,
+                DefinitionNodes = { startNode.GetRFEM6ID(), endNode.GetRFEM6ID() },
             };
 
             return rfLine;
 
         }
 
-        public static rfModel.line ToRFEM6(this RFEMLine rfemLine)
+        public static StructureCore.Line ToRFEM6(this RFEMLine rfemLine)
         {
 
             List<Node> nodes = rfemLine.Nodes;
 
-            rfModel.line rfLine = new rfModel.line();
+            StructureCore.Line rfLine = new StructureCore.Line();
 
 
             if (rfemLine.Curve is Polyline || rfemLine.Curve is Line)
             {
-
-                rfLine = new rfModel.line()
+                rfLine = new StructureCore.Line
                 {
-                    no = rfemLine.GetRFEM6ID(),
-                    definition_nodes = rfemLine.Nodes.Select(x => x.GetRFEM6ID()).ToArray(),
-                    type = rfModel.line_type.TYPE_POLYLINE,
+                    No = rfemLine.GetRFEM6ID(),
+                    Type = StructureCore.Line.Types.Type.Polyline,
                 };
+                rfLine.DefinitionNodes.AddRange(rfemLine.Nodes.Select(x => x.GetRFEM6ID()));
             }
 
 
@@ -85,46 +84,37 @@ namespace BH.Adapter.RFEM6
                 Node n11 = rfemLine.Nodes.ToArray()[2];
 
 
-                rfLine = new rfModel.line()
+                rfLine = new StructureCore.Line()
                 {
-                    no = rfemLine.GetRFEM6ID(),
-                    definition_nodes = new int[] { n11.GetRFEM6ID(), n00.GetRFEM6ID() },
-                    type = rfModel.line_type.TYPE_ARC,
-                    typeSpecified = true,
-                    arc_control_point = new rfModel.vector_3d() { x = mid.X, y = mid.Y, z = mid.Z },
-                    arc_control_point_objectSpecified = true,
-                    arc_alpha_adjustment_target = rfModel.line_arc_alpha_adjustment_target.ALPHA_ADJUSTMENT_TARGET_BEGINNING_OF_ARC,
-                    arc_alpha_adjustment_targetSpecified = true,
-
-
+                    No = rfemLine.GetRFEM6ID(),
+                    Type = StructureCore.Line.Types.Type.Arc,
+                    ArcAlphaAdjustmentTarget = StructureCore.Line.Types.ArcAlphaAdjustmentTarget.BeginningOfArc,
                 };
-
-                rfLine.SetPropertyValue("type", rfModel.line_type.TYPE_ARC);
+                rfLine.DefinitionNodes.Add(n11.GetRFEM6ID());
+                rfLine.DefinitionNodes.Add(n00.GetRFEM6ID());
+                rfLine.ArcControlPoint = new Vector3d() { X = mid.X, Y = mid.Y, Z = mid.Z };
 
             }
 
             if (rfemLine.Curve is Circle c)
-
             {
-                 
-                Point Centre = c.Centre;
+                Vector normal = c.Normal;
+                if (normal == null || BH.Engine.Geometry.Query.Length(normal) < 1e-6)
+                    normal = new Vector { X = 0, Y = 0, Z = 1 };
 
-                var normal = (rfemLine.Curve as Circle).Normal;
-                double rardius = (rfemLine.Curve as Circle).Radius;
-
-                rfLine = new rfModel.line()
+                rfLine = new StructureCore.Line()
                 {
-                    no = rfemLine.GetRFEM6ID(),
-                    type = rfModel.line_type.TYPE_CIRCLE,
-                    typeSpecified = true,
-                    circle_center = new rfModel.vector_3d { x = Centre.X, y = Centre.Y, z = Centre.Z },
-                    circle_normal = new rfModel.vector_3d { x = normal.X, y = normal.Y, z = normal.Z },
-                    circle_radius = rardius,
-                    circle_radiusSpecified = true,
-
+                    No = rfemLine.GetRFEM6ID(),
+                    Type = StructureCore.Line.Types.Type.Circle,
+                    CircleRadius = c.Radius,
+                    CircleCenter = new Vector3d { X = c.Centre.X, Y = c.Centre.Y, Z = c.Centre.Z },
+                    CircleNormal = new Vector3d { X = normal.X, Y = normal.Y, Z = normal.Z },
                 };
-
             }
+
+            string comment = rfemLine.ToRFEM6Comment();
+            if (comment != null)
+                rfLine.Comment = comment;
 
             return rfLine;
 

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
+    <LangVersion>10</LangVersion>
     <AssemblyVersion>9.0.0.0</AssemblyVersion>
     <Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
     <AssemblyName>RFEM6_Adapter</AssemblyName>
@@ -9,41 +10,13 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <FileVersion>9.3.0.0</FileVersion>
     <BaseOutputPath>..\Build\</BaseOutputPath>
-    <Configurations>Debug;Release;Debug_V682;Release_V682;Debug_V12;Release_V12</Configurations>
-    <RfemWebServiceLibraryVersion>6.12.11</RfemWebServiceLibraryVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Release_V682' Or '$(Configuration)' == 'Debug_V682'">
-    <DefineConstants>$(DefineConstants);RFEM6_8_2</DefineConstants>
-    <AssemblyName>RFEM6_V8_2_Adapter</AssemblyName>
-    <RfemWebServiceLibraryVersion>6.8.2</RfemWebServiceLibraryVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug_V12'">
-    <DefineConstants>$(DefineConstants);RFEM6_12_11</DefineConstants>
-    <AssemblyName>RFEM6_V12_11_Adapter</AssemblyName>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Debug_V12'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
+    <Configurations>Debug;Release</Configurations>
     <DefineConstants>$(DefineConstants);RFEM6_Base</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Dlubal.RFEMWebServiceLibrary"
-                      Version="$(RfemWebServiceLibraryVersion)" />
+    <PackageReference Include="Dlubal.Api.NetFramework" Version="2.15.7" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Private.ServiceModel" Version="4.10.0" />
-    <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageDownload Include="Dlubal.RFEMWebServiceLibrary" Version="[6.8.2]" />
-    <PackageDownload Include="Dlubal.RFEMWebServiceLibrary" Version="[6.12.11]" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -149,24 +122,9 @@
 		</Reference>
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Convert\FromRFEM6\IntermediateDataStructure\" />
-		<Folder Include="Convert\ToRFEM6\BHoMDataStructure\Constraints\NewFolder\" />
-	</ItemGroup>
-
-	<Target Name="EnsureConfigurationRestore"
-	        BeforeTargets="ResolvePackageAssets"
-	        Condition="'$(DesignTimeBuild)' != 'true' And '$(BuildingInsideVisualStudio)' != 'true'">
-		<Exec Command="dotnet restore &quot;$(MSBuildProjectFullPath)&quot; /p:Configuration=$(Configuration) --verbosity quiet"
-		      Condition="'$(MSBuildRuntimeType)' == 'Core'" />
-		<Exec Command="&quot;$(MSBuildToolsPath)\MSBuild.exe&quot; &quot;$(MSBuildProjectFullPath)&quot; /t:Restore /p:Configuration=$(Configuration) /v:q /nologo"
-		      Condition="'$(MSBuildRuntimeType)' == 'Full'" />
-	</Target>
-
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
-		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V8_2\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V682' Or '$(Configuration)' == 'Release_V682'" />
-		<Exec Command="xcopy &quot;$(TargetDir)RFEMWebServiceLibrary.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_Client\RFEM6_V12_11\&quot; /Y" Condition="'$(Configuration)' == 'Debug_V12' Or '$(Configuration)' == 'Release_V12' Or '$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Release'" />
+		<Exec Command="xcopy &quot;$(TargetDir)*.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies\RFEM6_Client\&quot; /Y" />
 	</Target>
 
 </Project>

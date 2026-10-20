@@ -70,7 +70,7 @@ namespace RFEM_Toolkit_Test.Elements
         [TearDown]
         public void TearDown()
         {
-            adapter.Wipeout();
+            RFEM6TestCleanup.WipeModel(adapter);
         }
 
         [Test]

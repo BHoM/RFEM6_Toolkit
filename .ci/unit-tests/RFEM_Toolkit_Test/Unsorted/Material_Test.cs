@@ -27,7 +27,6 @@
 //using BH.oM.Structure.Constraints;
 //using BH.oM.Structure.Elements;
 //using BH.oM.Data.Library;
-//using Dlubal.WS.Rfem6.Model;
 //using BH.oM.Physical.Materials;
 //using BH.oM.Structure.MaterialFragments;
 //using BH.Engine.Structure;
@@ -45,7 +44,7 @@
 //        [SetUp]
 //        public void Setup()
 //        {
-//            //adapter.Wipeout();
+//            RFEM6TestCleanup.WipeModel(adapter);
 //        }
 
 //        [OneTimeSetUp]

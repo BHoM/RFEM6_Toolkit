@@ -4,22 +4,21 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
-
 using BH.Engine.Base;
 using BH.Engine.Structure;
 using BH.oM.Adapter;
@@ -33,91 +32,99 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
-using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-#if RFEM6_8_2
-    public partial class RFEM6AdapterV8_2
-#elif RFEM6_12_11
-    public partial class RFEM6AdapterV12_11
-#else
     public partial class RFEM6Adapter
-#endif
     {
         private bool CreateCollection(IEnumerable<Node> bhNodes)
         {
+            return QueueNodes(bhNodes);
+        }
 
-            //Read all support from RFEM model + Removint the added nodes
-            HashSet<Constraint6DOF> constraints = this.GetCachedOrRead<RFEMNodalSupport>().Select(n => n.Constraint).ToHashSet(new Constraint6DOFComparer());
-            constraints = constraints.Where(c => !(c.PropertyValue("NodeList") is null)).ToHashSet();
+        private bool UpdateObjects(IEnumerable<Node> nodes)
+        {
+            return QueueNodes(nodes);
+        }
 
-            //Create map of support and node list to be able to update supports with new nodes if support already exist
-            Dictionary<Constraint6DOF, HashSet<int>> constraintToNodeMap = new Dictionary<Constraint6DOF, HashSet<int>>(new Constraint6DOFComparer());
-            foreach (Constraint6DOF c in constraints)
+        private bool QueueNodes(IEnumerable<Node> bhNodes)
+        {
+            HashSet<int> usedNumbers = UsedNumbers<StructureCore.Node>();
+            List<StructureCore.Node> nodesToCreate = new List<StructureCore.Node>();
+
+            // Duplicate nodes break surface boundaries in RFEM, so nodes already in the model at the same position are reused.
+            Dictionary<string, int> existingNodes = new Dictionary<string, int>();
+            foreach (StructureCore.Node rfNode in GetObjectList(new StructureCore.Node()).Where(n => n.No > 0))
             {
-                constraintToNodeMap[c] = new HashSet<int>((List<int>)c.PropertyValue("NodeList"));
+                string key = PositionKey(rfNode.Coordinate1, rfNode.Coordinate2, rfNode.Coordinate3);
+                if (!existingNodes.ContainsKey(key))
+                    existingNodes[key] = rfNode.No;
             }
-
-            bool supportInBHNodes = false;
 
             foreach (Node bhNode in bhNodes)
             {
-                rfModel.node rfNode = bhNode.ToRFEM6();
-
-                m_Model.set_node(rfNode);
-
-                if (bhNode.Support is null) { 
-                    continue; 
-                }
-                else 
+                int nodeNo;
+                if (bhNode.Position != null && existingNodes.TryGetValue(PositionKey(bhNode.Position.X, bhNode.Position.Y, bhNode.Position.Z), out int existingNo))
                 {
-                    
-                    supportInBHNodes = true;
-
-                    //if support already exist, add index to map and update support with new node list
-                    constraintToNodeMap.TryGetValue(bhNode.Support, out HashSet<int> nodeList);
-
-                    //if support does not exist, create new support and add to map and RFEM model
-                    if (nodeList is null)
-                    {
-
-                        //Add node index to list and add support to map
-                        nodeList = new HashSet<int>() { rfNode.no };
-
-                        rfModel.nodal_support rfNodalSupport = bhNode.Support.ToRFEM6();
-                        rfNodalSupport.nodes = nodeList.ToArray();
-                        int no = m_Model.get_first_free_number(rfModel.object_types.E_OBJECT_TYPE_NODAL_SUPPORT, 0);
-                        rfNodalSupport.no = no;
-                        bhNode.Support.SetRFEM6ID(no);
-                        constraintToNodeMap[bhNode.Support] = nodeList;
-                        m_Model.set_nodal_support(rfNodalSupport);
-                    }
-                    else
-                    {
-                        constraintToNodeMap[bhNode.Support].Add(rfNode.no);
-                        var comparer = new Constraint6DOFComparer();
-                        Constraint6DOF found = constraintToNodeMap.Keys.Where(n => comparer.Equals(n, bhNode.Support)).First();
-                        rfModel.nodal_support rfNodalSupport = m_Model.get_nodal_support(found.GetRFEM6ID());
-                        rfNodalSupport.nodes = constraintToNodeMap[bhNode.Support].ToArray();
-                        m_Model.set_nodal_support(rfNodalSupport);
-
-                    }
+                    nodeNo = existingNo;
+                    bhNode.SetRFEM6ID(nodeNo);
                 }
+                else
+                {
+                    nodeNo = ClaimNumber(bhNode.GetRFEM6ID(), usedNumbers);
+                    bhNode.SetRFEM6ID(nodeNo);
+                    nodesToCreate.Add(bhNode.ToRFEM6());
+                }
+
+                if (bhNode.Support != null)
+                    QueueNodalSupport(bhNode.Support, nodeNo);
             }
 
-
-            if (supportInBHNodes) BH.Engine.Base.Compute.RecordWarning(
-@"Please check at least one of the nodes pushed to RFEM6 has a support assigned. At this stage this might result in duplicate nodes.
-To clear the RFEM model please do the following:
-Remove duplicates: Tools > Model Check > Identical Nodes
-Renumbering: Tools > Renumber > Automatically"
-);
-
+            CreateObjectList(nodesToCreate);
             return true;
+        }
+
+        /// <summary>
+        /// Coordinates rounded to the millimetre, matching the tolerance of the node comparer.
+        /// </summary>
+        private static string PositionKey(double x, double y, double z)
+        {
+            return $"{Math.Round(x, 3) + 0.0:F3},{Math.Round(y, 3) + 0.0:F3},{Math.Round(z, 3) + 0.0:F3}";
+        }
+
+        /// <summary>
+        /// Adds the node to a support with the same stiffnesses queued in this push, or queues a new support.
+        /// Supports already in RFEM are not reused because adding nodes to them would need an extra update request.
+        /// </summary>
+        private void QueueNodalSupport(Constraint6DOF constraint, int nodeNo)
+        {
+            double[] stiffnesses = constraint.ToRFEM6Stiffnesses();
+
+            TypesForNodes.NodalSupport support = m_createQueue.OfType<TypesForNodes.NodalSupport>().FirstOrDefault(s =>
+                Convert.StiffnessesMatch(stiffnesses, new[] { s.SpringX, s.SpringY, s.SpringZ, s.RotationalRestraintX, s.RotationalRestraintY, s.RotationalRestraintZ }));
+
+            if (support == null)
+            {
+                support = constraint.ToRFEM6NodalSupport(ClaimNumber(0, UsedNumbers<TypesForNodes.NodalSupport>()));
+                constraint.SetRFEM6ID(support.No);
+                CreateObject(support);
+            }
+
+            if (!support.Nodes.Contains(nodeNo))
+                support.Nodes.Add(nodeNo);
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -78,6 +78,12 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
 
 		//}
 
+		[TearDown]
+		public void TearDown()
+		{
+			RFEM6TestCleanup.WipeModel(adapter);
+		}
+
 		[OneTimeSetUp]
 		public void InitializeRFEM6Adapter()
 		{

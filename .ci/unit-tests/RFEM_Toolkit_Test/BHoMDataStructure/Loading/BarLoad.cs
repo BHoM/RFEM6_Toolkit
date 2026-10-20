@@ -28,7 +28,6 @@ using BH.oM.Structure.SectionProperties;
 using BH.oM.Geometry;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Loads;
-using Dlubal.WS.Rfem6.Model;
 using BH.Engine.Geometry;
 using System.Security.Permissions;
 
@@ -116,11 +115,11 @@ namespace RFEM_Toolkit_Test.Elements
 
 
 
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //    adapter.Wipeout();
-        //}
+        [TearDown]
+        public void TearDown()
+        {
+            RFEM6TestCleanup.WipeModel(adapter);
+        }
 
         [SetUp]
         public void EveryTimeSetUp()

@@ -4,111 +4,50 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
-using BH.oM.Structure.Constraints;
-using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SurfaceProperties;
-using BH.oM.Geometry;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
-using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
-using BH.Engine.Spatial;
 
 namespace BH.Adapter.RFEM6
 {
-#if RFEM6_8_2
-    public partial class RFEM6AdapterV8_2
-#elif RFEM6_12_11
-    public partial class RFEM6AdapterV12_11
-#else
     public partial class RFEM6Adapter
-#endif
     {
-
         private List<Panel> ReadPanels(List<string> ids = null)
         {
-
-            var panelNumbersByType = m_Model.get_all_object_numbers_by_type(rfModel.object_types.E_OBJECT_TYPE_SURFACE);
-            var allRfPanels = panelNumbersByType.ToList().Select(n => m_Model.get_surface(n.no)).ToList();
-            List<int> panelNumbers = panelNumbersByType.ToList().Select(p => p.no).ToList();
-
-            List<Panel> bhPanels = new List<Panel>();
-
             Dictionary<int, Edge> edges = this.GetCachedOrReadAsDictionary<int, Edge>();
-            Dictionary<int, ISurfaceProperty> surfaceProperties = this.GetCachedOrReadAsDictionary<int, ISurfaceProperty>();
-            Dictionary<int, RFEMOpening> surfaceOpening = this.GetCachedOrReadAsDictionary<int, RFEMOpening>();
+            Dictionary<int, ISurfaceProperty> properties = this.GetCachedOrReadAsDictionary<int, ISurfaceProperty>();
+            List<(Opening, List<int>)> openings = ReadOpeningsWithSurfaces();
 
-            HashSet<int> surfaceWithOpeningIDs = surfaceOpening.SelectMany(o => o.Value.SurfaceIDs).ToHashSet();
-
-            Dictionary<int, HashSet<int>> surfaceOpeningIdDicionary = new Dictionary<int, HashSet<int>>();
-
-            foreach (int s in panelNumbers)
+            List<Panel> panels = new List<Panel>();
+            foreach (StructureCore.Surface rfSurface in GetObjectList(new StructureCore.Surface()).Where(s => s.No > 0))
             {
+                if (rfSurface.Type != StructureCore.Surface.Types.Type.Standard || rfSurface.Geometry != StructureCore.Surface.Types.Geometry.Plane)
+                    BH.Engine.Base.Compute.RecordWarning($"Surface {rfSurface.No} is a {rfSurface.Geometry} {rfSurface.Type} surface. It is read as a plane panel with its boundary lines and thickness only.");
 
-                HashSet<int> openingIds = new HashSet<int>();
+                properties.TryGetValue(rfSurface.Thickness, out ISurfaceProperty property);
+                List<Opening> surfaceOpenings = openings.Where(o => o.Item2.Contains(rfSurface.No)).Select(o => o.Item1).ToList();
 
-                if (surfaceWithOpeningIDs.Contains(s))
-                {
-
-
-                    foreach (KeyValuePair<int, RFEMOpening> entry in surfaceOpening)
-                    {
-
-                        if (entry.Value.SurfaceIDs.ToHashSet().Contains(s))
-                        {
-                            openingIds.Add(entry.Value.Opening.GetRFEM6ID());
-                        }
-
-
-                    }
-
-                }
-
-                surfaceOpeningIdDicionary.Add(s, openingIds);
-
-            }
-           
-            //ComparerPoin
-            m_PanelIDdict.Clear();
-            foreach (rfModel.surface rfPanel in allRfPanels)
-            {
-
-                var bhPanel = rfPanel.FromRFEM(edges, surfaceProperties, surfaceOpeningIdDicionary[rfPanel.no], surfaceOpening);
-                //m_PanelIDdict.Add(bhPanel, rfPanel.no);
-                m_PanelIDdict[bhPanel]=rfPanel.no;
-                bhPanels.Add(bhPanel);
-                //HashSet<Point> panelPointSet = new HasSet<Point> { bhPanel.ExternalEdges.Select(b => b.Curve.ControlPoints()) };
-
+                panels.Add(rfSurface.FromRFEM(edges, property, surfaceOpenings));
             }
 
-
-
-            return bhPanels;
+            return panels;
         }
-
     }
 }
-
-
-

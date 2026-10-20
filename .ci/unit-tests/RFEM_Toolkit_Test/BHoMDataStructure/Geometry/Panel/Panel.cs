@@ -106,11 +106,11 @@ namespace RFEM_Toolkit_Test.Elements
 
 
 
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //    adapter.Wipeout();
-        //}
+        [TearDown]
+        public void TearDown()
+        {
+            RFEM6TestCleanup.WipeModel(adapter);
+        }
 
         [Test]
         public void PushPullPanel()

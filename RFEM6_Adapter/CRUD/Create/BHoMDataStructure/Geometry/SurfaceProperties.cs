@@ -4,71 +4,65 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-using BH.oM.Adapter;
-using BH.oM.Structure.Elements;
-using BH.oM.Structure.MaterialFragments;
-using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
-using BH.oM.Adapters.RFEM6;
-
-using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-#if RFEM6_8_2
-    public partial class RFEM6AdapterV8_2
-#elif RFEM6_12_11
-    public partial class RFEM6AdapterV12_11
-#else
     public partial class RFEM6Adapter
-#endif
     {
-
-        //Has been implemented inside of Nodes.cs
-
         private bool CreateCollection(IEnumerable<ISurfaceProperty> surfaceProperties)
         {
-            Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
-
+            HashSet<int> usedNumbers = UsedNumbers<StructureCore.Thickness>();
+            List<StructureCore.Thickness> existingThicknesses = GetObjectList(new StructureCore.Thickness());
+            List<StructureCore.Thickness> thicknessesToCreate = new List<StructureCore.Thickness>();
 
             foreach (ISurfaceProperty surfaceProperty in surfaceProperties)
             {
+                int matNo = FindMaterialNumber(surfaceProperty.Material);
+                if (matNo <= 0)
+                {
+                    BH.Engine.Base.Compute.RecordError($"Cannot create surface property '{surfaceProperty.Name}' because its material is not in RFEM6 and was not queued in this push.");
+                    return false;
+                }
 
-                IMaterialFragment material = materials[surfaceProperty.Material.GetRFEM6ID()];
+                double thickness = BH.Engine.Structure.Query.ITotalThickness(surfaceProperty);
+                StructureCore.Thickness existing = existingThicknesses.Concat(thicknessesToCreate).FirstOrDefault(t =>
+                    t.Type == StructureCore.Thickness.Types.Type.Uniform
+                    && t.Material == matNo
+                    && Math.Abs(t.UniformThickness - thickness) < 1e-6
+                    && (string.IsNullOrWhiteSpace(surfaceProperty.Name) || string.Equals(t.Name, surfaceProperty.Name, StringComparison.OrdinalIgnoreCase)));
 
-                rfModel.thickness rfSurfaceThickness = Convert.ToRFEM6(surfaceProperty, material);
+                if (existing != null)
+                {
+                    surfaceProperty.SetRFEM6ID(existing.No);
+                    continue;
+                }
 
-                m_Model.set_thickness(rfSurfaceThickness);
-
+                surfaceProperty.SetRFEM6ID(ClaimNumber(surfaceProperty.GetRFEM6ID(), usedNumbers));
+                thicknessesToCreate.Add(surfaceProperty.ToRFEM6(matNo));
             }
 
+            CreateObjectList(thicknessesToCreate);
             return true;
-
         }
-
-
     }
 }
-
-
-
