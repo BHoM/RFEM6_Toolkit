@@ -8,7 +8,7 @@
 		<Copyright>Copyright © https://github.com/BHoM</Copyright>
 		<RootNamespace>BH.oM.Adapters.RFEM6</RootNamespace>
 		<FileVersion>10.0.0.0</FileVersion>
-		<Configurations>Debug;Release;Debug_V682;Release_V682;Debug_V12;Release_V12</Configurations>
+		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

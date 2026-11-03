@@ -130,6 +130,9 @@ namespace BH.Adapter.RFEM6
         [PreviousVersion("9.3", "BH.Adapter.RFEM6.RFEM6Adapter(System.String, System.Boolean)")]
         [PreviousVersion("9.3", "BH.Adapter.RFEM6.RFEM6AdapterV12_11(System.String, System.Boolean)")]
         [PreviousVersion("9.3", "BH.Adapter.RFEM6.RFEM6AdapterV8_2(System.String, System.Boolean)")]
+        [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6Adapter(System.String, System.Boolean)")]
+        [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6AdapterV12_11(System.String, System.Boolean)")]
+        [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6AdapterV8_2(System.String, System.Boolean)")]
         public RFEM6Adapter(string filePath = "", bool active = false, string apiKeyName = "BHoM Test Key")
         {
             m_apiKeyName = apiKeyName;
