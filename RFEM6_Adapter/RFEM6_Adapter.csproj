@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-    <LangVersion>10</LangVersion>
     <AssemblyVersion>9.0.0.0</AssemblyVersion>
     <Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
     <AssemblyName>RFEM6_Adapter</AssemblyName>
@@ -121,6 +120,15 @@
 			<Private>false</Private>
 		</Reference>
 	</ItemGroup>
+
+	<Target Name="EnsureConfigurationRestore"
+	        BeforeTargets="ResolvePackageAssets"
+	        Condition="'$(DesignTimeBuild)' != 'true' And '$(BuildingInsideVisualStudio)' != 'true'">
+		<Exec Command="dotnet restore &quot;$(MSBuildProjectFullPath)&quot; /p:Configuration=$(Configuration) --verbosity quiet"
+		      Condition="'$(MSBuildRuntimeType)' == 'Core'" />
+		<Exec Command="&quot;$(MSBuildToolsPath)\MSBuild.exe&quot; &quot;$(MSBuildProjectFullPath)&quot; /t:Restore /p:Configuration=$(Configuration) /v:q /nologo"
+		      Condition="'$(MSBuildRuntimeType)' == 'Full'" />
+	</Target>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />

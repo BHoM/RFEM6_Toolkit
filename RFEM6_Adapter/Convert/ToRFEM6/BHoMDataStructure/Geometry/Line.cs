@@ -34,6 +34,7 @@ using BH.Engine.Geometry;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.oM.Base;
 using Dlubal.Api.Common;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
 {

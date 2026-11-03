@@ -33,6 +33,7 @@ using BH.oM.Spatial.ShapeProfiles;
 using BH.Engine.Base;
 using BH.oM.Base;
 using System.Text.RegularExpressions;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 
 namespace BH.Adapter.RFEM6

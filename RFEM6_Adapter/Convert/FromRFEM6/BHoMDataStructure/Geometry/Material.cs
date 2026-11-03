@@ -35,6 +35,7 @@ using BH.oM.Base;
 using BH.oM.Structure.SectionProperties;
 using System.Text.RegularExpressions;
 using BH.oM.Physical.Materials;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
 {

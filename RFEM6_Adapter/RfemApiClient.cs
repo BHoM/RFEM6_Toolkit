@@ -36,6 +36,14 @@ using Dlubal.Api.Common;
 using Dlubal.Api.Rfem;
 using Google.Protobuf;
 using Grpc.Core;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
+using TypesForNodes = Dlubal.Api.Rfem.TypesForNodes;
+using TypesForLines = Dlubal.Api.Rfem.TypesForLines;
+using TypesForMembers = Dlubal.Api.Rfem.TypesForMembers;
+using TypesForSpecialObjects = Dlubal.Api.Rfem.TypesForSpecialObjects;
+using StructureAdvanced = Dlubal.Api.Rfem.StructureAdvanced;
+using RfLoading = Dlubal.Api.Rfem.Loading;
+using RfLoads = Dlubal.Api.Rfem.Loads;
 
 namespace BH.Adapter.RFEM6
 {

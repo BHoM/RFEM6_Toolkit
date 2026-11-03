@@ -22,6 +22,7 @@
 using BH.oM.Structure.Loads;
 
 using ActionCategory = Dlubal.Api.Rfem.Loading.LoadCase.Types.ActionCategory;
+using RfLoading = Dlubal.Api.Rfem.Loading;
 
 namespace BH.Adapter.RFEM6
 {

@@ -38,6 +38,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace RFEM_Toolkit_Test.Comparer_Tests
 {

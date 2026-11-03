@@ -26,6 +26,7 @@ using System.Text.RegularExpressions;
 
 using BH.oM.Base;
 using BH.oM.Structure.SectionProperties;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
 {
@@ -200,9 +201,12 @@ namespace BH.Adapter.RFEM6
             {
                 foreach (IBHoMObject profileObject in SectionProfiles(sectionObject))
                 {
-                    width ??= PropertyLength(profileObject, "Width");
-                    height ??= PropertyLength(profileObject, "Height") ?? PropertyLength(profileObject, "Depth");
-                    diameter ??= PropertyLength(profileObject, "Diameter");
+                    if (width == null)
+                        width = PropertyLength(profileObject, "Width");
+                    if (height == null)
+                        height = PropertyLength(profileObject, "Height") ?? PropertyLength(profileObject, "Depth");
+                    if (diameter == null)
+                        diameter = PropertyLength(profileObject, "Diameter");
                 }
             }
         }
@@ -223,7 +227,7 @@ namespace BH.Adapter.RFEM6
 
         private static string SectionProfileTypeName(ISectionProperty section)
         {
-            if (section is not IBHoMObject sectionObject)
+            if (!(section is IBHoMObject sectionObject))
                 return string.Empty;
 
             IBHoMObject profile = SectionProfiles(sectionObject).FirstOrDefault();

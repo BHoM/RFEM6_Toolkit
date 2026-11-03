@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net48</TargetFramework>
-		<LangVersion>10</LangVersion>
 		<AssemblyVersion>9.0.0.0</AssemblyVersion>
 		<Description>https://github.com/BHoM/RFEM6_Toolkit</Description>
 		<IsPackable>false</IsPackable>

@@ -19,6 +19,10 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using BH.Adapter.RFEM6;
 using BH.Engine.Base;
 using BH.oM.Data.Requests;
@@ -59,7 +63,7 @@ namespace RFEM_Toolkit_Test.Elements
         [Test]
         public void ReadResult()
         {
-            List<LoadCombination?> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l => l as LoadCombination).ToList();
+            List<LoadCombination> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l => l as LoadCombination).ToList();
 
             Loadcase loadcase1 = new Loadcase() { Name = "LC1", Nature = LoadNature.Dead, Number = 1 };
             LoadCombination loadCombination = new LoadCombination { Name = "LoadCombination1", Number = 1 };
@@ -84,8 +88,8 @@ namespace RFEM_Toolkit_Test.Elements
         [Test]
         public void ReadResult2()
         {
-            List<LoadCombination?> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l => l as LoadCombination).ToList();
-            List<LoadCombination?> relevantLoadComb = loadCombList.Take(38).ToList();
+            List<LoadCombination> loadCombList = adapter.Pull(new FilterRequest() { Type = typeof(LoadCombination) }).Select(l => l as LoadCombination).ToList();
+            List<LoadCombination> relevantLoadComb = loadCombList.Take(38).ToList();
 
             BarResultRequest request = new BarResultRequest();
 

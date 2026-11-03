@@ -32,6 +32,8 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
+using TypesForNodes = Dlubal.Api.Rfem.TypesForNodes;
 
 namespace BH.Adapter.RFEM6
 {

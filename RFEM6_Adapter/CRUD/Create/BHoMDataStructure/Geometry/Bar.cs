@@ -27,6 +27,8 @@ using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.SectionProperties;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
+using TypesForMembers = Dlubal.Api.Rfem.TypesForMembers;
 
 namespace BH.Adapter.RFEM6
 {

@@ -28,6 +28,8 @@ using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
+using Google.Protobuf;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
 {

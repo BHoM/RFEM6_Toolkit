@@ -24,6 +24,7 @@ using System.Linq;
 
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SurfaceProperties;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
 {

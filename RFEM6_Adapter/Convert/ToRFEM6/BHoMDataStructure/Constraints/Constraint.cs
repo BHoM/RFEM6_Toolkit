@@ -24,6 +24,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 using BH.oM.Structure.Constraints;
+using TypesForNodes = Dlubal.Api.Rfem.TypesForNodes;
+using TypesForLines = Dlubal.Api.Rfem.TypesForLines;
+using TypesForMembers = Dlubal.Api.Rfem.TypesForMembers;
+using TypesForSpecialObjects = Dlubal.Api.Rfem.TypesForSpecialObjects;
 
 namespace BH.Adapter.RFEM6
 {

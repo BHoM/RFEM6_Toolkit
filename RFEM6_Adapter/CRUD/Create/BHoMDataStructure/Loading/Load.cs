@@ -31,6 +31,8 @@ using BH.oM.Adapters.RFEM6.Fragments.Enums;
 using BH.oM.Base;
 using BH.oM.Geometry;
 using BH.oM.Structure.Loads;
+using Google.Protobuf;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
 {

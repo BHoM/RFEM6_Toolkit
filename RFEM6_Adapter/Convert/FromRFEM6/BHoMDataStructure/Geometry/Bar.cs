@@ -30,6 +30,7 @@ using BH.oM.Structure.SectionProperties;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.MaterialFragments;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
 {

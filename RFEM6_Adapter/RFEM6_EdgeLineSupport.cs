@@ -25,6 +25,9 @@ using System.Linq;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
+using TypesForLines = Dlubal.Api.Rfem.TypesForLines;
+using TypesForSpecialObjects = Dlubal.Api.Rfem.TypesForSpecialObjects;
+using StructureAdvanced = Dlubal.Api.Rfem.StructureAdvanced;
 
 namespace BH.Adapter.RFEM6
 {

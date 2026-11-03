@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using BH.oM.Adapters.RFEM6;
+using TypesForMembers = Dlubal.Api.Rfem.TypesForMembers;
 
 namespace BH.Adapter.RFEM6
 {

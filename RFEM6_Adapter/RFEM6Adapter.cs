@@ -127,6 +127,9 @@ namespace BH.Adapter.RFEM6
         [Input("active", "Set to true to activate the adapter and establish a connection to RFEM6.")]
         [Input("apiKeyName", "Name of the API key stored in config.ini. Defaults to 'BHoM Test Key'.")]
         [Output("adapter", "The created RFEM6 adapter configured for the Dlubal API II.")]
+        [PreviousVersion("9.3", "BH.Adapter.RFEM6.RFEM6Adapter(System.String, System.Boolean)")]
+        [PreviousVersion("9.3", "BH.Adapter.RFEM6.RFEM6AdapterV12_11(System.String, System.Boolean)")]
+        [PreviousVersion("9.3", "BH.Adapter.RFEM6.RFEM6AdapterV8_2(System.String, System.Boolean)")]
         public RFEM6Adapter(string filePath = "", bool active = false, string apiKeyName = "BHoM Test Key")
         {
             m_apiKeyName = apiKeyName;
@@ -309,12 +312,12 @@ namespace BH.Adapter.RFEM6
             return number;
         }
 
-        private static int GetObjectNumber(IMessage obj)
+        private static int GetObjectNumber(Google.Protobuf.IMessage obj)
         {
             return GetIntProperty(obj, "No");
         }
 
-        private static int GetIntProperty(IMessage obj, string propertyName)
+        private static int GetIntProperty(Google.Protobuf.IMessage obj, string propertyName)
         {
             PropertyInfo property = obj?.GetType().GetProperty(propertyName);
             if (property == null)

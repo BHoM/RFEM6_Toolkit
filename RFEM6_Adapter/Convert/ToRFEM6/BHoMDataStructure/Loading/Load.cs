@@ -26,6 +26,7 @@ using System.Linq;
 using BH.Engine.Geometry;
 using BH.oM.Geometry;
 using BH.oM.Structure.Loads;
+using RfLoads = Dlubal.Api.Rfem.Loads;
 
 namespace BH.Adapter.RFEM6
 {

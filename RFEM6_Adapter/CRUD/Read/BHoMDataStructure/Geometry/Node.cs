@@ -29,6 +29,7 @@ using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 
 using BH.oM.Adapters.RFEM6;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
 {

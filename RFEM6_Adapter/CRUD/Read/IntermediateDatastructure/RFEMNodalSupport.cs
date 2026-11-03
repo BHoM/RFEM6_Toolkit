@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using BH.oM.Adapters.RFEM6;
+using TypesForNodes = Dlubal.Api.Rfem.TypesForNodes;
 
 namespace BH.Adapter.RFEM6
 {

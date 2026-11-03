@@ -19,6 +19,10 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using BH.Adapter.RFEM6;
 using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6;
@@ -58,6 +62,7 @@ namespace RFEM_Toolkit_Test.Loading
 
         
         [TearDown]
+        [Description("Cleans up the RFEM6 model after each test.")]
         public void TearDown()
         {
             RFEM6TestCleanup.WipeModel(adapter);

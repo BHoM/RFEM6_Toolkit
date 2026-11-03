@@ -30,6 +30,7 @@ using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 
 using BH.Engine.Base;
+using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
 {

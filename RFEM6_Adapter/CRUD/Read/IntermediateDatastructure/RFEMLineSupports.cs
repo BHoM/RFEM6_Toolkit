@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using BH.oM.Adapters.RFEM6;
+using TypesForLines = Dlubal.Api.Rfem.TypesForLines;
 
 namespace BH.Adapter.RFEM6
 {
