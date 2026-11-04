@@ -21,13 +21,14 @@
  */
 using System;
 using System.Collections.Generic;
-using BH.oM.Structure.Elements;
-using BH.Engine.Structure;
-using System.Linq;
-using BH.oM.Geometry;
-using BH.Engine.Geometry;
 using System.ComponentModel;
+using System.Linq;
+using BH.Engine.Geometry;
+using BH.Engine.Structure;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.oM.Base.Attributes;
+using BH.oM.Geometry;
+using BH.oM.Structure.Elements;
 
 namespace BH.Adapter.RFEM6
 {
@@ -37,6 +38,8 @@ namespace BH.Adapter.RFEM6
         /**** Constructors                              ****/
         /***************************************************/
 
+        [Description("Initialises a new instance of the RFEMLineComparer class.")]
+        [Output("comparer", "The created RFEMLineComparer instance.")]
         public RFEMLineComparer()
         {
             m_nodeComparer = new NodeDistanceComparer();
@@ -44,6 +47,9 @@ namespace BH.Adapter.RFEM6
 
         /***************************************************/
 
+        [Description("Initialises a new instance of the RFEMLineComparer class with a specified number of decimals for node distance comparison.")]
+        [Input("decimals", "Number of decimal places used for comparing node positions.")]
+        [Output("comparer", "The created RFEMLineComparer instance.")]
         public RFEMLineComparer(int decimals)
         {
             m_nodeComparer = new NodeDistanceComparer(decimals);

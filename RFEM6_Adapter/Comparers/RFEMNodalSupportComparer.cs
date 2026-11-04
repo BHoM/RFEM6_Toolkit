@@ -21,12 +21,14 @@
  */
 using System;
 using System.Collections.Generic;
-using BH.oM.Adapters.RFEM6;
-using BH.oM.Structure.Constraints;
+using System.ComponentModel;
+using BH.Engine.Base;
 using BH.Engine.Structure;
+using BH.oM.Adapters.RFEM6;
+using BH.oM.Base.Attributes;
+using BH.oM.Structure.Constraints;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
-using BH.Engine.Base;
 
 namespace BH.Adapter.RFEM6
 {
@@ -36,6 +38,8 @@ namespace BH.Adapter.RFEM6
         /**** Constructors                              ****/
         /***************************************************/
 
+        [Description("Initialises a new instance of the RFEMNodalSupportComparer class.")]
+        [Output("comparer", "The created RFEMNodalSupportComparer instance.")]
         public RFEMNodalSupportComparer()
         {
 

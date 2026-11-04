@@ -21,7 +21,9 @@
  */
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using BH.oM.Adapters.RFEM6;
+using BH.oM.Base.Attributes;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Loads;
 using BH.oM.Structure.SectionProperties;
@@ -35,6 +37,8 @@ namespace BH.Adapter.RFEM6
         /**** Constructors                              ****/
         /***************************************************/
 
+        [Description("Initialises a new instance of the LoadCaseComparer class.")]
+        [Output("comparer", "The created LoadCaseComparer instance.")]
         public LoadCaseComparer()
         {
 

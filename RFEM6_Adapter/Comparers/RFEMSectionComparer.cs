@@ -21,6 +21,8 @@
  */
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using BH.oM.Base.Attributes;
 using BH.oM.Structure.SectionProperties;
 
 namespace BH.Adapter.RFEM6
@@ -31,6 +33,8 @@ namespace BH.Adapter.RFEM6
         /**** Constructors                              ****/
         /***************************************************/
 
+        [Description("Initialises a new instance of the RFEMSectionComparer class.")]
+        [Output("comparer", "The created RFEMSectionComparer instance.")]
         public RFEMSectionComparer()
         {
 

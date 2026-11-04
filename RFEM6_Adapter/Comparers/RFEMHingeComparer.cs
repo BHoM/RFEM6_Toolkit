@@ -21,7 +21,9 @@
  */
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using BH.oM.Adapters.RFEM6;
+using BH.oM.Base.Attributes;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.SectionProperties;
 using BH.oM.Structure.SurfaceProperties;
@@ -34,6 +36,8 @@ namespace BH.Adapter.RFEM6
         /**** Constructors                              ****/
         /***************************************************/
 
+        [Description("Initialises a new instance of the RFEMLineSupportComparer class.")]
+        [Output("comparer", "The created RFEMLineSupportComparer instance.")]
         public RFEMLineSupportComparer()
         {
 

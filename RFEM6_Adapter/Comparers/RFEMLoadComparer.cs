@@ -21,8 +21,10 @@
  */
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using BH.Engine.Structure;
 using BH.oM.Adapters.RFEM6;
+using BH.oM.Base.Attributes;
 using BH.oM.Geometry;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
@@ -38,6 +40,8 @@ namespace BH.Adapter.RFEM6
         /**** Constructors                              ****/
         /***************************************************/
 
+        [Description("Initialises a new instance of the RFEMLoadComparer class.")]
+        [Output("comparer", "The created RFEMLoadComparer instance.")]
         public RFEMLoadComparer()
         {
 
