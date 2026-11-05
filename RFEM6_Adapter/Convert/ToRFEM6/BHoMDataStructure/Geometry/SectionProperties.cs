@@ -25,6 +25,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using BH.oM.Base;
+using BH.oM.Spatial.ShapeProfiles;
 using BH.oM.Structure.SectionProperties;
 using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
@@ -53,8 +54,7 @@ namespace BH.Adapter.RFEM6
                 rfSection.No = sectionNo;
 
             if (!(materialType.Equals("Steel") && IsStandardSteelSection(bhSection))
-                && !sectionName.StartsWith("R_M1 ", StringComparison.Ordinal)
-                && !sectionName.StartsWith("CIRCLE_M1 ", StringComparison.Ordinal))
+                && !IsMigratedParametricRfemSectionName(sectionName))
                 BH.Engine.Base.Compute.RecordWarning($"Section {sectionName} uses a simplified RFEM6 export in v1. Parametric sections are not fully migrated yet.");
 
             if (bhSection is IBHoMObject bhomSection)
@@ -73,6 +73,13 @@ namespace BH.Adapter.RFEM6
                 return string.Empty;
 
             AlterSectionName(bhSection);
+
+            string profileRfemName = RfemProfileSectionName(bhSection);
+            if (!string.IsNullOrWhiteSpace(profileRfemName))
+            {
+                bhSection.Name = profileRfemName;
+                return profileRfemName;
+            }
 
             string parametricName = ParametricRfemSectionName(bhSection);
             if (!string.IsNullOrWhiteSpace(parametricName))
@@ -146,8 +153,76 @@ namespace BH.Adapter.RFEM6
         }
 
         /// <summary>
+        /// RFEM fabricated I and RHS names. Length segments are millimetres; BHoM profile dimensions are metres.
+        /// </summary>
+        private static string RfemProfileSectionName(ISectionProperty bhSection)
+        {
+            if (!(bhSection is IBHoMObject sectionObject))
+                return null;
+
+            foreach (IBHoMObject profileObject in SectionProfiles(sectionObject))
+            {
+                if (profileObject is ISectionProfile iSection)
+                {
+                    return BH.Engine.Adapters.RFEM6.Query.RfemISectionNameFromMetres(
+                        iSection.Height,
+                        iSection.Width,
+                        iSection.WebThickness,
+                        iSection.FlangeThickness,
+                        iSection.RootRadius,
+                        iSection.ToeRadius);
+                }
+
+                if (profileObject is BoxProfile boxSection)
+                {
+                    return BH.Engine.Adapters.RFEM6.Query.RfemRhsSectionNameFromMetres(
+                        boxSection.Height,
+                        boxSection.Width,
+                        boxSection.Thickness,
+                        boxSection.OuterRadius,
+                        boxSection.InnerRadius);
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsMigratedParametricRfemSectionName(string sectionName)
+        {
+            if (string.IsNullOrWhiteSpace(sectionName))
+                return false;
+
+            if (sectionName.StartsWith("R_M1 ", StringComparison.Ordinal)
+                || sectionName.StartsWith("CIRCLE_M1 ", StringComparison.Ordinal))
+                return true;
+
+            if (sectionName.StartsWith("I ", StringComparison.OrdinalIgnoreCase)
+                && BH.Engine.Adapters.RFEM6.Query.TryParseRfemISectionName(
+                    sectionName,
+                    out _,
+                    out _,
+                    out _,
+                    out _,
+                    out _,
+                    out _))
+                return true;
+
+            if (sectionName.StartsWith("RHS ", StringComparison.OrdinalIgnoreCase)
+                && BH.Engine.Adapters.RFEM6.Query.TryParseRfemRhsSectionName(
+                    sectionName,
+                    out _,
+                    out _,
+                    out _,
+                    out _,
+                    out _))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
         /// RFEM parametric rectangle and circle names (M1 = material group 1 in RFEM). X and Y are in millimetres; BHoM lengths are in metres.
-        /// Rectangle: R_M1 breadth/height (breadth = Width). Circle: CIRCLE_M1 diameter.
+        /// Rectangle: R_M1 b/h (breadth = Width, height = Height). Circle: CIRCLE_M1 diameter.
         /// </summary>
         private static string ParametricRfemSectionName(ISectionProperty bhSection)
         {

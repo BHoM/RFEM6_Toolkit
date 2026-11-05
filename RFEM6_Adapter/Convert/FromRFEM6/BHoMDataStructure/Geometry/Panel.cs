@@ -20,7 +20,6 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System.Collections.Generic;
-using System.Linq;
 
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.SurfaceProperties;
@@ -30,14 +29,31 @@ namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-        public static Panel FromRFEM(this StructureCore.Surface rfSurface, Dictionary<int, Edge> edges, ISurfaceProperty surfaceProperty, List<Opening> openings)
+        public static Panel FromRFEM(
+            this StructureCore.Surface rfSurface,
+            Dictionary<int, Edge> edges,
+            ISurfaceProperty surfaceProperty,
+            List<Opening> openings)
         {
+            List<Edge> externalEdges = new List<Edge>();
+
+            foreach (int lineNo in rfSurface.BoundaryLines)
+            {
+                if (edges.TryGetValue(lineNo, out Edge edge) && edge != null)
+                    externalEdges.Add(CloneEdgeForBoundary(edge));
+                else
+                    BH.Engine.Base.Compute.RecordWarning($"Surface {rfSurface.No} boundary references line {lineNo}, which was not read as an edge.");
+            }
+
             Panel panel = new Panel
             {
-                ExternalEdges = rfSurface.BoundaryLines.Select(l => edges.TryGetValue(l, out Edge edge) ? edge : null).Where(e => e != null).ToList(),
+                ExternalEdges = externalEdges,
                 Openings = openings ?? new List<Opening>(),
                 Property = surfaceProperty,
             };
+
+            panel.ExternalEdges.NormalisePlanarBoundaryEdges($"Surface {rfSurface.No}");
+
             panel.SetRFEM6ID(rfSurface.No);
 
             if (!string.IsNullOrWhiteSpace(rfSurface.Comment))

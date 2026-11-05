@@ -65,7 +65,7 @@ namespace BH.Adapter.RFEM6
                 string sectionName = section.ToRFEM6SectionName();
                 if (string.IsNullOrWhiteSpace(sectionName))
                 {
-                    BH.Engine.Base.Compute.RecordError($"Cannot push section of type {section.GetType().Name}: it has no Name and no dimensions on the section or its SectionProfile/Profile that the adapter can turn into an RFEM name (R_M1 or CIRCLE_M1).");
+                    BH.Engine.Base.Compute.RecordError($"Cannot push section of type {section.GetType().Name}: it has no Name and no dimensions on the section or its SectionProfile/Profile that the adapter can turn into an RFEM name (I, RHS, R_M1, or CIRCLE_M1).");
                     success = false;
                     continue;
                 }

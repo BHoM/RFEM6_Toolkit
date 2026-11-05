@@ -30,6 +30,7 @@ using BH.oM.Structure.SectionProperties;
 using BH.Engine.Adapter;
 using BH.oM.Adapters.RFEM6;
 using BH.oM.Structure.MaterialFragments;
+using BH.Engine.Adapters.RFEM6;
 using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
@@ -47,6 +48,7 @@ namespace BH.Adapter.RFEM6
                 SectionProperty = section,
                 Name = !string.IsNullOrWhiteSpace(member.Comment) ? member.Comment : "member nr." + member.No,
                 FEAType = member.Type.FromRFEM(),
+                OrientationAngle = BH.Engine.Adapters.RFEM6.Query.OrientationAngleFromRfemMemberRotation(member.RotationAngle),
             };
 
             bar.SetRFEM6ID(member.No);

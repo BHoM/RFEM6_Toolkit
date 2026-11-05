@@ -109,47 +109,7 @@ namespace BH.Adapter.RFEM6
 
         private static RFEMLine RfemLineToComparisonGeometry(StructureCore.Line rfLine, Dictionary<int, Node> nodes)
         {
-            if (rfLine == null)
-                return null;
-
-            ICurve curve = null;
-            List<Node> lineNodes = new List<Node>();
-
-            if (rfLine.Type == StructureCore.Line.Types.Type.Polyline)
-            {
-                foreach (int nodeNo in rfLine.DefinitionNodes)
-                {
-                    if (!nodes.TryGetValue(nodeNo, out Node nd))
-                        return null;
-
-                    lineNodes.Add(nd);
-                }
-
-                if (lineNodes.Count == 2)
-                    curve = Create.Line(lineNodes[0].Position, lineNodes[1].Position);
-                else if (lineNodes.Count > 2)
-                    curve = Create.Polyline(lineNodes.Select(n => n.Position).ToList());
-            }
-            else if (rfLine.Type == StructureCore.Line.Types.Type.Arc && rfLine.DefinitionNodes.Count >= 2)
-            {
-                if (!nodes.TryGetValue(rfLine.DefinitionNodes[0], out Node n0) || !nodes.TryGetValue(rfLine.DefinitionNodes[1], out Node n1))
-                    return null;
-
-                Point mid = Create.Point(rfLine.ArcControlPoint.X, rfLine.ArcControlPoint.Y, rfLine.ArcControlPoint.Z);
-                lineNodes = new List<Node> { n0, new Node { Position = mid }, n1 };
-                curve = Create.Arc(n1.Position, mid, n0.Position).Flip();
-            }
-            else if (rfLine.Type == StructureCore.Line.Types.Type.Circle)
-            {
-                Point centre = Create.Point(rfLine.CircleCenter.X, rfLine.CircleCenter.Y, rfLine.CircleCenter.Z);
-                lineNodes = new List<Node> { new Node { Position = centre } };
-                curve = Create.Circle(centre, rfLine.CircleRadius);
-            }
-
-            if (curve == null)
-                return null;
-
-            return new RFEMLine { Curve = curve, Nodes = lineNodes };
+            return Convert.RFEMLineFromApiLine(rfLine, nodes);
         }
 
         private static double LineGeometryDistance(RFEMLine a, RFEMLine b)

@@ -53,12 +53,20 @@ namespace BH.Adapter.RFEM6
             {
                 ISectionProperty bhSection;
 
+                if (!materials.TryGetValue(section.Material, out IMaterialFragment sectionMaterialsForParametric))
+                    continue;
+
+                ISectionProperty parametricSection = Convert.TryCreateSectionFromParametricRfemName(section.Name, sectionMaterialsForParametric);
+                if (parametricSection != null)
+                {
+                    parametricSection.SetRFEM6ID(section.No);
+                    sectionList.Add(parametricSection);
+                    continue;
+                }
+
                 if (section.Type == StructureCore.CrossSection.Types.Type.StandardizedSteel)
                 {
-                    if (!materials.TryGetValue(section.Material, out IMaterialFragment sectionMaterials))
-                        continue;
-
-                    bhSection = section.FromRFEM_Standardized_Steel(sectionListLib, sectionMaterials);
+                    bhSection = section.FromRFEM_Standardized_Steel(sectionListLib, sectionMaterialsForParametric);
                     bhSection.SetRFEM6ID(section.No);
                     sectionList.Add(bhSection);
                 }
@@ -66,10 +74,7 @@ namespace BH.Adapter.RFEM6
                 {
                     BH.Engine.Base.Compute.RecordWarning($"The section {section.Name} is not fully supported in v1 and will be read as ExplicitSection.");
 
-                    if (!materials.TryGetValue(section.Material, out IMaterialFragment sectionMaterials))
-                        continue;
-
-                    bhSection = new ExplicitSection() { Name = section.Name, Material = sectionMaterials };
+                    bhSection = new ExplicitSection() { Name = section.Name, Material = sectionMaterialsForParametric };
                     bhSection.SetRFEM6ID(section.No);
                     sectionList.Add(bhSection);
                 }

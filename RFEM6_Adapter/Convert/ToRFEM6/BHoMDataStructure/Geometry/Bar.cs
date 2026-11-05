@@ -31,6 +31,7 @@ using BH.Engine.Adapter;
 using BH.Engine.Base;
 
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
+using BH.Engine.Adapters.RFEM6;
 using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
@@ -48,11 +49,24 @@ namespace BH.Adapter.RFEM6
                 CrossSectionEnd = bar.SectionProperty.GetRFEM6ID(),
             };
 
+            ApplyMemberRotationFromBar(rfMember, bar);
+
             string comment = bar.ToRFEM6Comment();
             if (comment != null)
                 rfMember.Comment = comment;
 
             return rfMember;
+        }
+
+        private static void ApplyMemberRotationFromBar(StructureCore.Member rfMember, Bar bar)
+        {
+            double rotationAngleRadians = BH.Engine.Adapters.RFEM6.Query.RfemMemberRotationAngle(bar.OrientationAngle);
+            rfMember.RotationAngle = rotationAngleRadians;
+
+            bool isRotated = Math.Abs(rotationAngleRadians) > 1e-9;
+            rfMember.IsRotated = isRotated;
+            if (isRotated)
+                rfMember.RotationSpecificationType = StructureCore.Member.Types.RotationSpecificationType.ByAngle;
         }
 
     }

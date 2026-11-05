@@ -20,7 +20,6 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System.Collections.Generic;
-using System.Linq;
 
 using BH.oM.Structure.Elements;
 using StructureCore = Dlubal.Api.Rfem.StructureCore;
@@ -31,10 +30,18 @@ namespace BH.Adapter.RFEM6
     {
         public static Opening FromRFEM(this StructureCore.Opening rfOpening, Dictionary<int, Edge> edges)
         {
-            Opening opening = new Opening
+            List<Edge> openingEdges = new List<Edge>();
+
+            foreach (int lineNo in rfOpening.BoundaryLines)
             {
-                Edges = rfOpening.BoundaryLines.Select(l => edges.TryGetValue(l, out Edge edge) ? edge : null).Where(e => e != null).ToList(),
-            };
+                if (edges.TryGetValue(lineNo, out Edge edge) && edge != null)
+                    openingEdges.Add(CloneEdgeForBoundary(edge));
+                else
+                    BH.Engine.Base.Compute.RecordWarning($"Opening {rfOpening.No} boundary references line {lineNo}, which was not read as an edge.");
+            }
+
+            Opening opening = new Opening { Edges = openingEdges };
+            opening.Edges.NormalisePlanarBoundaryEdges($"Opening {rfOpening.No}");
             opening.SetRFEM6ID(rfOpening.No);
 
             if (!string.IsNullOrWhiteSpace(rfOpening.Comment))
