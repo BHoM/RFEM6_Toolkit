@@ -19,6 +19,10 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using BH.Adapter.RFEM6;
 using BH.Engine.Analytical;
 using BH.oM.Base;
@@ -26,7 +30,6 @@ using BH.oM.Data.Requests;
 using BH.oM.Spatial.ShapeProfiles;
 using BH.oM.Structure.MaterialFragments;
 using BH.oM.Structure.SectionProperties;
-using Dlubal.WS.Rfem6.Model;
 
 namespace RFEM_Toolkit_Test.Elements
 {
@@ -64,7 +67,7 @@ namespace RFEM_Toolkit_Test.Elements
         [TearDown]
         public void TearDown()
         {
-            //adapter.Wipeout();
+            RFEM6TestCleanup.WipeModel(adapter);
         }
 
         [Test]
@@ -72,7 +75,7 @@ namespace RFEM_Toolkit_Test.Elements
         {
             ///////////////////////////
             var sectionLibrary = BH.Engine.Library.Query.Library("EU_SteelSections");
-            var k=sectionLibrary.Select(s=>s.Name).Select(k=>(string)k).ToList();
+            var k=sectionLibrary.Select(s=>s.Name).Select(x=>(string)x).ToList();
             
             var weirdStringName = "cHs-42.4X.32";
             Dictionary<string, int> scorsDict= new Dictionary<string, int>();

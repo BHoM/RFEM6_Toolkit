@@ -19,6 +19,10 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using BH.Adapter.RFEM6;
 using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6;
@@ -27,7 +31,6 @@ using BH.oM.Geometry;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.Elements;
 using BH.oM.Data.Library;
-using Dlubal.WS.Rfem6.Model;
 using BH.oM.Physical.Materials;
 using BH.oM.Structure.MaterialFragments;
 
@@ -43,7 +46,14 @@ namespace RFEM_Toolkit_Test
         [SetUp]
         public void Setup()
         {
-            //adapter.Wipeout();
+            RFEM6TestCleanup.WipeModel(adapter);
+        }
+
+        
+        [TearDown]
+        public void TearDown()
+        {
+            RFEM6TestCleanup.WipeModel(adapter);
         }
 
         [OneTimeSetUp]
