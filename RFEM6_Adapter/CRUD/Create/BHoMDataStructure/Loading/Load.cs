@@ -27,6 +27,7 @@ using System.Reflection;
 using BH.Engine.Base;
 using BH.Engine.Geometry;
 using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
+using BH.oM.Adapters.RFEM6.Fragments;
 using BH.oM.Adapters.RFEM6.Fragments.Enums;
 using BH.oM.Base;
 using BH.oM.Geometry;
@@ -63,7 +64,7 @@ namespace BH.Adapter.RFEM6
                         loadNo = QueueLoads(loadCase, barLoad.ToRFEM6(ElementNumbers(barLoad.Objects?.Elements)));
                         break;
                     case AreaUniformlyDistributedLoad areaLoad:
-                        Polygon polygon = areaLoad.CustomData.Values.OfType<Polygon>().FirstOrDefault();
+                        Polygon polygon = areaLoad.FindFragment<RFEMLoadPolygon>()?.Polygon;
                         if (polygon != null)
                             loadNo = QueueLoads(loadCase, areaLoad.ToRFEM6(polygon, ElementNumbers(areaLoad.Objects?.Elements)));
                         else

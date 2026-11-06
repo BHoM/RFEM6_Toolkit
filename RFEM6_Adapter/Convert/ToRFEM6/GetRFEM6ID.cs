@@ -36,20 +36,14 @@ namespace BH.Adapter.RFEM6
         }
 
         /// <summary>
-        /// RFEM comment field: BHoM <see cref="IBHoMObject.Name"/> first, otherwise legacy CustomData "Comment".
+        /// RFEM comment field, taken from the BHoM <see cref="IBHoMObject.Name"/>.
         /// </summary>
         public static string ToRFEM6Comment(this IBHoMObject obj)
         {
-            if (obj == null)
+            if (obj == null || string.IsNullOrWhiteSpace(obj.Name))
                 return null;
 
-            if (!string.IsNullOrWhiteSpace(obj.Name))
-                return obj.Name.Trim();
-
-            if (obj.CustomData != null && obj.CustomData.TryGetValue("Comment", out object comment) && comment != null && !string.IsNullOrWhiteSpace(comment.ToString()))
-                return comment.ToString().Trim();
-
-            return null;
+            return obj.Name.Trim();
         }
     }
 }

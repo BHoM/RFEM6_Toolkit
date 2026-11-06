@@ -31,22 +31,23 @@ namespace BH.Engine.Adapters.RFEM6
         /**** Public Methods                            ****/
         /***************************************************/
 
-        [Description("Maps a BHoM bar OrientationAngle to the RFEM member rotation_angle. Both are in radians (RFEM API; the GUI may show β in degrees).")]
-        [Input("orientationAngleRadians", "BHoM bar OrientationAngle in radians.")]
-        [Output("rotationAngleRadians", "RFEM member rotation_angle in radians.")]
-        public static double RfemMemberRotationAngle(double orientationAngleRadians)
+        [Description("Builds an RFEM parametric RHS (box) name from BHoM lengths in metres.")]
+        [Input("heightMetres", "Overall height h.")]
+        [Input("widthMetres", "Overall width b.")]
+        [Input("thicknessMetres", "Wall thickness t.")]
+        [Input("outerRadiusMetres", "Outer corner radius ro.")]
+        [Input("innerRadiusMetres", "Inner corner radius ri.")]
+        [Output("rfemName", "RFEM cross-section name, for example RHS 750/500/15/15/12/H.")]
+        public static string RfemRhsSectionNameFromMetres(
+            double heightMetres,
+            double widthMetres,
+            double thicknessMetres,
+            double outerRadiusMetres,
+            double innerRadiusMetres)
         {
-            return orientationAngleRadians;
+            return $"RHS {LengthMillimetresText(heightMetres)}/{LengthMillimetresText(widthMetres)}/{LengthMillimetresText(thicknessMetres)}/{LengthMillimetresText(outerRadiusMetres)}/{LengthMillimetresText(innerRadiusMetres)}/{DefaultHotColdFlag}";
         }
 
         /***************************************************/
-
-        [Description("Maps an RFEM member rotation_angle to a BHoM bar OrientationAngle. Both are in radians.")]
-        [Input("rotationAngleRadians", "RFEM member rotation_angle in radians.")]
-        [Output("orientationAngleRadians", "BHoM bar OrientationAngle in radians.")]
-        public static double OrientationAngleFromRfemMemberRotation(double rotationAngleRadians)
-        {
-            return rotationAngleRadians;
-        }
     }
 }

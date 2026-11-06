@@ -25,6 +25,7 @@ using System.Linq;
 
 using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
+using BH.oM.Adapters.RFEM6.Fragments;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.oM.Base;
 using BH.oM.Geometry;
@@ -179,7 +180,8 @@ namespace BH.Adapter.RFEM6
 
         private static string PolygonKey(IBHoMObject load)
         {
-            if (!(load.PropertyValue("Polygon") is Polygon polygon))
+            Polygon polygon = load.FindFragment<RFEMLoadPolygon>()?.Polygon;
+            if (polygon == null)
                 return "";
 
             return string.Join(";", polygon.Vertices.Select(PointKey));

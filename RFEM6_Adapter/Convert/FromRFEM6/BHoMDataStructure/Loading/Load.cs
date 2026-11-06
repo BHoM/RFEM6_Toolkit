@@ -24,6 +24,7 @@ using System.Linq;
 
 using BH.Engine.Base;
 using BH.oM.Adapters.RFEM6.BHoMDataStructure.SupportDatastrures;
+using BH.oM.Adapters.RFEM6.Fragments;
 using BH.oM.Adapters.RFEM6.Fragments.Enums;
 using BH.oM.Base;
 using BH.oM.Geometry;
@@ -153,7 +154,7 @@ namespace BH.Adapter.RFEM6
             };
 
             if (vertices.Count >= 3)
-                bhLoad.SetPropertyValue("Polygon", BH.Engine.Geometry.Create.Polygon(vertices));
+                bhLoad.Fragments.AddOrReplace(new RFEMLoadPolygon { Polygon = BH.Engine.Geometry.Create.Polygon(vertices) });
 
             bhLoad.SetRFEM6ID(rfLoad.No);
             return bhLoad;

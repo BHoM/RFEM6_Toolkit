@@ -20,7 +20,6 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -34,22 +33,6 @@ namespace BH.Engine.Adapters.RFEM6
         /**** Private Fields                            ****/
         /***************************************************/
 
-        private static readonly Regex CompactAlphanumeric = new Regex(
-            @"[^a-zA-Z0-9]",
-            RegexOptions.CultureInvariant);
-
-        private static readonly Regex RfemHeCatalogueName = new Regex(
-            @"^HE(?<variant>AA|BB|A|B|M|C)(?<size>\d+(?:\.\d+)?)$",
-            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-
-        private static readonly Regex BhomHeCompactName = new Regex(
-            @"^HE(?<size>\d+(?:\.\d+)?)(?<variant>[A-Z]{1,2})$",
-            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-
-        private static readonly Regex EuropeanSteelGrade = new Regex(
-            @"^S(?<yield>\d{3})(?<suffix>[A-Z]*)$",
-            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-
         private static readonly Regex ParametricRectangleName = new Regex(
             @"^(?:R_M1|RM_1)\s*(?<breadth>\d+)\s*/\s*(?<height>\d+)\s*",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
@@ -61,65 +44,6 @@ namespace BH.Engine.Adapters.RFEM6
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
-
-        [Description("Returns an alphanumeric key used to match an RFEM cross-section name to BHoM steel library entries.")]
-        [Input("rfemSectionName", "RFEM cross-section name, including optional catalogue suffix after '|'.")]
-        [Output("lookupKey", "Compact name aligned with BHoM EU steel naming (for example HEB 800 becomes HE800B).")]
-        public static string RfemSectionLibraryLookupKey(string rfemSectionName)
-        {
-            if (string.IsNullOrWhiteSpace(rfemSectionName))
-                return string.Empty;
-
-            string compact = CompactAlphanumeric.Replace(RfemNameStem(rfemSectionName), string.Empty);
-            if (string.IsNullOrEmpty(compact))
-                return string.Empty;
-
-            Match rfemHe = RfemHeCatalogueName.Match(compact);
-            if (rfemHe.Success)
-            {
-                string variant = rfemHe.Groups["variant"].Value.ToUpperInvariant();
-                string size = rfemHe.Groups["size"].Value;
-                return $"HE{size}{variant}";
-            }
-
-            Match bhomHe = BhomHeCompactName.Match(compact);
-            if (bhomHe.Success)
-                return compact.ToUpperInvariant();
-
-            return compact.ToUpperInvariant();
-        }
-
-        [Description("Returns an alphanumeric key used to match an RFEM material name to BHoM material library entries.")]
-        [Input("rfemMaterialName", "RFEM material name, including optional catalogue suffix after '|'.")]
-        [Output("lookupKey", "Compact name used for fuzzy library matching.")]
-        public static string RfemMaterialLibraryLookupKey(string rfemMaterialName)
-        {
-            if (string.IsNullOrWhiteSpace(rfemMaterialName))
-                return string.Empty;
-
-            string compact = CompactAlphanumeric.Replace(RfemNameStem(rfemMaterialName), string.Empty);
-            if (string.IsNullOrEmpty(compact))
-                return string.Empty;
-
-            return compact.ToUpperInvariant();
-        }
-
-        [Description("Extracts the European steel grade token from an RFEM material name (for example S460N).")]
-        [Input("rfemMaterialName", "RFEM material name, including optional catalogue suffix after '|'.")]
-        [Output("gradeToken", "Alphanumeric grade token, or empty when no European steel grade is recognised.")]
-        public static string EuropeanSteelGradeToken(string rfemMaterialName)
-        {
-            string lookupKey = RfemMaterialLibraryLookupKey(rfemMaterialName);
-            if (string.IsNullOrEmpty(lookupKey))
-                return string.Empty;
-
-            Match grade = EuropeanSteelGrade.Match(lookupKey);
-            if (!grade.Success)
-                return string.Empty;
-
-            string suffix = grade.Groups["suffix"].Value.ToUpperInvariant();
-            return $"S{grade.Groups["yield"].Value}{suffix}";
-        }
 
         [Description("Parses RFEM parametric rectangle or circle cross-section names into BHoM lengths in metres.")]
         [Input("rfemSectionName", "RFEM cross-section name (R_M1, RM_1, or CIRCLE_M1).")]
@@ -167,11 +91,6 @@ namespace BH.Engine.Adapters.RFEM6
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private static string RfemNameStem(string rfemName)
-        {
-            return rfemName.Split('|')[0].Trim();
-        }
-
         private static bool TryParseMillimetres(string millimetresText, out double lengthMetres)
         {
             lengthMetres = 0;
@@ -181,5 +100,7 @@ namespace BH.Engine.Adapters.RFEM6
             lengthMetres = millimetres / 1000.0;
             return true;
         }
+
+        /***************************************************/
     }
 }

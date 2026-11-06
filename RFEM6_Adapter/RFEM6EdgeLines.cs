@@ -23,31 +23,31 @@ using System.Collections.Generic;
 using System.Linq;
 
 using BH.Engine.Base;
+using BH.oM.Adapters.RFEM6.Fragments;
 using BH.oM.Adapters.RFEM6.IntermediateDatastructure.Geometry;
 using BH.oM.Structure.Elements;
 
 namespace BH.Adapter.RFEM6
 {
     /// <summary>
-    /// A polyline edge is split into several RFEM lines. BHoM only allows one RFEMLine fragment per edge, so the full set is stored on CustomData during push.
+    /// A polyline edge is split into several RFEM lines. BHoM only allows one RFEMLine fragment per edge, so the full set is stored in an RFEMEdgeLines fragment during push.
     /// </summary>
     internal static class RFEM6EdgeLines
     {
-        internal const string CustomDataKey = "RFEM6_EdgeLines";
-
         internal static void Set(Edge edge, IList<RFEMLine> lines)
         {
             if (edge == null || lines == null || lines.Count == 0)
                 return;
 
-            edge.CustomData[CustomDataKey] = lines;
-            edge.Fragments.Add(lines[0]);
+            edge.Fragments.AddOrReplace(new RFEMEdgeLines { Lines = lines.ToList() });
+            edge.Fragments.AddOrReplace(lines[0]);
         }
 
         internal static List<RFEMLine> Get(Edge edge)
         {
-            if (edge?.CustomData != null && edge.CustomData.TryGetValue(CustomDataKey, out object stored) && stored is IList<RFEMLine> list)
-                return list.ToList();
+            List<RFEMLine> stored = edge?.FindFragment<RFEMEdgeLines>()?.Lines;
+            if (stored != null && stored.Count > 0)
+                return stored.ToList();
 
             RFEMLine single = edge?.FindFragment<RFEMLine>();
             return single != null ? new List<RFEMLine> { single } : new List<RFEMLine>();
