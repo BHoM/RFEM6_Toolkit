@@ -20,6 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System.Collections.Generic;
+using System.Linq;
 
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
@@ -35,32 +36,72 @@ namespace BH.Adapter.RFEM6
 {
     public static partial class Convert
     {
-
         public static IMaterialFragment FromRFEM(this StructureCore.Material rfMaterial, List<IMaterialFragment> matLibrary)
         {
-            IMaterialFragment libraryMatch = MatchMaterialLibraryObject(rfMaterial.Name, matLibrary, out _);
-            IBHoMObject result;
+            string name = rfMaterial.Name.Split('|')[0].Trim();
+            IBHoMObject result = null;
 
-            if (libraryMatch == null)
+            if (!rfMaterial.UserDefined)
+                result = MatchMaterialLibraryObject(rfMaterial.Name, matLibrary, out _)?.DeepClone();
+
+            if (result == null)
+                result = rfMaterial.FromRFEMProperties(name);
+
+            if (result == null)
             {
                 result = ((rfMaterial.MaterialType == StructureCore.Material.Types.MaterialType.Timber || (rfMaterial.MaterialType == StructureCore.Material.Types.MaterialType.Glass)) ?
                     (new BH.oM.Structure.MaterialFragments.GenericIsotropicMaterial()) :
                         (IBHoMObject)new BH.oM.Structure.MaterialFragments.GenericOrthotropicMaterial());
 
-                result.Name = rfMaterial.Name.Split('|')[0];
+                result.Name = name;
                 BH.Engine.Base.Compute.RecordWarning($"It is likely that the RFEM6 material {result.Name} has not corresponding element in the BHoM data set. It will be set to {result} instead when reading it, as this is the best guess.");
             }
-            else
-            {
-                result = libraryMatch;
-            }
 
-            result = result.DeepClone();
             result.SetRFEM6ID(rfMaterial.No);
 
             return (IMaterialFragment)result;
         }
+
+        /***************************************************/
+
+        // Builds the material from the values RFEM holds for it, as used for user-defined materials.
+        private static IMaterialFragment FromRFEMProperties(this StructureCore.Material rfMaterial, string name)
+        {
+            if (!rfMaterial.MaterialModel.ToString().StartsWith("Isotropic"))
+                return null;
+
+            StructureCore.Material.Types.TemperatureRow values = rfMaterial.Temperature?.Rows.FirstOrDefault();
+            if (values == null || values.ElasticityModulusGlobal <= 0)
+                return null;
+
+            double youngsModulus = values.ElasticityModulusGlobal;
+            double poissonsRatio = values.PoissonRatioGlobal;
+            if (poissonsRatio <= 0 && values.ShearModulusGlobal > 0)
+                poissonsRatio = youngsModulus / (2 * values.ShearModulusGlobal) - 1;
+
+            double density = values.MassDensity;
+            double thermalExpansion = values.ThermalExpansionCoefficientGlobal;
+
+            switch (rfMaterial.MaterialType)
+            {
+                case StructureCore.Material.Types.MaterialType.Concrete:
+                case StructureCore.Material.Types.MaterialType.FiberConcrete:
+                    return BH.Engine.Structure.Create.Concrete(name, youngsModulus, poissonsRatio, thermalExpansion, density, 0, 0, BH.Engine.Adapters.RFEM6.Query.PsiStrengthFromName(name));
+                case StructureCore.Material.Types.MaterialType.Steel:
+                case StructureCore.Material.Types.MaterialType.Metal:
+                case StructureCore.Material.Types.MaterialType.ReinforcingSteel:
+                case StructureCore.Material.Types.MaterialType.PrestressingSteel:
+                    return BH.Engine.Structure.Create.Steel(name, youngsModulus, poissonsRatio, thermalExpansion, density, 0, values.YieldStrength, values.UltimateTensileStrengthX);
+                default:
+                    return new GenericIsotropicMaterial
+                    {
+                        Name = name,
+                        YoungsModulus = youngsModulus,
+                        PoissonsRatio = poissonsRatio,
+                        ThermalExpansionCoeff = thermalExpansion,
+                        Density = density,
+                    };
+            }
+        }
     }
 }
-
-

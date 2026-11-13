@@ -58,7 +58,8 @@ namespace BH.Adapter.RFEM6
             Dictionary<string, int> existingNodes = new Dictionary<string, int>();
             foreach (StructureCore.Node rfNode in GetObjectList(new StructureCore.Node()).Where(n => n.No > 0))
             {
-                string key = PositionKey(rfNode.Coordinate1, rfNode.Coordinate2, rfNode.Coordinate3);
+                oM.Geometry.Point position = rfNode.GlobalPosition();
+                string key = PositionKey(position.X, position.Y, position.Z);
                 if (!existingNodes.ContainsKey(key))
                     existingNodes[key] = rfNode.No;
             }

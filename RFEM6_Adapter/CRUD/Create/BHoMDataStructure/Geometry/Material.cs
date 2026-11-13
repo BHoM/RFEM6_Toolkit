@@ -56,6 +56,10 @@ namespace BH.Adapter.RFEM6
                     usedNumbers.Add(queuedMaterial.No);
             }
 
+            HashSet<string> libraryNames = new HashSet<string>(
+                BH.Engine.Library.Query.Library("Structure\\Materials").Select(m => m.Name).Where(n => n != null),
+                StringComparer.OrdinalIgnoreCase);
+
             foreach (IMaterialFragment bhMaterial in materialFragments)
             {
                 string materialName = bhMaterial.ToRFEM6MaterialName();
@@ -84,9 +88,18 @@ namespace BH.Adapter.RFEM6
 
                 // C# cantilever: Name only. Keep a local ID for sections in this push;
                 // only send No when RFEM cannot default the new material to 1.
-                StructureCore.Material rfMaterial = new StructureCore.Material { Name = materialName };
-                if (materialNo != 1)
-                    rfMaterial.No = materialNo;
+                int sentNo = materialNo == 1 ? 0 : materialNo;
+                StructureCore.Material rfMaterial;
+                if (bhMaterial.IsRFEM6CatalogueMaterial(libraryNames))
+                {
+                    rfMaterial = new StructureCore.Material { Name = materialName };
+                    if (sentNo > 0)
+                        rfMaterial.No = sentNo;
+                }
+                else
+                {
+                    rfMaterial = ((IIsotropic)bhMaterial).ToRFEM6UserDefined(sentNo);
+                }
 
                 CreateObject(rfMaterial);
             }

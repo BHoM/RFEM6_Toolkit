@@ -21,8 +21,10 @@
  */
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
+using BH.oM.Base.Attributes;
 using BH.oM.Structure.Constraints;
 using TypesForNodes = Dlubal.Api.Rfem.TypesForNodes;
 using TypesForLines = Dlubal.Api.Rfem.TypesForLines;
@@ -121,6 +123,9 @@ namespace BH.Adapter.RFEM6
             };
         }
 
+        [Description("Returns true when all translational and rotational DOFs of the constraint are Fixed.")]
+        [Input("constraint", "Constraint to inspect.")]
+        [Output("isFullyFixed", "True when every DOF maps to an infinite RFEM stiffness.")]
         public static bool IsFullyFixed(this Constraint6DOF constraint)
         {
             return constraint.ToRFEM6Stiffnesses().All(double.IsPositiveInfinity);
@@ -162,11 +167,18 @@ namespace BH.Adapter.RFEM6
             };
         }
 
+        [Description("Returns true when all line-release DOFs of the constraint are Fixed.")]
+        [Input("release", "Line release constraint to inspect.")]
+        [Output("isFullyFixed", "True when every DOF maps to an infinite RFEM stiffness.")]
         public static bool IsFullyFixedLineRelease(this Constraint4DOF release)
         {
             return release.ToRFEM6LineReleaseStiffnesses().All(double.IsPositiveInfinity);
         }
 
+        [Description("Compares two RFEM stiffness arrays, treating infinities as equal when both are infinite.")]
+        [Input("a", "First stiffness array.")]
+        [Input("b", "Second stiffness array.")]
+        [Output("match", "True when lengths match and corresponding values agree within tolerance.")]
         public static bool StiffnessesMatch(double[] a, double[] b)
         {
             if (a == null || b == null || a.Length != b.Length)

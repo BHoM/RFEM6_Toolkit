@@ -53,8 +53,6 @@ namespace BH.Adapter.RFEM6
     /// </summary>
     public partial class RFEM6Adapter
     {
-        public const string DefaultApiKeyName = "BHoM Test Key";
-
         /// <summary>
         /// When no file path is supplied, let RFEM resolve the active model itself.
         /// Passing an explicit model id here has caused internal gRPC errors in some setups.

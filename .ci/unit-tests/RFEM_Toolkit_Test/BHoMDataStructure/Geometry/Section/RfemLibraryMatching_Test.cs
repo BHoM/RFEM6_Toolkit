@@ -21,6 +21,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
@@ -90,6 +91,67 @@ namespace RFEM_Toolkit_Test.Elements
             Assert.IsTrue(libraryKey.IndexOf(BH.Engine.Adapters.RFEM6.Query.EuropeanSteelGradeToken("S460N")) >= 0);
         }
 
+        [TestCase("Concrete f'c = 6000 psi", "6000psiNW")]
+        [TestCase("Concrete f'c = 6000 psi | Isotropic | Linear Elastic", "6000psiNW")]
+        [TestCase("Concrete f'c = 4,000 psi", "4000psiNW")]
+        [TestCase("Lightweight Concrete f'c = 5000 psi", "5000psiLW")]
+        [TestCase("Concrete f'c = 3000 psi LW", "3000psiLW")]
+        [TestCase("C30/37", "")]
+        [TestCase("HSC", "")]
+        public void UsaConcreteLibraryName_DefaultsToNormalWeight(string rfemName, string expectedName)
+        {
+            Assert.AreEqual(expectedName, BH.Engine.Adapters.RFEM6.Query.UsaConcreteLibraryName(rfemName));
+        }
+
+        [Test]
+        public void UsaConcreteLibraryName_MatchesMaterialsUsaDataset()
+        {
+            string libraryName = BH.Engine.Adapters.RFEM6.Query.UsaConcreteLibraryName("Concrete f'c = 6000 psi");
+            IMaterialFragment match = BH.Engine.Library.Query.Library("Structure\\Materials")
+                .OfType<Concrete>()
+                .FirstOrDefault(material => material.Name == libraryName);
+
+            Assert.IsNotNull(match);
+        }
+
+        [TestCase("6000psiNW", "Concrete f'c = 6000 psi")]
+        [TestCase("6000psiLW", "")]
+        [TestCase("C30/37", "")]
+        public void RfemUsaConcreteName_RoundTripsNormalWeight(string bhomName, string expectedName)
+        {
+            Assert.AreEqual(expectedName, BH.Engine.Adapters.RFEM6.Query.RfemUsaConcreteName(bhomName));
+        }
+
+        [Test]
+        public void PsiStrengthFromName_ConvertsToPascals()
+        {
+            Assert.AreEqual(41368543.76, BH.Engine.Adapters.RFEM6.Query.PsiStrengthFromName("Concrete f'c = 6000 psi"), 1);
+            Assert.AreEqual(0, BH.Engine.Adapters.RFEM6.Query.PsiStrengthFromName("HSC"));
+        }
+
+        [Test]
+        public void UserDefinedConcrete_IsPushedWithItsProperties()
+        {
+            Concrete hsc = BH.Engine.Structure.Create.Concrete("HSC", 40305.1e6, 0.2, 1e-5, 2306.66, 0, 0, 0);
+            HashSet<string> libraryNames = new HashSet<string>(
+                BH.Engine.Library.Query.Library("Structure\\Materials").Select(m => m.Name).Where(n => n != null),
+                StringComparer.OrdinalIgnoreCase);
+
+            Assert.IsFalse(hsc.IsRFEM6CatalogueMaterial(libraryNames));
+
+            Dlubal.Api.Rfem.StructureCore.Material rfMaterial = hsc.ToRFEM6UserDefined(9);
+            Assert.IsTrue(rfMaterial.UserDefined);
+            Assert.AreEqual(Dlubal.Api.Rfem.StructureCore.Material.Types.MaterialType.Concrete, rfMaterial.MaterialType);
+            Assert.AreEqual(40305.1e6, rfMaterial.Temperature.Rows[0].ElasticityModulusGlobal, 1);
+            Assert.AreEqual(16793.8e6, rfMaterial.Temperature.Rows[0].ShearModulusGlobal, 1e5);
+
+            Concrete usaNormalWeight = BH.Engine.Library.Query.Library("Structure\\Materials").OfType<Concrete>().First(m => m.Name == "6000psiNW");
+            Concrete usaLightweight = BH.Engine.Library.Query.Library("Structure\\Materials").OfType<Concrete>().First(m => m.Name == "6000psiLW");
+            Assert.IsTrue(usaNormalWeight.IsRFEM6CatalogueMaterial(libraryNames));
+            Assert.AreEqual("Concrete f'c = 6000 psi", usaNormalWeight.ToRFEM6MaterialName());
+            Assert.IsFalse(usaLightweight.IsRFEM6CatalogueMaterial(libraryNames));
+        }
+
         [TestCase("R_M1 300/400", 0.3, 0.4, 0)]
         [TestCase("RM_1 500/250", 0.5, 0.25, 0)]
         [TestCase("CIRCLE_M1 200", 0, 0, 0.2)]
@@ -129,7 +191,7 @@ namespace RFEM_Toolkit_Test.Elements
         [Test]
         public void RfemISectionName_RoundTripMetres()
         {
-            string rfemName = BH.Engine.Adapters.RFEM6.Query.RfemISectionNameFromMetres(0.3, 0.2, 0.01, 0.014, 0.012, 0.008);
+            string rfemName = BH.Engine.Adapters.RFEM6.Compute.RfemISectionNameFromMetres(0.3, 0.2, 0.01, 0.014, 0.012, 0.008);
             Assert.AreEqual("I 300/200/10/14/12/8/H", rfemName);
 
             Assert.IsTrue(BH.Engine.Adapters.RFEM6.Query.TryParseRfemISectionName(
@@ -152,7 +214,7 @@ namespace RFEM_Toolkit_Test.Elements
         [Test]
         public void RfemRhsSectionName_RoundTripMetres()
         {
-            string rfemName = BH.Engine.Adapters.RFEM6.Query.RfemRhsSectionNameFromMetres(0.75, 0.5, 0.015, 0.015, 0.012);
+            string rfemName = BH.Engine.Adapters.RFEM6.Compute.RfemRhsSectionNameFromMetres(0.75, 0.5, 0.015, 0.015, 0.012);
             Assert.AreEqual("RHS 750/500/15/15/12/H", rfemName);
 
             Assert.IsTrue(BH.Engine.Adapters.RFEM6.Query.TryParseRfemRhsSectionName(

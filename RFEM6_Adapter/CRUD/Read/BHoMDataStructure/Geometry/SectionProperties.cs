@@ -48,13 +48,17 @@ namespace BH.Adapter.RFEM6
             List<IBHoMObject> sectionListLib = BH.Engine.Library.Query.Library("Structure\\SectionProperties").ToList();
             Dictionary<int, IMaterialFragment> materials = this.GetCachedOrReadAsDictionary<int, IMaterialFragment>();
             var allSections = GetObjectList(new StructureCore.CrossSection());
+            List<string> guessedMaterialSections = new List<string>();
 
             foreach (var section in allSections)
             {
                 ISectionProperty bhSection;
 
                 if (!materials.TryGetValue(section.Material, out IMaterialFragment sectionMaterialsForParametric))
-                    continue;
+                {
+                    sectionMaterialsForParametric = GuessSectionMaterial(section, materials.Values);
+                    guessedMaterialSections.Add(section.Name);
+                }
 
                 ISectionProperty parametricSection = Convert.TryCreateSectionFromParametricRfemName(section.Name, sectionMaterialsForParametric);
                 if (parametricSection != null)
@@ -80,8 +84,23 @@ namespace BH.Adapter.RFEM6
                 }
             }
 
+            if (guessedMaterialSections.Count > 0)
+                BH.Engine.Base.Compute.RecordWarning($"RFEM6 did not report the material of {guessedMaterialSections.Count} cross-section(s), which happens when the RFEM version does not match the Dlubal API version of the adapter (RFEM 6.15). Their material was guessed from the section type: {string.Join(", ", guessedMaterialSections.Distinct())}.");
+
             sectionList = sectionList.OrderBy(x => x.GetRFEM6ID()).ToList();
             return sectionList;
+        }
+
+        private static IMaterialFragment GuessSectionMaterial(StructureCore.CrossSection section, IEnumerable<IMaterialFragment> materials)
+        {
+            bool isSteelSection = section.Type == StructureCore.CrossSection.Types.Type.StandardizedSteel
+                || section.Type == StructureCore.CrossSection.Types.Type.ParametricThinWalled;
+
+            IMaterialFragment guess = isSteelSection
+                ? materials.FirstOrDefault(m => m is Steel)
+                : materials.FirstOrDefault(m => m is Concrete);
+
+            return guess ?? materials.FirstOrDefault();
         }
     }
 }

@@ -51,7 +51,7 @@ namespace BH.Engine.Adapters.RFEM6
         [Description("Returns an alphanumeric key used to match an RFEM cross-section name to BHoM steel library entries.")]
         [Input("rfemSectionName", "RFEM cross-section name, including optional catalogue suffix after '|'.")]
         [Output("lookupKey", "Compact name aligned with BHoM EU steel naming (for example HEB 800 becomes HE800B).")]
-        public static string RfemSectionLibraryLookupKey(string rfemSectionName)
+        public static string RfemSectionLibraryLookupKey(this string rfemSectionName)
         {
             if (string.IsNullOrWhiteSpace(rfemSectionName))
                 return string.Empty;

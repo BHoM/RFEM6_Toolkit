@@ -21,10 +21,12 @@
  */
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 using BH.oM.Adapter;
+using BH.oM.Base.Attributes;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Constraints;
 using BH.oM.Structure.MaterialFragments;
@@ -39,9 +41,13 @@ namespace BH.Adapter.RFEM6
     public static partial class Convert
     {
 
-        public static bool IsAnagramUsingSort(string first, string second)
+        [Description("Returns true when two strings contain the same characters ignoring order.")]
+        [Input("first", "First string to compare.")]
+        [Input("second", "Second string to compare.")]
+        [Output("isAnagram", "True when both strings are anagrams of each other.")]
+        internal static bool IsAnagramUsingSort(string first, string second)
         {
-            if (first.Length != second.Length)
+            if (first == null || second == null || first.Length != second.Length)
                 return false;
 
             char[] firstChars = first.ToCharArray();

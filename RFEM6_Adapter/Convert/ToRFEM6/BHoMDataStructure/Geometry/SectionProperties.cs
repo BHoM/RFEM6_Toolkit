@@ -164,7 +164,7 @@ namespace BH.Adapter.RFEM6
             {
                 if (profileObject is ISectionProfile iSection)
                 {
-                    return BH.Engine.Adapters.RFEM6.Query.RfemISectionNameFromMetres(
+                    return BH.Engine.Adapters.RFEM6.Compute.RfemISectionNameFromMetres(
                         iSection.Height,
                         iSection.Width,
                         iSection.WebThickness,
@@ -175,7 +175,7 @@ namespace BH.Adapter.RFEM6
 
                 if (profileObject is BoxProfile boxSection)
                 {
-                    return BH.Engine.Adapters.RFEM6.Query.RfemRhsSectionNameFromMetres(
+                    return BH.Engine.Adapters.RFEM6.Compute.RfemRhsSectionNameFromMetres(
                         boxSection.Height,
                         boxSection.Width,
                         boxSection.Thickness,

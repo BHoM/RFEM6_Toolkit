@@ -60,7 +60,8 @@ namespace BH.Adapter.RFEM6
 
         private static void ApplyMemberRotationFromBar(StructureCore.Member rfMember, Bar bar)
         {
-            double rotationAngleRadians = BH.Engine.Adapters.RFEM6.Query.RfemMemberRotationAngle(bar.OrientationAngle);
+            // BHoM OrientationAngle and RFEM member rotation_angle are both radians.
+            double rotationAngleRadians = bar.OrientationAngle;
             rfMember.RotationAngle = rotationAngleRadians;
 
             bool isRotated = Math.Abs(rotationAngleRadians) > 1e-9;

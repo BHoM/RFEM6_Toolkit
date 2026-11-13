@@ -48,10 +48,19 @@ namespace BH.Engine.Adapters.RFEM6
         [Input("rfemMaterialName", "RFEM material name.")]
         [Input("materials", "BHoM structure material library entries.")]
         [Output("material", "Matching library Steel material, or null when no grade match is found.")]
-        public static IBHoMObject MatchEuropeanSteelMaterial(string rfemMaterialName, IEnumerable<IBHoMObject> materials)
+        public static IBHoMObject MatchEuropeanSteelMaterial(this string rfemMaterialName, IEnumerable<IBHoMObject> materials)
         {
-            if (string.IsNullOrWhiteSpace(rfemMaterialName) || materials == null)
+            if (string.IsNullOrWhiteSpace(rfemMaterialName))
+            {
+                Base.Compute.RecordError("Cannot match a European steel material from a null or empty RFEM material name.");
                 return null;
+            }
+
+            if (materials == null)
+            {
+                Base.Compute.RecordError("Cannot match a European steel material against a null material library.");
+                return null;
+            }
 
             string rfemGradeToken = EuropeanSteelGradeToken(rfemMaterialName);
             if (string.IsNullOrEmpty(rfemGradeToken))
@@ -65,7 +74,10 @@ namespace BH.Engine.Adapters.RFEM6
                 .ToList();
 
             if (matches.Count == 0)
+            {
+                Base.Compute.RecordWarning($"No BHoM library steel material matched RFEM grade '{rfemGradeToken}' from '{rfemMaterialName}'.");
                 return null;
+            }
 
             if (matches.Count == 1)
                 return matches[0];

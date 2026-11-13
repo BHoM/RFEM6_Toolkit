@@ -20,9 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using System.ComponentModel;
 using System.Text.RegularExpressions;
-using BH.oM.Base.Attributes;
 
 namespace BH.Engine.Adapters.RFEM6
 {
@@ -37,13 +35,11 @@ namespace BH.Engine.Adapters.RFEM6
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         /***************************************************/
-        /**** Public Methods                            ****/
+        /**** Internal Methods                          ****/
         /***************************************************/
 
-        [Description("Parses an RFEM parametric I-section name into BHoM lengths in metres.")]
-        [Input("rfemSectionName", "RFEM cross-section name.")]
-        [Output("parsed", "True when the name matches the RFEM I-section pattern.")]
-        public static bool TryParseRfemISectionName(
+        // Adapter-only helper: out parameters are not UI-friendly, so this stays internal.
+        internal static bool TryParseRfemISectionName(
             string rfemSectionName,
             out double heightMetres,
             out double widthMetres,

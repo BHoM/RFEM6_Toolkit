@@ -35,7 +35,7 @@ namespace BH.Adapter.RFEM6
         /// <summary>
         /// Builds RFEM line geometry from the RFEM API line and model nodes (shared by pull read and line matching).
         /// </summary>
-        public static RFEMLine RFEMLineFromApiLine(StructureCore.Line rfLine, Dictionary<int, Node> nodes)
+        internal static RFEMLine FromRFEM(StructureCore.Line rfLine, Dictionary<int, Node> nodes)
         {
             if (rfLine == null || nodes == null)
                 return null;

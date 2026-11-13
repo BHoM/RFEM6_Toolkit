@@ -43,7 +43,7 @@ namespace BH.Engine.Adapters.RFEM6
         [Description("Extracts the European steel grade token from an RFEM material name (for example S460N).")]
         [Input("rfemMaterialName", "RFEM material name, including optional catalogue suffix after '|'.")]
         [Output("gradeToken", "Alphanumeric grade token, or empty when no European steel grade is recognised.")]
-        public static string EuropeanSteelGradeToken(string rfemMaterialName)
+        public static string EuropeanSteelGradeToken(this string rfemMaterialName)
         {
             string lookupKey = RfemMaterialLibraryLookupKey(rfemMaterialName);
             if (string.IsNullOrEmpty(lookupKey))

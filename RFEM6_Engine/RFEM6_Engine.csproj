@@ -30,6 +30,11 @@
 			<Private>false</Private>
 			<SpecificVersion>false</SpecificVersion>
 		</Reference>
+		<Reference Include="BHoM_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
+			<Private>false</Private>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
 		<Reference Include="Structure_oM">
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Structure_oM.dll</HintPath>
 			<Private>false</Private>
@@ -38,9 +43,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Compute\" />
+		<InternalsVisibleTo Include="RFEM6_Adapter" />
+		<InternalsVisibleTo Include="RFEM_Toolkit_Test" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Folder Include="Create\" />
 		<Folder Include="Modify\" />
 	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
+	</Target>
 
 </Project>

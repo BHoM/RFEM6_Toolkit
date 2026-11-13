@@ -13,7 +13,7 @@ Object-level mapping notes are on the [RFEM6 Toolkit wiki](https://github.com/BH
 ## Requirements
 
 - **RFEM 6** running locally (adapter connects to the active instance or opens/creates a model).
-- **API key** configured in RFEM (`config.ini`). The adapter default key name is `BHoM Test Key` (constructor `apiKeyName` parameter).
+- **API key** in `%LocalAppData%\Dlubal\api\config.ini`. Creating the adapter writes a template file there if missing; paste your key into the `default` entry (from Extranet > API & Cloud). Leave the constructor `apiKeyName` empty to use that default.
 - **BHoM** assemblies under `C:\ProgramData\BHoM\Assemblies` (standard BHoM install).
 - Client dependencies copied to `C:\ProgramData\BHoM\Assemblies\RFEM6_Client\` on build (see [Post-build deployment](#post-build-deployment) below).
 - Development target: **.NET Framework 4.8**, RFEM **6.15.x** (constructor description).
@@ -62,10 +62,13 @@ Unit tests under `.ci/unit-tests` still target the old Web Service workflow in p
 ## Usage sketch
 
 ```csharp
-var adapter = new RFEM6Adapter(filePath: "", active: true, apiKeyName: "BHoM Test Key");
+// Leave apiKeyName empty to use the "default" entry in config.ini
+var adapter = new RFEM6Adapter(filePath: "", active: true);
 adapter.Push(objects);
 var pulled = adapter.Pull(typeof(Node));
 ```
+
+On first construction the adapter creates `%LocalAppData%\Dlubal\api\config.ini` if it does not exist. Add your API key value to the `default` entry before connecting. Optionally pass `apiKeyName` to select a named entry instead.
 
 Call **`adapter.Wipeout()`** between integration tests (or use a dedicated RFEM model) to clear the active model.
 
@@ -73,12 +76,12 @@ Call **`adapter.Wipeout()`** between integration tests (or use a dedicated RFEM 
 
 ## Post-build deployment
 
-The adapter project defines a **PostBuild** target that runs after each successful build:
+The oM, Engine, and Adapter projects define **PostBuild** targets that run after each successful build:
 
-1. Copies `RFEM6_Adapter.dll` to `C:\ProgramData\BHoM\Assemblies\`
-2. Copies dependent DLLs from the build output to `C:\ProgramData\BHoM\Assemblies\RFEM6_Client\`
+1. Copies `RFEM6_oM.dll`, `RFEM6_Engine.dll`, and `RFEM6_Adapter.dll` to `C:\ProgramData\BHoM\Assemblies\`
+2. Copies dependent DLLs from the adapter build output to `C:\ProgramData\BHoM\Assemblies\RFEM6_Client\`
 
-This lets a local BHoM install (Rhino/Grasshopper, Excel, etc.) load the adapter and gRPC client without manual copying.
+This lets a local BHoM install (Rhino/Grasshopper, Excel, etc.) load the toolkit and gRPC client without manual copying.
 
 **Local builds:** If you do not want files copied to `ProgramData` (permissions, multiple toolkits, or side-by-side versions), build with:
 
@@ -96,8 +99,10 @@ and copy `Build\net48\` outputs yourself.
 
 ## Common issues
 
+- **Missing or empty API key** — Edit `%LocalAppData%\Dlubal\api\config.ini` and set `default = ak-...` (or pass a named `apiKeyName`).
 - **Demo licence / element limits** — API access depends on your RFEM licence; demo mode caps model size.
 - **RFEM not running** — Start RFEM before push/pull; the adapter checks for the `RFEM6` process.
+- **Stale Engine DLL** — Rebuild so PostBuild updates `RFEM6_Engine.dll` in ProgramData; otherwise Query types can fail to load.
 - **gRPC / assembly conflicts** — See post-build `RFEM6_Client` folder and error text from `Connect()`.
 
 ---

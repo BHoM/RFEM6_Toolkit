@@ -49,7 +49,7 @@ namespace BH.Adapter.RFEM6
             {
                 foreach (StructureCore.Line rfLine in allRfLInes)
                 {
-                    RFEMLine geometry = Convert.RFEMLineFromApiLine(rfLine, nodes);
+                    RFEMLine geometry = Convert.FromRFEM(rfLine, nodes);
                     if (geometry?.Curve == null)
                         continue;
 

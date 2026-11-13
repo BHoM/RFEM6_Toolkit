@@ -120,6 +120,19 @@ namespace BH.Adapter.RFEM6
             if (string.IsNullOrWhiteSpace(rfemMaterialName) || matLibrary == null || matLibrary.Count == 0)
                 return null;
 
+            string usaConcreteName = EngineQuery.UsaConcreteLibraryName(rfemMaterialName);
+            if (!string.IsNullOrEmpty(usaConcreteName))
+            {
+                IMaterialFragment usaConcrete = matLibrary.FirstOrDefault(material => material is Concrete
+                    && usaConcreteName.Equals(material.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (usaConcrete != null)
+                {
+                    bestScore = 100;
+                    return usaConcrete;
+                }
+            }
+
             IMaterialFragment europeanSteel = EngineQuery.MatchEuropeanSteelMaterial(rfemMaterialName, matLibrary.Cast<IBHoMObject>()) as IMaterialFragment;
             if (europeanSteel != null)
             {

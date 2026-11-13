@@ -161,7 +161,7 @@ namespace BH.Adapter.RFEM6
 
             Dictionary<int, Point> nodePositions = new Dictionary<int, Point>();
             foreach (StructureCore.Node node in GetObjectList(new StructureCore.Node()).Concat(m_createQueue.OfType<StructureCore.Node>()))
-                nodePositions[node.No] = new Point { X = node.Coordinate1, Y = node.Coordinate2, Z = node.Coordinate3 };
+                nodePositions[node.No] = node.GlobalPosition();
 
             bool Matches(int nodeNo, Point point) =>
                 nodePositions.TryGetValue(nodeNo, out Point position) && position.Distance(point) < tolerance;

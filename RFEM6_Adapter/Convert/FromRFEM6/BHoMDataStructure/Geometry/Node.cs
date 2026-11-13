@@ -38,8 +38,7 @@ namespace BH.Adapter.RFEM6
         public static Node FromRFEM(this StructureCore.Node node)
         {
 
-            Node bhNode = new Node { Position = new oM.Geometry.Point() { X = node.Coordinate1, Y = node.Coordinate2, Z = node.Coordinate3 } };
-            //Node bhNode = new Node { Position = new oM.Geometry.Point() { X = node.coordinate_1, Y = node.coordinate_2, Z = node.coordinate_3 } };
+            Node bhNode = new Node { Position = node.GlobalPosition() };
 
             bhNode.SetRFEM6ID(node.No);
 
@@ -49,6 +48,17 @@ namespace BH.Adapter.RFEM6
                 bhNode.Name = "Node Nr. " + node.No;
 
             return bhNode;
+        }
+
+        // Coordinate1-3 are in the node's own coordinate system (relative to a reference node, a user coordinate system,
+        // or a distance along a line/member). Nodes only queued in this push have no global coordinates yet and were
+        // created in global Cartesian coordinates.
+        public static oM.Geometry.Point GlobalPosition(this StructureCore.Node node)
+        {
+            if (node.GlobalCoordinates != null)
+                return new oM.Geometry.Point() { X = node.GlobalCoordinates.X, Y = node.GlobalCoordinates.Y, Z = node.GlobalCoordinates.Z };
+
+            return new oM.Geometry.Point() { X = node.Coordinate1, Y = node.Coordinate2, Z = node.Coordinate3 };
         }
 
     }

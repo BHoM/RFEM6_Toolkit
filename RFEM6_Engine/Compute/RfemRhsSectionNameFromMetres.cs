@@ -25,7 +25,7 @@ using BH.oM.Base.Attributes;
 
 namespace BH.Engine.Adapters.RFEM6
 {
-    public static partial class Query
+    public static partial class Compute
     {
         /***************************************************/
         /**** Public Methods                            ****/

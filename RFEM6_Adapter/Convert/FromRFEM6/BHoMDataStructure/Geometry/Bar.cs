@@ -48,7 +48,8 @@ namespace BH.Adapter.RFEM6
                 SectionProperty = section,
                 Name = !string.IsNullOrWhiteSpace(member.Comment) ? member.Comment : "member nr." + member.No,
                 FEAType = member.Type.FromRFEM(),
-                OrientationAngle = BH.Engine.Adapters.RFEM6.Query.OrientationAngleFromRfemMemberRotation(member.RotationAngle),
+                // BHoM OrientationAngle and RFEM member rotation_angle are both radians.
+                OrientationAngle = member.RotationAngle,
             };
 
             bar.SetRFEM6ID(member.No);

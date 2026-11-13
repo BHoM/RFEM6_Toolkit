@@ -125,14 +125,16 @@ namespace BH.Adapter.RFEM6
         [Description("Adapter for RFEM6 using the Dlubal API II (gRPC). Requires RFEM 6.15.x.")]
         [Input("filePath", "Optional file path to the RFEM6 model. If left empty, the adapter will connect to the currently running RFEM6 instance.")]
         [Input("active", "Set to true to activate the adapter and establish a connection to RFEM6.")]
-        [Input("apiKeyName", "Name of the API key stored in config.ini. Defaults to 'BHoM Test Key'.")]
+        [Input("apiKeyName", "Optional name of an API key entry in %LocalAppData%\\Dlubal\\api\\config.ini. Leave empty to use the config.ini 'default' entry.")]
         [Output("adapter", "The created RFEM6 adapter configured for the Dlubal API II.")]
         [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6Adapter(System.String, System.Boolean)")]
+        [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6Adapter(System.String, System.Boolean, System.String)")]
         [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6AdapterV12_11(System.String, System.Boolean)")]
         [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6AdapterV8_2(System.String, System.Boolean)")]
-        public RFEM6Adapter(string filePath = "", bool active = false, string apiKeyName = "BHoM Test Key")
+        public RFEM6Adapter(string filePath = "", bool active = false, string apiKeyName = "")
         {
-            m_apiKeyName = apiKeyName;
+            m_apiKeyName = apiKeyName ?? "";
+            EnsureDlubalApiConfigIni();
 
             if (active)
             {
@@ -173,7 +175,7 @@ namespace BH.Adapter.RFEM6
 
         private bool m_isActive = false;
         private string m_filepath = "";
-        private string m_apiKeyName = "BHoM Test Key";
+        private string m_apiKeyName = "";
         // Holds IMessage objects. Typed as object so loading RFEM6Adapter doesn't require Google.Protobuf
         // before ResolveClientAssembly is registered (BHoM reflects over the adapter at startup).
         private readonly List<object> m_createQueue = new List<object>();
@@ -250,7 +252,45 @@ namespace BH.Adapter.RFEM6
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private static ApplicationRfem CreateApplication(string apiKeyName)
         {
+            if (string.IsNullOrWhiteSpace(apiKeyName))
+                return new ApplicationRfem();
+
             return new ApplicationRfem(apiKeyName: apiKeyName);
+        }
+
+        /// <summary>
+        /// Creates %LocalAppData%\Dlubal\api\config.ini with an empty default key entry when missing.
+        /// Does not overwrite an existing file.
+        /// </summary>
+        private static void EnsureDlubalApiConfigIni()
+        {
+            try
+            {
+                string directory = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "Dlubal",
+                    "api");
+                string path = Path.Combine(directory, "config.ini");
+
+                if (File.Exists(path))
+                    return;
+
+                Directory.CreateDirectory(directory);
+                File.WriteAllText(path,
+                    "; Dlubal API keys for RFEM / BHoM RFEM6 adapter." + Environment.NewLine +
+                    "; Generate a key in Extranet > API & Cloud, then paste the value after 'default ='." + Environment.NewLine +
+                    "; Leave the adapter apiKeyName empty to use this default entry." + Environment.NewLine +
+                    "[api_keys]" + Environment.NewLine +
+                    "default =" + Environment.NewLine);
+
+                BH.Engine.Base.Compute.RecordNote(
+                    $"Created Dlubal API config at '{path}'. Add your API key value to the 'default' entry before connecting.");
+            }
+            catch (Exception ex)
+            {
+                BH.Engine.Base.Compute.RecordWarning(
+                    $"Could not create Dlubal API config.ini under LocalAppData: {ex.Message}");
+            }
         }
 
         private static string DescribeLoadedClientAssemblies()

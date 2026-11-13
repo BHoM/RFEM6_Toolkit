@@ -34,7 +34,7 @@ namespace BH.Engine.Adapters.RFEM6
         [Description("Returns an alphanumeric key used to match an RFEM material name to BHoM material library entries.")]
         [Input("rfemMaterialName", "RFEM material name, including optional catalogue suffix after '|'.")]
         [Output("lookupKey", "Compact name used for fuzzy library matching.")]
-        public static string RfemMaterialLibraryLookupKey(string rfemMaterialName)
+        public static string RfemMaterialLibraryLookupKey(this string rfemMaterialName)
         {
             if (string.IsNullOrWhiteSpace(rfemMaterialName))
                 return string.Empty;

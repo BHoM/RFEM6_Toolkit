@@ -109,7 +109,7 @@ namespace BH.Adapter.RFEM6
 
         private static RFEMLine RfemLineToComparisonGeometry(StructureCore.Line rfLine, Dictionary<int, Node> nodes)
         {
-            return Convert.RFEMLineFromApiLine(rfLine, nodes);
+            return Convert.FromRFEM(rfLine, nodes);
         }
 
         private static double LineGeometryDistance(RFEMLine a, RFEMLine b)
