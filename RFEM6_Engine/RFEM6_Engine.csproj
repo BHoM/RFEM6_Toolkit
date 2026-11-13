@@ -8,26 +8,12 @@
 		<Copyright>Copyright © https://github.com/BHoM</Copyright>
 		<RootNamespace>BH.Engine.Adapters.RFEM6</RootNamespace>
 		<FileVersion>10.0.0.0</FileVersion>
-		<Configurations>Debug;Release;Debug_V682;Release_V682;Debug_V12;Release_V12</Configurations>
+		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
 		<OutputPath>..\Build\</OutputPath>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_V12|AnyCPU'">
-	  <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-	  <OutputPath>..\Build\</OutputPath>
-	  <DebugSymbols>true</DebugSymbols>
-	  <DebugType>full</DebugType>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_V682|AnyCPU'">
-	  <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-	  <OutputPath>..\Build\</OutputPath>
-	  <DebugSymbols>true</DebugSymbols>
-	  <DebugType>full</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -44,6 +30,11 @@
 			<Private>false</Private>
 			<SpecificVersion>false</SpecificVersion>
 		</Reference>
+		<Reference Include="BHoM_Engine">
+			<HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
+			<Private>false</Private>
+			<SpecificVersion>false</SpecificVersion>
+		</Reference>
 		<Reference Include="Structure_oM">
 			<HintPath>$(ProgramData)\BHoM\Assemblies\Structure_oM.dll</HintPath>
 			<Private>false</Private>
@@ -52,10 +43,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Compute\" />
+		<InternalsVisibleTo Include="RFEM6_Adapter" />
+		<InternalsVisibleTo Include="RFEM_Toolkit_Test" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Folder Include="Create\" />
 		<Folder Include="Modify\" />
-		<Folder Include="Query\" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

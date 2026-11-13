@@ -40,6 +40,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace RFEM_Toolkit_Test.Comparer_Tests
 {
@@ -77,6 +78,12 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
 		//{
 
 		//}
+
+		[TearDown]
+		public void TearDown()
+		{
+			RFEM6TestCleanup.WipeModel(adapter);
+		}
 
 		[OneTimeSetUp]
 		public void InitializeRFEM6Adapter()
