@@ -128,7 +128,6 @@ namespace BH.Adapter.RFEM6
         [Input("apiKeyName", "Optional name of an API key entry in %LocalAppData%\\Dlubal\\api\\config.ini. Leave empty to use the config.ini 'default' entry.")]
         [Output("adapter", "The created RFEM6 adapter configured for the Dlubal API II.")]
         [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6Adapter(System.String, System.Boolean)")]
-        [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6Adapter(System.String, System.Boolean, System.String)")]
         [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6AdapterV12_11(System.String, System.Boolean)")]
         [PreviousVersion("10.0", "BH.Adapter.RFEM6.RFEM6AdapterV8_2(System.String, System.Boolean)")]
         public RFEM6Adapter(string filePath = "", bool active = false, string apiKeyName = "")
