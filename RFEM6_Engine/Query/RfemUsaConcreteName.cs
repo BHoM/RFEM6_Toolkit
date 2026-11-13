@@ -53,17 +53,6 @@ namespace BH.Engine.Adapters.RFEM6
         }
 
         /***************************************************/
-
-        [Description("Checks whether a BHoM material name is a MaterialsUSA lightweight concrete (for example 6000psiLW), which has no RFEM catalogue equivalent.")]
-        [Input("bhomMaterialName", "Name of the BHoM material.")]
-        [Output("isLightweight", "True when the name is a MaterialsUSA lightweight concrete.")]
-        public static bool IsUsaLightweightConcreteName(this string bhomMaterialName)
-        {
-            Match match = MatchUsaConcreteLibraryName(bhomMaterialName);
-            return match != null && match.Groups["weight"].Value.Equals("LW", System.StringComparison.OrdinalIgnoreCase);
-        }
-
-        /***************************************************/
         /**** Private Methods                           ****/
         /***************************************************/
 

@@ -21,7 +21,6 @@
  */
 
 using System.ComponentModel;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using BH.oM.Base.Attributes;
 
@@ -62,23 +61,6 @@ namespace BH.Engine.Adapters.RFEM6
 
             string weight = LightweightConcrete.IsMatch(stem.Replace(strength.Value, " ")) ? "LW" : "NW";
             return $"{strength.Groups["strength"].Value.Replace(",", "")}psi{weight}";
-        }
-
-        /***************************************************/
-
-        [Description("Returns the concrete strength stated in psi in a material name (for example \"Concrete f'c = 6000 psi\" or 6000psiNW), converted to Pascals.")]
-        [Input("materialName", "RFEM or BHoM material name.")]
-        [Output("strength", "Strength in Pascals, or 0 when the name has no strength in psi.")]
-        public static double PsiStrengthFromName(this string materialName)
-        {
-            if (string.IsNullOrWhiteSpace(materialName))
-                return 0;
-
-            Match strength = PsiStrength.Match(materialName);
-            if (!strength.Success || !double.TryParse(strength.Groups["strength"].Value.Replace(",", ""), NumberStyles.Integer, CultureInfo.InvariantCulture, out double psi))
-                return 0;
-
-            return psi * PsiToPascal;
         }
 
         /***************************************************/
