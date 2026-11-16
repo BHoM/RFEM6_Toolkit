@@ -38,6 +38,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace RFEM_Toolkit_Test.Comparer_Tests
 {
@@ -214,7 +215,6 @@ namespace RFEM_Toolkit_Test.Comparer_Tests
         }
 
         [OneTimeSetUp]
-
         [Description("Method Initializes all used components ones.")]
         public void Edge_Test_InitializeRFEM6Adapter()
         {
