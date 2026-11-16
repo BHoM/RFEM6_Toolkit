@@ -30,8 +30,11 @@ namespace BH.Engine.Adapters.RFEM6
         /**** Private Fields                            ****/
         /***************************************************/
 
+        // RFEM may store dimensions as integer or decimal millimetres (BHoM push rounds to integers).
+        private const string RfemMillimetreNumber = @"(?:\d+(?:\.\d+)?)";
+
         private static readonly Regex RfemISectionName = new Regex(
-            @"^I\s+(?<height>\d+)\s*/\s*(?<width>\d+)\s*/\s*(?<web>\d+)\s*/\s*(?<flange>\d+)\s*/\s*(?<root>\d+)\s*/\s*(?<toe>\d+)\s*/\s*(?<hotCold>[HC])\s*$",
+            @"^I\s+(?<height>" + RfemMillimetreNumber + @")\s*/\s*(?<width>" + RfemMillimetreNumber + @")\s*/\s*(?<web>" + RfemMillimetreNumber + @")\s*/\s*(?<flange>" + RfemMillimetreNumber + @")\s*/\s*(?<root>" + RfemMillimetreNumber + @")\s*/\s*(?<toe>" + RfemMillimetreNumber + @")\s*/\s*(?<hotCold>[HC])\s*$",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         /***************************************************/

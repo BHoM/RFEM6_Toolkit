@@ -31,7 +31,7 @@ namespace BH.Engine.Adapters.RFEM6
         /***************************************************/
 
         private static readonly Regex RfemRhsSectionName = new Regex(
-            @"^RHS\s+(?<height>\d+)\s*/\s*(?<width>\d+)\s*/\s*(?<thickness>\d+)\s*/\s*(?<outer>\d+)\s*/\s*(?<inner>\d+)\s*/\s*(?<hotCold>[HC])\s*$",
+            @"^RHS\s+(?<height>" + RfemMillimetreNumber + @")\s*/\s*(?<width>" + RfemMillimetreNumber + @")\s*/\s*(?<thickness>" + RfemMillimetreNumber + @")\s*/\s*(?<outer>" + RfemMillimetreNumber + @")\s*/\s*(?<inner>" + RfemMillimetreNumber + @")\s*/\s*(?<hotCold>[HC])\s*$",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         /***************************************************/

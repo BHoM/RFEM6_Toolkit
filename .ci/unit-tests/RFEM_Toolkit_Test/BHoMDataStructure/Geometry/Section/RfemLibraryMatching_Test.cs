@@ -212,6 +212,28 @@ namespace RFEM_Toolkit_Test.Elements
         }
 
         [Test]
+        public void RfemISectionName_ParseDecimalMillimetresFromRfem()
+        {
+            string rfemName = "I 351.4/171/7/9.7/10.2/0/H";
+
+            Assert.IsTrue(BH.Engine.Adapters.RFEM6.Query.TryParseRfemISectionName(
+                rfemName,
+                out double heightMetres,
+                out double widthMetres,
+                out double webMetres,
+                out double flangeMetres,
+                out double rootMetres,
+                out double toeMetres));
+
+            Assert.AreEqual(0.3514, heightMetres, 1e-9);
+            Assert.AreEqual(0.171, widthMetres, 1e-9);
+            Assert.AreEqual(0.007, webMetres, 1e-9);
+            Assert.AreEqual(0.0097, flangeMetres, 1e-9);
+            Assert.AreEqual(0.0102, rootMetres, 1e-9);
+            Assert.AreEqual(0, toeMetres, 1e-9);
+        }
+
+        [Test]
         public void RfemRhsSectionName_RoundTripMetres()
         {
             string rfemName = BH.Engine.Adapters.RFEM6.Compute.RfemRhsSectionNameFromMetres(0.75, 0.5, 0.015, 0.015, 0.012);

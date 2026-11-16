@@ -32,11 +32,11 @@ namespace BH.Engine.Adapters.RFEM6
         /***************************************************/
 
         private static readonly Regex ParametricRectangleName = new Regex(
-            @"^(?:R_M1|RM_1)\s*(?<breadth>\d+)\s*/\s*(?<height>\d+)\s*",
+            @"^(?:R_M1|RM_1)\s*(?<breadth>" + RfemMillimetreNumber + @")\s*/\s*(?<height>" + RfemMillimetreNumber + @")\s*",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         private static readonly Regex ParametricCircleName = new Regex(
-            @"^CIRCLE_M1\s*(?<diameter>\d+)\s*",
+            @"^CIRCLE_M1\s*(?<diameter>" + RfemMillimetreNumber + @")\s*",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         /***************************************************/
@@ -90,7 +90,10 @@ namespace BH.Engine.Adapters.RFEM6
         private static bool TryParseMillimetres(string millimetresText, out double lengthMetres)
         {
             lengthMetres = 0;
-            if (!int.TryParse(millimetresText, NumberStyles.Integer, CultureInfo.InvariantCulture, out int millimetres))
+            if (!double.TryParse(millimetresText, NumberStyles.Float, CultureInfo.InvariantCulture, out double millimetres))
+                return false;
+
+            if (millimetres < 0)
                 return false;
 
             lengthMetres = millimetres / 1000.0;
