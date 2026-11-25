@@ -19,6 +19,10 @@
  * You should have received a copy of the GNU Lesser General Public License     
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using BH.Adapter.RFEM6;
 using BH.Engine.Base;
 using BH.oM.Data.Requests;
@@ -28,7 +32,6 @@ using BH.oM.Structure.SectionProperties;
 using BH.oM.Geometry;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Loads;
-using Dlubal.WS.Rfem6.Model;
 using BH.Engine.Geometry;
 using System.Security.Permissions;
 using BH.oM.Base;
@@ -59,11 +62,11 @@ namespace RFEM_Toolkit_Test.Elements
 
         List<Loadcase> loadCaseList;
 
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //    adapter.Wipeout();
-        //}
+        [TearDown]
+        public void TearDown()
+        {
+            RFEM6TestCleanup.WipeModel(adapter);
+        }
 
         [SetUp]
         public void EveryTimeSetUp()

@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 using System;
 using System.Collections.Generic;
@@ -27,17 +27,10 @@ using System.Text;
 using BH.oM.Adapter;
 using BH.oM.Structure.Elements;
 using BH.oM.Structure.Loads;
-using rfModel = Dlubal.WS.Rfem6.Model;
 
 namespace BH.Adapter.RFEM6
 {
-#if RFEM6_8_2
-    public partial class RFEM6AdapterV8_2
-#elif RFEM6_12_11
-    public partial class RFEM6AdapterV12_11
-#else
     public partial class RFEM6Adapter
-#endif
     {
         /***************************************************/
         /**** Override push                             ****/
@@ -48,58 +41,31 @@ namespace BH.Adapter.RFEM6
             try
             {
                 this.Connect();
-                
-                TwoStagePushErrorMessageCheck(objects);
 
-                return base.Push(objects, tag, pushType, actionConfig);
+                if (m_Application == null)
+                    return new List<object>();
 
+                LoadModelSnapshot(objects.Where(o => o != null).Select(o => o.GetType()), forPull: false);
+
+                m_isBatchCreate = true;
+                List<object> result = base.Push(objects, tag, pushType, actionConfig);
+                FlushCreateQueue();
+                return result;
             }
             finally
             {
+                m_isBatchCreate = false;
+                m_createQueue.Clear();
+                ClearModelSnapshot();
                 this.Disconnect();
             }
 
         }
 
-
-        
         /***************************************************/
-        /**** Private Methods                           ****/
-        /***************************************************/
-
-        /// <summary>
-        /// Validates that the pushed objects do not contain both structural elements and their corresponding loads in the same push operation.
-        /// RFEM6 requires a two-stage push: first push structural elements (Bars, Panels), then push their associated loads (BarUDL, AreaUDL).
-        /// </summary>
-        /// <param name="obj">The collection of objects being pushed to RFEM6.</param>
-        private void TwoStagePushErrorMessageCheck(IEnumerable<object> obj)
-        {
-
-            bool hasBar = obj.Any(o => o is Bar);
-            bool hasBarLoad = obj.Any(o => o is BarUniformlyDistributedLoad);
-
-
-            if (hasBar && hasBarLoad)
-            {
-                BH.Engine.Base.Compute.RecordError("Pushed Set has both Bars and Loads. Please make sure that Bars and BarUDLs are pushed seperatly. First Push bars, next push BarUDL!");
-            }
-
-            bool hasPanel = obj.Any(o => o is Panel);
-            bool hasAreaLoad = obj.Any(o => o is AreaUniformlyDistributedLoad);
-
-            if (hasPanel && hasAreaLoad)
-            {
-                BH.Engine.Base.Compute.RecordError("Pushed Set has both Panels and AreaUniformlyDistributedLoad. Please make sure that Panels and AreaUniformlyDistributedLoad are pushed seperatly. First Push Panels, next push AreaUniformlyDistributedLoads!");
-            }
-
-        }
-
-
-
 
     }
 }
-
 
 
 
