@@ -74,6 +74,9 @@ namespace BH.Adapter.RFEM6
 
             AlterSectionName(bhSection);
 
+            if (bhSection.Material is BH.oM.Structure.MaterialFragments.Steel && IsStandardSteelSection(bhSection))
+                return CatalogueSteelSectionName(bhSection);
+
             string profileRfemName = RfemProfileSectionName(bhSection);
             if (!string.IsNullOrWhiteSpace(profileRfemName))
             {
@@ -97,6 +100,12 @@ namespace BH.Adapter.RFEM6
                 return name ?? string.Empty;
             }
 
+            return CatalogueSteelSectionName(bhSection);
+        }
+
+        private static string CatalogueSteelSectionName(ISectionProperty bhSection)
+        {
+            string name = bhSection.Name.Trim();
             string compactName = Regex.Replace(name, @"\s+", "");
             Match rolledSteel = CompactRolledSteelName.Match(compactName);
             if (rolledSteel.Success)

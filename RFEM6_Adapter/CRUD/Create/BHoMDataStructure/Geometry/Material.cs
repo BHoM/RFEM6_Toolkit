@@ -76,6 +76,8 @@ namespace BH.Adapter.RFEM6
                 if (existingMaterial != null)
                 {
                     bhMaterial.SetRFEM6ID(existingMaterial.No);
+                    if (bhMaterial is IIsotropic isotropic && isotropic.YoungsModulus > 0 && !MaterialPropertiesMatch(existingMaterial, isotropic))
+                        UpdateObjectList(new List<IMessage> { isotropic.ToRFEM6UserDefined(existingMaterial.No) });
                     continue;
                 }
 
@@ -125,6 +127,23 @@ namespace BH.Adapter.RFEM6
 
             // A material queued with No=1 omits the number, so fall back to the id assigned in this push.
             return material.GetRFEM6ID();
+        }
+
+        private static bool MaterialPropertiesMatch(StructureCore.Material rfMaterial, IIsotropic bhMaterial)
+        {
+            StructureCore.Material.Types.TemperatureRow values = rfMaterial.Temperature?.Rows.FirstOrDefault();
+            if (values == null)
+                return false;
+
+            return ValuesMatch(values.ElasticityModulusGlobal, bhMaterial.YoungsModulus)
+                && ValuesMatch(values.PoissonRatioGlobal, bhMaterial.PoissonsRatio)
+                && ValuesMatch(values.MassDensity, bhMaterial.Density)
+                && ValuesMatch(values.ThermalExpansionCoefficientGlobal, bhMaterial.ThermalExpansionCoeff);
+        }
+
+        private static bool ValuesMatch(double a, double b)
+        {
+            return Math.Abs(a - b) <= 1e-6 * Math.Max(Math.Abs(a), Math.Abs(b));
         }
 
         private static bool MaterialNamesMatch(string rfemMaterialName, string bhMaterialName)

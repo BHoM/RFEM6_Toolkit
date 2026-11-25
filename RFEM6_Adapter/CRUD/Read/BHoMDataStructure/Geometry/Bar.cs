@@ -64,14 +64,12 @@ namespace BH.Adapter.RFEM6
 
                 Bar bhBar = rfMember.FromRFEM(node0, node1, section);
 
-                if (rfMember.MemberHingeStart > 0 || rfMember.MemberHingeEnd > 0)
+                bhBar.Release = new BarRelease
                 {
-                    bhBar.Release = new BarRelease
-                    {
-                        StartRelease = HingeOrFixed(hinges, rfMember.MemberHingeStart),
-                        EndRelease = HingeOrFixed(hinges, rfMember.MemberHingeEnd),
-                    };
-                }
+                    Name = rfMember.MemberHingeStart > 0 || rfMember.MemberHingeEnd > 0 ? null : "FixFix",
+                    StartRelease = HingeOrFixed(hinges, rfMember.MemberHingeStart),
+                    EndRelease = HingeOrFixed(hinges, rfMember.MemberHingeEnd),
+                };
 
                 barList.Add(bhBar);
 
