@@ -21,7 +21,10 @@
  */
 using System.Linq;
 
+using BH.Engine.Spatial;
+using BH.oM.Geometry;
 using BH.oM.Structure.Elements;
+using Dlubal.Api.Common;
 using StructureCore = Dlubal.Api.Rfem.StructureCore;
 
 namespace BH.Adapter.RFEM6
@@ -37,6 +40,19 @@ namespace BH.Adapter.RFEM6
                 Geometry = StructureCore.Surface.Types.Geometry.Plane,
                 Thickness = bhPanel.Property.GetRFEM6ID(),
             };
+
+            // RFEM's default grid origin is the first boundary point. On a corner of the surface that leaves zero grid points on one side,
+            // which RFEM rejects. The centroid lies strictly inside the surface's convex hull, so every grid direction gets points on both sides.
+            Point centroid = bhPanel.Centroid();
+            if (centroid != null)
+            {
+                rfSurface.GridOrigin = new Vector3d { X = centroid.X, Y = centroid.Y, Z = centroid.Z };
+                rfSurface.GridOriginX = centroid.X;
+                rfSurface.GridOriginY = centroid.Y;
+                rfSurface.GridOriginZ = centroid.Z;
+            }
+
+
             foreach (int lineNo in bhPanel.ExternalEdges.SelectMany(e => RFEM6EdgeLines.BoundaryLineNumbers(e)).Distinct())
                 rfSurface.BoundaryLines.Add(lineNo);
 

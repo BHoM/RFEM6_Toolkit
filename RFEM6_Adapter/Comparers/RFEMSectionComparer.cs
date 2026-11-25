@@ -53,14 +53,9 @@ namespace BH.Adapter.RFEM6
             //Check whether any of the compared objects is null.
             if (Object.ReferenceEquals(section1, null) || Object.ReferenceEquals(section2, null))
                 return false;
-            if (!(section1 is GenericSection || section2 is GenericSection))
-            {
-                Convert.AlterSectionName(section1);
-                Convert.AlterSectionName(section2);
-            }
-
-            bool sectionNameDoesMatch = String.Equals(section1.Name, section2.Name);
-            bool materialDoesMatch = String.Equals(section1.Material.Name, section2.Material.Name);
+            // Sections without a Name are told apart by the RFEM name built from their profile dimensions (e.g. R_M1 500/500).
+            bool sectionNameDoesMatch = String.Equals(section1.ToRFEM6SectionName(), section2.ToRFEM6SectionName());
+            bool materialDoesMatch = String.Equals(section1.Material?.Name, section2.Material?.Name);
 
             return sectionNameDoesMatch && materialDoesMatch;
 
